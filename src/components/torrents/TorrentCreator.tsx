@@ -87,8 +87,8 @@ export function TorrentCreator() {
           <Field label={t('File or folder to share')} htmlFor="creator-source">
             <div className="flex gap-2">
               <Input id="creator-source" value={form.sourcePath} onChange={(e) => set('sourcePath', e.target.value)} className="h-9" />
-              <Button type="button" size="icon" variant="outline" className="h-9 w-9 flex-shrink-0" aria-label={t('Browse for the file or folder')} title={t('Browse')} onClick={() => setPicking('source')}>
-                <FolderOpen className="h-4 w-4" />
+              <Button type="button" size="icon" variant="outline" className="size-9 shrink-0" aria-label={t('Browse for the file or folder')} title={t('Browse')} onClick={() => setPicking('source')}>
+                <FolderOpen className="size-4" />
               </Button>
             </div>
           </Field>
@@ -139,14 +139,14 @@ export function TorrentCreator() {
           <Field label={t('Also save the .torrent on qBittorrent\'s machine at (optional)')} htmlFor="creator-output">
             <div className="flex gap-2">
               <Input id="creator-output" placeholder={t('/path/to/name.torrent')} value={form.torrentFilePath} onChange={(e) => set('torrentFilePath', e.target.value)} className="h-9" />
-              <Button type="button" size="icon" variant="outline" className="h-9 w-9 flex-shrink-0" aria-label={t('Browse for where to save the .torrent')} title={t('Browse')} onClick={() => setPicking('output')}>
-                <FolderOpen className="h-4 w-4" />
+              <Button type="button" size="icon" variant="outline" className="size-9 shrink-0" aria-label={t('Browse for where to save the .torrent')} title={t('Browse')} onClick={() => setPicking('output')}>
+                <FolderOpen className="size-4" />
               </Button>
             </div>
           </Field>
 
           <Button type="submit" className="w-full" disabled={creating}>
-            {creating && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+            {creating && <Loader2 className="me-2 size-4 animate-spin" />}
             {t('Create torrent')}
           </Button>
         </form>
@@ -166,14 +166,14 @@ export function TorrentCreator() {
                     </p>
                   </div>
                   {task.status === 'Finished' && (
-                    <Button size="icon" variant="ghost" className="h-8 w-8" asChild>
+                    <Button size="icon" variant="ghost" className="size-8" asChild>
                       <a href={getCreatedTorrentUrl(task.taskID)} download={`${nameOf(task.sourcePath)}.torrent`} aria-label={t('Download the .torrent for {nameOf}', { nameOf: nameOf(task.sourcePath) })} title={t('Download .torrent')}>
-                        <Download className="h-4 w-4" />
+                        <Download className="size-4" />
                       </a>
                     </Button>
                   )}
-                  <Button size="icon" variant="ghost" className="h-8 w-8" aria-label={t('Remove {nameOf} from this list', { nameOf: nameOf(task.sourcePath) })} title={t('Remove from list')} onClick={() => remove(task.taskID)}>
-                    <Trash2 className="h-4 w-4" />
+                  <Button size="icon" variant="ghost" className="size-8" aria-label={t('Remove {nameOf} from this list', { nameOf: nameOf(task.sourcePath) })} title={t('Remove from list')} onClick={() => remove(task.taskID)}>
+                    <Trash2 className="size-4" />
                   </Button>
                 </li>
               ))}

@@ -20,7 +20,7 @@ export function PeerFlag({ code, country }: { code?: string; country?: string })
   if (!flag) return null
   // Its own layer: without one, iPhone Safari paints the text beside a flag in the flag's colors.
   return (
-    <span role="img" aria-label={country || code?.toUpperCase()} title={country || code?.toUpperCase()} className="inline-block w-5 flex-shrink-0 text-center text-base leading-none [transform:translateZ(0)]" style={{ fontFamily: FLAG_FONT_FAMILY }}>
+    <span role="img" aria-label={country || code?.toUpperCase()} title={country || code?.toUpperCase()} className="inline-block w-5 shrink-0 text-center text-base leading-none transform-gpu" style={{ fontFamily: FLAG_FONT_FAMILY }}>
       {flag}
     </span>
   )

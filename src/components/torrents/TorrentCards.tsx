@@ -67,7 +67,7 @@ export function TorrentCards({ torrents, selected, showCheckboxes, onToggle, ope
             aria-selected={isSelected}
             aria-current={openHash === torrent.hash ? 'true' : undefined}
             className={cn(
-              'flex cursor-default items-start gap-2 rounded-xl border bg-card px-2.5 py-2.5 shadow-sm transition-[transform,border-color] outline-none select-none focus-visible:ring-2 focus-visible:ring-ring [-webkit-touch-callout:none] active:scale-[0.99]',
+              'flex cursor-default items-start gap-2 rounded-xl border bg-card px-2.5 py-2.5 shadow-sm transition-[transform,border-color] outline-hidden select-none focus-visible:ring-2 focus-visible:ring-ring [-webkit-touch-callout:none] active:scale-[0.99]',
               isSelected && 'border-primary ring-1 ring-primary',
               openHash === torrent.hash && 'bg-primary/10 shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]',
               openHash === torrent.hash && !isSelected && 'border-primary/50',
@@ -88,7 +88,7 @@ export function TorrentCards({ torrents, selected, showCheckboxes, onToggle, ope
                 <span className={cn('min-w-[6.6em] shrink-0', getStateColor(torrent.state, torrent.completion_on))} title={torrent.error || undefined}>{getStateLabel(torrent.state, torrent.completion_on)}</span>
                 <span className="text-muted-foreground tabular-nums">{Math.round(torrent.progress * 100)}%</span>
               </div>
-              <p className="text-sm font-medium [overflow-wrap:anywhere]">{torrent.name}</p>
+              <p className="text-sm font-medium wrap-anywhere">{torrent.name}</p>
               {/* One line of facts, each with an icon. Hovering or a screen reader gives the words. */}
               {/* Packed from the start with one even gap, 12px where there's room and down to 4px on
                   narrow phones, so the five facts (about 20rem) stay on one line. Every fact sits in a

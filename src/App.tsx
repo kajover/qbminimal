@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState, type ComponentType } from 'react'
+import { lazy, startTransition, useEffect, useState, ViewTransition, type ComponentType } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 import { Layout } from '@/components/Layout'
@@ -39,13 +39,18 @@ function Screens() {
   if (status === 'checking') return <p className="grid min-h-dvh place-items-center text-sm text-muted-foreground">{t('Connecting...')}</p>
   if (status === 'signedOut') return <LoginForm />
 
+  // Switching pages is a transition, so the new page cross-fades in (index.css turns that off for
+  // reduced motion), and a page that still has to load keeps the old one up until it's ready.
+  const navigate = (next: PageId) => startTransition(() => setPage(next))
   const View = PAGE_VIEWS[page]
   return (
-    <Layout page={page} onNavigate={setPage}>
+    <Layout page={page} onNavigate={navigate}>
       {/* The key resets a page's error state when switching away from it. */}
-      <PageBoundary key={page}>
-        <View />
-      </PageBoundary>
+      <ViewTransition key={page}>
+        <PageBoundary>
+          <View />
+        </PageBoundary>
+      </ViewTransition>
     </Layout>
   )
 }

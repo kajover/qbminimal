@@ -35,6 +35,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [queryClient])
 
   const value = useMemo(() => ({ status, signIn, signOut }), [status, signIn, signOut])
-  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
+  return <SessionContext value={value}>{children}</SessionContext>
 }
 

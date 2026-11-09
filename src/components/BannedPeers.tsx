@@ -20,7 +20,7 @@ export function BannedPeers() {
             type="button"
             size="sm"
             variant="outline"
-            className="flex-shrink-0"
+            className="shrink-0"
             aria-label={t('Unban {ip}', { ip })}
             disabled={unban.isPending}
             onClick={() => unban.mutate(ip, { onSuccess: () => { toast.success(t('Peer unbanned')) } })}

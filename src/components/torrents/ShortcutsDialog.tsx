@@ -46,7 +46,7 @@ export function ShortcutsDialog({ open, onOpenChange }: { open: boolean; onOpenC
             <dl className="space-y-1 text-sm">
               {group.keys.map(([keys, what]) => (
                 <div key={what + keys.join()} className="flex items-center justify-between gap-4">
-                  <dt className="flex flex-shrink-0 gap-1">
+                  <dt className="flex shrink-0 gap-1">
                     {keys.map(key => <kbd key={key} className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs">{key}</kbd>)}
                   </dt>
                   <dd className="text-end text-muted-foreground">{what}</dd>

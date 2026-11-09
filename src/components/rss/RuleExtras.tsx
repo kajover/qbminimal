@@ -86,11 +86,11 @@ export function RuleExtras({ name, existing }: { name: string; existing: string[
   const [open, setOpen] = useState<'matches' | 'rename' | null>(null)
   return (
     <>
-      <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t('Show matches for {name}', { name })} title={t('Show matching articles')} onClick={() => setOpen('matches')}>
-        <Eye className="h-4 w-4" />
+      <Button variant="ghost" size="icon" className="size-8" aria-label={t('Show matches for {name}', { name })} title={t('Show matching articles')} onClick={() => setOpen('matches')}>
+        <Eye className="size-4" />
       </Button>
-      <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t('Rename {name}', { name })} title={t('Rename')} onClick={() => setOpen('rename')}>
-        <TextCursorInput className="h-4 w-4" />
+      <Button variant="ghost" size="icon" className="size-8" aria-label={t('Rename {name}', { name })} title={t('Rename')} onClick={() => setOpen('rename')}>
+        <TextCursorInput className="size-4" />
       </Button>
       {open === 'matches' && <MatchesDialog name={name} onClose={() => setOpen(null)} />}
       {open === 'rename' && <RenameDialog name={name} existing={existing} onClose={() => setOpen(null)} />}

@@ -48,7 +48,7 @@ export function SpeedChart() {
       <figcaption className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
         {SERIES.map(series => (
           <span key={series.key} className="flex items-center gap-1.5">
-            <span className={`h-2 w-2 rounded-full ${series.dot}`} aria-hidden />
+            <span className={`size-2 rounded-full ${series.dot}`} aria-hidden />
             <span className="text-muted-foreground">{series.label}</span>
             <span className="tabular-nums">{speed(latest[series.key])}</span>
           </span>
@@ -87,7 +87,7 @@ export function SpeedChart() {
               <p className="text-muted-foreground">{ago(latest.time - point.time)}</p>
               {SERIES.map(series => (
                 <p key={series.key} className="flex items-center gap-1.5 whitespace-nowrap">
-                  <span className={`h-1.5 w-1.5 rounded-full ${series.dot}`} aria-hidden />
+                  <span className={`size-1.5 rounded-full ${series.dot}`} aria-hidden />
                   {series.label} {speed(point[series.key])}
                 </p>
               ))}

@@ -54,7 +54,7 @@ export function BrowserSettings() {
         <CardDescription>{t('Remembered on this device only')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Row icon={<Bell className="h-4 w-4" />} title={t('Finished downloads')} description={notificationsSupported()
+        <Row icon={<Bell className="size-4" />} title={t('Finished downloads')} description={notificationsSupported()
             ? needsHomeScreen()
               ? t('Get a notification when a torrent finishes downloading. On iPhone and iPad this only works while the app is open: iOS pauses it soon after you switch to another app.')
               : t('Get a notification when a torrent finishes downloading, as long as this page is open in a tab. The browser asks for permission first.')
@@ -64,7 +64,7 @@ export function BrowserSettings() {
           <Switch aria-label={t('Finished downloads')} checked={notices} onCheckedChange={() => void toggleNotices()} />
         </Row>
         <Row
-          icon={<Magnet className="h-4 w-4" />}
+          icon={<Magnet className="size-4" />}
           title={t('Magnet links')}
           description={canHandleMagnets()
             ? t('Magnet links you click on other websites open here, on the Add page.')

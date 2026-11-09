@@ -25,7 +25,7 @@ const limit = (bytes: number | undefined) => (bytes === undefined ? '-' : bytes 
 function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
     <div className="flex min-w-0 items-center gap-2 rounded-md bg-muted/60 px-3 py-2">
-      <span className="flex-shrink-0 text-muted-foreground">{icon}</span>
+      <span className="shrink-0 text-muted-foreground">{icon}</span>
       <div className="min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className="truncate text-sm tabular-nums" title={value}>{value}</p>
@@ -55,7 +55,7 @@ function SessionPauseButton({ paused }: { paused: boolean }) {
 
   return (
     <Button type="button" size="sm" variant={paused ? 'default' : 'outline'} disabled={pending} onClick={toggle} className="w-full gap-2">
-      {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+      {paused ? <Play className="size-4" /> : <Pause className="size-4" />}
       {paused ? t('Resume all transfers') : t('Pause all transfers')}
     </Button>
   )
@@ -120,7 +120,7 @@ export function TorrentStats({ children }: { children: ReactNode }) {
           <>
             <div className={cn('space-y-2.5 rounded-md border px-3 py-2.5', !connection && 'text-muted-foreground')}>
               <div className="flex items-center gap-3">
-                <span className={cn('h-2.5 w-2.5 flex-shrink-0 rounded-full', sessionPaused ? 'bg-muted-foreground' : connection?.dot ?? 'bg-muted-foreground')} aria-hidden />
+                <span className={cn('size-2.5 shrink-0 rounded-full', sessionPaused ? 'bg-muted-foreground' : connection?.dot ?? 'bg-muted-foreground')} aria-hidden />
                 <div className="min-w-0">
                   <p className={cn('text-sm font-medium', !sessionPaused && connection?.text)}>
                     {connection?.label ?? t('Connection status unknown')}{sessionPaused && t(', all transfers paused')}
@@ -137,11 +137,11 @@ export function TorrentStats({ children }: { children: ReactNode }) {
             </section>
 
             <div className="grid grid-cols-2 gap-2">
-              <Fact icon={<HardDrive className="h-4 w-4" />} label={t('Free space')} value={size(state.free_space_on_disk)} />
-              <Fact icon={<Network className="h-4 w-4" />} label={t('DHT nodes')} value={count(state.dht_nodes)} />
+              <Fact icon={<HardDrive className="size-4" />} label={t('Free space')} value={size(state.free_space_on_disk)} />
+              <Fact icon={<Network className="size-4" />} label={t('DHT nodes')} value={count(state.dht_nodes)} />
               {externalAddress && (
                 <div className="col-span-2">
-                  <Fact icon={<Globe className="h-4 w-4" />} label={t('External address')} value={externalAddress} />
+                  <Fact icon={<Globe className="size-4" />} label={t('External address')} value={externalAddress} />
                 </div>
               )}
             </div>

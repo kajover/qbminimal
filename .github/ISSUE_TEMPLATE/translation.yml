@@ -1,0 +1,32 @@
+name: Translation fix
+description: Report a wrong, unclear or missing translation
+title: "Translation: "
+labels: [translation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping with translations. You can also fix the text yourself: open your language's file in `src/i18n/locales`, click the pencil, and propose the change. See [CONTRIBUTING.md](https://github.com/kajover/qbminimal/blob/main/CONTRIBUTING.md#translations).
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      placeholder: German, Português (Brasil), 日本語 …
+    validations:
+      required: true
+  - type: textarea
+    id: lines
+    attributes:
+      label: What should change
+      description: For each text, the English original if you know it, what the app shows now, and what it should say. A screenshot helps.
+      placeholder: |
+        English: Add torrents
+        Shows: …
+        Should be: …
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Where you saw it, or why the new wording is better.

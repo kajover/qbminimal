@@ -23,18 +23,18 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
   return (
     <>
       {/* Only where there's a mouse, which usually means a keyboard too. */}
-      <Button variant="ghost" size="icon" className="hidden h-8 w-8 pointer-fine:inline-flex" aria-label={t('Keyboard shortcuts')} title={t('Keyboard shortcuts (?)')} onClick={onShowShortcuts}>
-        <Keyboard className="h-4 w-4" />
+      <Button variant="ghost" size="icon" className="hidden size-8 pointer-fine:inline-flex" aria-label={t('Keyboard shortcuts')} title={t('Keyboard shortcuts (?)')} onClick={onShowShortcuts}>
+        <Keyboard className="size-4" />
       </Button>
-      <Button variant={filtersOpen || list.filtered ? 'secondary' : 'outline'} size="icon" className="h-8 w-8" aria-label={t('Search and filter')} title={t('Search and filter')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
-        <Search className="h-4 w-4" />
+      <Button variant={filtersOpen || list.filtered ? 'secondary' : 'outline'} size="icon" className="size-8" aria-label={t('Search and filter')} title={t('Search and filter')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
+        <Search className="size-4" />
       </Button>
 
       {list.showTable ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="h-8 w-8" aria-label={t('Columns')} title={t('Choose columns')}>
-              <Columns3 className="h-4 w-4" />
+            <Button variant="outline" size="icon" className="size-8" aria-label={t('Columns')} title={t('Choose columns')}>
+              <Columns3 className="size-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="max-h-[70vh] w-56 overflow-y-auto">
@@ -53,7 +53,7 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2">
-              <ArrowUpDown className="h-4 w-4" />
+              <ArrowUpDown className="size-4" />
               {t('Sort: {column}', { column: getColumn(list.sort.field).label })} {arrow}
             </Button>
           </DropdownMenuTrigger>
@@ -68,11 +68,11 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
       )}
 
       <div className="flex rounded-md border" role="group" aria-label={t('View')}>
-        <Button variant={list.showTable ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8 rounded-e-none" aria-label={t('Table view')} title={t('Table view')} aria-pressed={list.showTable} onClick={() => list.showAsTable(true)}>
-          <Table2 className="h-4 w-4" />
+        <Button variant={list.showTable ? 'secondary' : 'ghost'} size="icon" className="size-8 rounded-e-none" aria-label={t('Table view')} title={t('Table view')} aria-pressed={list.showTable} onClick={() => list.showAsTable(true)}>
+          <Table2 className="size-4" />
         </Button>
-        <Button variant={list.showTable ? 'ghost' : 'secondary'} size="icon" className="h-8 w-8 rounded-s-none" aria-label={t('Card view')} title={t('Card view')} aria-pressed={!list.showTable} onClick={() => list.showAsTable(false)}>
-          <LayoutList className="h-4 w-4" />
+        <Button variant={list.showTable ? 'ghost' : 'secondary'} size="icon" className="size-8 rounded-s-none" aria-label={t('Card view')} title={t('Card view')} aria-pressed={!list.showTable} onClick={() => list.showAsTable(false)}>
+          <LayoutList className="size-4" />
         </Button>
       </div>
     </>

@@ -61,7 +61,7 @@ function PeerFacts({ peer }: { peer: TorrentPeer }) {
       type="button"
       aria-expanded={flagsShown}
       onClick={() => setFlagsShown(shown => !shown)}
-      className="rounded-sm underline decoration-dotted underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+      className="rounded-sm underline decoration-dotted underline-offset-2 outline-hidden hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
     >
       {flags}
     </button>
@@ -129,8 +129,8 @@ function PeerRow({ id, peer, children }: { id: string; peer: TorrentPeer; childr
           </>
         )}
       </div>
-      <Button variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" aria-expanded={expanded} aria-label={label} title={label} onClick={() => setExpanded(!expanded)}>
-        <ChevronDown className={cn('h-4 w-4 transition-transform', expanded && 'rotate-180')} />
+      <Button variant="ghost" size="icon" className="size-7 shrink-0" aria-expanded={expanded} aria-label={label} title={label} onClick={() => setExpanded(!expanded)}>
+        <ChevronDown className={cn('size-4 transition-transform', expanded && 'rotate-180')} />
       </Button>
       {children}
     </li>
@@ -194,8 +194,8 @@ export function PeersTab({ hash }: { hash: string }) {
           <NativeSelect aria-label={sortLabel} className="h-8 flex-1" value={sortField} onChange={(e) => setSortField(e.target.value as SortField)}>
             {sortFields.map(([field, label]) => <option key={field} value={field}>{label()}</option>)}
           </NativeSelect>
-          <Button type="button" variant="outline" size="icon" className="h-8 w-8 flex-shrink-0" aria-label={sortLabel} title={sortLabel} onClick={() => setDescending(d => !d)}>
-            {descending ? <ArrowDown className="h-4 w-4" /> : <ArrowUp className="h-4 w-4" />}
+          <Button type="button" variant="outline" size="icon" className="size-8 shrink-0" aria-label={sortLabel} title={sortLabel} onClick={() => setDescending(d => !d)}>
+            {descending ? <ArrowDown className="size-4" /> : <ArrowUp className="size-4" />}
           </Button>
         </div>
         <ul className="divide-y text-sm">
@@ -209,7 +209,7 @@ export function PeersTab({ hash }: { hash: string }) {
                 disabled={action.isPending}
                 onConfirm={() => ban(id)}
               >
-                <Ban className="h-3.5 w-3.5" />
+                <Ban className="size-3.5" />
               </ConfirmAction>
             </PeerRow>
           ))}

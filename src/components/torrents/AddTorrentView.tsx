@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type DragEvent, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useEffectEvent, useRef, useState, type DragEvent, type FormEvent, type ReactNode } from 'react'
 import { ChevronDown, ChevronRight, Loader2, Upload, X } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
@@ -180,14 +180,20 @@ export function AddTorrentView() {
   }
 
   // Looks up the file list on its own once the single source stops changing.
-  const fetchRef = useRef(fetchFileList)
-  useEffect(() => { fetchRef.current = fetchFileList })
-  useEffect(() => {
-    fetchRun.current++
+  // An Effect Event, so the timer below always runs the latest fetchFileList without restarting.
+  const fetchLatest = useEffectEvent(() => { void fetchFileList() })
+  // A new source clears the last lookup's state while rendering, before the effect starts the next.
+  const lookupKey = `${metadataSupported}|${sourceKey}`
+  const [lookupFor, setLookupFor] = useState(lookupKey)
+  if (lookupFor !== lookupKey) {
+    setLookupFor(lookupKey)
     setFetchingMetadata(false)
     setMetadataError(null)
+  }
+  useEffect(() => {
+    fetchRun.current++
     if (!metadataSupported || !sourceKey) return
-    const timer = setTimeout(() => { void fetchRef.current() }, METADATA_DEBOUNCE_MS)
+    const timer = setTimeout(fetchLatest, METADATA_DEBOUNCE_MS)
     return () => clearTimeout(timer)
   }, [sourceKey, metadataSupported])
 
@@ -264,7 +270,7 @@ export function AddTorrentView() {
             >
               <div className="flex flex-wrap items-center gap-2">
                 <Button type="button" size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                  <Upload className="me-2 h-4 w-4" />
+                  <Upload className="me-2 size-4" />
                   {t('Choose .torrent files')}
                 </Button>
                 <span className="text-xs text-muted-foreground">{t('or drop them here')}</span>
@@ -275,8 +281,8 @@ export function AddTorrentView() {
                   {files.map(file => (
                     <li key={`${file.name}-${file.size}`} className="flex items-center gap-2">
                       <span className="min-w-0 flex-1 truncate" title={file.name}>{file.name}</span>
-                      <Button type="button" variant="ghost" size="icon" className="h-6 w-6" aria-label={t('Remove {name}', { name: file.name })} onClick={() => setFiles(prev => prev.filter(f => f !== file))}>
-                        <X className="h-3 w-3" />
+                      <Button type="button" variant="ghost" size="icon" className="size-6" aria-label={t('Remove {name}', { name: file.name })} onClick={() => setFiles(prev => prev.filter(f => f !== file))}>
+                        <X className="size-3" />
                       </Button>
                     </li>
                   ))}
@@ -290,7 +296,7 @@ export function AddTorrentView() {
                   <div className="flex flex-wrap items-center gap-2" aria-live="polite">
                     {fetchingMetadata ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className="size-4 animate-spin" />
                         <span>{t('Getting file list...')}</span>
                         <Button type="button" size="sm" variant="ghost" onClick={stopFetching}>{t('Cancel')}</Button>
                         {!(singleSource instanceof File) && <span className="w-full text-xs text-muted-foreground">{t('A magnet link needs peers to share the file list.')}</span>}
@@ -312,7 +318,7 @@ export function AddTorrentView() {
             )}
 
             <Button type="button" variant="ghost" size="sm" className="-ms-3" aria-expanded={showOptions} onClick={() => setShowOptions(!showOptions)}>
-              {showOptions ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4 rtl:rotate-180" />}
+              {showOptions ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4 rtl:rotate-180" />}
               {t('More options')}
             </Button>
 
@@ -418,7 +424,7 @@ export function AddTorrentView() {
             )}
 
             <Button type="submit" className="w-full" disabled={adding}>
-              {adding && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+              {adding && <Loader2 className="me-2 size-4 animate-spin" />}
               {sourceCount > 1 ? t('Add {sourceCount} torrents', { sourceCount }) : t('Add torrent')}
             </Button>
           </form>
@@ -426,7 +432,7 @@ export function AddTorrentView() {
       </Card>
 
       <Button type="button" variant="ghost" size="sm" className="-ms-3" aria-expanded={showCreator} onClick={() => setShowCreator(!showCreator)}>
-        {showCreator ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4 rtl:rotate-180" />}
+        {showCreator ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4 rtl:rotate-180" />}
         {t('Create a torrent')}
       </Button>
       {showCreator && <TorrentCreator />}

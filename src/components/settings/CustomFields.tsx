@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { ConfirmAction } from '@/components/ConfirmAction'
@@ -31,8 +31,8 @@ export function ScanDirsEditor({ value, onChange, disabled }: { value: unknown; 
         <div key={i} className="space-y-1 rounded-md border p-2">
           <div className="flex gap-2">
             <Input aria-label={t('Watched folder')} placeholder={t('Folder to watch')} value={path} disabled={disabled} onChange={(e) => update(rows.map((row, j) => (j === i ? [e.target.value, row[1]] : row)))} className="h-8 text-sm" />
-            <Button type="button" size="icon" variant="ghost" className="h-8 w-8 flex-shrink-0" aria-label={t('Remove watched folder')} disabled={disabled} onClick={() => update(rows.filter((_, j) => j !== i))}>
-              <Trash2 className="h-4 w-4" />
+            <Button type="button" size="icon" variant="ghost" className="size-8 shrink-0" aria-label={t('Remove watched folder')} disabled={disabled} onClick={() => update(rows.filter((_, j) => j !== i))}>
+              <Trash2 className="size-4" />
             </Button>
           </div>
           <select
@@ -52,7 +52,7 @@ export function ScanDirsEditor({ value, onChange, disabled }: { value: unknown; 
         </div>
       ))}
       <Button type="button" size="sm" variant="outline" disabled={disabled} onClick={() => update([...rows, ['', 0]])}>
-        <Plus className="me-1 h-4 w-4" />{' '}{t('Add folder')}
+        <Plus className="me-1 size-4" />{' '}{t('Add folder')}
       </Button>
     </div>
   )
@@ -178,12 +178,10 @@ const emptyCookie = (): Cookie => ({ name: '', domain: '', path: '/', value: '',
 // Saved straight away with its own button, since qBittorrent keeps cookies apart from the other settings.
 export function CookiesEditor() {
   const { data, refetch, isLoading } = useQuery({ queryKey: ['app', 'cookies'], queryFn: () => qbitClient.getCookies() })
-  const [rows, setRows] = useState<Cookie[] | null>(null)
+  // Edits start from what qBittorrent has, until the first change makes them our own.
+  const [edited, setRows] = useState<Cookie[] | null>(null)
   const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    if (data && rows === null) setRows(data)
-  }, [data, rows])
+  const rows = edited ?? data ?? null
 
   if (isLoading || !rows) return <p className="text-xs text-muted-foreground">{t('Loading cookies...')}</p>
 
@@ -225,7 +223,7 @@ export function CookiesEditor() {
       ))}
       <div className="flex gap-2">
         <Button type="button" size="sm" variant="outline" onClick={() => setRows([...rows, emptyCookie()])}>
-          <Plus className="me-1 h-4 w-4" />{' '}{t('Add cookie')}
+          <Plus className="me-1 size-4" />{' '}{t('Add cookie')}
         </Button>
         <Button type="button" size="sm" disabled={saving} onClick={save}>{t('Save cookies')}</Button>
       </div>

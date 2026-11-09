@@ -71,8 +71,8 @@ function TrackerRow({ hash, tracker }: { hash: string; tracker: TorrentTracker }
           {t('Seeds {seeds} · Peers {peers}', { seeds: Math.max(tracker.num_seeds ?? 0, 0), peers: Math.max(tracker.num_leeches ?? 0, 0) })}{tracker.msg ? ` · ${tracker.msg}` : ''}
         </p>
       </div>
-      <Button type="button" variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" aria-label={t('Edit {url}', { url: tracker.url })} title={t('Edit tracker')} onClick={startEditing}>
-        <Pencil className="h-3.5 w-3.5" />
+      <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0" aria-label={t('Edit {url}', { url: tracker.url })} title={t('Edit tracker')} onClick={startEditing}>
+        <Pencil className="size-3.5" />
       </Button>
       <ConfirmAction
         label={t('Remove {url}', { url: tracker.url })}
@@ -82,7 +82,7 @@ function TrackerRow({ hash, tracker }: { hash: string; tracker: TorrentTracker }
         disabled={action.isPending}
         onConfirm={remove}
       >
-        <Trash2 className="h-3.5 w-3.5" />
+        <Trash2 className="size-3.5" />
       </ConfirmAction>
     </li>
   )

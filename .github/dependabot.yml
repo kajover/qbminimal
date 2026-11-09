@@ -1,0 +1,25 @@
+# Checks every week for newer versions and opens pull requests, so the app always builds with the
+# newest packages and GitHub Actions. Small updates come grouped in one pull request; each major
+# version gets its own, since those can need code changes. CI runs on every one before it's merged.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # The linter (typescript-eslint) supports TypeScript up to 6.0. Type checking uses
+      # TypeScript 7 through the typescript-native alias, which Dependabot keeps current.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']

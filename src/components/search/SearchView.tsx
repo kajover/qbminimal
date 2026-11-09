@@ -65,10 +65,10 @@ export function SearchView() {
             <div className="flex gap-2">
               <Input type="search" aria-label={t('Search for')} placeholder={t('Search for...')} value={pattern} onChange={(e) => setPattern(e.target.value)} required />
               <Button type="submit" disabled={search.running} aria-label={t('Search')} title={t('Search')}>
-                {search.running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                {search.running ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
               </Button>
               {search.running && (
-                <Button type="button" variant="ghost" size="icon" aria-label={t('Stop search')} title={t('Stop search')} onClick={() => void search.cancel()}><X className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="icon" aria-label={t('Stop search')} title={t('Stop search')} onClick={() => void search.cancel()}><X className="size-4" /></Button>
               )}
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -99,14 +99,14 @@ export function SearchView() {
           </DialogHeader>
           {adding && (
             <div className="space-y-1 text-sm">
-              <p className="font-medium [overflow-wrap:anywhere]">{adding.fileName}</p>
+              <p className="font-medium wrap-anywhere">{adding.fileName}</p>
               <p className="text-muted-foreground">{formatBytes(adding.fileSize)} · {t('{seeds} seeds · {leeches} leeches', { seeds: adding.nbSeeders, leeches: adding.nbLeechers })}</p>
             </div>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setAdding(null)}>{t('Cancel')}</Button>
             <Button disabled={addBusy} onClick={() => adding && void add(adding)} className="gap-2">
-              {addBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {addBusy ? <Loader2 className="size-4 animate-spin" /> : null}
               {t('Add')}
             </Button>
           </DialogFooter>

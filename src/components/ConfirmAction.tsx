@@ -28,7 +28,7 @@ export function ConfirmAction({ label, title, message, confirmLabel, disabled, o
           {buttonLabel}
         </Button>
       ) : (
-        <Button type="button" variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" aria-label={label} title={label} disabled={disabled} onClick={() => setOpen(true)}>
+        <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0" aria-label={label} title={label} disabled={disabled} onClick={() => setOpen(true)}>
           {children}
         </Button>
       )}

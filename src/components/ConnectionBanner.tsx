@@ -20,7 +20,7 @@ export function ConnectionBanner() {
 
   return (
     <div role="status" className="flex items-center justify-center gap-2 border-t bg-amber-500/15 px-4 py-1.5 text-center text-xs text-amber-800 dark:text-amber-200">
-      {online ? <Loader2 className="h-3.5 w-3.5 flex-shrink-0 animate-spin" aria-hidden /> : <WifiOff className="h-3.5 w-3.5 flex-shrink-0" aria-hidden />}
+      {online ? <Loader2 className="size-3.5 shrink-0 animate-spin" aria-hidden /> : <WifiOff className="size-3.5 shrink-0" aria-hidden />}
       {online
         ? t('Can\'t reach qBittorrent. Trying again, and what you see may be out of date.')
         : t('You\'re offline. The list updates again when you\'re back online.')}

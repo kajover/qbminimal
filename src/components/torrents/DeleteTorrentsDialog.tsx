@@ -51,7 +51,7 @@ export function DeleteTorrentsDialog({ torrents, open, onOpenChange, onConfirm }
           </DialogDescription>
         </DialogHeader>
         <ul className="max-h-40 space-y-1 overflow-y-auto text-sm">
-          {torrents.map(torrent => <li key={torrent.hash} className="[overflow-wrap:anywhere]">{torrent.name}</li>)}
+          {torrents.map(torrent => <li key={torrent.hash} className="wrap-anywhere">{torrent.name}</li>)}
         </ul>
         <div className="flex items-center gap-1">
           <Checkbox id="delete-files" checked={withFiles} onCheckedChange={(checked) => changeFiles(checked === true)} />
@@ -60,13 +60,13 @@ export function DeleteTorrentsDialog({ torrents, open, onOpenChange, onConfirm }
             type="button"
             variant="ghost"
             size="icon"
-            className={locked ? 'h-8 w-8 text-foreground' : 'h-8 w-8 text-muted-foreground'}
+            className={locked ? 'size-8 text-foreground' : 'size-8 text-muted-foreground'}
             aria-pressed={locked}
             aria-label={locked ? t('Stop remembering this choice') : t('Remember this choice')}
             title={locked ? t('Remembered for next time. Click to stop remembering.') : t('Remember this choice for next time')}
             onClick={toggleLock}
           >
-            {locked ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
+            {locked ? <Lock className="size-4" /> : <LockOpen className="size-4" />}
           </Button>
         </div>
         <DialogFooter>

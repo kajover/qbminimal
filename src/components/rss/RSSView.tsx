@@ -52,9 +52,9 @@ export function RSSView() {
             <CardHeader className="flex items-center justify-between gap-1">
               <CardTitle>{t('Feeds')}</CardTitle>
               <div className="flex gap-1">
-                <Button size="sm" variant="outline" aria-label={t('Refresh all feeds')} title={t('Refresh all feeds')} disabled={feeds.length === 0} onClick={() => refresh('', t('Refreshing all feeds'))}><RefreshCw className="h-4 w-4" /></Button>
-                <Button size="sm" variant="outline" aria-label={t('New folder')} title={t('New folder')} onClick={() => setPrompt({ kind: 'addFolder' })}><FolderPlus className="h-4 w-4" /></Button>
-                <Button size="sm" variant="outline" aria-label={t('Add feed')} title={t('Add feed')} onClick={() => setPrompt({ kind: 'addFeed' })}><Plus className="h-4 w-4" /></Button>
+                <Button size="sm" variant="outline" aria-label={t('Refresh all feeds')} title={t('Refresh all feeds')} disabled={feeds.length === 0} onClick={() => refresh('', t('Refreshing all feeds'))}><RefreshCw className="size-4" /></Button>
+                <Button size="sm" variant="outline" aria-label={t('New folder')} title={t('New folder')} onClick={() => setPrompt({ kind: 'addFolder' })}><FolderPlus className="size-4" /></Button>
+                <Button size="sm" variant="outline" aria-label={t('Add feed')} title={t('Add feed')} onClick={() => setPrompt({ kind: 'addFeed' })}><Plus className="size-4" /></Button>
               </div>
             </CardHeader>
             <CardContent>

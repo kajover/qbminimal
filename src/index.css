@@ -92,7 +92,6 @@
   a[href^='maps:'] {
     color: inherit !important;
     text-decoration: none !important;
-    -webkit-text-decoration: none !important;
     pointer-events: none;
   }
 
@@ -345,13 +344,12 @@
      of a pixel, which smears the pixel font. */
   line-height: 0.625;
   position: relative;
-  top: -0.0775em;
   top: round(-0.0775em, 1px);
 }
 
 /* On/off switches. Safari 17.4 and newer draw their own iOS switch in the system's color; main.tsx
    marks the page .native-switch there. Other browsers get the same shape from these rules, filled
-   with the system's accent color where the browser shares it, or else the familiar switch green. */
+   with the system's accent color. */
 .switch {
   flex-shrink: 0;
   cursor: pointer;
@@ -383,7 +381,6 @@
   transition: translate 0.2s;
 }
 :root:not(.native-switch) .switch:checked {
-  background: oklch(0.723 0.219 149.579);
   background: AccentColor;
 }
 :root:not(.native-switch) .switch:checked::before {
@@ -405,7 +402,6 @@
 .glass,
 .glass-bar {
   background-color: color-mix(in oklab, var(--background) 78%, transparent);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
   backdrop-filter: blur(20px) saturate(1.8);
 }
 .dark .glass,
@@ -439,7 +435,6 @@
   .dark .glass,
   .dark .glass-bar {
     background-color: var(--background);
-    -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 }
@@ -471,4 +466,17 @@
 /* Downloading pieces: diagonal stripes, so they differ from done pieces without colour. */
 .piece-stripes {
   background-image: repeating-linear-gradient(45deg, var(--color-amber-500) 0 2px, var(--color-amber-700, #b45309) 2px 4px);
+}
+
+/* Pages cross-fade when switching (App.tsx), briefly, and not at all for people who ask for less
+   motion. */
+::view-transition-group(*) {
+  animation-duration: 0.15s;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

@@ -19,7 +19,7 @@ export function MoreMenu({ torrents, groups }: { torrents: Torrent[]; groups: Me
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="gap-1" title={t('More actions')}>
-          <MoreHorizontal className="h-4 w-4" />
+          <MoreHorizontal className="size-4" />
           <span className="max-sm:sr-only">{t('More')}</span>
         </Button>
       </DropdownMenuTrigger>

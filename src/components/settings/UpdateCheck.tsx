@@ -43,7 +43,7 @@ export function UpdateCheck() {
                 ) : newer ? (
                   <a href={link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-primary underline underline-offset-2">
                     {t('Version {version} is available', { version: latest })}
-                    <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+                    <ExternalLink className="size-3.5" aria-hidden />
                   </a>
                 ) : (
                   <span className="text-green-600 dark:text-green-500">{t('Up to date')}</span>

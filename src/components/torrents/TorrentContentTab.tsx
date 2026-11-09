@@ -16,9 +16,9 @@ import { t } from '@/i18n'
 const INDENT = 16
 
 function WantedIcon({ state }: { state: 'all' | 'some' | 'none' }) {
-  if (state === 'all') return <SquareCheck className="h-4 w-4 flex-shrink-0 text-green-500" />
-  if (state === 'some') return <SquareMinus className="h-4 w-4 flex-shrink-0 text-green-500" />
-  return <Square className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+  if (state === 'all') return <SquareCheck className="size-4 shrink-0 text-green-500" />
+  if (state === 'some') return <SquareMinus className="size-4 shrink-0 text-green-500" />
+  return <Square className="size-4 shrink-0 text-muted-foreground" />
 }
 
 // Finished files can be saved straight from qBittorrent 5.3. Otherwise the button explains why not.
@@ -28,14 +28,14 @@ function DownloadLink({ hash, file, canServe }: { hash: string; file: TorrentFil
     // A disabled button ignores the pointer, so the wrapper carries the tooltip.
     return (
       <span className="inline-flex cursor-not-allowed" title={reason} onClick={(e) => e.stopPropagation()}>
-        <Button variant="ghost" size="icon" className="h-6 w-6" disabled aria-label={t('Download {name}: {reason}', { name: file.name, reason })}><Download className="h-3 w-3" /></Button>
+        <Button variant="ghost" size="icon" className="size-6" disabled aria-label={t('Download {name}: {reason}', { name: file.name, reason })}><Download className="size-3" /></Button>
       </span>
     )
   }
   return (
-    <Button variant="ghost" size="icon" className="h-6 w-6" asChild>
+    <Button variant="ghost" size="icon" className="size-6" asChild>
       <a href={getFileDownloadUrl(hash, file.index)} download={file.name.split('/').pop()} target="_blank" rel="noopener" title={t('Download')} aria-label={t('Download {name}', { name: file.name })} onClick={(e) => e.stopPropagation()}>
-        <Download className="h-3 w-3" />
+        <Download className="size-3" />
       </a>
     </Button>
   )
@@ -92,8 +92,8 @@ export function TorrentContentTab({ hash }: { hash: string }) {
   })
 
   const renameButton = (node: FileTreeNode) => (
-    <Button type="button" variant="ghost" size="icon" className="h-6 w-6" aria-label={t('Rename {name}', { name: node.name })} title={t('Rename')} onClick={(e) => { e.stopPropagation(); setRenaming(node.path) }}>
-      <Pencil className="h-3 w-3" />
+    <Button type="button" variant="ghost" size="icon" className="size-6" aria-label={t('Rename {name}', { name: node.name })} title={t('Rename')} onClick={(e) => { e.stopPropagation(); setRenaming(node.path) }}>
+      <Pencil className="size-3" />
     </Button>
   )
 
@@ -107,7 +107,7 @@ export function TorrentContentTab({ hash }: { hash: string }) {
       return (
         <div key={node.path} className={row} style={pad} onClick={() => want([file.index], file.priority === 0)}>
           <WantedIcon state={file.priority > 0 ? 'all' : 'none'} />
-          <File className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+          <File className="size-4 shrink-0 text-muted-foreground" />
           <span className="min-w-0 flex-1 truncate text-sm" title={node.name}>{node.name}</span>
           <span className="text-xs text-muted-foreground tabular-nums">{file.progress > 0 && file.progress < 1 ? `${Math.floor(file.progress * 100)}% · ` : ''}{formatBytes(file.size)}</span>
           {renameButton(node)}
@@ -122,7 +122,7 @@ export function TorrentContentTab({ hash }: { hash: string }) {
         <div className={cn(row, 'font-medium')} style={pad} onClick={() => want(node.indexes, node.wanted !== 'all')}>
           <WantedIcon state={node.wanted} />
           <button type="button" className="rounded p-0.5 hover:bg-muted" aria-label={open ? t('Collapse {name}', { name: node.name }) : t('Expand {name}', { name: node.name })} aria-expanded={open} onClick={(e) => { e.stopPropagation(); toggleOpen(node.path) }}>
-            <ChevronRight className={cn('h-3.5 w-3.5 transition-transform', open ? 'rotate-90' : 'rtl:rotate-180')} />
+            <ChevronRight className={cn('size-3.5 transition-transform', open ? 'rotate-90' : 'rtl:rotate-180')} />
           </button>
           <span className="min-w-0 flex-1 truncate text-sm" title={node.name}>{node.name}</span>
           <span className="text-xs font-normal text-muted-foreground tabular-nums">{formatBytes(node.size)}</span>

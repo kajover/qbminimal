@@ -125,15 +125,15 @@ export function TorrentDetailsPanel({ torrent, onClose }: DetailsProps) {
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
           onKeyDown={onEdgeKey}
-          className="group flex h-3 flex-shrink-0 cursor-row-resize touch-none items-center justify-center outline-none"
+          className="group flex h-3 shrink-0 cursor-row-resize touch-none items-center justify-center outline-hidden"
         >
           <span className="h-1 w-10 rounded-full bg-border group-hover:bg-primary/60 group-focus-visible:bg-primary" />
         </div>
         <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 pb-3">
           <div className="flex items-center justify-between gap-2">
             <h2 className="truncate text-sm font-medium" title={torrent.name}>{torrent.name}</h2>
-            <Button variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" aria-label={t('Close details')} title={t('Close (Esc)')} onClick={onClose}>
-              <X className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="size-7 shrink-0" aria-label={t('Close details')} title={t('Close (Esc)')} onClick={onClose}>
+              <X className="size-4" />
             </Button>
           </div>
           <DetailsTabs torrent={torrent} listClassName="w-full max-w-xl" />
@@ -189,7 +189,7 @@ export function TorrentDetailsDialog({ torrent, onClose }: DetailsProps) {
           aria-describedby={undefined}
           data-keeps-swipes
           className={cn(
-            'fixed z-50 flex flex-col overflow-hidden border bg-card shadow-2xl outline-none data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom',
+            'fixed z-50 flex flex-col overflow-hidden border bg-card shadow-2xl outline-hidden data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom',
             large
               ? 'inset-x-0 bottom-0 h-[calc(100dvh-env(safe-area-inset-top)-0.5rem)] rounded-t-[1.75rem] border-b-0 pb-[env(safe-area-inset-bottom)]'
               : 'inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] h-[62dvh] rounded-[2rem]',
@@ -205,7 +205,7 @@ export function TorrentDetailsDialog({ torrent, onClose }: DetailsProps) {
             onPointerMove={moveDrag}
             onPointerUp={endDrag}
             onPointerCancel={() => { drag.current = null; setOffset(null) }}
-            className="flex h-6 w-full flex-shrink-0 cursor-grab touch-none items-center justify-center outline-none active:cursor-grabbing focus-visible:[&>span]:bg-primary"
+            className="flex h-6 w-full shrink-0 cursor-grab touch-none items-center justify-center outline-hidden active:cursor-grabbing focus-visible:[&>span]:bg-primary"
           >
             <span className="h-1.5 w-10 rounded-full bg-muted-foreground/40" />
           </button>
@@ -213,8 +213,8 @@ export function TorrentDetailsDialog({ torrent, onClose }: DetailsProps) {
             <div className="flex items-center justify-between gap-2">
               <DialogPrimitive.Title className="truncate text-base font-semibold" title={torrent.name}>{torrent.name}</DialogPrimitive.Title>
               <DialogPrimitive.Close asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0 rounded-full bg-muted" aria-label={t('Close details')}>
-                  <X className="h-4 w-4" />
+                <Button variant="ghost" size="icon" className="size-8 shrink-0 rounded-full bg-muted" aria-label={t('Close details')}>
+                  <X className="size-4" />
                 </Button>
               </DialogPrimitive.Close>
             </div>

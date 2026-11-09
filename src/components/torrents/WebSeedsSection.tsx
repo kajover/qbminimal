@@ -46,8 +46,8 @@ function WebSeedRow({ hash, url }: { hash: string; url: string }) {
   return (
     <li className="flex items-start gap-1 px-2 py-2">
       <p className="min-w-0 flex-1 break-all">{url}</p>
-      <Button type="button" variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" aria-label={t('Edit {url}', { url })} title={t('Edit web seed')} onClick={() => { setValue(url); setEditing(true) }}>
-        <Pencil className="h-3.5 w-3.5" />
+      <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0" aria-label={t('Edit {url}', { url })} title={t('Edit web seed')} onClick={() => { setValue(url); setEditing(true) }}>
+        <Pencil className="size-3.5" />
       </Button>
       <ConfirmAction
         label={t('Remove {url}', { url })}
@@ -58,7 +58,7 @@ function WebSeedRow({ hash, url }: { hash: string; url: string }) {
         onConfirm={() => action.mutateAsync({ work: () => qbitClient.removeWebSeeds(hash, [url]), failed: t('Failed to remove web seed') })
           .then(() => { toast.success(t('Web seed removed')) }, () => undefined)}
       >
-        <Trash2 className="h-3.5 w-3.5" />
+        <Trash2 className="size-3.5" />
       </ConfirmAction>
     </li>
   )

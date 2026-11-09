@@ -134,7 +134,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
 
   const navButtons = PAGES.map(({ id, label, icon: Icon }) => (
     <Button key={id} variant={page === id ? 'secondary' : 'ghost'} className="justify-start gap-2 overflow-hidden text-base" title={label} aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
-      <Icon className="h-5 w-5" />
+      <Icon className="size-5" />
       <span className="truncate">{label}</span>
     </Button>
   ))
@@ -166,7 +166,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
       <div>
         <div className="flex">
           {/* Above the torrent details panel (z-30), so the edge handle is never covered. */}
-          <div ref={sidebarBox} className="sticky top-14 z-[35] hidden h-[calc(100vh-3.5rem)] flex-shrink-0 self-start md:flex">
+          <div ref={sidebarBox} className="sticky top-14 z-35 hidden h-[calc(100vh-3.5rem)] shrink-0 self-start md:flex">
             {sidebarShown && (
               <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="w-max min-w-(--sidebar-start) overflow-x-hidden overflow-y-auto p-2 pb-4">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{navButtons}</nav>
@@ -205,7 +205,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
         <div className="flex justify-around px-1 py-1.5">
           {PAGES.map(({ id, label, icon: Icon }) => (
             <button key={id} type="button" aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)} className={cn('flex min-w-0 flex-auto flex-col items-center rounded-full px-1 py-1 transition-colors [:root[data-tab-labels=off]_&]:py-2', page === id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground')}>
-              <Icon className="h-5 w-5" />
+              <Icon className="size-5" />
               {/* Hidden in Settings, the names stay for screen readers. */}
               <span className="max-w-full truncate text-sm [:root[data-tab-labels=off]_&]:sr-only">{label}</span>
             </button>

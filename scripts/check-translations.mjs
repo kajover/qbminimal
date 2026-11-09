@@ -26,13 +26,24 @@ function walk(dir) {
 walk(root)
 
 let problems = 0
-for (const file of fs.readdirSync(path.join(root, 'i18n')).filter(name => /^[a-z]{2}(-[A-Z][a-z]{3})?\.ts$/.test(name))) {
-  const text = fs.readFileSync(path.join(root, 'i18n', file), 'utf8')
-  const catalog = new Set([...text.matchAll(/^ {2}'((?:[^'\\]|\\.)*)':/gm)].map(match => match[1].replace(/\\(.)/g, '$1')))
-  const missing = [...used].filter(key => !catalog.has(key))
-  console.log(`${file}: ${catalog.size} translations, ${missing.length} missing`)
+const localesDir = path.join(root, 'i18n', 'locales')
+for (const file of fs.readdirSync(localesDir).filter(name => name.endsWith('.json')).sort()) {
+  let catalog
+  try {
+    catalog = JSON.parse(fs.readFileSync(path.join(localesDir, file), 'utf8'))
+  } catch (error) {
+    console.log(`${file}: not valid JSON (${error.message})`)
+    problems++
+    continue
+  }
+  const missing = [...used].filter(key => !(key in catalog))
+  // Every {placeholder} in the English text has to stay in the translation, spelled the same.
+  const names = text => [...text.matchAll(/\{(\w+)\}/g)].map(match => match[1]).sort().join()
+  const broken = Object.entries(catalog).filter(([english, translated]) => typeof translated !== 'string' || names(english) !== names(translated))
+  console.log(`${file}: ${Object.keys(catalog).length} translations, ${missing.length} missing`)
   for (const key of missing) console.log(`  missing: ${key}`)
-  problems += missing.length
+  for (const [key] of broken) console.log(`  placeholders differ: ${key}`)
+  problems += missing.length + broken.length
 }
 // Text shown through a variable, like column names, isn't found here and is listed in the catalogs by hand.
 process.exitCode = problems ? 1 : 0

@@ -66,8 +66,8 @@ export function FolderPicker({ open, onOpenChange, start, mode, onPick }: Folder
           <DialogDescription>{t('On the machine where qBittorrent runs.')}</DialogDescription>
         </DialogHeader>
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); const value = (e.currentTarget.elements.namedItem('picker-path') as HTMLInputElement).value.trim(); if (value) setDir(value) }}>
-          <Button type="button" size="icon" variant="outline" className="h-8 w-8 flex-shrink-0" aria-label={t('Up one folder')} onClick={() => setDir(parentOf(dir))}>
-            <ChevronUp className="h-4 w-4" />
+          <Button type="button" size="icon" variant="outline" className="size-8 shrink-0" aria-label={t('Up one folder')} onClick={() => setDir(parentOf(dir))}>
+            <ChevronUp className="size-4" />
           </Button>
           <Input key={dir} name="picker-path" aria-label={t('Folder path')} defaultValue={dir} className="h-8 text-sm" />
           <Button type="submit" size="sm" variant="outline">{t('Go')}</Button>
@@ -88,7 +88,7 @@ export function FolderPicker({ open, onOpenChange, start, mode, onPick }: Folder
                     className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-start hover:bg-muted"
                     onClick={() => (entry.isDir ? setDir(entry.path) : (onPick(entry.path), onOpenChange(false)))}
                   >
-                    {entry.isDir ? <Folder className="h-4 w-4 flex-shrink-0 text-yellow-500" /> : <File className="h-4 w-4 flex-shrink-0 text-muted-foreground" />}
+                    {entry.isDir ? <Folder className="size-4 shrink-0 text-yellow-500" /> : <File className="size-4 shrink-0 text-muted-foreground" />}
                     <span className="break-all">{nameOf(entry.path)}</span>
                   </button>
                 </li>

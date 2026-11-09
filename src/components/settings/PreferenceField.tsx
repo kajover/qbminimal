@@ -66,8 +66,8 @@ export function PreferenceField({ def, value, getValue, onChange, disabled, hasU
       control = (
         <div className="flex gap-2">
           <Input id={id} value={String(value ?? '')} disabled={disabled} onChange={(e) => onChange(e.target.value)} className="h-9" />
-          <Button type="button" size="icon" variant="outline" className="h-9 w-9 flex-shrink-0" aria-label={t('Browse for {label}', { label: def.label })} title={t('Browse')} disabled={disabled} onClick={() => setPicking(true)}>
-            <FolderOpen className="h-4 w-4" />
+          <Button type="button" size="icon" variant="outline" className="size-9 shrink-0" aria-label={t('Browse for {label}', { label: def.label })} title={t('Browse')} disabled={disabled} onClick={() => setPicking(true)}>
+            <FolderOpen className="size-4" />
           </Button>
           {picking && (
             <FolderPicker open onOpenChange={setPicking} mode={def.type === 'path' ? 'dirs' : 'all'} start={String(value || '/')} onPick={(path) => onChange(path)} />

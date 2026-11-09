@@ -38,7 +38,7 @@ function Cell({ torrent, id }: { torrent: Torrent; id: ColumnId }): ReactNode {
           <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-secondary">
             <div className="h-full bg-primary" style={{ width: `${torrent.progress * 100}%` }} />
           </div>
-          <span className="w-10 flex-shrink-0 text-end">{percent >= 100 ? '100' : percent.toFixed(1)}</span>
+          <span className="w-10 shrink-0 text-end">{percent >= 100 ? '100' : percent.toFixed(1)}</span>
         </div>
       )
     }
@@ -197,7 +197,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
 
   return (
     // Its own scrollbar is hidden: the one at the bottom of the screen stands in for it.
-    <div ref={scroller} className="overflow-x-auto overscroll-x-none rounded-xl border bg-card max-sm:-mx-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div ref={scroller} className="overflow-x-auto overscroll-x-none rounded-xl border bg-card max-sm:-mx-2 scrollbar-none">
       <table className="table-fixed caption-bottom text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
         <colgroup>
           <col style={{ width: SELECT_WIDTH * scale }} />
@@ -242,7 +242,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
                     className={cn('flex w-full min-w-0 cursor-grab items-center gap-1 hover:text-foreground active:cursor-grabbing', def.numeric && 'justify-end', sorted && 'text-foreground')}
                   >
                     <span className="truncate">{def.header ?? def.label}</span>
-                    {sorted && (sortDirection === 'asc' ? <ArrowUp className="h-3.5 w-3.5 flex-shrink-0" /> : <ArrowDown className="h-3.5 w-3.5 flex-shrink-0" />)}
+                    {sorted && (sortDirection === 'asc' ? <ArrowUp className="size-3.5 shrink-0" /> : <ArrowDown className="size-3.5 shrink-0" />)}
                   </button>
                   <span
                     role="separator"
@@ -286,7 +286,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
                   aria-selected={isSelected}
                   aria-current={openHash === torrent.hash ? 'true' : undefined}
                   className={cn(
-                    'group cursor-default border-b transition-colors outline-none select-none last:border-0 hover:bg-muted/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary [-webkit-touch-callout:none]',
+                    'group cursor-default border-b transition-colors outline-hidden select-none last:border-0 hover:bg-muted/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary [-webkit-touch-callout:none]',
                     isSelected && 'bg-muted',
                     openHash === torrent.hash && 'bg-primary/10 hover:bg-primary/15 shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]',
                   )}

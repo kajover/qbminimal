@@ -146,8 +146,8 @@ export function TorrentActions({ torrent }: { torrent: Torrent }) {
             ['down', 'Move down', ArrowDown],
             ['bottom', 'Move to bottom', ArrowDownToLine],
           ] as [QueueMove, string, typeof ArrowUp][]).map(([direction, label, Icon]) => (
-            <Button key={direction} type="button" size="icon" variant="outline" className="h-8 w-8" aria-label={t(label)} title={queued ? t(label) : undefined} disabled={action.isPending || !queued} onClick={() => run(() => qbitClient.moveInQueue(hashes, direction), t('Queue order changed'), t('Failed to change queue order'))}>
-              <Icon className="h-4 w-4" />
+            <Button key={direction} type="button" size="icon" variant="outline" className="size-8" aria-label={t(label)} title={queued ? t(label) : undefined} disabled={action.isPending || !queued} onClick={() => run(() => qbitClient.moveInQueue(hashes, direction), t('Queue order changed'), t('Failed to change queue order'))}>
+              <Icon className="size-4" />
             </Button>
           ))}
         </div>

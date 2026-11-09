@@ -104,7 +104,7 @@ export function SearchPluginsDialog({ open, onOpenChange }: { open: boolean; onO
                       failed: t('Failed to uninstall plugin'),
                     }).then(() => { toast.success(t('Plugin uninstalled')) }, () => undefined)}
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="size-3.5" />
                   </ConfirmAction>
                 </li>
               ))}

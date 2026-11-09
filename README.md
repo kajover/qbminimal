@@ -9,7 +9,7 @@
 
 A minimal, phone-friendly Web UI for [qBittorrent](https://www.qbittorrent.org/). It replaces qBittorrent's built-in browser interface with a cleaner one that works just as well on a phone as on a desktop.
 
-Built with React, TypeScript, Vite, and Tailwind CSS.
+Built with React 19, TypeScript 7, Vite 8, and Tailwind CSS 4.
 
 ## Screenshots
 
@@ -46,7 +46,7 @@ In Safari on an iPhone, where the list runs on behind the address bar:
 - **Logs**, statistics with a live speed graph, connection status, and the alternative speed limit switch. A notice says when qBittorrent can't be reached.
 - **Notifications** when a torrent finishes, if you turn them on.
 - **Keyboard shortcuts** for the torrent list. Press `?` to see them.
-- **16 languages**, listed [below](#languages).
+- **30 languages**, listed [below](#languages).
 - **Accessibility options**, described [below](#accessibility).
 - **Settings**: every qBittorrent preference, shown only when your qBittorrent version has it.
 - A sidebar you can hide on wide screens.
@@ -59,30 +59,44 @@ In Safari on an iPhone, where the list runs on behind the address bar:
 - **Screen readers** hear when the selection, the sort order, the view, or the number of matching torrents changes. Icon buttons have names, and the tab bar's names stay readable to screen readers when they are hidden on screen.
 - **Tab bar labels** can be turned off on phones under **Settings > App > Appearance**, leaving larger icons.
 - **Keyboard shortcuts** for the torrent list. Press `?` to see them.
+- **Less motion**: switching pages cross-fades briefly, and not at all when the device asks for reduced motion.
 
 ## Languages
 
-| Language | Shown as |
-| --- | --- |
-| English | English |
-| Arabic | العربية |
-| Bengali | বাংলা |
-| Chinese (Simplified) | 中文（简体） |
-| Chinese (Traditional) | 中文（繁體） |
-| Dutch | Nederlands |
-| French | Français |
-| German | Deutsch |
-| Hindi | हिन्दी |
-| Italian | Italiano |
-| Japanese | 日本語 |
-| Korean | 한국어 |
-| Polish | Polski |
-| Portuguese (Portugal) | Português (Portugal) |
-| Russian | Русский |
-| Spanish (Spain) | Español |
-| Turkish | Türkçe |
+| Language | Shown as | Improve it |
+| --- | --- | --- |
+| English | English | The original |
+| Arabic | العربية | [Edit ar.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/ar.json) |
+| Bengali | বাংলা | [Edit bn.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/bn.json) |
+| Bulgarian | Български | [Edit bg.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/bg.json) |
+| Chinese (Simplified) | 中文（简体） | [Edit zh-Hans.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/zh-Hans.json) |
+| Chinese (Traditional) | 中文（繁體） | [Edit zh-Hant.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/zh-Hant.json) |
+| Czech | Čeština | [Edit cs.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/cs.json) |
+| Dutch | Nederlands | [Edit nl.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/nl.json) |
+| French | Français | [Edit fr.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/fr.json) |
+| German | Deutsch | [Edit de.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/de.json) |
+| Greek | Ελληνικά | [Edit el.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/el.json) |
+| Hebrew | עברית | [Edit he.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/he.json) |
+| Hindi | हिन्दी | [Edit hi.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/hi.json) |
+| Hungarian | Magyar | [Edit hu.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/hu.json) |
+| Indonesian | Bahasa Indonesia | [Edit id.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/id.json) |
+| Italian | Italiano | [Edit it.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/it.json) |
+| Japanese | 日本語 | [Edit ja.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/ja.json) |
+| Korean | 한국어 | [Edit ko.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/ko.json) |
+| Persian | فارسی | [Edit fa.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/fa.json) |
+| Polish | Polski | [Edit pl.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/pl.json) |
+| Portuguese (Brazil) | Português (Brasil) | [Edit pt-BR.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/pt-BR.json) |
+| Portuguese (Portugal) | Português (Portugal) | [Edit pt.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/pt.json) |
+| Romanian | Română | [Edit ro.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/ro.json) |
+| Russian | Русский | [Edit ru.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/ru.json) |
+| Spanish (Spain) | Español | [Edit es.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/es.json) |
+| Swedish | Svenska | [Edit sv.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/sv.json) |
+| Thai | ไทย | [Edit th.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/th.json) |
+| Turkish | Türkçe | [Edit tr.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/tr.json) |
+| Ukrainian | Українська | [Edit uk.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/uk.json) |
+| Vietnamese | Tiếng Việt | [Edit vi.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/vi.json) |
 
-The language follows the browser, or pick one under **Settings > App > Appearance**. For Arabic the page is mirrored, right to left. See [Translations](#translations) to add one or correct one.
+The language follows the browser, or pick one under **Settings > App > Appearance**. For Arabic, Hebrew, and Persian the page is mirrored, right to left. See [Translations](#translations) to correct one or add one: no programming needed.
 
 ## Requirements
 
@@ -104,6 +118,8 @@ qBittorrent 5.0 or newer. A few features need a newer version and stay hidden or
 
 ## Development
 
+Needs Node.js 26 or newer.
+
 ```bash
 npm install
 npm run dev
@@ -116,16 +132,18 @@ Checks, also run by CI on every push and pull request:
 ```bash
 npm run lint
 npm test
-npx tsc -b
+npm run typecheck
 ```
+
+`npm run typecheck` uses TypeScript 7. The linter uses TypeScript 6.0 until typescript-eslint supports 7. Dependabot checks every week for newer packages and GitHub Actions and opens pull requests for them.
 
 ## Translations
 
-The text is translated with `t('English text')`, and each language is a file in `src/i18n` that maps the English text to its translation. To add a language, copy `src/i18n/de.ts`, translate the values, and add the language to `LANGUAGES` and `LOADERS` in `src/i18n/index.ts`. Keep each `{placeholder}` as it is. For a language written right to left, also add it to `RIGHT_TO_LEFT`; use start and end classes (`ps-2`, `text-end`) rather than left and right ones so the page mirrors.
+Help with translations is very welcome, and needs no programming: each language is one JSON file in [`src/i18n/locales`](src/i18n/locales) that you can edit right on GitHub. The **Edit** links in the [language list](#languages) open your language's file. Change the text on the right of each colon and propose the change; a check on the pull request names anything it can't use. [CONTRIBUTING.md](CONTRIBUTING.md#translations) has the few rules, and how to add a new language. You can also [report a wrong translation](https://github.com/kajover/qbminimal/issues/new?template=translation.yml) without editing anything.
 
-Where qBittorrent's own translations have the same text, qbminimal uses their wording and terms, so the words match what you see in qBittorrent. The rest was machine translated and hasn't been reviewed by native speakers yet, so corrections are welcome.
+Where qBittorrent's own translations have the same text, qbminimal uses their wording and terms, so the words match what you see in qBittorrent. The rest was machine translated and hasn't been reviewed by native speakers yet.
 
-`npm run i18n:check` lists text that a language doesn't cover yet.
+`npm run i18n:check` lists text that a language doesn't cover yet, and lines whose `{placeholders}` don't match.
 
 ## Building a release
 

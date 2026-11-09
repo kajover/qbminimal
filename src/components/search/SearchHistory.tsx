@@ -31,8 +31,8 @@ export function SearchHistory({ activeId, onOpen }: { activeId: number | null; o
             <button type="button" className="px-2 py-1 text-start" onClick={() => onOpen(search.id)}>
               {patterns[search.id] ?? t('Search {id}', { id: search.id })} · {search.total} {search.status === 'Running' ? t('(running)') : ''}
             </button>
-            <Button type="button" variant="ghost" size="icon" className="h-6 w-6" aria-label={t('Delete search {value}', { value: patterns[search.id] ?? search.id })} title={t('Delete')} onClick={() => remove(search.id)}>
-              <X className="h-3 w-3" />
+            <Button type="button" variant="ghost" size="icon" className="size-6" aria-label={t('Delete search {value}', { value: patterns[search.id] ?? search.id })} title={t('Delete')} onClick={() => remove(search.id)}>
+              <X className="size-3" />
             </Button>
           </li>
         ))}

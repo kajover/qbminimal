@@ -1,4 +1,4 @@
-import { lazy, useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
+import { lazy, useCallback, useEffect, useEffectEvent, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
 import { ChevronLeft, ChevronRight, Pause, Play, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/NativeSelect'
@@ -92,17 +92,17 @@ export function TorrentsView() {
     if (!viewMounted.current) { viewMounted.current = true; return }
     announce(list.showTable ? t('Table view') : t('Card view'))
   }, [list.showTable])
-  const matchingCount = useRef(list.matching.length)
+  // An Effect Event reads the count as it is when the timer fires, without restarting the timer.
   const matchingLength = list.matching.length
-  useEffect(() => { matchingCount.current = matchingLength })
+  const announceMatches = useEffectEvent(() => {
+    const n = matchingLength
+    announce(n === 0 ? t('No torrents match these filters') : n === 1 ? t('1 torrent') : t('{count} torrents', { count: n }))
+  })
   const { name: filterName, status: filterStatus, category: filterCategory, tag: filterTag, tracker: filterTracker } = list.filters
   const filtersMounted = useRef(false)
   useEffect(() => {
     if (!filtersMounted.current) { filtersMounted.current = true; return }
-    const timer = setTimeout(() => {
-      const n = matchingCount.current
-      announce(n === 0 ? t('No torrents match these filters') : n === 1 ? t('1 torrent') : t('{count} torrents', { count: n }))
-    }, 800)
+    const timer = setTimeout(announceMatches, 800)
     return () => clearTimeout(timer)
   }, [filterName, filterStatus, filterCategory, filterTag, filterTracker])
 
@@ -248,7 +248,7 @@ export function TorrentsView() {
         <div role="status" aria-label={t('Loading torrents')} className="space-y-2 rounded-xl border bg-card p-3 max-sm:-mx-2">
           {[72, 55, 64, 48, 60].map((width, i) => (
             <div key={i} className="flex animate-pulse items-center gap-3 py-1.5">
-              <div className="h-4 w-4 rounded bg-muted" />
+              <div className="size-4 rounded bg-muted" />
               <div className="h-3 rounded bg-muted" style={{ width: `${width}%` }} />
               <div className="ms-auto h-3 w-16 rounded bg-muted" />
             </div>
@@ -284,14 +284,14 @@ export function TorrentsView() {
           aria-label={t('Selected torrents')}
           className="glass z-30 flex items-center gap-1 overflow-x-auto p-1.5 max-md:fixed max-md:inset-x-3 max-md:mb-0 max-md:bottom-[calc(var(--bottom-nav-height,4rem)+var(--table-scrollbar-space,0px)+0.5rem)] max-md:rounded-full max-md:px-2 md:sticky md:top-16 md:rounded-xl"
         >
-          <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0" aria-label={t('Clear selection')} title={t('Clear selection (Esc)')} onClick={selection.clear}>
-            <X className="h-4 w-4" />
+          <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Clear selection')} title={t('Clear selection (Esc)')} onClick={selection.clear}>
+            <X className="size-4" />
           </Button>
           <span className="me-auto pe-2 text-sm whitespace-nowrap tabular-nums">{t('{count} selected', { count })}</span>
-          <Button variant="ghost" size="sm" className="gap-1" title={t('Start')} onClick={start}><Play className="h-4 w-4" /><span className="max-sm:sr-only">{t('Start')}</span></Button>
-          <Button variant="ghost" size="sm" className="gap-1" title={t('Stop')} onClick={stop}><Pause className="h-4 w-4" /><span className="max-sm:sr-only">{t('Stop')}</span></Button>
+          <Button variant="ghost" size="sm" className="gap-1" title={t('Start')} onClick={start}><Play className="size-4" /><span className="max-sm:sr-only">{t('Start')}</span></Button>
+          <Button variant="ghost" size="sm" className="gap-1" title={t('Stop')} onClick={stop}><Pause className="size-4" /><span className="max-sm:sr-only">{t('Stop')}</span></Button>
           <MoreMenu torrents={selectedTorrents} groups={groups} />
-          <Button variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" title={t('Delete (Del)')} onClick={() => askToDelete(selectedTorrents)}><Trash2 className="h-4 w-4" /><span className="max-sm:sr-only">{t('Delete')}</span></Button>
+          <Button variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" title={t('Delete (Del)')} onClick={() => askToDelete(selectedTorrents)}><Trash2 className="size-4" /><span className="max-sm:sr-only">{t('Delete')}</span></Button>
         </div>
       )}
 
@@ -344,9 +344,9 @@ export function TorrentsView() {
           </label>
           {list.pageCount > 1 && (
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" aria-label={t('Previous page')} disabled={list.page === 1} onClick={() => list.setPage(list.page - 1)}><ChevronLeft className="h-4 w-4 rtl:rotate-180" /></Button>
+              <Button variant="outline" size="sm" aria-label={t('Previous page')} disabled={list.page === 1} onClick={() => list.setPage(list.page - 1)}><ChevronLeft className="size-4 rtl:rotate-180" /></Button>
               <span className="text-sm tabular-nums">{list.page} / {list.pageCount}</span>
-              <Button variant="outline" size="sm" aria-label={t('Next page')} disabled={list.page === list.pageCount} onClick={() => list.setPage(list.page + 1)}><ChevronRight className="h-4 w-4 rtl:rotate-180" /></Button>
+              <Button variant="outline" size="sm" aria-label={t('Next page')} disabled={list.page === list.pageCount} onClick={() => list.setPage(list.page + 1)}><ChevronRight className="size-4 rtl:rotate-180" /></Button>
             </div>
           )}
         </div>

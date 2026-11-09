@@ -44,8 +44,8 @@ function CategoryRow({ category }: { category: TorrentCategory }) {
         <p className="break-words">{category.name}</p>
         <p className="break-all text-xs text-muted-foreground">{category.savePath || t('Default save path')}</p>
       </div>
-      <Button type="button" variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" aria-label={t('Edit {name}', { name: category.name })} title={t('Edit category')} onClick={() => { setSavePath(category.savePath ?? ''); setEditing(true) }}>
-        <Pencil className="h-3.5 w-3.5" />
+      <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0" aria-label={t('Edit {name}', { name: category.name })} title={t('Edit category')} onClick={() => { setSavePath(category.savePath ?? ''); setEditing(true) }}>
+        <Pencil className="size-3.5" />
       </Button>
       <ConfirmAction
         label={t('Delete {name}', { name: category.name })}
@@ -56,7 +56,7 @@ function CategoryRow({ category }: { category: TorrentCategory }) {
         onConfirm={() => action.mutateAsync({ work: () => qbitClient.removeCategories([category.name]), failed: t('Failed to delete category') })
           .then(() => { toast.success(t('Category deleted')) }, () => undefined)}
       >
-        <Trash2 className="h-3.5 w-3.5" />
+        <Trash2 className="size-3.5" />
       </ConfirmAction>
     </li>
   )
@@ -135,7 +135,7 @@ export function CategoriesTagsDialog({ open, onOpenChange }: { open: boolean; on
                       onConfirm={() => action.mutateAsync({ work: () => qbitClient.deleteTags([tag]), failed: t('Failed to delete tag') })
                         .then(() => { toast.success(t('Tag deleted')) }, () => undefined)}
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
+                      <Trash2 className="size-3.5" />
                     </ConfirmAction>
                   </li>
                 ))}

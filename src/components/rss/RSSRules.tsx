@@ -119,13 +119,13 @@ export function RSSRules() {
         <div className="flex gap-1">
         <input ref={importInput} type="file" accept=".json,application/json" className="hidden" onChange={importFile} />
         <Button size="sm" variant="outline" aria-label={t('Import rules')} title={t('Import rules from a file')} disabled={importing} onClick={() => importInput.current?.click()}>
-          <Upload className="h-4 w-4" />
+          <Upload className="size-4" />
         </Button>
         <Button size="sm" variant="outline" aria-label={t('Export rules')} title={t('Export rules to a file')} disabled={!rules || Object.keys(rules).length === 0} onClick={download}>
-          <Download className="h-4 w-4" />
+          <Download className="size-4" />
         </Button>
         <Button size="sm" variant="outline" aria-label={t('Add rule')} title={t('Add rule')} onClick={() => open({ name: '', isNew: true, rule: EMPTY_RULE })}>
-          <Plus className="h-4 w-4" />
+          <Plus className="size-4" />
         </Button>
         </div>
       </CardHeader>
@@ -144,7 +144,7 @@ export function RSSRules() {
                 </p>
               </div>
               <RuleExtras name={name} existing={Object.keys(rules ?? {})} />
-              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t('Edit {name}', { name })} title={t('Edit')} onClick={() => open({
+              <Button variant="ghost" size="icon" className="size-8" aria-label={t('Edit {name}', { name })} title={t('Edit')} onClick={() => open({
                 name,
                 isNew: false,
                 rule: {
@@ -154,10 +154,10 @@ export function RSSRules() {
                   savePath: rule.torrentParams?.save_path ?? rule.savePath ?? '',
                 },
               })}>
-                <Pencil className="h-4 w-4" />
+                <Pencil className="size-4" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t('Delete {name}', { name })} title={t('Delete')} onClick={() => { setRemoving(name); setRemoveOpen(true) }}>
-                <Trash2 className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="size-8" aria-label={t('Delete {name}', { name })} title={t('Delete')} onClick={() => { setRemoving(name); setRemoveOpen(true) }}>
+                <Trash2 className="size-4" />
               </Button>
           </li>
         ))}

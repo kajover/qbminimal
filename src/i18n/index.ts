@@ -8,18 +8,31 @@ export type Catalog = Record<string, string>
 // Each language by its own name, in the order the Settings list shows them.
 export const LANGUAGES = [
   { code: 'en', name: 'English' },
+  { code: 'cs', name: 'Čeština' },
   { code: 'de', name: 'Deutsch' },
   { code: 'es', name: 'Español' },
   { code: 'fr', name: 'Français' },
+  { code: 'id', name: 'Bahasa Indonesia' },
   { code: 'it', name: 'Italiano' },
+  { code: 'hu', name: 'Magyar' },
   { code: 'nl', name: 'Nederlands' },
   { code: 'pl', name: 'Polski' },
   { code: 'pt', name: 'Português (Portugal)' },
+  { code: 'pt-BR', name: 'Português (Brasil)' },
+  { code: 'ro', name: 'Română' },
+  { code: 'sv', name: 'Svenska' },
   { code: 'tr', name: 'Türkçe' },
+  { code: 'vi', name: 'Tiếng Việt' },
+  { code: 'el', name: 'Ελληνικά' },
+  { code: 'bg', name: 'Български' },
   { code: 'ru', name: 'Русский' },
+  { code: 'uk', name: 'Українська' },
   { code: 'ar', name: 'العربية' },
+  { code: 'fa', name: 'فارسی' },
+  { code: 'he', name: 'עברית' },
   { code: 'hi', name: 'हिन्दी' },
   { code: 'bn', name: 'বাংলা' },
+  { code: 'th', name: 'ไทย' },
   { code: 'zh-Hans', name: '中文（简体）' },
   { code: 'zh-Hant', name: '中文（繁體）' },
   { code: 'ja', name: '日本語' },
@@ -28,28 +41,12 @@ export const LANGUAGES = [
 export type LanguageCode = (typeof LANGUAGES)[number]['code']
 export type LanguageChoice = LanguageCode | 'auto'
 
-// Each language is its own file, loaded only when it's used.
-const LOADERS: Record<Exclude<LanguageCode, 'en'>, () => Promise<{ default: Catalog }>> = {
-  de: () => import('./de'),
-  es: () => import('./es'),
-  fr: () => import('./fr'),
-  it: () => import('./it'),
-  nl: () => import('./nl'),
-  pl: () => import('./pl'),
-  pt: () => import('./pt'),
-  tr: () => import('./tr'),
-  ru: () => import('./ru'),
-  ar: () => import('./ar'),
-  hi: () => import('./hi'),
-  bn: () => import('./bn'),
-  'zh-Hans': () => import('./zh-Hans'),
-  'zh-Hant': () => import('./zh-Hant'),
-  ja: () => import('./ja'),
-  ko: () => import('./ko'),
-}
+// Each language is a JSON file in ./locales, named by its code, loaded only when it's used.
+const FILES = import.meta.glob<Catalog>('./locales/*.json', { import: 'default' })
+const loadCatalog = (code: Exclude<LanguageCode, 'en'>) => FILES[`./locales/${code}.json`]()
 
 // Languages written right to left. The page is mirrored for them.
-const RIGHT_TO_LEFT: ReadonlySet<LanguageCode> = new Set(['ar'])
+const RIGHT_TO_LEFT: ReadonlySet<LanguageCode> = new Set(['ar', 'fa', 'he'])
 
 const STORAGE_KEY = 'qbminimal.language'
 let catalog: Catalog = {}
@@ -72,8 +69,11 @@ function chineseScript(tag: string): LanguageCode {
 export function detectLanguage(preferred: readonly string[] = typeof navigator === 'undefined' ? [] : navigator.languages ?? [navigator.language]): LanguageCode {
   for (const tag of preferred) {
     const lower = tag.toLowerCase()
-    const code = lower.split('-')[0]
+    // Some older browsers still name Hebrew by its former code, iw.
+    const code = lower.split('-')[0].replace(/^iw$/, 'he')
     if (code === 'zh') return chineseScript(lower)
+    // Brazil has its own Portuguese; everywhere else gets Portugal's.
+    if (code === 'pt') return lower === 'pt-br' ? 'pt-BR' : 'pt'
     if (isLanguage(code)) return code
   }
   return 'en'
@@ -83,7 +83,7 @@ export async function loadLanguage() {
   const choice = chosenLanguage()
   const code = choice === 'auto' ? detectLanguage() : choice
   try {
-    catalog = code === 'en' ? {} : (await LOADERS[code]()).default
+    catalog = code === 'en' ? {} : await loadCatalog(code)
     current = code
   } catch {
     // The translation couldn't load, so the app shows in English.

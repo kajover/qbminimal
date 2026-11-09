@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useTheme } from 'next-themes'
+import { useTheme, type Theme } from '@/lib/theme'
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -22,7 +22,7 @@ import { chosenTextSize, setTextSize, TEXT_SIZES, type TextSize } from '@/lib/te
 import { chosenLanguage, LANGUAGES, setLanguage, t, type LanguageChoice } from '@/i18n'
 
 // System is the default, so it comes first.
-const themeOptions = [
+const themeOptions: { value: Theme; label: string; icon: typeof Monitor }[] = [
   { value: 'system', label: t('System'), icon: Monitor },
   { value: 'light', label: t('Light'), icon: Sun },
   { value: 'dark', label: t('Dark'), icon: Moon },
@@ -92,7 +92,7 @@ function AppSection() {
             <div className="flex flex-wrap gap-1" role="group" aria-label={t('Theme')}>
               {themeOptions.map(({ value, label, icon: Icon }) => (
                 <Button key={value} variant={theme === value ? 'secondary' : 'outline'} size="sm" aria-pressed={theme === value} onClick={() => setTheme(value)} className="gap-2">
-                  <Icon className="h-4 w-4" />
+                  <Icon className="size-4" />
                   <span>{label}</span>
                 </Button>
               ))}

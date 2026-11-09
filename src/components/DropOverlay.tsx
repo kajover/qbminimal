@@ -53,7 +53,7 @@ export function DropOverlay() {
   return (
     <div className="pointer-events-none fixed inset-0 z-50 grid place-items-center bg-background/70 p-6 backdrop-blur-sm">
       <div className="flex flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-primary bg-card px-10 py-8 text-center shadow-lg">
-        <Upload className="h-8 w-8 text-primary" />
+        <Upload className="size-8 text-primary" />
         <p className="font-medium">{t('Drop .torrent files to add them')}</p>
         <p className="text-sm text-muted-foreground">{t('You can choose options before they\'re added')}</p>
       </div>

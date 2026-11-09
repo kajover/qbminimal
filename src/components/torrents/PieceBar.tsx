@@ -111,7 +111,7 @@ function AvailabilityBar({ hash }: { hash: string }) {
 function LegendItem({ className, label }: { className: string; label: string }) {
   return (
     <span className="flex items-center gap-1">
-      <span className={`h-2 w-2 rounded-sm ${className}`} aria-hidden="true" />
+      <span className={`size-2 rounded-sm ${className}`} aria-hidden="true" />
       {label}
     </span>
   )

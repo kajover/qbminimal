@@ -24,8 +24,8 @@ export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMark
   const menu = (label: string, items: [string, () => void, boolean?][]) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" aria-label={t('Actions for {label}', { label })} title={t('Actions')} onClick={(e) => e.stopPropagation()}>
-          <MoreVertical className="h-4 w-4" />
+        <Button variant="ghost" size="icon" className="size-7 shrink-0" aria-label={t('Actions for {label}', { label })} title={t('Actions')} onClick={(e) => e.stopPropagation()}>
+          <MoreVertical className="size-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
@@ -73,7 +73,7 @@ export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMark
       {folders.filter(path => getRSSParent(path) === parent).map(path => (
         <li key={`folder:${path}`} className="space-y-2">
           <div className="flex items-center gap-1 text-sm font-medium" style={{ marginLeft: depth * STEP }}>
-            <Folder className="h-4 w-4 text-yellow-500" />
+            <Folder className="size-4 text-yellow-500" />
             <span className="min-w-0 flex-1 truncate">{rssName(path)}</span>
             {menu(t('folder {name}', { name: rssName(path) }), [
               [t('Refresh'), () => onRefresh(path, t('Refreshing folder'))],

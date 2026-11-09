@@ -101,7 +101,7 @@ export function TorrentInfoTab({ torrent }: { torrent: Torrent }) {
           <dl className="divide-y text-sm">
             {group.rows.filter((row): row is [string, string | number] => row[1] !== undefined && row[1] !== false && row[1] !== '').map(([label, value]) => (
               <div key={label} className="flex justify-between gap-4 px-2 py-1.5">
-                <dt className="flex-shrink-0 text-muted-foreground">{label}</dt>
+                <dt className="shrink-0 text-muted-foreground">{label}</dt>
                 <dd className="truncate text-end tabular-nums" title={String(value)}>{value}</dd>
               </div>
             ))}

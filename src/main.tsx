@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ThemeProvider } from 'next-themes'
+import { startTheme } from './lib/theme'
 import { loadLanguage } from './i18n'
 import { readMagnetFromAddress, sendToAdd } from './lib/incoming'
 import { applyTextSize } from './lib/textSize'
@@ -25,7 +25,8 @@ if (CSS.supports('-webkit-touch-callout', 'none')) {
   viewport?.setAttribute('content', `${viewport.getAttribute('content')}, maximum-scale=1`)
 }
 
-// The text size and other looks chosen in Settings apply before anything is drawn.
+// The theme, text size and other looks chosen in Settings apply before anything is drawn.
+startTheme()
 applyTextSize()
 applyDisplayOptions()
 
@@ -33,15 +34,12 @@ const root = document.getElementById('root')
 if (!root) throw new Error('index.html needs a #root element')
 
 // The language loads before the app's own modules, so all their text comes out translated.
-// The theme follows the device until someone picks light or dark in Settings.
 void loadLanguage()
   .then(() => import('./App'))
   .then(({ default: App }) => {
     createRoot(root).render(
       <StrictMode>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <App />
-        </ThemeProvider>
+        <App />
       </StrictMode>,
     )
   })
