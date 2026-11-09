@@ -1270,6 +1270,12 @@ const pt: Record<string, string> = {
   'Make the details larger': 'Ampliar os detalhes',
   'Show more': 'Mostrar mais',
   'Show less': 'Mostrar menos',
+  'Retry': 'Tentar novamente',
+  'A magnet link needs peers to share the file list.': 'Uma ligação magnet precisa de pares que partilhem a lista de ficheiros.',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': 'Não foi possível obter a lista de ficheiros a tempo. Uma ligação magnet precisa de pares que a partilhem. Pode ainda adicionar o torrent sem escolher ficheiros.',
+  'Selection cleared': 'Seleção limpa',
+  'Sorted by {column}, ascending': 'Ordenado por {column}, ascendente',
+  'Sorted by {column}, descending': 'Ordenado por {column}, descendente',
 }
 
 export default pt

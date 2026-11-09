@@ -1270,6 +1270,12 @@ const ru: Record<string, string> = {
   'Make the details larger': 'Увеличить панель сведений',
   'Show more': 'Показать больше',
   'Show less': 'Показать меньше',
+  'Retry': 'Повторить',
+  'A magnet link needs peers to share the file list.': 'Для magnet-ссылки нужны пиры, которые передадут список файлов.',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': 'Не удалось вовремя получить список файлов. Для magnet-ссылки нужны пиры, которые её раздают. Торрент всё равно можно добавить без выбора файлов.',
+  'Selection cleared': 'Выделение снято',
+  'Sorted by {column}, ascending': 'Сортировка по столбцу «{column}», по возрастанию',
+  'Sorted by {column}, descending': 'Сортировка по столбцу «{column}», по убыванию',
 }
 
 export default ru

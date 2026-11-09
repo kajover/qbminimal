@@ -1,9 +1,10 @@
 import { useRef, useState, type DragEvent, type KeyboardEvent, type PointerEvent, type ReactElement, type ReactNode } from 'react'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
+import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { columnWidth, getColumn, moveColumn, resizeColumn, shiftColumn, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
+import { columnWidth, DEFAULT_COLUMN_LAYOUT, getColumn, toggleColumn, moveColumn, resizeColumn, shiftColumn, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
 import { DOWN_SPEED_COLOR, formatEta, getStateBadge, getStateLabel, ratioColor, UP_SPEED_COLOR, peerPair as pair } from '@/lib/torrentState'
 import type { SortDirection } from '@/lib/listSettings'
 import type { RowProps } from '@/hooks/useRowPress'
@@ -77,6 +78,8 @@ interface TorrentTableProps {
   torrents: Torrent[]
   layout: ColumnLayout
   onLayoutChange: (layout: ColumnLayout) => void
+  // Reset columns also puts the sort order back.
+  onResetSort: () => void
   selected: ReadonlySet<string>
   // Whether every, some, or none of the matching torrents are selected, for the header checkbox.
   selectAllState: boolean | 'indeterminate'
@@ -113,7 +116,7 @@ function naturalWidth(cells: Element[], host: HTMLElement): number {
 // A table whose columns can be dragged to a new place, resized from their right edge, sorted by
 // clicking, and shown or hidden from the Columns menu. Alt + arrow keys on a header move it too.
 // Clicking a row selects it and opens its details; Ctrl or Cmd adds to the selection, Shift a range.
-export function TorrentTable({ torrents, layout, onLayoutChange, selected, selectAllState, onToggle, onSelectAll, openHash, sortField, sortDirection, onSort, rowProps, wrapBody }: TorrentTableProps) {
+export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, selected, selectAllState, onToggle, onSelectAll, openHash, sortField, sortDirection, onSort, rowProps, wrapBody }: TorrentTableProps) {
   const { data: serverState } = useTransferInfo()
   // qBittorrent hides its # column while queueing is off, when every torrent would show *.
   const columns = visibleColumns(layout).filter(def => def.id !== 'priority' || serverState?.queueing !== false)
@@ -198,6 +201,8 @@ export function TorrentTable({ torrents, layout, onLayoutChange, selected, selec
           {/* Takes any room left over, so the columns keep their widths. */}
           <col />
         </colgroup>
+        <ContextMenu>
+        <ContextMenuTrigger asChild>
         <thead className="border-b">
           <tr>
             <th className="sticky start-0 z-10 h-10 bg-card px-2 text-start">
@@ -255,6 +260,17 @@ export function TorrentTable({ torrents, layout, onLayoutChange, selected, selec
             <th aria-hidden />
           </tr>
         </thead>
+        </ContextMenuTrigger>
+        <ContextMenuContent className="max-h-[70vh] w-56">
+          {layout.order.map(id => (
+            <ContextMenuCheckboxItem key={id} checked={!layout.hidden.includes(id)} disabled={id === 'name'} onSelect={(e) => e.preventDefault()} onCheckedChange={() => onLayoutChange(toggleColumn(layout, id))}>
+              {getColumn(id).label}
+            </ContextMenuCheckboxItem>
+          ))}
+          <ContextMenuSeparator />
+          <ContextMenuItem onClick={() => { onLayoutChange(DEFAULT_COLUMN_LAYOUT); onResetSort() }}>{t('Reset columns')}</ContextMenuItem>
+        </ContextMenuContent>
+        </ContextMenu>
         {wrapBody(
           <tbody>
             {torrents.map(torrent => {
@@ -264,13 +280,14 @@ export function TorrentTable({ torrents, layout, onLayoutChange, selected, selec
                   key={torrent.hash}
                   {...rowProps(torrent)}
                   aria-selected={isSelected}
+                  aria-current={openHash === torrent.hash ? 'true' : undefined}
                   className={cn(
                     'group cursor-default border-b transition-colors outline-none select-none last:border-0 hover:bg-muted/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary [-webkit-touch-callout:none]',
                     isSelected && 'bg-muted',
-                    openHash === torrent.hash && 'shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]',
+                    openHash === torrent.hash && 'bg-primary/10 hover:bg-primary/15 shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]',
                   )}
                 >
-                  <td className={cn('px-2 py-1.5', PINNED_LEFT, isSelected && PINNED_SELECTED, openHash === torrent.hash && 'shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]')}>
+                  <td className={cn('px-2 py-1.5', PINNED_LEFT, isSelected && PINNED_SELECTED, openHash === torrent.hash && !isSelected && 'bg-[color-mix(in_oklab,var(--primary)_10%,var(--card))] group-hover:bg-[color-mix(in_oklab,var(--primary)_15%,var(--card))]', openHash === torrent.hash && 'shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]')}>
                     <Checkbox
                       aria-label={t('Select {name}', { name: torrent.name })}
                       checked={isSelected}

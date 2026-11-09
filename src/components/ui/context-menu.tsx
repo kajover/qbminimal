@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ChevronRightIcon } from "lucide-react"
+import { CheckIcon, ChevronRightIcon } from "lucide-react"
 import { ContextMenu as ContextMenuPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
@@ -32,6 +32,19 @@ function ContextMenuItem({ className, destructive, ...props }: React.ComponentPr
   )
 }
 
+function ContextMenuCheckboxItem({ className, children, checked, ...props }: React.ComponentProps<typeof ContextMenuPrimitive.CheckboxItem>) {
+  return (
+    <ContextMenuPrimitive.CheckboxItem className={cn(row, "ps-8 pe-2", className)} checked={checked} {...props}>
+      <span className="pointer-events-none absolute start-2 flex size-3.5 items-center justify-center">
+        <ContextMenuPrimitive.ItemIndicator>
+          <CheckIcon className="size-4" />
+        </ContextMenuPrimitive.ItemIndicator>
+      </span>
+      {children}
+    </ContextMenuPrimitive.CheckboxItem>
+  )
+}
+
 function ContextMenuLabel({ className, ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Label>) {
   return <ContextMenuPrimitive.Label className={cn("max-w-64 truncate px-2 py-1.5 text-xs font-medium text-muted-foreground", className)} {...props} />
 }
@@ -59,6 +72,7 @@ function ContextMenuSubContent({ className, ...props }: React.ComponentProps<typ
 
 export {
   ContextMenu,
+  ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuLabel,

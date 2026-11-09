@@ -1270,6 +1270,12 @@ const tr: Record<string, string> = {
   'Make the details larger': 'Ayrıntıları büyüt',
   'Show more': 'Daha fazla göster',
   'Show less': 'Daha az göster',
+  'Retry': 'Yeniden dene',
+  'A magnet link needs peers to share the file list.': 'Magnet bağlantısının dosya listesini paylaşacak eşlere ihtiyacı vardır.',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': 'Dosya listesi zamanında alınamadı. Magnet bağlantısının onu paylaşacak eşlere ihtiyacı vardır. Torrent\'i dosya seçmeden yine de ekleyebilirsin.',
+  'Selection cleared': 'Seçim temizlendi',
+  'Sorted by {column}, ascending': '{column} sütununa göre sıralandı, artan',
+  'Sorted by {column}, descending': '{column} sütununa göre sıralandı, azalan',
 }
 
 export default tr

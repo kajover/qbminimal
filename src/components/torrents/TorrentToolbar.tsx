@@ -46,7 +46,7 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
               </DropdownMenuCheckboxItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onColumnsChange(DEFAULT_COLUMN_LAYOUT)}>{t('Reset columns')}</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => { onColumnsChange(DEFAULT_COLUMN_LAYOUT); list.resetSort() }}>{t('Reset columns')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (

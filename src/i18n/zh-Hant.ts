@@ -1270,6 +1270,12 @@ const zhHant: Record<string, string> = {
   'Make the details larger': '放大詳細資料',
   'Show more': '顯示更多',
   'Show less': '顯示較少',
+  'Retry': '重試',
+  'A magnet link needs peers to share the file list.': '磁力連結需要有節點來分享檔案清單。',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': '未能及時取得檔案清單。磁力連結需要有節點來分享。你仍然可以不選擇檔案直接新增該種子。',
+  'Selection cleared': '已清除選取',
+  'Sorted by {column}, ascending': '依{column}遞增排序',
+  'Sorted by {column}, descending': '依{column}遞減排序',
 }
 
 export default zhHant

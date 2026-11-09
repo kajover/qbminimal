@@ -1270,6 +1270,12 @@ const ko: Record<string, string> = {
   'Make the details larger': '세부 정보 키우기',
   'Show more': '더 보기',
   'Show less': '간단히 보기',
+  'Retry': '다시 시도',
+  'A magnet link needs peers to share the file list.': '마그넷 링크는 파일 목록을 공유할 피어가 필요합니다.',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': '시간 내에 파일 목록을 가져오지 못했습니다. 마그넷 링크는 공유할 피어가 필요합니다. 파일을 선택하지 않고 토렌트를 추가할 수도 있습니다.',
+  'Selection cleared': '선택이 해제되었습니다',
+  'Sorted by {column}, ascending': '{column} 기준 오름차순 정렬',
+  'Sorted by {column}, descending': '{column} 기준 내림차순 정렬',
 }
 
 export default ko

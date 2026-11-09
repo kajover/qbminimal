@@ -1270,6 +1270,12 @@ const zhHans: Record<string, string> = {
   'Make the details larger': '放大详情',
   'Show more': '显示更多',
   'Show less': '显示更少',
+  'Retry': '重试',
+  'A magnet link needs peers to share the file list.': '磁力链接需要有节点来共享文件列表。',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': '未能及时获取文件列表。磁力链接需要有节点来共享。你仍然可以不选择文件直接添加该种子。',
+  'Selection cleared': '已清除选择',
+  'Sorted by {column}, ascending': '按{column}升序排序',
+  'Sorted by {column}, descending': '按{column}降序排序',
 }
 
 export default zhHans

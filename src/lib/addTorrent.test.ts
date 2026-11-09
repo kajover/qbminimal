@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_ADD_OPTIONS, buildAddParams, describeAddResult, parseLinks, readMetadata } from './addTorrent'
+import { DEFAULT_ADD_OPTIONS, buildAddParams, describeAddResult, parseLinks, readMetadata, selectedSize } from './addTorrent'
 
 describe('parseLinks', () => {
   it('keeps one link per non-blank line', () => {
@@ -85,3 +85,10 @@ describe('readMetadata', () => {
     })
   })
 })
+
+describe('selectedSize', () => {
+  it('adds up the wanted files', () => {
+    expect(selectedSize([{ length: 5 }, { length: 7 }, { length: 1 }], [1, 0, 7])).toBe(6)
+  })
+})
+

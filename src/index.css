@@ -273,3 +273,8 @@
   }
 }
 
+
+/* Downloading pieces: diagonal stripes, so they differ from done pieces without colour. */
+.piece-stripes {
+  background-image: repeating-linear-gradient(45deg, #f59e0b 0 2px, #b45309 2px 4px);
+}

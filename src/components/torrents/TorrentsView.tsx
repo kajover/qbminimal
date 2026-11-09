@@ -1,4 +1,4 @@
-import { lazy, useCallback, useEffect, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
+import { lazy, useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
 import { ChevronLeft, ChevronRight, Pause, Play, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/NativeSelect'
@@ -11,7 +11,8 @@ import { useSelection } from '@/hooks/useSelection'
 import { useTorrentList } from '@/hooks/useTorrentList'
 import { PAGE_SIZES } from '@/lib/listSettings'
 import { loadFilterViews, type FilterView } from '@/lib/filterViews'
-import { loadColumnLayout, saveColumnLayout, type ColumnLayout } from '@/lib/torrentColumns'
+import { announce } from '@/lib/announce'
+import { getColumn, loadColumnLayout, saveColumnLayout, type ColumnLayout } from '@/lib/torrentColumns'
 import type { Torrent } from '@/types'
 import { useBulkActions, type BulkPrompt } from './bulkActions'
 import { BulkPromptDialog } from './BulkPromptDialog'
@@ -71,6 +72,39 @@ export function TorrentsView() {
   const count = selectedTorrents.length
   const groups = useBulkActions(selectedTorrents, setPrompt)
   const closeDetails = useCallback(() => setDetailsHash(null), [])
+
+  // Screen readers hear changes the user made, not the 2 second data refresh.
+  const previousCount = useRef(count)
+  useEffect(() => {
+    if (previousCount.current === count) return
+    previousCount.current = count
+    announce(count > 0 ? t('{count} selected', { count }) : t('Selection cleared'))
+  }, [count])
+  const { field: sortField, direction: sortDirection } = list.sort
+  const sortMounted = useRef(false)
+  useEffect(() => {
+    if (!sortMounted.current) { sortMounted.current = true; return }
+    const column = getColumn(sortField).label
+    announce(sortDirection === 'asc' ? t('Sorted by {column}, ascending', { column }) : t('Sorted by {column}, descending', { column }))
+  }, [sortField, sortDirection])
+  const viewMounted = useRef(false)
+  useEffect(() => {
+    if (!viewMounted.current) { viewMounted.current = true; return }
+    announce(list.showTable ? t('Table view') : t('Card view'))
+  }, [list.showTable])
+  const matchingCount = useRef(list.matching.length)
+  const matchingLength = list.matching.length
+  useEffect(() => { matchingCount.current = matchingLength })
+  const { name: filterName, status: filterStatus, category: filterCategory, tag: filterTag, tracker: filterTracker } = list.filters
+  const filtersMounted = useRef(false)
+  useEffect(() => {
+    if (!filtersMounted.current) { filtersMounted.current = true; return }
+    const timer = setTimeout(() => {
+      const n = matchingCount.current
+      announce(n === 0 ? t('No torrents match these filters') : n === 1 ? t('1 torrent') : t('{count} torrents', { count: n }))
+    }, 800)
+    return () => clearTimeout(timer)
+  }, [filterName, filterStatus, filterCategory, filterTag, filterTracker])
 
   const changeColumns = (layout: ColumnLayout) => {
     setColumns(layout)
@@ -275,6 +309,7 @@ export function TorrentsView() {
           torrents={list.rows}
           layout={columns}
           onLayoutChange={changeColumns}
+          onResetSort={list.resetSort}
           selected={selection.selected}
           selectAllState={matchingSelected === 0 ? false : matchingSelected === list.matching.length ? true : 'indeterminate'}
           onToggle={toggleBox}

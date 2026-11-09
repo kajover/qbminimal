@@ -1270,6 +1270,12 @@ const nl: Record<string, string> = {
   'Make the details larger': 'Details groter maken',
   'Show more': 'Meer tonen',
   'Show less': 'Minder tonen',
+  'Retry': 'Opnieuw proberen',
+  'A magnet link needs peers to share the file list.': 'Een magnetlink heeft peers nodig die de bestandslijst delen.',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': 'De bestandslijst kwam niet op tijd binnen. Een magnetlink heeft peers nodig die hem delen. Je kunt de torrent nog steeds toevoegen zonder bestanden te kiezen.',
+  'Selection cleared': 'Selectie gewist',
+  'Sorted by {column}, ascending': 'Gesorteerd op {column}, oplopend',
+  'Sorted by {column}, descending': 'Gesorteerd op {column}, aflopend',
 }
 
 export default nl

@@ -35,25 +35,25 @@ In Safari on an iPhone, where the list runs on behind the address bar:
 
 ## Features
 
-- **Torrent list** as a table or as cards. In the table you can show, hide, drag, and resize columns, and sort by any of them. The layout is remembered on each device.
+- **Torrent list** as a table or as cards. In the table you can show, hide (also by right-clicking a header), drag, and resize columns, and sort by any of them. The layout is remembered on each device.
 - **Filters** by name, status, category, tag, and tracker, each showing how many torrents it matches. Save a set of filters as a **view** to apply it again in one tap.
 - **Torrent details**: pieces, transfer facts, files (choose what to download, rename, and save finished files with qBittorrent 5.3), trackers, peers with country flags, and every per-torrent setting: limits, location, queue, category, tags, and more.
 - **Selecting and actions**: click a torrent to open its details in a panel below the list, Ctrl or Cmd-click and Shift-click to select several, and right-click for every action. On phones, tap a torrent for its details and hold one to start selecting.
 - **Bulk actions** for several torrents at once, from the selection bar or the right-click menu.
-- **Add torrents** from links or .torrent files with all of qBittorrent's options. Drop .torrent files anywhere on the page, or let the browser open magnet links here. **Create torrents** from files on the server.
+- **Add torrents** from links or .torrent files with all of qBittorrent's options. For a single magnet link or .torrent, see its files first and choose which to download. Drop .torrent files anywhere on the page, or let the browser open magnet links here. **Create torrents** from files on the server.
 - **RSS** feeds and folders, articles, and download rules, including import and export.
 - **Search** with qBittorrent's search plugins, and plugin management.
 - **Logs**, statistics with a live speed graph, connection status, and the alternative speed limit switch. A notice says when qBittorrent can't be reached.
 - **Notifications** when a torrent finishes, if you turn them on.
 - **Keyboard shortcuts** for the torrent list. Press `?` to see them.
-- **Languages**: English, Arabic, Bengali, Chinese (Simplified and Traditional), Dutch, French, German, Hindi, Italian, Japanese, Korean, Portuguese (Portugal), Russian, Spanish (Spain), and Turkish, with the page mirrored for Arabic. The language follows the browser, or pick one in Settings.
+- **Languages**: English, Arabic, Bengali, Chinese (Simplified and Traditional), Dutch, French, German, Hindi, Italian, Japanese, Korean, Polish, Portuguese (Portugal), Russian, Spanish (Spain), and Turkish, with the page mirrored for Arabic. The language follows the browser, or pick one in Settings.
 - **Settings**: every qBittorrent preference, shown only when your qBittorrent version has it.
 - A sidebar you can hide on wide screens.
 - Light and dark themes that follow your device, and a layout made for phones, including when added to the home screen.
 
 ## Requirements
 
-qBittorrent 5.0 or newer. A few features need a newer version and stay hidden or explain themselves on older ones: SSL settings for torrents need 5.1, reading .torrent files before adding them needs 5.2, and saving finished files from the browser needs 5.3.
+qBittorrent 5.0 or newer. A few features need a newer version and stay hidden or explain themselves on older ones: SSL settings for torrents need 5.1, seeing a torrent's files before adding it needs 5.2, and saving finished files from the browser needs 5.3.
 
 ## Installing
 

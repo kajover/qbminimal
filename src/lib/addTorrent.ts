@@ -134,3 +134,9 @@ export function readMetadata(body: unknown): TorrentMetadata | null {
   if (!info || !Array.isArray(info.files)) return null
   return { name: info.name ?? '', size: info.length ?? 0, files: info.files }
 }
+
+// Bytes of the files whose priority is above 0.
+export function selectedSize(files: { length: number }[], priorities: number[]): number {
+  return files.reduce((sum, file, i) => sum + (priorities[i] > 0 ? file.length : 0), 0)
+}
+

@@ -1270,6 +1270,12 @@ const ar: Record<string, string> = {
   'Make the details larger': 'تكبير التفاصيل',
   'Show more': 'عرض المزيد',
   'Show less': 'عرض أقل',
+  'Retry': 'إعادة المحاولة',
+  'A magnet link needs peers to share the file list.': 'يحتاج رابط المغناطيس إلى أقران يشاركون قائمة الملفات.',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': 'تعذر الحصول على قائمة الملفات في الوقت المناسب. يحتاج رابط المغناطيس إلى أقران يشاركونه. يمكنك إضافة التورنت دون اختيار الملفات.',
+  'Selection cleared': 'تم مسح التحديد',
+  'Sorted by {column}, ascending': 'الترتيب حسب {column}، تصاعدي',
+  'Sorted by {column}, descending': 'الترتيب حسب {column}، تنازلي',
 }
 
 export default ar

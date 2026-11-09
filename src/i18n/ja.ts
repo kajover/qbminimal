@@ -1270,6 +1270,12 @@ const ja: Record<string, string> = {
   'Make the details larger': '詳細を大きくする',
   'Show more': '詳しく表示',
   'Show less': '表示を減らす',
+  'Retry': '再試行',
+  'A magnet link needs peers to share the file list.': 'マグネットリンクにはファイル一覧を共有するピアが必要です。',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': 'ファイル一覧を時間内に取得できませんでした。マグネットリンクには共有するピアが必要です。ファイルを選ばずにトレントを追加することもできます。',
+  'Selection cleared': '選択を解除しました',
+  'Sorted by {column}, ascending': '{column}で昇順に並べ替え',
+  'Sorted by {column}, descending': '{column}で降順に並べ替え',
 }
 
 export default ja

@@ -6,9 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageHeader } from '@/components/PageHeader'
 import { FreeSpaceHint } from './FreeSpaceHint'
 import { Checkbox } from '@/components/ui/checkbox'
+import { TorrentFilePicker } from './TorrentFilePicker'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useCategories, useTags } from '@/hooks/useApi'
+import { useCategories, useTags, useWebApiVersion } from '@/hooks/useApi'
+import { supportsFeature } from '@/lib/apiVersion'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import {
@@ -20,22 +22,14 @@ import {
   type AddTorrentOptions,
   type TorrentMetadata,
 } from '@/lib/addTorrent'
-import { formatBytes } from '@/lib/format'
 import { onIncoming, takeIncoming } from '@/lib/incoming'
 import { TorrentCreator } from './TorrentCreator'
 import { t } from '@/i18n'
 
 const selectClass = 'border-input dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-2 text-sm'
 const METADATA_POLL_MS = 1500
-const METADATA_TIMEOUT_MS = 120000
-
-// qBittorrent's file priorities: 0 skips the file.
-const FILE_PRIORITIES = [
-  { value: 1, label: t('Normal') },
-  { value: 6, label: t('High') },
-  { value: 7, label: t('Maximum') },
-  { value: 0, label: t('Don\'t download') },
-]
+const METADATA_TIMEOUT_MS = 60000
+const METADATA_DEBOUNCE_MS = 600
 
 function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
   return (
@@ -83,7 +77,10 @@ export function AddTorrentView() {
   const [metadataSource, setMetadataSource] = useState<string | null>(null)
   const [priorities, setPriorities] = useState<number[]>([])
   const [fetchingMetadata, setFetchingMetadata] = useState(false)
+  const [metadataError, setMetadataError] = useState<string | null>(null)
   const fetchRun = useRef(0)
+  const { data: webApiVersion } = useWebApiVersion()
+  const metadataSupported = supportsFeature(webApiVersion, 'metadata')
 
   const linkList = parseLinks(links)
   const sourceCount = linkList.length + files.length
@@ -127,12 +124,14 @@ export function AddTorrentView() {
   const stopFetching = () => {
     fetchRun.current++
     setFetchingMetadata(false)
+    setMetadataError(t('Stopped'))
   }
 
   const fetchFileList = async () => {
     const run = ++fetchRun.current
     setFetchingMetadata(true)
     setMetadata(null)
+    setMetadataError(null)
     const started = Date.now()
     if (singleSource instanceof File) {
       try {
@@ -148,7 +147,7 @@ export function AddTorrentView() {
       } catch (error) {
         if (fetchRun.current !== run) return
         const message = error instanceof Error ? error.message : ''
-        toast.error(t('Couldn\'t read the .torrent file'), { description: message.includes('404') ? t('This needs qBittorrent 5.2 or newer.') : message || undefined })
+        setMetadataError(message.includes('404') ? t('This needs qBittorrent 5.2 or newer.') : message || t('Couldn\'t read the .torrent file'))
       } finally {
         if (fetchRun.current === run) setFetchingMetadata(false)
       }
@@ -166,7 +165,7 @@ export function AddTorrentView() {
           return
         }
         if (Date.now() - started > METADATA_TIMEOUT_MS) {
-          toast.error(t('Couldn\'t get the file list in time'), { description: t('A magnet link needs peers to share it. You can still add the torrent without choosing files.') })
+          setMetadataError(t('Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.'))
           return
         }
         await new Promise(resolve => setTimeout(resolve, METADATA_POLL_MS))
@@ -174,13 +173,23 @@ export function AddTorrentView() {
     } catch (error) {
       if (fetchRun.current !== run) return
       const message = error instanceof Error ? error.message : ''
-      toast.error(t('Couldn\'t get the file list'), {
-        description: message.includes('404') ? t('This needs qBittorrent 5.2 or newer.') : message || undefined,
-      })
+      setMetadataError(message.includes('404') ? t('This needs qBittorrent 5.2 or newer.') : message || t('Couldn\'t get the file list'))
     } finally {
       if (fetchRun.current === run) setFetchingMetadata(false)
     }
   }
+
+  // Looks up the file list on its own once the single source stops changing.
+  const fetchRef = useRef(fetchFileList)
+  useEffect(() => { fetchRef.current = fetchFileList })
+  useEffect(() => {
+    fetchRun.current++
+    setFetchingMetadata(false)
+    setMetadataError(null)
+    if (!metadataSupported || !sourceKey) return
+    const timer = setTimeout(() => { void fetchRef.current() }, METADATA_DEBOUNCE_MS)
+    return () => clearTimeout(timer)
+  }, [sourceKey, metadataSupported])
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
@@ -278,48 +287,26 @@ export function AddTorrentView() {
             {canChooseFiles && (
               <div className="space-y-2 rounded-md border p-3 text-sm">
                 {!activeMetadata ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button type="button" size="sm" variant="outline" disabled={fetchingMetadata} onClick={fetchFileList}>
-                      {fetchingMetadata && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
-                      {fetchingMetadata ? t('Getting file list...') : t('Choose files first')}
-                    </Button>
-                    {fetchingMetadata && <Button type="button" size="sm" variant="ghost" onClick={stopFetching}>{t('Stop')}</Button>}
-                    <span className="text-xs text-muted-foreground">{singleSource instanceof File ? t('Optional.') : t('Optional. Magnet links need peers to share the list.')}</span>
+                  <div className="flex flex-wrap items-center gap-2" aria-live="polite">
+                    {fetchingMetadata ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>{t('Getting file list...')}</span>
+                        <Button type="button" size="sm" variant="ghost" onClick={stopFetching}>{t('Cancel')}</Button>
+                        {!(singleSource instanceof File) && <span className="w-full text-xs text-muted-foreground">{t('A magnet link needs peers to share the file list.')}</span>}
+                      </>
+                    ) : (
+                      <>
+                        {metadataError && <span className="text-xs text-destructive">{metadataError}</span>}
+                        <Button type="button" size="sm" variant="outline" onClick={fetchFileList}>
+                          {metadataError ? t('Retry') : t('Choose files first')}
+                        </Button>
+                        {!metadataError && <span className="text-xs text-muted-foreground">{singleSource instanceof File ? t('Optional.') : t('Optional. Magnet links need peers to share the list.')}</span>}
+                      </>
+                    )}
                   </div>
                 ) : (
-                  <>
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="font-medium break-all">{activeMetadata.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {t('{size} of {total} selected', { size: formatBytes(activeMetadata.files.reduce((sum, file, i) => sum + (priorities[i] > 0 ? file.length : 0), 0)), total: formatBytes(activeMetadata.size) })}
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button type="button" size="sm" variant="ghost" onClick={() => setPriorities(activeMetadata.files.map(() => 1))}>{t('Select all')}</Button>
-                      <Button type="button" size="sm" variant="ghost" onClick={() => setPriorities(activeMetadata.files.map(() => 0))}>{t('Select none')}</Button>
-                    </div>
-                    <ul className="max-h-64 space-y-1 overflow-y-auto">
-                      {activeMetadata.files.map((file, i) => (
-                        <li key={file.path} className="flex items-center gap-2">
-                          <Checkbox
-                            aria-label={t('Download {path}', { path: file.path })}
-                            checked={priorities[i] > 0}
-                            onCheckedChange={(checked) => setPriorities(prev => prev.map((p, j) => (j === i ? (checked ? 1 : 0) : p)))}
-                          />
-                          <span className="min-w-0 flex-1 break-all text-xs">{file.path}</span>
-                          <span className="flex-shrink-0 text-xs text-muted-foreground">{formatBytes(file.length)}</span>
-                          <select
-                            aria-label={t('Priority for {path}', { path: file.path })}
-                            value={priorities[i]}
-                            onChange={(e) => setPriorities(prev => prev.map((p, j) => (j === i ? Number(e.target.value) : p)))}
-                            className="border-input dark:bg-input/30 h-7 flex-shrink-0 rounded-md border bg-transparent px-1 text-xs"
-                          >
-                            {FILE_PRIORITIES.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
-                          </select>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
+                  <TorrentFilePicker metadata={activeMetadata} priorities={priorities} onChange={setPriorities} />
                 )}
               </div>
             )}

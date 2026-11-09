@@ -255,8 +255,26 @@ export class DemoClient implements ApiClient {
     return files.map(file => ({ hash: fakeHash(file.name), info: { name: file.name.replace(/\.torrent$/, ''), length: 2 * MiB, files: [{ path: 'Demo/video.mkv', length: 1.5 * MiB }, { path: 'Demo/readme.txt', length: 0.5 * MiB }] } }))
   }
 
+  // Like a magnet link finding peers: only the hash for the first ~2 seconds, then the file list.
+  private metadataAsked = new Map<string, number>()
   async fetchMetadata(source: string) {
-    return { hash: fakeHash(source), info: { name: source.slice(0, 48), length: 3 * MiB, files: [{ path: 'Demo/video.mkv', length: 2 * MiB }, { path: 'Demo/subtitles.srt', length: 1 * MiB }] } }
+    const first = this.metadataAsked.get(source) ?? Date.now()
+    this.metadataAsked.set(source, first)
+    if (Date.now() - first < 2000) return { hash: fakeHash(source) }
+    return {
+      hash: fakeHash(source),
+      info: {
+        name: 'Big.Buck.Bunny.and.Friends.Complete.Collection.2008-2024.2160p.UHD.BluRay.REMUX.HDR10.HEVC.DTS-HD.MA.5.1',
+        length: 9 * MiB,
+        files: [
+          { path: 'Big.Buck.Bunny.and.Friends.Complete.Collection.2008-2024.2160p.UHD.BluRay.REMUX.HDR10.HEVC.DTS-HD.MA.5.1/Season 01/Big.Buck.Bunny.and.Friends.S01E01.The.Very.First.Morning.In.The.Meadow.2160p.UHD.BluRay.REMUX.mkv', length: 4 * MiB },
+          { path: 'Big.Buck.Bunny.and.Friends.Complete.Collection.2008-2024.2160p.UHD.BluRay.REMUX.HDR10.HEVC.DTS-HD.MA.5.1/Season 01/Big.Buck.Bunny.and.Friends.S01E02.A.Squirrel.Named.Frank.2160p.UHD.BluRay.REMUX.mkv', length: 3 * MiB },
+          { path: 'Big.Buck.Bunny.and.Friends.Complete.Collection.2008-2024.2160p.UHD.BluRay.REMUX.HDR10.HEVC.DTS-HD.MA.5.1/Subtitles/English (SDH)/Big.Buck.Bunny.and.Friends.S01E01.en.sdh.forced.srt', length: 0.5 * MiB },
+          { path: 'Big.Buck.Bunny.and.Friends.Complete.Collection.2008-2024.2160p.UHD.BluRay.REMUX.HDR10.HEVC.DTS-HD.MA.5.1/Subtitles/English (SDH)/Big.Buck.Bunny.and.Friends.S01E02.en.sdh.forced.srt', length: 0.5 * MiB },
+          { path: 'Big.Buck.Bunny.and.Friends.Complete.Collection.2008-2024.2160p.UHD.BluRay.REMUX.HDR10.HEVC.DTS-HD.MA.5.1/readme.txt', length: 1 * MiB },
+        ],
+      },
+    }
   }
 
   async pauseTorrents(hashes: string[]) { this.each(hashes, t => { t.stopped = true }) }

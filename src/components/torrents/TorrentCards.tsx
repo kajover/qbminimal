@@ -64,10 +64,12 @@ export function TorrentCards({ torrents, selected, showCheckboxes, onToggle, ope
             key={torrent.hash}
             {...rowProps(torrent)}
             aria-selected={isSelected}
+            aria-current={openHash === torrent.hash ? 'true' : undefined}
             className={cn(
               'flex cursor-default items-start gap-2 rounded-xl border bg-card px-3 py-2.5 shadow-sm transition-[transform,border-color] outline-none select-none focus-visible:ring-2 focus-visible:ring-ring [-webkit-touch-callout:none] active:scale-[0.99]',
               isSelected && 'border-primary ring-1 ring-primary',
-              openHash === torrent.hash && !isSelected && 'border-primary/60',
+              openHash === torrent.hash && 'bg-primary/10 shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]',
+              openHash === torrent.hash && !isSelected && 'border-primary/50',
             )}
           >
             {showCheckboxes && (

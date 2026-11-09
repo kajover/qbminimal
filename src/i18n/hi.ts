@@ -1270,6 +1270,12 @@ const hi: Record<string, string> = {
   'Make the details larger': 'विवरण बड़ा करें',
   'Show more': 'और दिखाएँ',
   'Show less': 'कम दिखाएँ',
+  'Retry': 'फिर से कोशिश करें',
+  'A magnet link needs peers to share the file list.': 'मैग्नेट लिंक को फ़ाइल सूची साझा करने के लिए पीयर चाहिए।',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': 'फ़ाइल सूची समय पर नहीं मिल सकी। मैग्नेट लिंक को साझा करने के लिए पीयर चाहिए। आप फ़ाइलें चुने बिना भी टोरेंट जोड़ सकते हैं।',
+  'Selection cleared': 'चयन हटाया गया',
+  'Sorted by {column}, ascending': '{column} के अनुसार क्रमबद्ध, आरोही',
+  'Sorted by {column}, descending': '{column} के अनुसार क्रमबद्ध, अवरोही',
 }
 
 export default hi

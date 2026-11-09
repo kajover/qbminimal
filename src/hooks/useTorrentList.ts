@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { loadListSettings, saveListSettings, type ListView, type SortDirection, type SortField } from '@/lib/listSettings'
+import { DEFAULT_LIST_SETTINGS, loadListSettings, saveListSettings, type ListView, type SortDirection, type SortField } from '@/lib/listSettings'
 import { compareTorrents } from '@/lib/torrentColumns'
 import { countFilterOptions, filterTorrents, groupTrackersByHost, type TorrentFilters } from '@/lib/torrentFilters'
 import type { Torrent } from '@/types'
@@ -61,6 +61,11 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
     // Picking the sorted column again flips the direction.
     sortBy: (field: SortField) => {
       setSort(current => ({ field, direction: current.field === field && current.direction === 'asc' ? 'desc' : 'asc' }))
+      setRequestedPage(1)
+    },
+    // Back to qBittorrent's queue order, as on first use.
+    resetSort: () => {
+      setSort({ field: DEFAULT_LIST_SETTINGS.sortField, direction: DEFAULT_LIST_SETTINGS.sortDirection })
       setRequestedPage(1)
     },
     // 'auto' follows the screen: the table when wide, cards on phones.

@@ -5,6 +5,28 @@ import { t } from '@/i18n'
 
 const DONE_COLOR = '#22c55e'
 const DOWNLOADING_COLOR = '#f59e0b'
+const DOWNLOADING_ALT_COLOR = '#b45309'
+// Same stripes as the legend swatch (.piece-stripes in index.css).
+function stripePattern(context: CanvasRenderingContext2D, size: number) {
+  const tile = document.createElement('canvas')
+  tile.width = tile.height = size
+  const tileContext = tile.getContext('2d')
+  if (!tileContext) return null
+  tileContext.fillStyle = DOWNLOADING_COLOR
+  tileContext.fillRect(0, 0, size, size)
+  tileContext.fillStyle = DOWNLOADING_ALT_COLOR
+  // Two bands cover the diagonal and its wrap-around corners, so the tile repeats seamlessly.
+  for (const offset of [0, -size]) {
+    tileContext.beginPath()
+    tileContext.moveTo(offset + size / 2, 0)
+    tileContext.lineTo(offset + size, 0)
+    tileContext.lineTo(offset + size * 1.5, size)
+    tileContext.lineTo(offset + size, size)
+    tileContext.closePath()
+    tileContext.fill()
+  }
+  return context.createPattern(tile, 'repeat')
+}
 // Keeps a column with only a few finished pieces visible on a huge torrent.
 const MIN_DONE_OPACITY = 0.25
 
@@ -18,10 +40,12 @@ function drawPieces(canvas: HTMLCanvasElement, states: number[]) {
   canvas.width = width
   canvas.height = height
 
+  const stripes = stripePattern(context, Math.max(4, Math.round(5 * window.devicePixelRatio)))
   getPieceColumns(states, width).forEach((column, x) => {
     if (column.downloading) {
+      // Diagonal stripes, so downloading doesn't rely on colour alone.
       context.globalAlpha = 1
-      context.fillStyle = DOWNLOADING_COLOR
+      context.fillStyle = stripes ?? DOWNLOADING_COLOR
     } else if (column.done > 0) {
       context.globalAlpha = MIN_DONE_OPACITY + (1 - MIN_DONE_OPACITY) * column.done
       context.fillStyle = DONE_COLOR
@@ -121,7 +145,7 @@ export function PieceBar({ hash, torrentComplete }: { hash: string; torrentCompl
         <span>{summary}</span>
         <span className="flex items-center gap-2">
           <LegendItem className="bg-green-500" label={t('Done')} />
-          <LegendItem className="bg-amber-500" label={t('Downloading')} />
+          <LegendItem className="piece-stripes" label={t('Downloading')} />
           <LegendItem className="border bg-muted" label={t('Missing')} />
         </span>
       </div>

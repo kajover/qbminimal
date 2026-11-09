@@ -166,7 +166,8 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
 
       <div>
         <div className="flex">
-          <div ref={sidebarBox} className="sticky top-14 hidden h-[calc(100vh-3.5rem)] flex-shrink-0 self-start md:flex">
+          {/* Above the torrent details panel (z-30), so the edge handle is never covered. */}
+          <div ref={sidebarBox} className="sticky top-14 z-[35] hidden h-[calc(100vh-3.5rem)] flex-shrink-0 self-start md:flex">
             {sidebarShown && (
               <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="w-max min-w-[150px] overflow-x-hidden overflow-y-auto p-2 pb-4">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{navButtons}</nav>

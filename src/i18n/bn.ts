@@ -1270,6 +1270,12 @@ const bn: Record<string, string> = {
   'Make the details larger': 'বিস্তারিত বড় করুন',
   'Show more': 'আরও দেখুন',
   'Show less': 'কম দেখুন',
+  'Retry': 'আবার চেষ্টা করুন',
+  'A magnet link needs peers to share the file list.': 'ম্যাগনেট লিংকের ফাইল তালিকা শেয়ার করার জন্য পিয়ার দরকার।',
+  'Couldn\'t get the file list in time. A magnet link needs peers to share it. You can still add the torrent without choosing files.': 'ফাইল তালিকা সময়মতো পাওয়া যায়নি। ম্যাগনেট লিংক শেয়ার করার জন্য পিয়ার দরকার। ফাইল না বেছেও আপনি টরেন্ট যোগ করতে পারেন।',
+  'Selection cleared': 'নির্বাচন মুছে ফেলা হয়েছে',
+  'Sorted by {column}, ascending': '{column} অনুযায়ী সাজানো, ঊর্ধ্বক্রমে',
+  'Sorted by {column}, descending': '{column} অনুযায়ী সাজানো, নিম্নক্রমে',
 }
 
 export default bn
