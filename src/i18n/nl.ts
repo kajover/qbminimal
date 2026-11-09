@@ -9,7 +9,6 @@ const nl: Record<string, string> = {
   '{minutes} min ago': '{minutes} min geleden',
   'Language': 'Taal',
   'Same as the browser': 'Zelfde als de browser',
-  'Theme and language follow your device unless you choose': 'Thema en taal volgen je apparaat, tenzij je zelf kiest',
   'Add tags': 'Labels toevoegen',
   'Allocating': 'Toewijzen',
   'Anime': 'Anime',
@@ -1276,6 +1275,14 @@ const nl: Record<string, string> = {
   'Selection cleared': 'Selectie gewist',
   'Sorted by {column}, ascending': 'Gesorteerd op {column}, oplopend',
   'Sorted by {column}, descending': 'Gesorteerd op {column}, aflopend',
+  'Text size': 'Tekstgrootte',
+  'Small': 'Klein',
+  'Large': 'Groot',
+  'Larger': 'Groter',
+  'Theme, language and text size follow your device unless you choose': 'Thema, taal en tekstgrootte volgen je apparaat, tenzij je zelf kiest',
+  'Tab bar labels': 'Labels in de tabbalk',
+  'Speeds in the header': 'Snelheden in de kopbalk',
+  'Speed limit button in the header': 'Knop voor snelheidslimiet in de kopbalk',
 }
 
 export default nl

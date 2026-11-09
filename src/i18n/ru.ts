@@ -9,7 +9,6 @@ const ru: Record<string, string> = {
   '{minutes} min ago': '{minutes} мин назад',
   'Language': 'Язык',
   'Same as the browser': 'Как в браузере',
-  'Theme and language follow your device unless you choose': 'Тема и язык берутся из настроек устройства, если вы не выберете их сами',
   'Add tags': 'Добавить метки',
   'Allocating': 'Выделение места',
   'Anime': 'Аниме',
@@ -1276,6 +1275,14 @@ const ru: Record<string, string> = {
   'Selection cleared': 'Выделение снято',
   'Sorted by {column}, ascending': 'Сортировка по столбцу «{column}», по возрастанию',
   'Sorted by {column}, descending': 'Сортировка по столбцу «{column}», по убыванию',
+  'Text size': 'Размер текста',
+  'Small': 'Мелкий',
+  'Large': 'Крупный',
+  'Larger': 'Ещё крупнее',
+  'Theme, language and text size follow your device unless you choose': 'Тема, язык и размер текста берутся с устройства, если вы не выберете другие',
+  'Tab bar labels': 'Подписи на панели вкладок',
+  'Speeds in the header': 'Скорости в шапке',
+  'Speed limit button in the header': 'Кнопка ограничения скорости в шапке',
 }
 
 export default ru

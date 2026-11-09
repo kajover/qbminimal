@@ -46,10 +46,43 @@ In Safari on an iPhone, where the list runs on behind the address bar:
 - **Logs**, statistics with a live speed graph, connection status, and the alternative speed limit switch. A notice says when qBittorrent can't be reached.
 - **Notifications** when a torrent finishes, if you turn them on.
 - **Keyboard shortcuts** for the torrent list. Press `?` to see them.
-- **Languages**: English, Arabic, Bengali, Chinese (Simplified and Traditional), Dutch, French, German, Hindi, Italian, Japanese, Korean, Polish, Portuguese (Portugal), Russian, Spanish (Spain), and Turkish, with the page mirrored for Arabic. The language follows the browser, or pick one in Settings.
+- **16 languages**, listed [below](#languages).
+- **Accessibility options**, described [below](#accessibility).
 - **Settings**: every qBittorrent preference, shown only when your qBittorrent version has it.
 - A sidebar you can hide on wide screens.
-- Light and dark themes that follow your device, and a layout made for phones, including when added to the home screen.
+- Light and dark themes that follow your device, and a layout made for phones, including when added to the home screen. Under **Settings > App > Appearance** you can also hide the speeds and the speed limit button in the header.
+
+## Accessibility
+
+- **Text size**: Small, Default, Large, or Larger under **Settings > App > Appearance**. Spacing, icons, and table columns grow with the text, and the sizes build on the browser's own text size, so a larger default set there still counts. On iPhone and iPad you can still pinch to zoom.
+- **Color-blind-safe colors** are applied throughout: every status, speed, ratio, and pieces color comes from the [Okabe–Ito](https://jfly.uni-koeln.de/color/) set (bluish green, blue, orange, and vermillion), chosen to stay easy to tell apart with any kind of color blindness. Colors never carry meaning alone either: statuses have labels, speeds have arrows, the upload line in the speed graph is dashed, and pieces being downloaded are striped.
+- **Screen readers** hear when the selection, the sort order, the view, or the number of matching torrents changes. Icon buttons have names, and the tab bar's names stay readable to screen readers when they are hidden on screen.
+- **Tab bar labels** can be turned off on phones under **Settings > App > Appearance**, leaving larger icons.
+- **Keyboard shortcuts** for the torrent list. Press `?` to see them.
+
+## Languages
+
+| Language | Shown as |
+| --- | --- |
+| English | English |
+| Arabic | العربية |
+| Bengali | বাংলা |
+| Chinese (Simplified) | 中文（简体） |
+| Chinese (Traditional) | 中文（繁體） |
+| Dutch | Nederlands |
+| French | Français |
+| German | Deutsch |
+| Hindi | हिन्दी |
+| Italian | Italiano |
+| Japanese | 日本語 |
+| Korean | 한국어 |
+| Polish | Polski |
+| Portuguese (Portugal) | Português (Portugal) |
+| Russian | Русский |
+| Spanish (Spain) | Español |
+| Turkish | Türkçe |
+
+The language follows the browser, or pick one under **Settings > App > Appearance**. For Arabic the page is mirrored, right to left. See [Translations](#translations) to add one or correct one.
 
 ## Requirements
 
@@ -114,6 +147,8 @@ DEPLOY_URL=https://example.com/qbittorrent/
 Then run `npm run deploy` for the latest release, or `scripts/deploy.sh --zip qbminimal-release.zip` for a local build.
 
 ## Credits
+
+qbminimal is influenced by the original project [qbitWebber](https://github.com/ksuaning-au/qbitWebber).
 
 Third-party components and their licenses are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

@@ -9,7 +9,6 @@ const tr: Record<string, string> = {
   '{minutes} min ago': '{minutes} dk önce',
   'Language': 'Dil',
   'Same as the browser': 'Tarayıcıyla aynı',
-  'Theme and language follow your device unless you choose': 'Siz seçmedikçe tema ve dil cihazınızı izler',
   'Add tags': 'Etiketleri ekle',
   'Allocating': 'Ayrılıyor',
   'Anime': 'Anime',
@@ -1276,6 +1275,14 @@ const tr: Record<string, string> = {
   'Selection cleared': 'Seçim temizlendi',
   'Sorted by {column}, ascending': '{column} sütununa göre sıralandı, artan',
   'Sorted by {column}, descending': '{column} sütununa göre sıralandı, azalan',
+  'Text size': 'Metin boyutu',
+  'Small': 'Küçük',
+  'Large': 'Büyük',
+  'Larger': 'Daha büyük',
+  'Theme, language and text size follow your device unless you choose': 'Siz seçmedikçe tema, dil ve metin boyutu cihazınıza uyar',
+  'Tab bar labels': 'Sekme çubuğu etiketleri',
+  'Speeds in the header': 'Başlıktaki hızlar',
+  'Speed limit button in the header': 'Başlıktaki hız sınırı düğmesi',
 }
 
 export default tr

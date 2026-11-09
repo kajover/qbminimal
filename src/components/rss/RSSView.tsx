@@ -48,7 +48,7 @@ export function RSSView() {
 
       {feedsQuery.isLoading ? <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading feeds...')}</p> : (
         <div className="flex flex-col gap-4 md:flex-row md:items-start">
-          <Card className="w-full gap-2 md:w-80">
+          <Card className="gap-2 md:w-80">
             <CardHeader className="flex items-center justify-between gap-1">
               <CardTitle>{t('Feeds')}</CardTitle>
               <div className="flex gap-1">

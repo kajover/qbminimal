@@ -9,7 +9,6 @@ const zhHans: Record<string, string> = {
   '{minutes} min ago': '{minutes} 分钟前',
   'Language': '语言',
   'Same as the browser': '跟随浏览器',
-  'Theme and language follow your device unless you choose': '除非手动选择，主题和语言跟随设备',
   'Add tags': '添加标签',
   'Allocating': '正在分配',
   'Anime': '动画',
@@ -1276,6 +1275,14 @@ const zhHans: Record<string, string> = {
   'Selection cleared': '已清除选择',
   'Sorted by {column}, ascending': '按{column}升序排序',
   'Sorted by {column}, descending': '按{column}降序排序',
+  'Text size': '文字大小',
+  'Small': '小',
+  'Large': '大',
+  'Larger': '更大',
+  'Theme, language and text size follow your device unless you choose': '除非你自行选择，主题、语言和文字大小都跟随设备',
+  'Tab bar labels': '标签栏文字',
+  'Speeds in the header': '标题栏中的速度',
+  'Speed limit button in the header': '标题栏中的限速按钮',
 }
 
 export default zhHans

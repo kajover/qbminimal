@@ -3,18 +3,22 @@ import { useTorrentAvailability, useTorrentPieces } from '@/hooks/useApi'
 import { countPieces, getAvailabilityColumns, getPieceColumns } from '@/lib/pieces'
 import { t } from '@/i18n'
 
-const DONE_COLOR = '#22c55e'
-const DOWNLOADING_COLOR = '#f59e0b'
-const DOWNLOADING_ALT_COLOR = '#b45309'
+// The palette's colors as the page has them (index.css sets the color-blind-safe ones), so the
+// bars match the rest of the page. The fallbacks are Tailwind's own, should a color not be on the page.
+const paletteColor = (name: string, fallback: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(`--color-${name}`).trim() || fallback
+const doneColor = () => paletteColor('green-500', '#22c55e')
+const downloadingColor = () => paletteColor('amber-500', '#f59e0b')
+const downloadingAltColor = () => paletteColor('amber-700', '#b45309')
 // Same stripes as the legend swatch (.piece-stripes in index.css).
 function stripePattern(context: CanvasRenderingContext2D, size: number) {
   const tile = document.createElement('canvas')
   tile.width = tile.height = size
   const tileContext = tile.getContext('2d')
   if (!tileContext) return null
-  tileContext.fillStyle = DOWNLOADING_COLOR
+  tileContext.fillStyle = downloadingColor()
   tileContext.fillRect(0, 0, size, size)
-  tileContext.fillStyle = DOWNLOADING_ALT_COLOR
+  tileContext.fillStyle = downloadingAltColor()
   // Two bands cover the diagonal and its wrap-around corners, so the tile repeats seamlessly.
   for (const offset of [0, -size]) {
     tileContext.beginPath()
@@ -45,10 +49,10 @@ function drawPieces(canvas: HTMLCanvasElement, states: number[]) {
     if (column.downloading) {
       // Diagonal stripes, so downloading doesn't rely on colour alone.
       context.globalAlpha = 1
-      context.fillStyle = stripes ?? DOWNLOADING_COLOR
+      context.fillStyle = stripes ?? downloadingColor()
     } else if (column.done > 0) {
       context.globalAlpha = MIN_DONE_OPACITY + (1 - MIN_DONE_OPACITY) * column.done
-      context.fillStyle = DONE_COLOR
+      context.fillStyle = doneColor()
     } else {
       return
     }
@@ -56,8 +60,8 @@ function drawPieces(canvas: HTMLCanvasElement, states: number[]) {
   })
 }
 
-const AVAILABLE_COLOR = '#3b82f6'
-const UNAVAILABLE_COLOR = '#ef4444'
+const availableColor = () => paletteColor('blue-500', '#3b82f6')
+const unavailableColor = () => paletteColor('red-500', '#ef4444')
 
 function drawAvailability(canvas: HTMLCanvasElement, availability: number[]) {
   const context = canvas.getContext('2d')
@@ -70,7 +74,7 @@ function drawAvailability(canvas: HTMLCanvasElement, availability: number[]) {
     if (peers < 0) return
     // More peers with a piece shows as a stronger blue, up to five.
     context.globalAlpha = peers === 0 ? 1 : 0.3 + 0.7 * Math.min(peers, 5) / 5
-    context.fillStyle = peers === 0 ? UNAVAILABLE_COLOR : AVAILABLE_COLOR
+    context.fillStyle = peers === 0 ? unavailableColor() : availableColor()
     context.fillRect(x, 0, 1, height)
   })
 }

@@ -105,13 +105,13 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
         </table>
       </div>
 
-      <ul className="space-y-2 md:hidden">
+      <ul className="space-y-2 max-sm:-mx-2 md:hidden">
         {shown.map(result => (
           <li key={`${result.fileUrl}|${result.descrLink}`} className="flex items-start gap-2 rounded-xl border bg-card px-3 py-2.5">
             <button type="button" className="min-w-0 flex-1 text-start" onClick={() => result.fileUrl && onAdd(result)}>
-              <span className="block text-[10px] text-muted-foreground">{t('{seeds} seeds · {leeches} leeches', { seeds: result.nbSeeders, leeches: result.nbLeechers })}</span>
-              <span className="block text-xs font-medium [overflow-wrap:anywhere]">{result.fileName}</span>
-              <span className="block truncate text-[10px] text-muted-foreground">{formatBytes(result.fileSize)} · {host(result.siteUrl)}</span>
+              <span className="block text-xs text-muted-foreground">{t('{seeds} seeds · {leeches} leeches', { seeds: result.nbSeeders, leeches: result.nbLeechers })}</span>
+              <span className="block text-sm font-medium [overflow-wrap:anywhere]">{result.fileName}</span>
+              <span className="block truncate text-xs text-muted-foreground">{formatBytes(result.fileSize)} · {host(result.siteUrl)}</span>
             </button>
             {links(result)}
           </li>

@@ -45,7 +45,7 @@ export function SpeedLimitToggle() {
     <Button
       variant="ghost"
       size="icon"
-      className={cn('h-8 w-8', enabled && 'bg-amber-500/15 text-amber-600 hover:bg-amber-500/25 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-400')}
+      className={cn('h-8 w-8 [:root[data-speed-limit-button=off]_&]:hidden', enabled && 'bg-amber-500/15 text-amber-600 hover:bg-amber-500/25 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-400')}
       aria-label={t('Alternative speed limits')}
       aria-pressed={enabled}
       title={title}

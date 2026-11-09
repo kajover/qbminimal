@@ -1,4 +1,5 @@
 import { useRef, useState, type DragEvent, type KeyboardEvent, type PointerEvent, type ReactElement, type ReactNode } from 'react'
+import { textScale } from '@/lib/textSize'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
@@ -43,7 +44,7 @@ function Cell({ torrent, id }: { torrent: Torrent; id: ColumnId }): ReactNode {
     }
     case 'state':
       return (
-        <span className={cn('inline-block max-w-full truncate rounded px-1.5 py-0.5 text-xs font-medium', getStateBadge(torrent.state, torrent.completion_on))} title={torrent.error || undefined}>
+        <span className={cn('inline-block max-w-full truncate rounded px-1.5 py-0.5 font-medium', getStateBadge(torrent.state, torrent.completion_on))} title={torrent.error || undefined}>
           {getStateLabel(torrent.state, torrent.completion_on)}
         </span>
       )
@@ -127,8 +128,11 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   const [dropTarget, setDropTarget] = useState<ColumnId | null>(null)
   const scroller = useRef<HTMLDivElement>(null)
 
-  const widthOf = (id: ColumnId) => (resizing?.id === id ? resizing.width : columnWidth(layout, id))
-  const total = SELECT_WIDTH + columns.reduce((sum, def) => sum + widthOf(def.id), 0)
+  // Widths are saved as they were for 12px text, so the table's 14px text and a larger text size
+  // widen them to keep their text fitting.
+  const scale = textScale() * (14 / 12)
+  const widthOf = (id: ColumnId) => (resizing?.id === id ? resizing.width : columnWidth(layout, id) * scale)
+  const total = SELECT_WIDTH * scale + columns.reduce((sum, def) => sum + widthOf(def.id), 0)
 
   const startResize = (e: PointerEvent<HTMLSpanElement>, id: ColumnId) => {
     e.preventDefault()
@@ -140,10 +144,10 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   const moveResize = (e: PointerEvent<HTMLSpanElement>, id: ColumnId) => {
     if (!resizeStart.current || resizing?.id !== id) return
     const def = getColumn(id)
-    setResizing({ id, width: Math.max(def.minWidth, resizeStart.current.width + (e.clientX - resizeStart.current.x) * resizeStart.current.sign) })
+    setResizing({ id, width: Math.max(def.minWidth * scale, resizeStart.current.width + (e.clientX - resizeStart.current.x) * resizeStart.current.sign) })
   }
   const endResize = () => {
-    if (resizing) onLayoutChange(resizeColumn(layout, resizing.id, resizing.width))
+    if (resizing) onLayoutChange(resizeColumn(layout, resizing.id, resizing.width / scale))
     resizeStart.current = null
     setResizing(null)
   }
@@ -157,7 +161,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
     const header = host.querySelectorAll('thead th')[index + 1]
     // Room for the sort arrow, so sorting by the column later doesn't cut its header.
     const headerWidth = header ? naturalWidth([header], host) + 18 : 0
-    onLayoutChange(resizeColumn(layout, id, Math.max(naturalWidth(cells, host), headerWidth) + 1))
+    onLayoutChange(resizeColumn(layout, id, (Math.max(naturalWidth(cells, host), headerWidth) + 1) / scale))
   }
 
   const onDragStart = (e: DragEvent<HTMLTableCellElement>, id: ColumnId) => {
@@ -193,10 +197,10 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
 
   return (
     // Its own scrollbar is hidden: the one at the bottom of the screen stands in for it.
-    <div ref={scroller} className="overflow-x-auto overscroll-x-none rounded-xl border bg-card [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <table className="table-fixed caption-bottom text-xs tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
+    <div ref={scroller} className="overflow-x-auto overscroll-x-none rounded-xl border bg-card max-sm:-mx-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <table className="table-fixed caption-bottom text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
         <colgroup>
-          <col style={{ width: SELECT_WIDTH }} />
+          <col style={{ width: SELECT_WIDTH * scale }} />
           {columns.map(def => <col key={def.id} style={{ width: widthOf(def.id) }} />)}
           {/* Takes any room left over, so the columns keep their widths. */}
           <col />

@@ -9,7 +9,6 @@ const ar: Record<string, string> = {
   '{minutes} min ago': 'قبل {minutes} د',
   'Language': 'اللغة',
   'Same as the browser': 'مثل المتصفح',
-  'Theme and language follow your device unless you choose': 'يتبع المظهر واللغة جهازك ما لم تختر غير ذلك',
   'Add tags': 'إضافة وسوم',
   'Allocating': 'جارٍ الحجز',
   'Anime': 'أنمي',
@@ -1276,6 +1275,14 @@ const ar: Record<string, string> = {
   'Selection cleared': 'تم مسح التحديد',
   'Sorted by {column}, ascending': 'الترتيب حسب {column}، تصاعدي',
   'Sorted by {column}, descending': 'الترتيب حسب {column}، تنازلي',
+  'Text size': 'حجم النص',
+  'Small': 'صغير',
+  'Large': 'كبير',
+  'Larger': 'أكبر',
+  'Theme, language and text size follow your device unless you choose': 'يتبع المظهر واللغة وحجم النص جهازك ما لم تختر غير ذلك',
+  'Tab bar labels': 'أسماء شريط التبويب',
+  'Speeds in the header': 'السرعات في الترويسة',
+  'Speed limit button in the header': 'زر حدود السرعة في الترويسة',
 }
 
 export default ar

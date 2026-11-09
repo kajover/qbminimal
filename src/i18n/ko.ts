@@ -9,7 +9,6 @@ const ko: Record<string, string> = {
   '{minutes} min ago': '{minutes}분 전',
   'Language': '언어',
   'Same as the browser': '브라우저와 동일',
-  'Theme and language follow your device unless you choose': '직접 선택하지 않으면 테마와 언어는 기기 설정을 따릅니다',
   'Add tags': '태그 추가',
   'Allocating': '할당 중',
   'Anime': '애니메이션',
@@ -1276,6 +1275,14 @@ const ko: Record<string, string> = {
   'Selection cleared': '선택이 해제되었습니다',
   'Sorted by {column}, ascending': '{column} 기준 오름차순 정렬',
   'Sorted by {column}, descending': '{column} 기준 내림차순 정렬',
+  'Text size': '글자 크기',
+  'Small': '작게',
+  'Large': '크게',
+  'Larger': '더 크게',
+  'Theme, language and text size follow your device unless you choose': '직접 고르지 않으면 테마, 언어, 글자 크기는 기기 설정을 따릅니다',
+  'Tab bar labels': '탭 막대 이름',
+  'Speeds in the header': '헤더의 속도',
+  'Speed limit button in the header': '헤더의 속도 제한 버튼',
 }
 
 export default ko

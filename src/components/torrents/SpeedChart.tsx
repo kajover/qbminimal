@@ -5,11 +5,10 @@ import { t } from '@/i18n'
 
 const WIDTH = 600
 const HEIGHT = 120
-// Download green and upload blue, as in the header, checked for color-blind separation in both
-// themes. Upload is dashed too, so the two never rely on color alone.
+// Download green and upload blue, as in the header, in the color-blind-safe shades index.css sets. Upload is dashed too, so the two never rely on color alone.
 const SERIES = [
-  { key: 'down', label: t('Download'), stroke: 'stroke-[#16a34a]', dot: 'bg-[#16a34a]', dash: undefined },
-  { key: 'up', label: t('Upload'), stroke: 'stroke-[#2563eb] dark:stroke-[#3b82f6]', dot: 'bg-[#2563eb] dark:bg-[#3b82f6]', dash: '6 4' },
+  { key: 'down', label: t('Download'), stroke: 'stroke-green-600', dot: 'bg-green-600', dash: undefined },
+  { key: 'up', label: t('Upload'), stroke: 'stroke-blue-600 dark:stroke-blue-500', dot: 'bg-blue-600 dark:bg-blue-500', dash: '6 4' },
 ] as const
 
 const speed = (bytes: number) => `${formatBytes(bytes)}/s`
@@ -57,7 +56,7 @@ export function SpeedChart() {
         <span className="sr-only">{t('Highest in this period: {speed}.', { speed: speed(peak) })}</span>
       </figcaption>
 
-      <div className="flex gap-2 text-[10px] text-muted-foreground tabular-nums">
+      <div className="flex gap-2 text-[0.625rem] text-muted-foreground tabular-nums">
         <div className="flex flex-col justify-between py-0.5 text-end" aria-hidden>
           <span>{speed(top)}</span>
           <span>{speed(top / 2)}</span>

@@ -9,7 +9,6 @@ const ja: Record<string, string> = {
   '{minutes} min ago': '{minutes} 分前',
   'Language': '言語',
   'Same as the browser': 'ブラウザーと同じ',
-  'Theme and language follow your device unless you choose': 'テーマと言語は、選択しない限りデバイスの設定に従います',
   'Add tags': 'タグを追加',
   'Allocating': '割り当て中',
   'Anime': 'アニメ',
@@ -1276,6 +1275,14 @@ const ja: Record<string, string> = {
   'Selection cleared': '選択を解除しました',
   'Sorted by {column}, ascending': '{column}で昇順に並べ替え',
   'Sorted by {column}, descending': '{column}で降順に並べ替え',
+  'Text size': '文字サイズ',
+  'Small': '小',
+  'Large': '大',
+  'Larger': '特大',
+  'Theme, language and text size follow your device unless you choose': 'テーマ、言語、文字サイズは、選ばない限りデバイスの設定に従います',
+  'Tab bar labels': 'タブバーのラベル',
+  'Speeds in the header': 'ヘッダーの速度表示',
+  'Speed limit button in the header': 'ヘッダーの速度制限ボタン',
 }
 
 export default ja

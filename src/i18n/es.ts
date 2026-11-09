@@ -9,7 +9,6 @@ const es: Record<string, string> = {
   '{minutes} min ago': 'hace {minutes} min',
   'Language': 'Idioma',
   'Same as the browser': 'Igual que el navegador',
-  'Theme and language follow your device unless you choose': 'El tema y el idioma siguen a tu dispositivo, salvo que elijas otros',
   'Add tags': 'Añadir etiquetas',
   'Allocating': 'Asignando espacio',
   'Anime': 'Anime',
@@ -1276,6 +1275,14 @@ const es: Record<string, string> = {
   'Selection cleared': 'Selección borrada',
   'Sorted by {column}, ascending': 'Ordenado por {column}, ascendente',
   'Sorted by {column}, descending': 'Ordenado por {column}, descendente',
+  'Text size': 'Tamaño del texto',
+  'Small': 'Pequeño',
+  'Large': 'Grande',
+  'Larger': 'Más grande',
+  'Theme, language and text size follow your device unless you choose': 'El tema, el idioma y el tamaño del texto siguen a tu dispositivo, salvo que elijas otra cosa',
+  'Tab bar labels': 'Nombres en la barra de pestañas',
+  'Speeds in the header': 'Velocidades en la cabecera',
+  'Speed limit button in the header': 'Botón de límite de velocidad en la cabecera',
 }
 
 export default es

@@ -9,7 +9,6 @@ const hi: Record<string, string> = {
   '{minutes} min ago': '{minutes} मिनट पहले',
   'Language': 'भाषा',
   'Same as the browser': 'ब्राउज़र के अनुसार',
-  'Theme and language follow your device unless you choose': 'जब तक आप खुद न चुनें, थीम और भाषा आपके डिवाइस के अनुसार रहेंगी',
   'Add tags': 'टैग जोड़ें',
   'Allocating': 'जगह आवंटन',
   'Anime': 'एनीमे',
@@ -1276,6 +1275,14 @@ const hi: Record<string, string> = {
   'Selection cleared': 'चयन हटाया गया',
   'Sorted by {column}, ascending': '{column} के अनुसार क्रमबद्ध, आरोही',
   'Sorted by {column}, descending': '{column} के अनुसार क्रमबद्ध, अवरोही',
+  'Text size': 'टेक्स्ट का आकार',
+  'Small': 'छोटा',
+  'Large': 'बड़ा',
+  'Larger': 'और बड़ा',
+  'Theme, language and text size follow your device unless you choose': 'जब तक आप न चुनें, थीम, भाषा और टेक्स्ट का आकार आपके डिवाइस के अनुसार रहते हैं',
+  'Tab bar labels': 'टैब बार के नाम',
+  'Speeds in the header': 'हेडर में गति',
+  'Speed limit button in the header': 'हेडर में गति सीमा बटन',
 }
 
 export default hi

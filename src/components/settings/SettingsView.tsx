@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTheme } from 'next-themes'
 import { Monitor, Moon, Sun } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -15,6 +16,9 @@ import { PreferenceField } from './PreferenceField'
 import { PageHeader } from '@/components/PageHeader'
 import { NativeSelect } from '@/components/NativeSelect'
 import { BrowserSettings } from './BrowserSettings'
+import { Switch } from '@/components/ui/switch'
+import { displayOption, setDisplayOption, type DisplayOption } from '@/lib/displayOptions'
+import { chosenTextSize, setTextSize, TEXT_SIZES, type TextSize } from '@/lib/textSize'
 import { chosenLanguage, LANGUAGES, setLanguage, t, type LanguageChoice } from '@/i18n'
 
 // System is the default, so it comes first.
@@ -24,10 +28,37 @@ const themeOptions = [
   { value: 'dark', label: t('Dark'), icon: Moon },
 ]
 
+const textSizeLabels: Record<TextSize, string> = {
+  small: t('Small'),
+  default: t('Default'),
+  large: t('Large'),
+  larger: t('Larger'),
+}
+
 const SECTIONS = [{ id: 'app', title: t('App') }, ...PREFERENCE_SECTIONS.map(({ id, title }) => ({ id, title }))]
+
+// An on/off choice from lib/displayOptions, which applies it to the page at once.
+function OptionSwitch({ option, label, className }: { option: DisplayOption; label: string; className?: string }) {
+  const [on, setOn] = useState(() => displayOption(option))
+  const id = `option-${option}`
+  return (
+    <div className={cn('mt-3 flex items-center justify-between gap-2', className)}>
+      <Label htmlFor={id}>{label}</Label>
+      <Switch
+        id={id}
+        checked={on}
+        onCheckedChange={(checked) => {
+          setDisplayOption(option, checked)
+          setOn(checked)
+        }}
+      />
+    </div>
+  )
+}
 
 function AppSection() {
   const { theme, setTheme } = useTheme()
+  const [textSize, setTextSizeState] = useState(chosenTextSize)
   const { data: qbittorrentVersion } = useAppVersion()
   const { data: webApiVersion } = useWebApiVersion()
   const { data: build } = useQuery({ queryKey: ['app', 'buildInfo'], queryFn: () => qbitClient.getBuildInfo() })
@@ -53,7 +84,7 @@ function AppSection() {
       <Card>
         <CardHeader>
           <CardTitle>{t('Appearance')}</CardTitle>
-          <CardDescription>{t('Theme and language follow your device unless you choose')}</CardDescription>
+          <CardDescription>{t('Theme, language and text size follow your device unless you choose')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -75,6 +106,24 @@ function AppSection() {
               {LANGUAGES.map(language => <option key={language.code} value={language.code}>{language.name}</option>)}
             </NativeSelect>
           </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <Label htmlFor="text-size">{t('Text size')}</Label>
+            <NativeSelect
+              id="text-size"
+              value={textSize}
+              onChange={(e) => {
+                const size = e.target.value as TextSize
+                setTextSize(size)
+                setTextSizeState(size)
+              }}
+            >
+              {TEXT_SIZES.map(({ value }) => <option key={value} value={value}>{textSizeLabels[value]}</option>)}
+            </NativeSelect>
+          </div>
+          <OptionSwitch option="headerSpeeds" label={t('Speeds in the header')} />
+          <OptionSwitch option="speedLimitButton" label={t('Speed limit button in the header')} />
+          {/* The tab bar is only on phones, so the choice is too. */}
+          <OptionSwitch option="tabLabels" label={t('Tab bar labels')} className="md:hidden" />
         </CardContent>
       </Card>
 

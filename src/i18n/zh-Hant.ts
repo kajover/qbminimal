@@ -9,7 +9,6 @@ const zhHant: Record<string, string> = {
   '{minutes} min ago': '{minutes} 分鐘前',
   'Language': '語言',
   'Same as the browser': '與瀏覽器相同',
-  'Theme and language follow your device unless you choose': '除非您自行選擇，否則主題與語言會跟隨裝置設定',
   'Add tags': '新增標籤',
   'Allocating': '配置空間中',
   'Anime': '動畫',
@@ -1276,6 +1275,14 @@ const zhHant: Record<string, string> = {
   'Selection cleared': '已清除選取',
   'Sorted by {column}, ascending': '依{column}遞增排序',
   'Sorted by {column}, descending': '依{column}遞減排序',
+  'Text size': '文字大小',
+  'Small': '小',
+  'Large': '大',
+  'Larger': '更大',
+  'Theme, language and text size follow your device unless you choose': '除非你自行選擇，主題、語言和文字大小都會跟隨裝置',
+  'Tab bar labels': '標籤列文字',
+  'Speeds in the header': '標題列中的速度',
+  'Speed limit button in the header': '標題列中的限速按鈕',
 }
 
 export default zhHant

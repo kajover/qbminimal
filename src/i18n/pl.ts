@@ -9,7 +9,6 @@ const pl: Record<string, string> = {
   '{minutes} min ago': '{minutes} min temu',
   'Language': 'Język',
   'Same as the browser': 'Jak w przeglądarce',
-  'Theme and language follow your device unless you choose': 'Motyw i język zależą od urządzenia, chyba że wybierzesz inaczej',
   'Add tags': 'Dodaj tagi',
   'Allocating': 'Alokowanie',
   'Anime': 'Anime',
@@ -1276,6 +1275,14 @@ const pl: Record<string, string> = {
   'Selection cleared': 'Wyczyszczono zaznaczenie',
   'Sorted by {column}, ascending': 'Posortowano według: {column}, rosnąco',
   'Sorted by {column}, descending': 'Posortowano według: {column}, malejąco',
+  'Text size': 'Rozmiar tekstu',
+  'Small': 'Mały',
+  'Large': 'Duży',
+  'Larger': 'Większy',
+  'Theme, language and text size follow your device unless you choose': 'Motyw, język i rozmiar tekstu są takie jak na urządzeniu, chyba że wybierzesz inaczej',
+  'Tab bar labels': 'Podpisy na pasku kart',
+  'Speeds in the header': 'Prędkości w nagłówku',
+  'Speed limit button in the header': 'Przycisk limitu prędkości w nagłówku',
 }
 
 export default pl

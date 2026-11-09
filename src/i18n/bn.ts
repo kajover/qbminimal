@@ -9,7 +9,6 @@ const bn: Record<string, string> = {
   '{minutes} min ago': '{minutes} মি. আগে',
   'Language': 'ভাষা',
   'Same as the browser': 'ব্রাউজারের মতো',
-  'Theme and language follow your device unless you choose': 'আপনি বেছে না নিলে থিম ও ভাষা আপনার ডিভাইস অনুযায়ী থাকবে',
   'Add tags': 'ট্যাগ যোগ করুন',
   'Allocating': 'জায়গা বরাদ্দ হচ্ছে',
   'Anime': 'অ্যানিমে',
@@ -1276,6 +1275,14 @@ const bn: Record<string, string> = {
   'Selection cleared': 'নির্বাচন মুছে ফেলা হয়েছে',
   'Sorted by {column}, ascending': '{column} অনুযায়ী সাজানো, ঊর্ধ্বক্রমে',
   'Sorted by {column}, descending': '{column} অনুযায়ী সাজানো, নিম্নক্রমে',
+  'Text size': 'লেখার আকার',
+  'Small': 'ছোট',
+  'Large': 'বড়',
+  'Larger': 'আরও বড়',
+  'Theme, language and text size follow your device unless you choose': 'আপনি না বেছে নিলে থিম, ভাষা ও লেখার আকার আপনার ডিভাইস অনুযায়ী থাকে',
+  'Tab bar labels': 'ট্যাব বারের নাম',
+  'Speeds in the header': 'হেডারে গতি',
+  'Speed limit button in the header': 'হেডারে গতিসীমার বোতাম',
 }
 
 export default bn

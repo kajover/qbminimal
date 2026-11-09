@@ -245,7 +245,7 @@ export function TorrentsView() {
     return (
       <div className="space-y-4">
         {header}
-        <div role="status" aria-label={t('Loading torrents')} className="space-y-2 rounded-xl border bg-card p-3">
+        <div role="status" aria-label={t('Loading torrents')} className="space-y-2 rounded-xl border bg-card p-3 max-sm:-mx-2">
           {[72, 55, 64, 48, 60].map((width, i) => (
             <div key={i} className="flex animate-pulse items-center gap-3 py-1.5">
               <div className="h-4 w-4 rounded bg-muted" />

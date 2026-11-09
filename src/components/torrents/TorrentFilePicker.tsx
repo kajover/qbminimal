@@ -72,12 +72,12 @@ export function TorrentFilePicker({ metadata, priorities, onChange }: Props) {
             <div className="min-w-0 flex-1">
               <p className="text-xs [overflow-wrap:anywhere]" title={file.path} dir="ltr"><Breakable text={name} /></p>
               <div className="mt-0.5 flex items-center gap-2">
-                <p className="min-w-0 flex-1 truncate text-[10px] text-muted-foreground tabular-nums" dir="ltr">{folder ? `${folder} · ` : ''}{formatBytes(file.length)}</p>
+                <p className="min-w-0 flex-1 truncate text-[0.625rem] text-muted-foreground tabular-nums" dir="ltr">{folder ? `${folder} · ` : ''}{formatBytes(file.length)}</p>
                 <select
                   aria-label={t('Priority for {path}', { path: file.path })}
                   value={priorities[i]}
                   onChange={(e) => setOne(i, Number(e.target.value))}
-                  className="border-input dark:bg-input/30 h-6 flex-shrink-0 rounded-md border bg-transparent px-1 text-[10px]"
+                  className="border-input dark:bg-input/30 h-6 flex-shrink-0 rounded-md border bg-transparent px-1 text-xs"
                 >
                   {FILE_PRIORITIES.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
                 </select>
