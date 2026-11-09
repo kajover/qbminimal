@@ -265,7 +265,7 @@ export function TorrentsView() {
     return (
       <div className="space-y-4">
         {header}
-        <p className="py-8 text-center text-muted-foreground">{notice}</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{notice}</p>
       </div>
     )
   }
@@ -300,7 +300,7 @@ export function TorrentsView() {
       {filtersOpen && <TorrentFilterPanel list={list} categories={Object.keys(categories ?? {})} tags={tags ?? []} onManage={() => setManageOpen(true)} views={views} onViewsChange={setViews} />}
 
       {list.matching.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-4 text-muted-foreground">
+        <div className="flex flex-col items-center gap-2 py-8 text-sm text-muted-foreground">
           <span>{t('No torrents match these filters')}</span>
           <Button variant="outline" size="sm" onClick={list.clearFilters}>{t('Clear filters')}</Button>
         </div>

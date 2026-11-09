@@ -1,7 +1,7 @@
 {
   "name": "qbminimal",
   "description": "A minimal, phone-friendly Web UI for qBittorrent",
-  "version": "1.4.13",
+  "version": "1.4.14",
   "license": "GPL-3.0-only",
   "private": true,
   "type": "module",

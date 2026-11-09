@@ -87,7 +87,7 @@ export function SearchView() {
       </Card>
 
       {search.results.length > 0 ? <SearchResults results={search.results} onAdd={setAdding} />
-        : search.searched && !search.running && <p className="py-8 text-center text-muted-foreground">{t('Nothing found')}</p>}
+        : search.searched && !search.running && <p className="py-8 text-center text-sm text-muted-foreground">{t('Nothing found')}</p>}
 
       <SearchPluginsDialog open={pluginsOpen} onOpenChange={setPluginsOpen} />
 

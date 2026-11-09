@@ -145,8 +145,8 @@ export function TorrentContentTab({ hash }: { hash: string }) {
         <span>{t('Downloading {count} ({size} of {total})', { count: wanted.length, size: bytes(wanted), total: bytes(all) })}</span>
       </div>
       <div className="flex-1 overflow-y-auto py-1">
-        {isLoading ? <p className="py-8 text-center text-muted-foreground">{t('Loading files...')}</p>
-          : tree.length === 0 ? <p className="py-8 text-center text-muted-foreground">{t('No files yet')}</p>
+        {isLoading ? <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading files...')}</p>
+          : tree.length === 0 ? <p className="py-8 text-center text-sm text-muted-foreground">{t('No files yet')}</p>
           : tree.map(node => render(node, 0))}
       </div>
     </div>

@@ -107,8 +107,8 @@ function PreferencesSection({ sectionId, edits, setEdits }: { sectionId: string;
   const save = useSavePreferences()
   const section = PREFERENCE_SECTIONS.find(s => s.id === sectionId)
 
-  if (isLoading) return <p className="py-8 text-center text-muted-foreground">{t('Loading settings...')}</p>
-  if (isError || !original || !section) return <p className="py-8 text-center text-muted-foreground">{t('Couldn\'t load qBittorrent\'s settings')}</p>
+  if (isLoading) return <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading settings...')}</p>
+  if (isError || !original || !section) return <p className="py-8 text-center text-sm text-muted-foreground">{t('Couldn\'t load qBittorrent\'s settings')}</p>
 
   const valueFor = (def: PrefDef) => (def.key in edits ? edits[def.key] : toFormValue(def, original[def.key]))
   const getValue = (key: string) => (key in edits ? edits[key] : original[key])

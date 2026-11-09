@@ -51,11 +51,11 @@ function MainLog() {
       <Input type="search" aria-label={t('Filter log messages')} placeholder={t('Filter messages')} value={search} onChange={(e) => setSearch(e.target.value)} className="h-9" />
 
       {isLoading ? (
-        <p className="py-6 text-center text-muted-foreground">{t('Loading logs...')}</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading logs...')}</p>
       ) : isError && !logs ? (
-        <p className="py-6 text-center text-muted-foreground">{t('Couldn\'t load the log')}</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{t('Couldn\'t load the log')}</p>
       ) : shown.length === 0 ? (
-        <p className="py-6 text-center text-muted-foreground">{t('No matching entries')}</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{t('No matching entries')}</p>
       ) : (
         <ul className="space-y-1">
           {shown.map(log => {
@@ -77,9 +77,9 @@ function PeerLog() {
   const { data: entries, isLoading, isError } = usePeerLog(true)
   const shown = useMemo(() => [...(entries ?? [])].reverse().slice(0, MAX_ROWS), [entries])
 
-  if (isLoading) return <p className="py-6 text-center text-muted-foreground">{t('Loading peer log...')}</p>
-  if (isError && !entries) return <p className="py-6 text-center text-muted-foreground">{t('Couldn\'t load the peer log')}</p>
-  if (shown.length === 0) return <p className="py-6 text-center text-muted-foreground">{t('No blocked or banned peers yet')}</p>
+  if (isLoading) return <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading peer log...')}</p>
+  if (isError && !entries) return <p className="py-8 text-center text-sm text-muted-foreground">{t('Couldn\'t load the peer log')}</p>
+  if (shown.length === 0) return <p className="py-8 text-center text-sm text-muted-foreground">{t('No blocked or banned peers yet')}</p>
 
   return (
     <ul className="space-y-1">

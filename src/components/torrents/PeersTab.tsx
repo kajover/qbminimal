@@ -183,11 +183,11 @@ export function PeersTab({ hash }: { hash: string }) {
   return (
     <div className="space-y-3">
       {isLoading ? (
-        <div className="py-8 text-center text-muted-foreground">{t('Loading peers...')}</div>
+        <div className="py-8 text-center text-sm text-muted-foreground">{t('Loading peers...')}</div>
       ) : isError && !peers ? (
-        <div className="py-8 text-center text-muted-foreground">{t('Couldn\'t load peers')}</div>
+        <div className="py-8 text-center text-sm text-muted-foreground">{t('Couldn\'t load peers')}</div>
       ) : entries.length === 0 ? (
-        <div className="py-8 text-center text-muted-foreground">{t('No peers connected')}</div>
+        <div className="py-8 text-center text-sm text-muted-foreground">{t('No peers connected')}</div>
       ) : (
         <>
         <div className="flex items-center gap-2 px-2">

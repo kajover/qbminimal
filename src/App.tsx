@@ -36,7 +36,7 @@ function Screens() {
   // So do torrents dropped on the page or handed over later.
   useEffect(() => onIncoming(() => setPage('add')), [])
 
-  if (status === 'checking') return <p className="grid min-h-dvh place-items-center text-muted-foreground">{t('Connecting...')}</p>
+  if (status === 'checking') return <p className="grid min-h-dvh place-items-center text-sm text-muted-foreground">{t('Connecting...')}</p>
   if (status === 'signedOut') return <LoginForm />
 
   const View = PAGE_VIEWS[page]

@@ -28,7 +28,7 @@ class LoadErrorBoundary extends Component<{ children: ReactNode }, { failed: boo
 export function PageBoundary({ loading, children }: { loading?: ReactNode; children: ReactNode }) {
   return (
     <LoadErrorBoundary>
-      <Suspense fallback={loading === undefined ? <div className="py-8 text-center text-muted-foreground">{t('Loading...')}</div> : loading}>
+      <Suspense fallback={loading === undefined ? <div className="py-8 text-center text-sm text-muted-foreground">{t('Loading...')}</div> : loading}>
         {children}
       </Suspense>
     </LoadErrorBoundary>

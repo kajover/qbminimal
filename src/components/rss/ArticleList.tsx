@@ -12,7 +12,7 @@ interface ArticleListProps {
 
 // A feed's articles, unread ones in bold. Opening one marks it read.
 export function ArticleList({ articles, onOpened, onDownload }: ArticleListProps) {
-  if (articles.length === 0) return <p className="py-8 text-center text-muted-foreground">{t('No articles')}</p>
+  if (articles.length === 0) return <p className="py-8 text-center text-sm text-muted-foreground">{t('No articles')}</p>
   return (
     <ul className="space-y-2">
       {articles.map(article => {

@@ -71,11 +71,11 @@ export function SearchPluginsDialog({ open, onOpenChange }: { open: boolean; onO
 
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto">
           {isLoading ? (
-            <div className="py-6 text-center text-muted-foreground">{t('Loading plugins...')}</div>
+            <div className="py-8 text-center text-sm text-muted-foreground">{t('Loading plugins...')}</div>
           ) : isError && !plugins ? (
-            <div className="py-6 text-center text-muted-foreground">{t('Couldn\'t load plugins')}</div>
+            <div className="py-8 text-center text-sm text-muted-foreground">{t('Couldn\'t load plugins')}</div>
           ) : !plugins?.length ? (
-            <div className="py-6 text-center text-muted-foreground">{t('No plugins installed')}</div>
+            <div className="py-8 text-center text-sm text-muted-foreground">{t('No plugins installed')}</div>
           ) : (
             <ul className="divide-y text-sm">
               {plugins.map(plugin => (

@@ -115,11 +115,11 @@ export function TrackersTab({ hash }: { hash: string }) {
   return (
     <div className="space-y-3">
       {isLoading ? (
-        <div className="py-8 text-center text-muted-foreground">{t('Loading trackers...')}</div>
+        <div className="py-8 text-center text-sm text-muted-foreground">{t('Loading trackers...')}</div>
       ) : isError && !trackers ? (
-        <div className="py-8 text-center text-muted-foreground">{t('Couldn\'t load trackers')}</div>
+        <div className="py-8 text-center text-sm text-muted-foreground">{t('Couldn\'t load trackers')}</div>
       ) : real.length === 0 ? (
-        <div className="py-8 text-center text-muted-foreground">{t('No trackers')}</div>
+        <div className="py-8 text-center text-sm text-muted-foreground">{t('No trackers')}</div>
       ) : (
         <ul className="divide-y text-sm">
           {real.map(tracker => <TrackerRow key={tracker.url} hash={hash} tracker={tracker} />)}

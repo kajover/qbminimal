@@ -46,7 +46,7 @@ export function RSSView() {
     <div className="space-y-4">
       <PageHeader title={t('RSS')} description={t('Feeds, articles, and rules that download new episodes')} />
 
-      {feedsQuery.isLoading ? <p className="py-8 text-center text-muted-foreground">{t('Loading feeds...')}</p> : (
+      {feedsQuery.isLoading ? <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading feeds...')}</p> : (
         <div className="flex flex-col gap-4 md:flex-row md:items-start">
           <Card className="w-full gap-2 md:w-80">
             <CardHeader className="flex items-center justify-between gap-1">
@@ -68,8 +68,8 @@ export function RSSView() {
               {feed && <Button size="sm" variant="ghost" disabled={feed.unreadCount === 0} onClick={() => markRead(feed.path)}>{t('Mark all as read')}</Button>}
             </CardHeader>
             <CardContent>
-              {!feed ? <p className="py-8 text-center text-muted-foreground">{t('Pick a feed to see its articles')}</p>
-                : articlesQuery.isLoading ? <p className="py-8 text-center text-muted-foreground">{t('Loading articles...')}</p>
+              {!feed ? <p className="py-8 text-center text-sm text-muted-foreground">{t('Pick a feed to see its articles')}</p>
+                : articlesQuery.isLoading ? <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading articles...')}</p>
                 : <ArticleList articles={articlesQuery.data?.articles ?? []} onOpened={a => { if (!a.isRead) void markRead(feed.path, a.id) }} onDownload={addTorrent} />}
             </CardContent>
           </Card>
