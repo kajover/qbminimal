@@ -134,7 +134,8 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
 
   const navButtons = PAGES.map(({ id, label, icon: Icon }) => (
     <Button key={id} variant={page === id ? 'secondary' : 'ghost'} className="justify-start gap-2 overflow-hidden text-base" title={label} aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
-      <Icon className="size-5" />
+      {/* Icons a little larger than the 16px labels, in the same proportion as the buttons. */}
+      <Icon className="size-4.5" />
       <span className="truncate">{label}</span>
     </Button>
   ))

@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "ธีม ภาษา และขนาดข้อความจะตามอุปกรณ์ของคุณ เว้นแต่คุณเลือก",
   "Tab bar labels": "ป้ายชื่อแถบแท็บ",
   "Speeds in the header": "ความเร็วในส่วนหัว",
-  "Speed limit button in the header": "ปุ่มจำกัดความเร็วในส่วนหัว"
+  "Speed limit button in the header": "ปุ่มจำกัดความเร็วในส่วนหัว",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal เป็นโอเพนซอร์ส ร่วมแปล รายงานปัญหา หรือช่วยปรับปรุงได้บน GitHub",
+  "Contribute on GitHub": "ร่วมพัฒนาบน GitHub"
 }

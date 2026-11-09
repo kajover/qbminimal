@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "Motiv, jazyk a velikost textu se řídí vaším zařízením, pokud nevyberete jinak",
   "Tab bar labels": "Popisky lišty karet",
   "Speeds in the header": "Rychlosti v záhlaví",
-  "Speed limit button in the header": "Tlačítko omezení rychlosti v záhlaví"
+  "Speed limit button in the header": "Tlačítko omezení rychlosti v záhlaví",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal je open source. Na GitHubu můžete pomoci s překladem, nahlásit problémy nebo ho vylepšit.",
+  "Contribute on GitHub": "Přispět na GitHubu"
 }

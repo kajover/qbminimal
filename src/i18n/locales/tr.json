@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "Siz seçmedikçe tema, dil ve metin boyutu cihazınıza uyar",
   "Tab bar labels": "Sekme çubuğu etiketleri",
   "Speeds in the header": "Başlıktaki hızlar",
-  "Speed limit button in the header": "Başlıktaki hız sınırı düğmesi"
+  "Speed limit button in the header": "Başlıktaki hız sınırı düğmesi",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal açık kaynaklıdır. GitHub'da çeviriye yardım edin, sorunları bildirin veya geliştirin.",
+  "Contribute on GitHub": "GitHub'da katkıda bulunun"
 }

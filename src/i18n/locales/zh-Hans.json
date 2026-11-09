@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "除非你自行选择，主题、语言和文字大小都跟随设备",
   "Tab bar labels": "标签栏文字",
   "Speeds in the header": "标题栏中的速度",
-  "Speed limit button in the header": "标题栏中的限速按钮"
+  "Speed limit button in the header": "标题栏中的限速按钮",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal 是开源软件。欢迎在 GitHub 上协助翻译、报告问题或改进它。",
+  "Contribute on GitHub": "在 GitHub 上参与贡献"
 }

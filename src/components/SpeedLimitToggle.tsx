@@ -52,7 +52,7 @@ export function SpeedLimitToggle() {
       disabled={pending}
       onClick={toggle}
     >
-      <Turtle className="size-5" />
+      <Turtle className="size-4" />
     </Button>
   )
 }

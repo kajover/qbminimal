@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "Motyw, język i rozmiar tekstu są takie jak na urządzeniu, chyba że wybierzesz inaczej",
   "Tab bar labels": "Podpisy na pasku kart",
   "Speeds in the header": "Prędkości w nagłówku",
-  "Speed limit button in the header": "Przycisk limitu prędkości w nagłówku"
+  "Speed limit button in the header": "Przycisk limitu prędkości w nagłówku",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal jest open source. Pomóż w tłumaczeniu, zgłaszaj problemy lub ulepszaj go na GitHubie.",
+  "Contribute on GitHub": "Współtwórz na GitHubie"
 }

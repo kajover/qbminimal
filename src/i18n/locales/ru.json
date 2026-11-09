@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "Тема, язык и размер текста берутся с устройства, если вы не выберете другие",
   "Tab bar labels": "Подписи на панели вкладок",
   "Speeds in the header": "Скорости в шапке",
-  "Speed limit button in the header": "Кнопка ограничения скорости в шапке"
+  "Speed limit button in the header": "Кнопка ограничения скорости в шапке",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal — проект с открытым исходным кодом. Помогайте с переводом, сообщайте о проблемах или улучшайте его на GitHub.",
+  "Contribute on GitHub": "Внести вклад на GitHub"
 }

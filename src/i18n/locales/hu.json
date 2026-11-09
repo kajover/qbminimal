@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "A téma, a nyelv és a szövegméret az eszközödet követi, hacsak nem választasz",
   "Tab bar labels": "Fülsáv címkéi",
   "Speeds in the header": "Sebességek a fejlécben",
-  "Speed limit button in the header": "Sebességkorlát gomb a fejlécben"
+  "Speed limit button in the header": "Sebességkorlát gomb a fejlécben",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "A qbminimal nyílt forráskódú. A GitHubon segíthet a fordításban, jelezheti a hibákat, vagy továbbfejlesztheti.",
+  "Contribute on GitHub": "Közreműködés a GitHubon"
 }

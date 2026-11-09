@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "जब तक आप न चुनें, थीम, भाषा और टेक्स्ट का आकार आपके डिवाइस के अनुसार रहते हैं",
   "Tab bar labels": "टैब बार के नाम",
   "Speeds in the header": "हेडर में गति",
-  "Speed limit button in the header": "हेडर में गति सीमा बटन"
+  "Speed limit button in the header": "हेडर में गति सीमा बटन",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal ओपन सोर्स है। GitHub पर अनुवाद में मदद करें, समस्याओं की रिपोर्ट करें या इसे बेहतर बनाएँ।",
+  "Contribute on GitHub": "GitHub पर योगदान दें"
 }

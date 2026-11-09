@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "テーマ、言語、文字サイズは、選ばない限りデバイスの設定に従います",
   "Tab bar labels": "タブバーのラベル",
   "Speeds in the header": "ヘッダーの速度表示",
-  "Speed limit button in the header": "ヘッダーの速度制限ボタン"
+  "Speed limit button in the header": "ヘッダーの速度制限ボタン",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal はオープンソースです。GitHub で翻訳に協力したり、問題を報告したり、改善に参加できます。",
+  "Contribute on GitHub": "GitHub で貢献する"
 }

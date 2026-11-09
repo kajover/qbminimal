@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "ערכת נושא, שפה וגודל טקסט עוקבים אחר המכשיר שלך, אלא אם תבחר",
   "Tab bar labels": "תוויות סרגל הלשוניות",
   "Speeds in the header": "מהירויות בכותרת",
-  "Speed limit button in the header": "כפתור מגבלת מהירות בכותרת"
+  "Speed limit button in the header": "כפתור מגבלת מהירות בכותרת",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal הוא קוד פתוח. עזרו בתרגום, דווחו על בעיות או שפרו אותו ב-GitHub.",
+  "Contribute on GitHub": "תרמו ב-GitHub"
 }

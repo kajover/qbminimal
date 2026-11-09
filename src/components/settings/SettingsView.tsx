@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTheme, type Theme } from '@/lib/theme'
-import { Monitor, Moon, Sun } from 'lucide-react'
+import { ExternalLink, Monitor, Moon, Sun } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -143,6 +143,13 @@ function AppSection() {
             ))}
           </dl>
           <UpdateCheck />
+          <div className="mt-4 space-y-1 border-t pt-4">
+            <p className="text-xs text-muted-foreground">{t('qbminimal is open source. Help translate it, report problems, or improve it on GitHub.')}</p>
+            <a href="https://github.com/kajover/qbminimal/blob/main/CONTRIBUTING.md" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-2">
+              {t('Contribute on GitHub')}
+              <ExternalLink className="size-3.5" aria-hidden />
+            </a>
+          </div>
         </CardContent>
       </Card>
 

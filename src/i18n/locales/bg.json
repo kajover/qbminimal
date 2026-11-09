@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "Темата, езикът и размерът на текста следват устройството ви, освен ако не изберете",
   "Tab bar labels": "Етикети на лентата с раздели",
   "Speeds in the header": "Скорости в заглавната лента",
-  "Speed limit button in the header": "Бутон за ограничение на скоростта в заглавната лента"
+  "Speed limit button in the header": "Бутон за ограничение на скоростта в заглавната лента",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal е с отворен код. Помогнете с превода, докладвайте проблеми или го подобрете в GitHub.",
+  "Contribute on GitHub": "Допринесете в GitHub"
 }

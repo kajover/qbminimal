@@ -1281,5 +1281,7 @@
   "Theme, language and text size follow your device unless you choose": "직접 고르지 않으면 테마, 언어, 글자 크기는 기기 설정을 따릅니다",
   "Tab bar labels": "탭 막대 이름",
   "Speeds in the header": "헤더의 속도",
-  "Speed limit button in the header": "헤더의 속도 제한 버튼"
+  "Speed limit button in the header": "헤더의 속도 제한 버튼",
+  "qbminimal is open source. Help translate it, report problems, or improve it on GitHub.": "qbminimal은 오픈 소스입니다. GitHub에서 번역을 돕고, 문제를 신고하고, 개선에 참여해 주세요.",
+  "Contribute on GitHub": "GitHub에서 기여하기"
 }
