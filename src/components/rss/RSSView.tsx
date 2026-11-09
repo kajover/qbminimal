@@ -44,7 +44,7 @@ export function RSSView() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title={t('RSS')} description={t('Feeds, articles, and rules that download new episodes for you')} />
+      <PageHeader title={t('RSS')} description={t('Feeds, articles, and rules that download new episodes')} />
 
       {feedsQuery.isLoading ? <p className="py-8 text-center text-muted-foreground">{t('Loading feeds...')}</p> : (
         <div className="flex flex-col gap-4 md:flex-row md:items-start">

@@ -9,6 +9,7 @@ import { TorrentsView } from '@/components/torrents/TorrentsView'
 import { SessionProvider } from '@/components/SessionProvider'
 import { useSession } from '@/hooks/useSession'
 import { hasIncoming, onIncoming } from '@/lib/incoming'
+import { registerServiceWorker } from '@/lib/notify'
 import { t } from '@/i18n'
 
 const named = <K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K) => lazy(() => load().then(module => ({ default: module[name] })))
@@ -50,6 +51,7 @@ function Screens() {
 }
 
 export default function App() {
+  useEffect(registerServiceWorker, [])
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster position="top-center" offset={TOAST_OFFSET} mobileOffset={TOAST_OFFSET} />

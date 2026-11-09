@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type DragEvent, type FormEvent, type ReactNode } from 'react'
-import { Loader2, Upload, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, Loader2, Upload, X } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -73,6 +73,7 @@ export function AddTorrentView() {
   const [files, setFiles] = useState<File[]>([])
   const [options, setOptions] = useState<AddTorrentOptions>(DEFAULT_ADD_OPTIONS)
   const [showOptions, setShowOptions] = useState(false)
+  const [showCreator, setShowCreator] = useState(false)
   const [adding, setAdding] = useState(false)
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -323,30 +324,31 @@ export function AddTorrentView() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Field label={t('Category')} htmlFor="add-category">
-                <select id="add-category" value={options.category} onChange={(e) => set('category', e.target.value)} className={selectClass}>
-                  <option value="">{t('No category')}</option>
-                  {categoryNames.map(name => <option key={name} value={name}>{name}</option>)}
-                </select>
-              </Field>
-              <Field label={t('Tags, separated by commas')} htmlFor="add-tags">
-                <Input id="add-tags" list="add-tag-list" value={options.tags} onChange={(e) => set('tags', e.target.value)} className="h-9" />
-                <datalist id="add-tag-list">{(tags ?? []).map(tag => <option key={tag} value={tag} />)}</datalist>
-              </Field>
-            </div>
-
-            <Field label={t('Save path (blank = default)')} htmlFor="add-save-path">
-              <Input id="add-save-path" value={options.savePath} onChange={(e) => set('savePath', e.target.value)} className="h-9" />
-              <FreeSpaceHint path={options.savePath} />
-            </Field>
-
-            <Button type="button" variant="ghost" size="sm" aria-expanded={showOptions} onClick={() => setShowOptions(!showOptions)}>
-              {showOptions ? t('Hide options') : t('More options')}
+            <Button type="button" variant="ghost" size="sm" className="-ms-3" aria-expanded={showOptions} onClick={() => setShowOptions(!showOptions)}>
+              {showOptions ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4 rtl:rotate-180" />}
+              {t('More options')}
             </Button>
 
             {showOptions && (
               <div className="space-y-3 rounded-md border p-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Field label={t('Category')} htmlFor="add-category">
+                    <select id="add-category" value={options.category} onChange={(e) => set('category', e.target.value)} className={selectClass}>
+                      <option value="">{t('No category')}</option>
+                      {categoryNames.map(name => <option key={name} value={name}>{name}</option>)}
+                    </select>
+                  </Field>
+                  <Field label={t('Tags, separated by commas')} htmlFor="add-tags">
+                    <Input id="add-tags" list="add-tag-list" value={options.tags} onChange={(e) => set('tags', e.target.value)} className="h-9" />
+                    <datalist id="add-tag-list">{(tags ?? []).map(tag => <option key={tag} value={tag} />)}</datalist>
+                  </Field>
+                </div>
+
+                <Field label={t('Save path (blank = default)')} htmlFor="add-save-path">
+                  <Input id="add-save-path" value={options.savePath} onChange={(e) => set('savePath', e.target.value)} className="h-9" />
+                  <FreeSpaceHint path={options.savePath} />
+                </Field>
+
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <Field label={t('When added')} htmlFor="add-start">
                     <TriSelect id="add-start" value={options.start} onChange={(value) => set('start', value)} labels={["qBittorrent's default", 'Start', "Don't start"]} />
@@ -436,7 +438,11 @@ export function AddTorrentView() {
         </CardContent>
       </Card>
 
-      <TorrentCreator />
+      <Button type="button" variant="ghost" size="sm" className="-ms-3" aria-expanded={showCreator} onClick={() => setShowCreator(!showCreator)}>
+        {showCreator ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4 rtl:rotate-180" />}
+        {t('Create a torrent')}
+      </Button>
+      {showCreator && <TorrentCreator />}
     </div>
   )
 }

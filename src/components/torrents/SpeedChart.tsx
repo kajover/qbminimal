@@ -82,7 +82,7 @@ export function SpeedChart() {
           </svg>
           {point && hover !== null && (
             <div
-              className="pointer-events-none absolute top-0 z-10 rounded-md border bg-popover px-2 py-1 text-[11px] text-popover-foreground shadow-md"
+              className="pointer-events-none absolute top-0 z-10 rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md"
               style={{ left: `${(hover / (samples.length - 1)) * 100}%`, transform: hover > samples.length / 2 ? 'translateX(calc(-100% - 8px))' : 'translateX(8px)' }}
             >
               <p className="text-muted-foreground">{ago(latest.time - point.time)}</p>

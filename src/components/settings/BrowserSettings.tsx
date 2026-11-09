@@ -5,7 +5,7 @@ import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from '@/hooks/use-toast'
 import { magnetHandlerUrl } from '@/lib/incoming'
-import { finishNoticesOn, notificationsSupported, setFinishNotices } from '@/lib/notify'
+import { finishNoticesOn, needsHomeScreen, notificationsSupported, setFinishNotices } from '@/lib/notify'
 import { t } from '@/i18n'
 
 // Browsers only let secure pages handle magnet links, and Safari doesn't let pages do it at all.
@@ -54,14 +54,20 @@ export function BrowserSettings() {
         <CardDescription>{t('Remembered on this device only')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Row icon={<Bell className="h-4 w-4" />} title={t('Finished downloads')} description={t('Say when a torrent finishes while this page is open. In the background this is a notification, if the browser allows it.')}>
+        <Row icon={<Bell className="h-4 w-4" />} title={t('Finished downloads')} description={notificationsSupported()
+            ? needsHomeScreen()
+              ? t('Get a notification when a torrent finishes downloading. On iPhone and iPad this only works while the app is open: iOS pauses it soon after you switch to another app.')
+              : t('Get a notification when a torrent finishes downloading, as long as this page is open in a tab. The browser asks for permission first.')
+            : needsHomeScreen()
+              ? t('On iPhone and iPad, notifications only work in the app added to the Home Screen (Share, then Add to Home Screen, iOS 16.4 or later), and only while it is open. In Safari, finished downloads show on this page.')
+              : t('This browser can\'t show notifications, so finished downloads show on this page while it is open.')}>
           <Switch aria-label={t('Finished downloads')} checked={notices} onCheckedChange={() => void toggleNotices()} />
         </Row>
         <Row
           icon={<Magnet className="h-4 w-4" />}
           title={t('Magnet links')}
           description={canHandleMagnets()
-            ? t('Open magnet links from other sites on the Add page here.')
+            ? t('Magnet links you click on other websites open here, on the Add page.')
             : t('This browser can\'t open magnet links with a web page. It needs a secure (https) address, and Safari doesn\'t offer it.')}
         >
           <Button variant="outline" size="sm" disabled={!canHandleMagnets()} onClick={registerMagnets}>{t('Open them here')}</Button>

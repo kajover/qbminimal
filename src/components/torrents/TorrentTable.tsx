@@ -36,7 +36,7 @@ function Cell({ torrent, id }: { torrent: Torrent; id: ColumnId }): ReactNode {
           <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-secondary">
             <div className="h-full bg-primary" style={{ width: `${torrent.progress * 100}%` }} />
           </div>
-          <span className="w-10 flex-shrink-0 text-end text-xs">{percent >= 100 ? '100' : percent.toFixed(1)}</span>
+          <span className="w-10 flex-shrink-0 text-end">{percent >= 100 ? '100' : percent.toFixed(1)}</span>
         </div>
       )
     }
@@ -191,7 +191,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, selected, selec
   return (
     // Its own scrollbar is hidden: the one at the bottom of the screen stands in for it.
     <div ref={scroller} className="overflow-x-auto overscroll-x-none rounded-xl border bg-card [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <table className="table-fixed caption-bottom text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
+      <table className="table-fixed caption-bottom text-xs tabular-nums md:text-sm" style={{ width: `max(100%, ${total}px)` }}>
         <colgroup>
           <col style={{ width: SELECT_WIDTH }} />
           {columns.map(def => <col key={def.id} style={{ width: widthOf(def.id) }} />)}
@@ -279,7 +279,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, selected, selec
                     />
                   </td>
                   {columns.map(def => (
-                    <td key={def.id} className={cn('truncate px-2 py-1.5 whitespace-nowrap', def.numeric && 'text-end', def.id === 'name' && 'text-xs font-medium')}>
+                    <td key={def.id} className={cn('truncate px-2 py-1.5 whitespace-nowrap', def.numeric && 'text-end', def.id === 'name' && 'font-medium')}>
                       {/* Numbers, sizes, dates and paths read left to right, also in a right-to-left language. */}
                       {WORD_COLUMNS.has(def.id) ? <Cell torrent={torrent} id={def.id} /> : <span dir="ltr"><Cell torrent={torrent} id={def.id} /></span>}
                     </td>

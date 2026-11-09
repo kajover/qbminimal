@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
-import { LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { ChevronLeft, ChevronRight, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { DropOverlay } from '@/components/DropOverlay'
@@ -17,22 +17,13 @@ interface LayoutProps {
   children: ReactNode
 }
 
-function LogoutButton({ className, iconOnly = false }: { className?: string; iconOnly?: boolean }) {
+function LogoutButton() {
   const { signOut } = useSession()
   const [busy, setBusy] = useState(false)
   const label = busy ? t('Logging out...') : t('Logout')
-  const logOut = () => { setBusy(true); void signOut() }
-  if (iconOnly) {
-    return (
-      <Button variant="ghost" size="icon" className={className} disabled={busy} aria-label={label} title={label} onClick={logOut}>
-        <LogOut className="size-5" />
-      </Button>
-    )
-  }
   return (
-    <Button variant="ghost" className={cn('justify-start gap-2 text-muted-foreground', className)} disabled={busy} onClick={logOut}>
-      <LogOut className="h-5 w-5" />
-      {label}
+    <Button variant="ghost" size="icon" disabled={busy} aria-label={label} title={label} onClick={() => { setBusy(true); void signOut() }}>
+      <LogOut className="size-5" />
     </Button>
   )
 }
@@ -63,14 +54,77 @@ function useBarSizes() {
 }
 
 const SIDEBAR_KEY = 'qbminimal.sidebar'
+const SIDEBAR_WIDTH_KEY = 'qbminimal.sidebarWidth'
+// Dragged narrower than SIDEBAR_COLLAPSE, the sidebar hides; between that and SIDEBAR_MIN it stays at SIDEBAR_MIN.
+const SIDEBAR_MIN = 120
+const SIDEBAR_MAX = 320
+const SIDEBAR_COLLAPSE = 72
+
+const storedWidth = () => {
+  const width = Number(readStored(SIDEBAR_WIDTH_KEY))
+  return width >= SIDEBAR_MIN && width <= SIDEBAR_MAX ? width : null
+}
+
+// Wide screens only. The sidebar is 120px, or as wide as its labels if they need more, until it's dragged by its edge, which also
+// holds the button that hides and shows it. --sidebar-width lets panels fixed to the window line up
+// with the main column.
+function useSidebar() {
+  const [shown, setShown] = useState(() => readStored(SIDEBAR_KEY) !== 'hidden')
+  const [width, setWidth] = useState<number | null>(storedWidth)
+  const [measured, setMeasured] = useState(0)
+  const box = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (typeof ResizeObserver === 'undefined' || !box.current) return
+    const observer = new ResizeObserver(([entry]) => setMeasured(entry.contentRect.width))
+    observer.observe(box.current)
+    return () => observer.disconnect()
+  }, [])
+
+  const show = (on: boolean) => {
+    writeStored(SIDEBAR_KEY, on ? null : 'hidden')
+    setShown(on)
+  }
+
+  const startDrag = (event: ReactPointerEvent) => {
+    if (event.button !== 0 || (event.target as Element).closest('button') || !box.current) return
+    event.preventDefault()
+    const rect = box.current.getBoundingClientRect()
+    const rtl = getComputedStyle(box.current).direction === 'rtl'
+    let latest = { shown, width }
+    const move = (e: PointerEvent) => {
+      const dragged = rtl ? rect.right - e.clientX : e.clientX - rect.left
+      latest = dragged < SIDEBAR_COLLAPSE
+        ? { shown: false, width: latest.width }
+        : { shown: true, width: Math.round(Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, dragged))) }
+      setShown(latest.shown)
+      if (latest.shown) setWidth(latest.width)
+    }
+    const end = () => {
+      window.removeEventListener('pointermove', move)
+      document.body.style.removeProperty('cursor')
+      document.body.style.removeProperty('user-select')
+      writeStored(SIDEBAR_KEY, latest.shown ? null : 'hidden')
+      writeStored(SIDEBAR_WIDTH_KEY, latest.width ? String(latest.width) : null)
+    }
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', end, { once: true })
+    window.addEventListener('pointercancel', end, { once: true })
+  }
+
+  // A double click on the edge goes back to fitting the labels.
+  const resetWidth = () => {
+    writeStored(SIDEBAR_WIDTH_KEY, null)
+    setWidth(null)
+  }
+
+  return { shown, width, measured, box, show, startDrag, resetWidth }
+}
 
 export function Layout({ page, onNavigate, children }: LayoutProps) {
-  // Wide screens only: the sidebar can be hidden to give the list the whole width.
-  const [sidebarShown, setSidebarShown] = useState(() => readStored(SIDEBAR_KEY) !== 'hidden')
-  const toggleSidebar = () => {
-    writeStored(SIDEBAR_KEY, sidebarShown ? 'hidden' : null)
-    setSidebarShown(!sidebarShown)
-  }
+  const { shown: sidebarShown, width: sidebarWidth, measured: sidebarMeasured, box: sidebarBox, show: showSidebar, startDrag, resetWidth } = useSidebar()
   const { header: headerRef, nav: navRef } = useBarSizes()
 
   // A newly opened page starts at its top.
@@ -79,9 +133,9 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
   }, [page])
 
   const navButtons = PAGES.map(({ id, label, icon: Icon }) => (
-    <Button key={id} variant={page === id ? 'secondary' : 'ghost'} className="justify-start gap-2" aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
+    <Button key={id} variant={page === id ? 'secondary' : 'ghost'} className="justify-start gap-2 overflow-hidden" title={label} aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
       <Icon className="h-5 w-5" />
-      {label}
+      <span className="truncate">{label}</span>
     </Button>
   ))
 
@@ -91,16 +145,12 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
     // window lets iPhone Safari show the page on behind its address bar; a fixed frame stops at it
     // and leaves a blank strip. Nothing may make the page wider than the screen: iPhone Safari would
     // then widen the whole layout, open it zoomed in, and push the tab bar out of sight.
-    // --sidebar-width lets panels fixed to the window line up with the main column.
-    <div style={{ '--sidebar-width': sidebarShown ? '12rem' : '0px' } as CSSProperties} className="min-h-screen bg-background max-md:overflow-x-clip">
+    <div style={{ '--sidebar-width': `${sidebarMeasured}px` } as CSSProperties} className="min-h-screen bg-background max-md:overflow-x-clip">
       <header ref={headerRef} className="glass-bar sticky top-0 z-40 border-b pt-[env(safe-area-inset-top)]">
         <div className="flex h-14 items-center justify-between gap-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
           <div className="flex min-w-0 items-center gap-2">
             {/* The tab bar holds the pages on phones, so this corner only needs a way out. */}
-            <LogoutButton iconOnly className="md:hidden" />
-            <Button variant="ghost" size="icon" className="max-md:hidden" aria-label={sidebarShown ? t('Hide sidebar') : t('Show sidebar')} aria-pressed={!sidebarShown} title={sidebarShown ? t('Hide sidebar') : t('Show sidebar')} onClick={toggleSidebar}>
-              {sidebarShown ? <PanelLeftClose className="size-5" /> : <PanelLeftOpen className="size-5" />}
-            </Button>
+            <LogoutButton />
             {/* Silkscreen's pixels are an eighth of its size, so it stays crisp at 16px or 24px, never 20px.
                 24px fits phones from 375 points wide. */}
             <h1 className="brand-title text-base min-[375px]:text-2xl">{t('qBittorrent')}</h1>
@@ -116,12 +166,28 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
 
       <div>
         <div className="flex">
-          {sidebarShown && (
-            <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-48 flex-shrink-0 flex-col gap-1 self-start overflow-y-auto border-e p-2 pb-4 md:flex">
-              <nav aria-label={t('Pages')} className="flex flex-col gap-1">{navButtons}</nav>
-              <LogoutButton className="mt-auto" />
-            </aside>
-          )}
+          <div ref={sidebarBox} className="sticky top-14 hidden h-[calc(100vh-3.5rem)] flex-shrink-0 self-start md:flex">
+            {sidebarShown && (
+              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="w-max min-w-30 overflow-x-hidden overflow-y-auto p-2 pb-4">
+                <nav aria-label={t('Pages')} className="flex flex-col gap-1">{navButtons}</nav>
+              </aside>
+            )}
+            {/* The sidebar's edge: drag it to resize, or past a point to hide; the button in its middle hides and shows it. */}
+            <div className="group relative w-px bg-border">
+              <div aria-hidden className="absolute inset-y-0 -inset-x-1.5 z-10 cursor-col-resize" onPointerDown={startDrag} onDoubleClick={resetWidth} />
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute top-1/2 left-1/2 z-20 h-8 w-3 min-w-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background p-0 text-muted-foreground shadow-none hover:text-foreground"
+                aria-label={sidebarShown ? t('Hide sidebar') : t('Show sidebar')}
+                aria-expanded={sidebarShown}
+                title={sidebarShown ? t('Hide sidebar') : t('Show sidebar')}
+                onClick={() => showSidebar(!sidebarShown)}
+              >
+                {sidebarShown ? <ChevronLeft className="size-2.5 rtl:rotate-180" /> : <ChevronRight className="size-2.5 rtl:rotate-180" />}
+              </Button>
+            </div>
+          </div>
           <main className="min-w-0 flex-1 pt-4 pb-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] max-md:pb-[calc(var(--bottom-nav-height,5rem)+1rem)]">
             {children}
           </main>

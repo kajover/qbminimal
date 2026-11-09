@@ -1,5 +1,6 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
-import { Ban, ChevronDown } from 'lucide-react'
+import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { ArrowDown, ArrowUp, Ban, ChevronDown } from 'lucide-react'
+import { NativeSelect } from '@/components/NativeSelect'
 import { BannedPeers } from '@/components/BannedPeers'
 import { ConfirmAction } from '@/components/ConfirmAction'
 import { Button } from '@/components/ui/button'
@@ -15,6 +16,35 @@ import { DOWN_SPEED_COLOR, UP_SPEED_COLOR } from '@/lib/torrentState'
 import type { TorrentPeer } from '@/types'
 import { PeerFlag } from './PeerFlag'
 import { t } from '@/i18n'
+
+type SortField = 'ip' | 'client' | 'progress' | 'dl_speed' | 'up_speed' | 'downloaded' | 'uploaded' | 'relevance'
+
+const sortFields: [SortField, () => string][] = [
+  ['ip', () => t('IP address')],
+  ['client', () => t('Client')],
+  ['progress', () => t('Progress')],
+  ['dl_speed', () => t('Down speed')],
+  ['up_speed', () => t('Up speed')],
+  ['downloaded', () => t('Downloaded')],
+  ['uploaded', () => t('Uploaded')],
+  ['relevance', () => t('Relevance')],
+]
+
+// IPv4 by octets, so 10.0.0.9 comes before 10.0.0.10. Anything else (IPv6) sorts after, as text.
+function compareIp(a: string, b: string) {
+  const octets = (ip: string) => /^\d{1,3}(\.\d{1,3}){3}$/.test(ip) ? ip.split('.').map(Number) : null
+  const x = octets(a), y = octets(b)
+  if (x && y) return x[0] - y[0] || x[1] - y[1] || x[2] - y[2] || x[3] - y[3]
+  if (x) return -1
+  if (y) return 1
+  return a.localeCompare(b)
+}
+
+function comparePeers(field: SortField, [idA, a]: [string, TorrentPeer], [idB, b]: [string, TorrentPeer]) {
+  if (field === 'ip') return compareIp(a.ip ?? idA, b.ip ?? idB)
+  if (field === 'client') return (a.client ?? '').localeCompare(b.client ?? '')
+  return (a[field] ?? 0) - (b[field] ?? 0)
+}
 
 const percent = (fraction: number | undefined) => `${Math.round((fraction ?? 0) * 1000) / 10}%`
 const speed = (bytes: number | undefined, color: string) =>
@@ -82,7 +112,7 @@ function PeerRow({ id, peer, children }: { id: string; peer: TorrentPeer; childr
       <PeerFlag code={peer.country_code} country={peer.country} />
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-2">
-          <p className="min-w-0 truncate font-medium tabular-nums" dir="ltr" title={peer.ip ?? id}>{peer.ip ?? id}</p>
+          <p className="min-w-0 truncate font-medium text-foreground tabular-nums" dir="ltr" title={peer.ip ?? id}>{peer.ip ?? id}</p>
           <p className="ms-auto shrink-0 text-xs text-muted-foreground tabular-nums">{percent(peer.progress)}</p>
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground tabular-nums">
@@ -142,7 +172,13 @@ export function PeersTab({ hash }: { hash: string }) {
     }).then(() => { toast.success(t('Peer banned')) }, () => undefined)
   }
 
-  const entries = Object.entries(peers ?? {})
+  const [sortField, setSortField] = useState<SortField>('dl_speed')
+  const [descending, setDescending] = useState(true)
+  const entries = useMemo(() => {
+    const list = Object.entries(peers ?? {})
+    return list.sort((a, b) => (descending ? -1 : 1) * comparePeers(sortField, a, b))
+  }, [peers, sortField, descending])
+  const sortLabel = t('Sort: {column}', { column: sortFields.find(([f]) => f === sortField)![1]() })
 
   return (
     <div className="space-y-3">
@@ -153,6 +189,15 @@ export function PeersTab({ hash }: { hash: string }) {
       ) : entries.length === 0 ? (
         <div className="py-8 text-center text-muted-foreground">{t('No peers connected')}</div>
       ) : (
+        <>
+        <div className="flex items-center gap-2 px-2">
+          <NativeSelect aria-label={sortLabel} className="h-8 flex-1" value={sortField} onChange={(e) => setSortField(e.target.value as SortField)}>
+            {sortFields.map(([field, label]) => <option key={field} value={field}>{label()}</option>)}
+          </NativeSelect>
+          <Button type="button" variant="outline" size="icon" className="h-8 w-8 flex-shrink-0" aria-label={sortLabel} title={sortLabel} onClick={() => setDescending(d => !d)}>
+            {descending ? <ArrowDown className="h-4 w-4" /> : <ArrowUp className="h-4 w-4" />}
+          </Button>
+        </div>
         <ul className="divide-y text-sm">
           {entries.map(([id, peer]) => (
             <PeerRow key={id} id={id} peer={peer}>
@@ -169,6 +214,7 @@ export function PeersTab({ hash }: { hash: string }) {
             </PeerRow>
           ))}
         </ul>
+        </>
       )}
 
       {data && !data.showFlags && entries.length > 0 && (

@@ -33,8 +33,6 @@ In Safari on an iPhone, where the list runs on behind the address bar:
   <img src="docs/screenshots/iphone.png" alt="The torrent list as cards in Safari on an iPhone, continuing behind Safari's address bar under the floating tab bar" width="260">
 </p>
 
-The screenshots come from the demo (`npm run demo`), so the torrents are made up.
-
 ## Features
 
 - **Torrent list** as a table or as cards. In the table you can show, hide, drag, and resize columns, and sort by any of them. The layout is remembered on each device.
@@ -80,14 +78,6 @@ npm run dev
 
 The dev server sends API requests under `/api` to qBittorrent at `http://localhost:8080`. Change `server.proxy` in `vite.config.ts` to point at yours.
 
-To try the app without a qBittorrent server, run the demo. It keeps pretend torrents in memory, and they react to what you do:
-
-```bash
-npm run demo
-```
-
-Set `VITE_DEMO_WEB_API=2.17.0` to make the demo act like a newer qBittorrent. Add `?torrents=40` to the address for a longer list, and `?signedin` to skip the sign-in form.
-
 Checks, also run by CI on every push and pull request:
 
 ```bash
@@ -124,8 +114,6 @@ DEPLOY_URL=https://example.com/qbittorrent/
 Then run `npm run deploy` for the latest release, or `scripts/deploy.sh --zip qbminimal-release.zip` for a local build.
 
 ## Credits
-
-qbminimal is influenced by the original project qbitwebber.
 
 Third-party components and their licenses are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

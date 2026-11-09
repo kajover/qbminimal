@@ -27,7 +27,7 @@ function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: s
     <div className="flex min-w-0 items-center gap-2 rounded-md bg-muted/60 px-3 py-2">
       <span className="flex-shrink-0 text-muted-foreground">{icon}</span>
       <div className="min-w-0">
-        <p className="text-[11px] text-muted-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
         <p className="truncate text-sm tabular-nums" title={value}>{value}</p>
       </div>
     </div>
