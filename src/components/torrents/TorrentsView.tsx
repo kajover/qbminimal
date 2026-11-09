@@ -224,10 +224,34 @@ export function TorrentsView() {
     return () => window.removeEventListener('keydown', onKey)
   })
 
+  // Phones: above the tab bar and the table's scrollbar, where a thumb reaches. Wide screens: in the
+  // title row, between the title and the toolbar, no taller than the title, so the list below
+  // doesn't move when a torrent is selected.
+  const selectionBar = count > 0 && (
+    <div
+      role="toolbar"
+      aria-label={t('Selected torrents')}
+      className="glass z-30 flex items-center gap-1 overflow-x-auto max-md:fixed max-md:inset-x-3 max-md:bottom-[calc(var(--bottom-nav-height,4rem)+var(--table-scrollbar-space,0px)+0.5rem)] max-md:rounded-full max-md:p-1.5 max-md:px-2 md:w-full md:max-w-xl md:rounded-xl md:p-0.5"
+    >
+      <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Clear selection')} title={t('Clear selection (Esc)')} onClick={selection.clear}>
+        <X className="size-4" />
+      </Button>
+      <span className="me-auto pe-2 text-sm whitespace-nowrap tabular-nums">{t('{count} selected', { count })}</span>
+      <Button variant="ghost" size="sm" className="gap-1" title={t('Start')} onClick={start}><Play className="size-4" /><span className="max-sm:sr-only">{t('Start')}</span></Button>
+      <Button variant="ghost" size="sm" className="gap-1" title={t('Stop')} onClick={stop}><Pause className="size-4" /><span className="max-sm:sr-only">{t('Stop')}</span></Button>
+      <MoreMenu torrents={selectedTorrents} groups={groups} />
+      <Button variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" title={t('Delete (Del)')} onClick={() => askToDelete(selectedTorrents)}><Trash2 className="size-4" /><span className="max-sm:sr-only">{t('Delete')}</span></Button>
+    </div>
+  )
+
   const total = torrents.length
   const header = (
     <PageHeader
       title={t('Torrents')}
+      // Kept in view while scrolling as long as something is selected, so its actions stay at hand. The
+      // shadow carries the background a little lower, over the rows scrolling under it, without taking room.
+      className={count > 0 ? 'md:sticky md:top-14 md:z-20 md:bg-background md:shadow-[0_0.5rem_0_var(--background)]' : undefined}
+      middle={selectionBar}
       description={!isLoading && (
         // The count opens the connection status and statistics.
         <TorrentStats>
@@ -276,24 +300,6 @@ export function TorrentsView() {
     <div className="space-y-4">
       {header}
 
-      {count > 0 && (
-        // Phones: above the tab bar and the table's scrollbar, where a thumb reaches, without the list's gap
-        // below it, which would only push it up. Wide screens: under the header.
-        <div
-          role="toolbar"
-          aria-label={t('Selected torrents')}
-          className="glass z-30 flex items-center gap-1 overflow-x-auto p-1.5 max-md:fixed max-md:inset-x-3 max-md:mb-0 max-md:bottom-[calc(var(--bottom-nav-height,4rem)+var(--table-scrollbar-space,0px)+0.5rem)] max-md:rounded-full max-md:px-2 md:sticky md:top-16 md:rounded-xl"
-        >
-          <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Clear selection')} title={t('Clear selection (Esc)')} onClick={selection.clear}>
-            <X className="size-4" />
-          </Button>
-          <span className="me-auto pe-2 text-sm whitespace-nowrap tabular-nums">{t('{count} selected', { count })}</span>
-          <Button variant="ghost" size="sm" className="gap-1" title={t('Start')} onClick={start}><Play className="size-4" /><span className="max-sm:sr-only">{t('Start')}</span></Button>
-          <Button variant="ghost" size="sm" className="gap-1" title={t('Stop')} onClick={stop}><Pause className="size-4" /><span className="max-sm:sr-only">{t('Stop')}</span></Button>
-          <MoreMenu torrents={selectedTorrents} groups={groups} />
-          <Button variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" title={t('Delete (Del)')} onClick={() => askToDelete(selectedTorrents)}><Trash2 className="size-4" /><span className="max-sm:sr-only">{t('Delete')}</span></Button>
-        </div>
-      )}
 
       <FilterViewChips list={list} views={views} onViewsChange={setViews} />
 
