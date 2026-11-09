@@ -133,9 +133,9 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
   }, [page])
 
   const navButtons = PAGES.map(({ id, label, icon: Icon }) => (
-    <Button key={id} variant={page === id ? 'secondary' : 'ghost'} className="justify-start gap-2 overflow-hidden text-base" title={label} aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
-      {/* Icons a little larger than the 16px labels, in the same proportion as the buttons. */}
-      <Icon className="size-4.5" />
+    <Button key={id} variant={page === id ? 'secondary' : 'ghost'} className="justify-start gap-2 overflow-hidden" title={label} aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
+      {/* 14px labels like the tab bar's, with 16px icons beside them, as on the other buttons. */}
+      <Icon className="size-4" />
       <span className="truncate">{label}</span>
     </Button>
   ))
@@ -206,9 +206,10 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
         <div className="flex justify-around px-1 py-1.5">
           {PAGES.map(({ id, label, icon: Icon }) => (
             <button key={id} type="button" aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)} className={cn('flex min-w-0 flex-auto flex-col items-center rounded-full px-1 py-1 transition-colors [:root[data-tab-labels=off]_&]:py-2', page === id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground')}>
-              <Icon className="size-5" />
+              {/* 18px icons over 12px names; with the names hidden in Settings, 20px icons on their own. */}
+              <Icon className="size-4.5 [:root[data-tab-labels=off]_&]:size-5" />
               {/* Hidden in Settings, the names stay for screen readers. */}
-              <span className="max-w-full truncate text-sm [:root[data-tab-labels=off]_&]:sr-only">{label}</span>
+              <span className="max-w-full truncate text-xs [:root[data-tab-labels=off]_&]:sr-only">{label}</span>
             </button>
           ))}
         </div>
