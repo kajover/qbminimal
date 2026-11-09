@@ -1,4 +1,4 @@
-import { lazy, startTransition, useEffect, useState, ViewTransition, type ComponentType } from 'react'
+import { lazy, startTransition, useEffect, useState, type ComponentType } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 import { Layout } from '@/components/Layout'
@@ -33,24 +33,27 @@ function Screens() {
   const { status } = useSession()
   // A magnet link the page was opened for starts on the Add page.
   const [page, setPage] = useState<PageId>(() => (hasIncoming() ? 'add' : 'torrents'))
+  const [selected, setSelected] = useState(page)
   // So do torrents dropped on the page or handed over later.
-  useEffect(() => onIncoming(() => setPage('add')), [])
+  useEffect(() => onIncoming(() => { setSelected('add'); setPage('add') }), [])
 
   if (status === 'checking') return <p className="grid min-h-dvh place-items-center text-sm text-muted-foreground">{t('Connecting...')}</p>
   if (status === 'signedOut') return <LoginForm />
 
-  // Switching pages is a transition, so the new page cross-fades in (index.css turns that off for
-  // reduced motion), and a page that still has to load keeps the old one up until it's ready.
-  const navigate = (next: PageId) => startTransition(() => setPage(next))
+  // Pages switch at once, like a phone's tab bar. As a transition, a page that still has to load
+  // keeps the current one on screen until it's ready, instead of a loading message.
+  // The tapped tab lights up straight away; its page follows once loaded.
+  const navigate = (next: PageId) => {
+    setSelected(next)
+    startTransition(() => setPage(next))
+  }
   const View = PAGE_VIEWS[page]
   return (
-    <Layout page={page} onNavigate={navigate}>
-      {/* The key resets a page's error state when switching away from it. */}
-      <ViewTransition key={page}>
-        <PageBoundary>
-          <View />
-        </PageBoundary>
-      </ViewTransition>
+    <Layout page={selected} onNavigate={navigate}>
+      {/* The reset key clears a page's error when switching away from it. */}
+      <PageBoundary resetKey={page}>
+        <View />
+      </PageBoundary>
     </Layout>
   )
 }

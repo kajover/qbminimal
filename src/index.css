@@ -467,16 +467,3 @@
 .piece-stripes {
   background-image: repeating-linear-gradient(45deg, var(--color-amber-500) 0 2px, var(--color-amber-700, #b45309) 2px 4px);
 }
-
-/* Pages cross-fade when switching (App.tsx), briefly, and not at all for people who ask for less
-   motion. */
-::view-transition-group(*) {
-  animation-duration: 0.15s;
-}
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
-}

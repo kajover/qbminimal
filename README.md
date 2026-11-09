@@ -59,7 +59,6 @@ In Safari on an iPhone, where the list runs on behind the address bar:
 - **Screen readers** hear when the selection, the sort order, the view, or the number of matching torrents changes. Icon buttons have names, and the tab bar's names stay readable to screen readers when they are hidden on screen.
 - **Tab bar labels** can be turned off on phones under **Settings > App > Appearance**, leaving larger icons.
 - **Keyboard shortcuts** for the torrent list. Press `?` to see them.
-- **Less motion**: switching pages cross-fades briefly, and not at all when the device asks for reduced motion.
 
 ## Languages
 

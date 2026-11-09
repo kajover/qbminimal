@@ -25,12 +25,12 @@ class LoadErrorBoundary extends Component<{ children: ReactNode }, { failed: boo
   }
 }
 
-export function PageBoundary({ loading, children }: { loading?: ReactNode; children: ReactNode }) {
+// The loading boundary stays in place while what's inside changes, so a switch made in a transition
+// keeps the current content on screen until the next has loaded. A new resetKey clears a failure.
+export function PageBoundary({ loading, resetKey, children }: { loading?: ReactNode; resetKey?: string; children: ReactNode }) {
   return (
-    <LoadErrorBoundary>
-      <Suspense fallback={loading === undefined ? <div className="py-8 text-center text-sm text-muted-foreground">{t('Loading...')}</div> : loading}>
-        {children}
-      </Suspense>
-    </LoadErrorBoundary>
+    <Suspense fallback={loading === undefined ? <div className="py-8 text-center text-sm text-muted-foreground">{t('Loading...')}</div> : loading}>
+      <LoadErrorBoundary key={resetKey}>{children}</LoadErrorBoundary>
+    </Suspense>
   )
 }
