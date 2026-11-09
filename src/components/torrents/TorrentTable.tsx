@@ -191,7 +191,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, selected, selec
   return (
     // Its own scrollbar is hidden: the one at the bottom of the screen stands in for it.
     <div ref={scroller} className="overflow-x-auto overscroll-x-none rounded-xl border bg-card [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <table className="table-fixed caption-bottom text-xs tabular-nums md:text-sm" style={{ width: `max(100%, ${total}px)` }}>
+      <table className="table-fixed caption-bottom text-xs tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
         <colgroup>
           <col style={{ width: SELECT_WIDTH }} />
           {columns.map(def => <col key={def.id} style={{ width: widthOf(def.id) }} />)}

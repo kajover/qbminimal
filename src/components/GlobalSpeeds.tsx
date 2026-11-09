@@ -38,7 +38,7 @@ export function GlobalSpeeds() {
         onClick={() => setOpen(true)}
         title={title}
         aria-label={`${t('Current speeds')}: ↓ ${formatBytes(speeds.down)}/s, ↑ ${formatBytes(speeds.up)}/s. ${title}`}
-        className="-mx-1 flex flex-col rounded-md px-1 py-0.5 text-[10px] leading-tight tabular-nums whitespace-nowrap outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring sm:text-xs"
+        className="-mx-1 flex flex-col rounded-md px-1 py-0.5 text-[10px] leading-tight tabular-nums whitespace-nowrap outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
       >
         {row('↓', speeds.down, state?.dl_rate_limit)}
         {row('↑', speeds.up, state?.up_rate_limit)}

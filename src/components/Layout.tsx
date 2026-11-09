@@ -65,7 +65,7 @@ const storedWidth = () => {
   return width >= SIDEBAR_MIN && width <= SIDEBAR_MAX ? width : null
 }
 
-// Wide screens only. The sidebar is 120px, or as wide as its labels if they need more, until it's dragged by its edge, which also
+// Wide screens only. The sidebar reaches the title's first "r" (150px), or is as wide as its labels if they need more, until it's dragged by its edge, which also
 // holds the button that hides and shows it. --sidebar-width lets panels fixed to the window line up
 // with the main column.
 function useSidebar() {
@@ -168,7 +168,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
         <div className="flex">
           <div ref={sidebarBox} className="sticky top-14 hidden h-[calc(100vh-3.5rem)] flex-shrink-0 self-start md:flex">
             {sidebarShown && (
-              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="w-max min-w-30 overflow-x-hidden overflow-y-auto p-2 pb-4">
+              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="w-max min-w-[150px] overflow-x-hidden overflow-y-auto p-2 pb-4">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{navButtons}</nav>
               </aside>
             )}

@@ -52,7 +52,7 @@ function DetailsTabs({ torrent, listClassName }: { torrent: Torrent; listClassNa
   return (
     <Tabs value={tab} onValueChange={choose} className="min-h-0 flex-1">
       <TabsList className={cn('grid grid-cols-5', listClassName)}>
-        {TABS.map(tab => <TabsTrigger key={tab.id} value={tab.id} className="px-0.5 text-xs sm:px-3 sm:text-sm">{tab.label}</TabsTrigger>)}
+        {TABS.map(tab => <TabsTrigger key={tab.id} value={tab.id} className="px-0.5 text-xs sm:px-3">{tab.label}</TabsTrigger>)}
       </TabsList>
       <TabsContent value="details" className="overflow-y-auto"><TorrentInfoTab torrent={torrent} /></TabsContent>
       <TabsContent value="content" className="flex min-h-0 flex-col overflow-hidden"><TorrentContentTab key={torrent.hash} hash={torrent.hash} /></TabsContent>
