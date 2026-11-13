@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Lock, LockOpen } from 'lucide-react'
+import { Lock, LockOpen, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -71,7 +71,7 @@ export function DeleteTorrentsDialog({ torrents, open, onOpenChange, onConfirm }
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>{t('Cancel')}</Button>
-          <Button variant="destructive" onClick={() => onConfirm(withFiles)}>{withFiles ? t('Delete with files') : t('Delete')}</Button>
+          <Button variant="destructive" onClick={() => onConfirm(withFiles)}><Trash2 />{withFiles ? t('Delete with files') : t('Delete')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

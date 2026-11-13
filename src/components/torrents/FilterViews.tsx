@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import { Bookmark, X } from 'lucide-react'
+import { Bookmark, Save, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import type { TorrentList } from '@/hooks/useTorrentList'
 import { saveFilterViews, sameFilters, upsertView, type FilterView } from '@/lib/filterViews'
@@ -61,17 +61,16 @@ export function SaveViewButton({ list, views, onViewsChange }: FilterViewsProps)
         <Bookmark className="size-4" />{' '}{t('Save as view')}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>{t('Save as view')}</DialogTitle>
-            <DialogDescription>{t('The view shows above the list and applies these filters in one tap.')}</DialogDescription>
           </DialogHeader>
           <form onSubmit={submit} className="space-y-3">
             <Input aria-label={t('View name')} placeholder={t('For example: Downloading movies')} autoFocus maxLength={40} value={name} onChange={(e) => setName(e.target.value)} />
             {replacing && <p className="text-sm text-muted-foreground">{t('A view with this name exists. Saving replaces it.')}</p>}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>{t('Cancel')}</Button>
-              <Button type="submit" disabled={!name.trim()}>{replacing ? t('Replace') : t('Save')}</Button>
+              <Button type="submit" disabled={!name.trim()}><Save />{replacing ? t('Replace') : t('Save')}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

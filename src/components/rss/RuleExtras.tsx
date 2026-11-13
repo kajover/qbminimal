@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react'
-import { Eye, TextCursorInput } from 'lucide-react'
+import { Eye, Pencil, TextCursorInput } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
@@ -14,10 +14,9 @@ function MatchesDialog({ name, onClose }: { name: string; onClose: () => void })
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-h-[80vh] overflow-y-auto">
+      <DialogContent aria-describedby={undefined} className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('Matches for {name}', { name })}</DialogTitle>
-          <DialogDescription>{t('Articles already in your feeds that this rule matches.')}</DialogDescription>
         </DialogHeader>
         {isLoading ? (
           <p className="text-sm text-muted-foreground">{t('Loading...')}</p>
@@ -73,7 +72,7 @@ function RenameDialog({ name, existing, onClose }: { name: string; existing: str
           <Input aria-label={t('New rule name')} autoFocus value={value} onChange={(e) => setValue(e.target.value)} />
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>{t('Cancel')}</Button>
-            <Button type="submit" disabled={saving}>{t('Rename')}</Button>
+            <Button type="submit" disabled={saving}><Pencil />{t('Rename')}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

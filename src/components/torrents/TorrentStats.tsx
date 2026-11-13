@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from 'react'
-import { Globe, HardDrive, Network, Pause, Play } from 'lucide-react'
+import { Activity, Database, Gauge, Globe, HardDrive, History, Network, Pause, Play, Turtle, type LucideIcon } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { useApiFeature, useTransferInfo } from '@/hooks/useApi'
+import { useApiFeature, usePreferences, useTorrents, useTransferInfo } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import { formatDuration } from '@/lib/format'
@@ -61,16 +61,67 @@ function SessionPauseButton({ paused }: { paused: boolean }) {
   )
 }
 
+// Switches qBittorrent between its normal and alternative ("slow") speed limits. Pressed and amber
+// while the alternative ones are on, like the speeds in the header.
+function AlternativeLimitsButton({ on }: { on: boolean }) {
+  const queryClient = useQueryClient()
+  const { data: prefs } = usePreferences()
+  const [pending, setPending] = useState(false)
+  const rate = (bytes: unknown) => (Number(bytes) > 0 ? `${formatBytes(Number(bytes))}/s` : t('unlimited'))
+  const rates = prefs ? `↓ ${rate(prefs.alt_dl_limit)} · ↑ ${rate(prefs.alt_up_limit)}` : undefined
+
+  const toggle = async () => {
+    setPending(true)
+    try {
+      await qbitClient.toggleSpeedLimitsMode()
+      await queryClient.invalidateQueries({ queryKey: ['torrents'] })
+      if (on) toast.success(t('Alternative speed limits off'), { description: t('Your normal speed limits apply') })
+      else toast.success(t('Alternative speed limits on'), { description: rates })
+    } catch (e) {
+      toast.error(t('Failed to change speed limits'), { description: e instanceof Error ? e.message : undefined })
+    } finally {
+      setPending(false)
+    }
+  }
+
+  return (
+    <Button
+      type="button"
+      size="sm"
+      variant="outline"
+      aria-pressed={on}
+      title={rates}
+      disabled={pending}
+      onClick={toggle}
+      className={cn('mt-2 w-full gap-2', on && 'border-amber-500/40 bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 dark:text-amber-400')}
+    >
+      <Turtle className="size-4" />
+      {on ? t('Alternative speed limits are on') : t('Alternative speed limits are off')}
+    </Button>
+  )
+}
+
 export function TorrentStats({ children }: { children: ReactNode }) {
   const { data: state } = useTransferInfo()
+  const { data: torrents } = useTorrents()
   const canPauseSession = useApiFeature('sessionPause') && typeof state?.session_state === 'boolean'
   const sessionPaused = state?.session_state === true
   const connection = CONNECTION_LABELS[state?.connection_status ?? '']
   const externalAddress = [state?.last_external_address_v4, state?.last_external_address_v6].filter(Boolean).join(', ')
 
-  const allGroups: { title: string; rows: [string, string][] }[] = state ? [
+  const allGroups: { title: string; icon: LucideIcon; rows: [string, string][] }[] = state ? [
+    {
+      title: t('Storage'),
+      icon: HardDrive,
+      rows: [
+        [t('Free space'), size(state.free_space_on_disk)],
+        // Summed here, as qBittorrent doesn't report it.
+        [t('Total size of torrents'), torrents ? formatBytes(torrents.reduce((sum, torrent) => sum + (torrent.size ?? 0), 0)) : '-'],
+      ],
+    },
     {
       title: t('All time'),
+      icon: History,
       rows: [
         [t('Downloaded'), size(state.alltime_dl)],
         [t('Uploaded'), size(state.alltime_ul)],
@@ -79,6 +130,7 @@ export function TorrentStats({ children }: { children: ReactNode }) {
     },
     {
       title: t('This session'),
+      icon: Activity,
       rows: [
         [t('Downloaded'), size(state.dl_info_data)],
         [t('Uploaded'), size(state.up_info_data)],
@@ -90,6 +142,7 @@ export function TorrentStats({ children }: { children: ReactNode }) {
     },
     {
       title: t('Cache and disk'),
+      icon: Database,
       rows: [
         [t('Read cache hits'), state.read_cache_hits !== undefined ? `${state.read_cache_hits}%` : '-'],
         [t('Read cache overload'), state.read_cache_overload !== undefined ? `${state.read_cache_overload}%` : '-'],
@@ -132,12 +185,12 @@ export function TorrentStats({ children }: { children: ReactNode }) {
             </div>
 
             <section>
-              <h3 className="mb-1 text-xs font-medium text-muted-foreground">{t('Speed')}</h3>
+              <h3 className="mb-1 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><Gauge className="size-3.5" />{t('Speed')}</h3>
               <SpeedChart />
+              <AlternativeLimitsButton on={state.use_alt_speed_limits === true} />
             </section>
 
             <div className="grid grid-cols-2 gap-2">
-              <Fact icon={<HardDrive className="size-4" />} label={t('Free space')} value={size(state.free_space_on_disk)} />
               <Fact icon={<Network className="size-4" />} label={t('DHT nodes')} value={count(state.dht_nodes)} />
               {externalAddress && (
                 <div className="col-span-2">
@@ -148,7 +201,7 @@ export function TorrentStats({ children }: { children: ReactNode }) {
 
             {groups.map(group => (
               <section key={group.title}>
-                <h3 className="mb-1 text-xs font-medium text-muted-foreground">{group.title}</h3>
+                <h3 className="mb-1 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><group.icon className="size-3.5" />{group.title}</h3>
                 <dl className="divide-y text-sm">
                   {group.rows.map(([label, value]) => (
                     <div key={label} className="flex justify-between gap-4 py-1.5">

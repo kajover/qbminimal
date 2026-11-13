@@ -1,6 +1,12 @@
 # Contributing
 
-Thanks for helping. The easiest way to help is with translations: no programming and no setup, just a GitHub account.
+Thanks for helping. Every kind of contribution is welcome:
+
+- **Code**: bug fixes, new features, and tidying up, as [pull requests](https://github.com/kajover/qbminimal/pulls). See [Code](#code) below.
+- **Ideas and questions**: start a thread in [Discussions](https://github.com/kajover/qbminimal/discussions), or join one.
+- **Bugs and feature requests**: [open an issue](https://github.com/kajover/qbminimal/issues/new/choose).
+- **Reviews**: try open pull requests and say what works and what doesn't.
+- **Translations**: the easiest place to start, with no programming and no setup, just a GitHub account.
 
 ## Translations
 
@@ -49,6 +55,8 @@ If that's more than you'd like to do, open an issue offering the language and we
 New English text shows in English until a language has it. `npm run i18n:check`, which CI also runs, lists every text a language is missing and every line whose placeholders don't match.
 
 ## Code
+
+Pull requests of any size are welcome, from a one-line fix to a new feature. For something large, a short issue or discussion first helps agree on the approach before you spend time on it.
 
 ```bash
 npm install

@@ -40,7 +40,7 @@ function renderView() {
   return screen.findByText('alpha')
 }
 
-const row = (name: string) => within(screen.getByRole('table')).getByText(name).closest('tr') as HTMLElement
+const row = (name: string) => within(screen.getAllByRole('table').at(-1)!).getByText(name).closest('tr') as HTMLElement
 const selectedNames = () => screen.queryAllByRole('row').filter(r => r.getAttribute('aria-selected') === 'true').map(r => within(r).getAllByRole('cell')[2].textContent)
 
 describe('the torrent list', () => {
@@ -53,7 +53,7 @@ describe('the torrent list', () => {
     await renderView()
     await userEvent.click(row('bravo'))
     expect(selectedNames()).toEqual(['bravo'])
-    expect(screen.getByRole('toolbar', { name: 'Selected torrents' })).toHaveTextContent('1 selected')
+    expect(screen.getByRole('toolbar', { name: 'Selected torrents' })).toHaveTextContent(/1\/\d+ selected/)
     expect(await screen.findByRole('region', { name: 'Torrent details' })).toHaveTextContent('bravo')
   })
 

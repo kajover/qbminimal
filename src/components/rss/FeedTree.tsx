@@ -1,4 +1,4 @@
-import { Folder, MoreVertical } from 'lucide-react'
+import { CheckCheck, Clock, Folder, FolderInput, Link, MoreVertical, Pencil, RefreshCw, Trash2, type LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { getRSSParent } from '@/lib/rss'
@@ -21,7 +21,7 @@ interface FeedTreeProps {
 
 // qBittorrent's feed folders as a tree, each feed and folder with its own menu.
 export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMarkRead, onPrompt }: FeedTreeProps) {
-  const menu = (label: string, items: [string, () => void, boolean?][]) => (
+  const menu = (label: string, items: [string, LucideIcon, () => void, boolean?][]) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="size-7 shrink-0" aria-label={t('Actions for {label}', { label })} title={t('Actions')} onClick={(e) => e.stopPropagation()}>
@@ -29,7 +29,7 @@ export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMark
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-        {items.map(([text, run, danger]) => <DropdownMenuItem key={text} className={cn(danger && 'text-destructive')} onClick={run}>{text}</DropdownMenuItem>)}
+        {items.map(([text, Icon, run, danger]) => <DropdownMenuItem key={text} className={cn(danger && 'text-destructive')} onClick={run}><Icon className="size-4" />{text}</DropdownMenuItem>)}
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -55,13 +55,13 @@ export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMark
           </span>
         </span>
         {menu(feed.title, [
-          [t('Refresh'), () => onRefresh(feed.path, t('Refreshing feed'))],
-          [t('Mark all as read'), () => onMarkRead(feed.path)],
-          [t('Rename'), () => onPrompt({ kind: 'rename', path: feed.path, isFolder: false })],
-          [t('Move to folder'), () => onPrompt({ kind: 'move', path: feed.path })],
-          [t('Change address'), () => onPrompt({ kind: 'url', feed })],
-          [t('Refresh time'), () => onPrompt({ kind: 'interval', feed })],
-          [t('Remove'), () => onPrompt({ kind: 'remove', path: feed.path, isFolder: false }), true],
+          [t('Refresh'), RefreshCw, () => onRefresh(feed.path, t('Refreshing feed'))],
+          [t('Mark all as read'), CheckCheck, () => onMarkRead(feed.path)],
+          [t('Rename'), Pencil, () => onPrompt({ kind: 'rename', path: feed.path, isFolder: false })],
+          [t('Move to folder'), FolderInput, () => onPrompt({ kind: 'move', path: feed.path })],
+          [t('Change address'), Link, () => onPrompt({ kind: 'url', feed })],
+          [t('Refresh time'), Clock, () => onPrompt({ kind: 'interval', feed })],
+          [t('Remove'), Trash2, () => onPrompt({ kind: 'remove', path: feed.path, isFolder: false }), true],
         ])}
       </div>
     </li>
@@ -76,11 +76,11 @@ export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMark
             <Folder className="size-4 text-yellow-500" />
             <span className="min-w-0 flex-1 truncate">{rssName(path)}</span>
             {menu(t('folder {name}', { name: rssName(path) }), [
-              [t('Refresh'), () => onRefresh(path, t('Refreshing folder'))],
-              [t('Mark all as read'), () => onMarkRead(path)],
-              [t('Rename'), () => onPrompt({ kind: 'rename', path, isFolder: true })],
-              [t('Move to folder'), () => onPrompt({ kind: 'move', path })],
-              [t('Remove'), () => onPrompt({ kind: 'remove', path, isFolder: true }), true],
+              [t('Refresh'), RefreshCw, () => onRefresh(path, t('Refreshing folder'))],
+              [t('Mark all as read'), CheckCheck, () => onMarkRead(path)],
+              [t('Rename'), Pencil, () => onPrompt({ kind: 'rename', path, isFolder: true })],
+              [t('Move to folder'), FolderInput, () => onPrompt({ kind: 'move', path })],
+              [t('Remove'), Trash2, () => onPrompt({ kind: 'remove', path, isFolder: true }), true],
             ])}
           </div>
           <ul className="space-y-2">{level(path, depth + 1)}</ul>

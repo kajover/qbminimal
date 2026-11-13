@@ -1,6 +1,6 @@
 import { useState, useSyncExternalStore, type PointerEvent } from 'react'
 import { formatBytes } from '@/lib/format'
-import { getSpeedHistory, niceCeiling, onSpeedHistory, type SpeedSample } from '@/lib/speedHistory'
+import { getSpeedHistory, getTorrentSpeedHistory, niceCeiling, onSpeedHistory, type SpeedSample } from '@/lib/speedHistory'
 import { t } from '@/i18n'
 
 const WIDTH = 600
@@ -25,12 +25,13 @@ function linePath(samples: SpeedSample[], key: 'down' | 'up', top: number) {
   return samples.map((sample, i) => `${i ? 'L' : 'M'}${(i * step).toFixed(1)},${(HEIGHT - (sample[key] / top) * HEIGHT).toFixed(1)}`).join('')
 }
 
-// Download and upload speed since the page opened, up to ten minutes back.
-export function SpeedChart() {
-  const samples = useSyncExternalStore(onSpeedHistory, getSpeedHistory)
+// Download and upload speed since the page opened, up to ten minutes back: all torrents together,
+// or with `hash`, one torrent since its details first opened.
+export function SpeedChart({ hash }: { hash?: string } = {}) {
+  const samples = useSyncExternalStore(onSpeedHistory, hash ? () => getTorrentSpeedHistory(hash) : getSpeedHistory)
   const [hover, setHover] = useState<number | null>(null)
 
-  if (samples.length < 2) return <p className="py-4 text-center text-xs text-muted-foreground">{t('The speed graph fills in while this page stays open.')}</p>
+  if (samples.length < 2) return <p className="py-4 text-center text-xs text-muted-foreground">{hash ? t('The speed graph fills in while the details stay open.') : t('The speed graph fills in while this page stays open.')}</p>
 
   const peak = Math.max(...samples.map(s => Math.max(s.down, s.up)))
   const top = niceCeiling(peak)

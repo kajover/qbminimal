@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
-import { X } from 'lucide-react'
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { FolderTree, Info, RadioTower, SlidersHorizontal, Users, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useBackButtonClose } from '@/hooks/useBackButtonClose'
 import { readStored, writeStored } from '@/lib/storage'
+import { watchTorrentSpeeds } from '@/lib/speedHistory'
 import { cn } from '@/lib/utils'
 import type { Torrent } from '@/types'
 import { PeersTab } from './PeersTab'
@@ -15,11 +16,11 @@ import { TrackersTab } from './TrackersTab'
 import { t } from '@/i18n'
 
 const TABS = [
-  { id: 'details', label: t('Details') },
-  { id: 'content', label: t('Content') },
-  { id: 'actions', label: t('Actions') },
-  { id: 'trackers', label: t('Trackers') },
-  { id: 'peers', label: t('Peers') },
+  { id: 'details', label: t('Details'), icon: Info },
+  { id: 'content', label: t('Content'), icon: FolderTree },
+  { id: 'actions', label: t('Actions'), icon: SlidersHorizontal },
+  { id: 'trackers', label: t('Trackers'), icon: RadioTower },
+  { id: 'peers', label: t('Peers'), icon: Users },
 ] as const
 
 const HEIGHT_KEY = 'qbminimal.detailsHeight'
@@ -39,7 +40,10 @@ function initialHeight() {
 
 // Everything about one torrent. The open tab is remembered, also for the next time details open,
 // and each tab's key is the hash, so its content starts fresh for another torrent.
-function DetailsTabs({ torrent, listClassName }: { torrent: Torrent; listClassName?: string }) {
+// `end` sits at the end of the tabs' row, for the close button.
+function DetailsTabs({ torrent, listClassName, end }: { torrent: Torrent; listClassName?: string; end?: ReactNode }) {
+  // Its speeds are recorded while the details are open, whichever tab shows, for the Details graph.
+  useEffect(() => watchTorrentSpeeds(torrent.hash), [torrent.hash])
   const [tab, setTab] = useState<TabId>(() => {
     const stored = readStored(TAB_KEY)
     return isTabId(stored) ? stored : 'details'
@@ -51,9 +55,13 @@ function DetailsTabs({ torrent, listClassName }: { torrent: Torrent; listClassNa
   }
   return (
     <Tabs value={tab} onValueChange={choose} className="min-h-0 flex-1">
-      <TabsList className={cn('grid grid-cols-5', listClassName)}>
-        {TABS.map(tab => <TabsTrigger key={tab.id} value={tab.id} className="px-0.5 text-xs sm:px-3">{tab.label}</TabsTrigger>)}
-      </TabsList>
+      <div className="flex items-center gap-2">
+        <TabsList className={cn('grid min-w-0 flex-1 grid-cols-5', listClassName)}>
+          {/* Icons where there's room beside the names. */}
+          {TABS.map(({ id, label, icon: Icon }) => <TabsTrigger key={id} value={id} className="gap-1 px-0.5 text-xs sm:px-3"><Icon className="size-3.5 max-sm:hidden" />{label}</TabsTrigger>)}
+        </TabsList>
+        {end && <div className="ms-auto shrink-0">{end}</div>}
+      </div>
       <TabsContent value="details" className="overflow-y-auto"><TorrentInfoTab torrent={torrent} /></TabsContent>
       <TabsContent value="content" className="flex min-h-0 flex-col overflow-hidden"><TorrentContentTab key={torrent.hash} hash={torrent.hash} /></TabsContent>
       <TabsContent value="actions" className="overflow-y-auto"><TorrentActions key={torrent.hash} torrent={torrent} /></TabsContent>
@@ -130,13 +138,17 @@ export function TorrentDetailsPanel({ torrent, onClose }: DetailsProps) {
           <span className="h-1 w-10 rounded-full bg-border group-hover:bg-primary/60 group-focus-visible:bg-primary" />
         </div>
         <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 pb-3">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="truncate text-sm font-medium" title={torrent.name}>{torrent.name}</h2>
-            <Button variant="ghost" size="icon" className="size-7 shrink-0" aria-label={t('Close details')} title={t('Close (Esc)')} onClick={onClose}>
-              <X className="size-4" />
-            </Button>
-          </div>
-          <DetailsTabs torrent={torrent} listClassName="w-full max-w-xl" />
+          {/* The name is in the Details tab's About; the tabs share their row with the close button. */}
+          <h2 className="sr-only">{torrent.name}</h2>
+          <DetailsTabs
+            torrent={torrent}
+            listClassName="max-w-xl"
+            end={(
+              <Button variant="ghost" size="icon" className="size-7" aria-label={t('Close details')} title={t('Close (Esc)')} onClick={onClose}>
+                <X className="size-4" />
+              </Button>
+            )}
+          />
         </div>
       </section>
     </>
@@ -210,15 +222,17 @@ export function TorrentDetailsDialog({ torrent, onClose }: DetailsProps) {
             <span className="h-1.5 w-10 rounded-full bg-muted-foreground/40" />
           </button>
           <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 pb-3">
-            <div className="flex items-center justify-between gap-2">
-              <DialogPrimitive.Title className="truncate text-base font-semibold" title={torrent.name}>{torrent.name}</DialogPrimitive.Title>
-              <DialogPrimitive.Close asChild>
-                <Button variant="ghost" size="icon" className="size-8 shrink-0 rounded-full bg-muted" aria-label={t('Close details')}>
-                  <X className="size-4" />
-                </Button>
-              </DialogPrimitive.Close>
-            </div>
-            <DetailsTabs torrent={torrent} listClassName="w-full" />
+            <DialogPrimitive.Title className="sr-only">{torrent.name}</DialogPrimitive.Title>
+            <DetailsTabs
+              torrent={torrent}
+              end={(
+                <DialogPrimitive.Close asChild>
+                  <Button variant="ghost" size="icon" className="size-8 rounded-full bg-muted" aria-label={t('Close details')}>
+                    <X className="size-4" />
+                  </Button>
+                </DialogPrimitive.Close>
+              )}
+            />
           </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

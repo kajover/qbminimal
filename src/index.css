@@ -129,94 +129,19 @@
   font-display: block;
 }
 
-/* The title's size in pixels, which follows the text size chosen in Settings: 20, 24, 28 or 32.
-   Silkscreen's pixels are an eighth of its size, so steps of 4px stay sharp on 2x and 3x screens.
-   On narrow phones the header's speeds grow with the text too, so the title steps down until both
-   fit with room between them. */
+/* The title's size in pixels on the login form, which follows the text size chosen in Settings.
+   Silkscreen's pixels are an eighth of its size, so steps of 4px stay sharp on 2x and 3x screens. */
 :root {
-  --brand-px: 12;
+  --brand-px: 24;
 }
-@media (width >= 338px) {
-  :root {
-    --brand-px: 16;
-  }
-}
-@media (width >= 368px) {
-  :root {
-    --brand-px: 20;
-  }
-}
-@media (width >= 398px) {
-  :root {
-    --brand-px: 24;
-  }
-}
-
 :root[data-text-size='small'] {
-  --brand-px: 12;
+  --brand-px: 20;
 }
-@media (width >= 322px) {
-  :root[data-text-size='small'] {
-    --brand-px: 16;
-  }
-}
-@media (width >= 352px) {
-  :root[data-text-size='small'] {
-    --brand-px: 20;
-  }
-}
-
 :root[data-text-size='large'] {
-  --brand-px: 12;
+  --brand-px: 28;
 }
-@media (width >= 353px) {
-  :root[data-text-size='large'] {
-    --brand-px: 16;
-  }
-}
-@media (width >= 383px) {
-  :root[data-text-size='large'] {
-    --brand-px: 20;
-  }
-}
-@media (width >= 413px) {
-  :root[data-text-size='large'] {
-    --brand-px: 24;
-  }
-}
-@media (width >= 443px) {
-  :root[data-text-size='large'] {
-    --brand-px: 28;
-  }
-}
-
 :root[data-text-size='larger'] {
-  --brand-px: 12;
-}
-@media (width >= 369px) {
-  :root[data-text-size='larger'] {
-    --brand-px: 16;
-  }
-}
-@media (width >= 399px) {
-  :root[data-text-size='larger'] {
-    --brand-px: 20;
-  }
-}
-@media (width >= 429px) {
-  :root[data-text-size='larger'] {
-    --brand-px: 24;
-  }
-}
-@media (width >= 459px) {
-  :root[data-text-size='larger'] {
-    --brand-px: 28;
-  }
-}
-@media (width >= 489px) {
-  :root[data-text-size='larger'] {
-    --brand-px: 32;
-  }
+  --brand-px: 32;
 }
 
 /* The app's colors. Every green, blue, yellow, amber, orange, red and sky shade is one of the
@@ -287,42 +212,8 @@
   --color-sky-700: #7cc6ef;
 }
 
-/* With the header's speeds hidden, the title has the room to take its full size on phones too. */
-:root[data-header-speeds='off'] {
-  --brand-px: 24;
-}
-
-:root[data-header-speeds='off'][data-text-size='small'] {
-  --brand-px: 20;
-}
-
-:root[data-header-speeds='off'][data-text-size='large'] {
-  --brand-px: 24;
-}
-@media (width >= 339px) {
-  :root[data-header-speeds='off'][data-text-size='large'] {
-    --brand-px: 28;
-  }
-}
-
-:root[data-header-speeds='off'][data-text-size='larger'] {
-  --brand-px: 24;
-}
-@media (width >= 343px) {
-  :root[data-header-speeds='off'][data-text-size='larger'] {
-    --brand-px: 28;
-  }
-}
-@media (width >= 373px) {
-  :root[data-header-speeds='off'][data-text-size='larger'] {
-    --brand-px: 32;
-  }
-}
-
 :root {
   --brand-size: calc(var(--brand-px) * 1px);
-  /* Where the title's first "r" begins, which the sidebar reaches when it opens. */
-  --sidebar-start: calc(33px + 1.5rem + var(--brand-size) * 3.875);
 }
 /* Screens without 2x pixels can only draw steps of 8px sharply, so 20 and 28 round down. */
 @media (resolution < 2dppx) {
@@ -428,6 +319,23 @@
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09);
 }
 
+/* Bars kept at the bottom of the window: --bar-bottom from the bottom, placed from the top. */
+.bottom-bar {
+  position: fixed;
+  top: calc(100dvh - var(--bar-bottom, 0px));
+  translate: 0 -100%;
+}
+
+/* The phone's selection bar sits where the tab bar does, flat like it, without a shadow. */
+@media (max-width: 1199.98px) {
+  .glass.glass-flat-phone {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45);
+  }
+  .dark .glass.glass-flat-phone {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09);
+  }
+}
+
 /* Reduce Transparency, or more contrast, in the system settings: solid bars. */
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
   .glass,
@@ -443,7 +351,12 @@
    indicator. Bars and panels kept above it, and the page's room at its end, use this. */
 :root {
   --nav-gap: 0.5rem;
-  --bottom-nav-height: calc(var(--nav-bar-height, 3.75rem) + max(var(--nav-gap), env(safe-area-inset-bottom)));
+  /* How far the tab bar, or the selection bar in its place, sits from the bottom of the page.
+     Bars at the bottom are placed from the top, at 100dvh less their height (bottom-bar class
+     below): Safari 26 lifts an element placed with `bottom` 16px higher than asked, clear of its
+     floating address bar, which would leave a gap above that bar. */
+  --bottom-edge: max(var(--nav-gap), env(safe-area-inset-bottom));
+  --bottom-nav-height: calc(var(--nav-bar-height, 3.75rem) + var(--bottom-edge));
 }
 /* iPhone Safari in its own window, upright: the page ends at Safari's address bar, which floats
    with room of its own above it, so the tab bar can sit lower, closer to that bar. Not lower than
@@ -453,6 +366,9 @@
   @media (display-mode: browser) and (orientation: portrait) and (max-width: 32rem) {
     :root {
       --nav-gap: 4px;
+      /* Not lower: the window ends 16px above Safari's floating address bar, and Safari cuts off
+         any fixed bar placed past that edge. */
+      --bottom-edge: var(--nav-gap);
     }
   }
 }
@@ -461,9 +377,42 @@
     --bottom-nav-height: 0px;
   }
 }
+/* Phones without the tab bar (Settings > Menu bar off): the selection bar and the table's
+   scrollbar take its place, as far from the screen's edge as the tab bar would be. */
+@media (max-width: 1199.98px) {
+  :root:not([data-menu-bar='on']) {
+    --bottom-nav-height: var(--bottom-edge);
+    --selection-bar-gap: 0px;
+  }
+}
 
 
 /* Downloading pieces: diagonal stripes, so they differ from done pieces without colour. */
 .piece-stripes {
   background-image: repeating-linear-gradient(45deg, var(--color-amber-500) 0 2px, var(--color-amber-700, #b45309) 2px 4px);
+}
+
+/* The torrent table's column titles follow its rows sideways on a scroll timeline (set up in
+   TorrentTable), frame for frame. --table-scroll is how far the rows can scroll; the titles move
+   that far left, or right in a right-to-left language, and the select-all box moves back by as
+   much so it stays pinned like the row checkboxes. */
+@keyframes table-head-x {
+  from { translate: 0 0; }
+  to { translate: calc(var(--table-scroll, 0px) * var(--table-dir, -1)) 0; }
+}
+@keyframes table-head-pin {
+  from { translate: 0 0; }
+  to { translate: calc(var(--table-scroll, 0px) * var(--table-dir, -1) * -1) 0; }
+}
+.table-head-linked {
+  animation: table-head-x linear both;
+  animation-timeline: --table-x;
+}
+.table-head-pinned {
+  animation: table-head-pin linear both;
+  animation-timeline: --table-x;
+}
+[dir='rtl'] .table-head-linked,
+[dir='rtl'] .table-head-pinned {
+  --table-dir: 1;
 }

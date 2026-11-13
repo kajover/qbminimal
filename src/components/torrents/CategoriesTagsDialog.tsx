@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Plus, Save, Trash2, X } from 'lucide-react'
 import { ConfirmAction } from '@/components/ConfirmAction'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useCategories, useTags, useTorrentAction } from '@/hooks/useApi'
@@ -30,7 +30,7 @@ function CategoryRow({ category }: { category: TorrentCategory }) {
           <Label htmlFor={`category-path-${category.name}`} className="text-xs text-muted-foreground">{t('Save path for {name} (blank = default)', { name: category.name })}</Label>
           <Input id={`category-path-${category.name}`} value={savePath} autoFocus onChange={(e) => setSavePath(e.target.value)} className="h-8 text-sm" />
           <div className="flex gap-2">
-            <Button type="submit" size="sm" variant="outline" disabled={action.isPending}>{t('Save')}</Button>
+            <Button type="submit" size="sm" variant="outline" disabled={action.isPending}><Save />{t('Save')}</Button>
             <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(false)}>{t('Cancel')}</Button>
           </div>
         </form>
@@ -96,10 +96,9 @@ export function CategoriesTagsDialog({ open, onOpenChange }: { open: boolean; on
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[80vh] max-w-lg flex-col overflow-hidden">
+      <DialogContent aria-describedby={undefined} className="flex max-h-[80vh] max-w-lg flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>{t('Categories and tags')}</DialogTitle>
-          <DialogDescription>{t('Changes apply to every torrent.')}</DialogDescription>
         </DialogHeader>
 
         <div className="min-h-0 flex-1 space-y-5 overflow-y-auto text-sm">
@@ -113,7 +112,7 @@ export function CategoriesTagsDialog({ open, onOpenChange }: { open: boolean; on
             <form onSubmit={addCategory} className="space-y-2 border-t pt-3">
               <Input aria-label={t('New category name')} placeholder={t('New category name')} value={newCategory} onChange={(e) => setNewCategory(e.target.value)} className="h-8 text-sm" />
               <Input aria-label={t('Save path for the new category')} placeholder={t('Save path (blank = default)')} value={newCategoryPath} onChange={(e) => setNewCategoryPath(e.target.value)} className="h-8 text-sm" />
-              <Button type="submit" size="sm" variant="outline" disabled={action.isPending}>{t('Create category')}</Button>
+              <Button type="submit" size="sm" variant="outline" disabled={action.isPending}><Plus />{t('Create category')}</Button>
             </form>
           </section>
 
@@ -143,13 +142,13 @@ export function CategoriesTagsDialog({ open, onOpenChange }: { open: boolean; on
             )}
             <form onSubmit={addTags} className="flex gap-2 border-t pt-3">
               <Input aria-label={t('New tags, separated by commas')} placeholder={t('New tags, separated by commas')} value={newTags} onChange={(e) => setNewTags(e.target.value)} className="h-8 text-sm" />
-              <Button type="submit" size="sm" variant="outline" disabled={action.isPending}>{t('Create')}</Button>
+              <Button type="submit" size="sm" variant="outline" disabled={action.isPending}><Plus />{t('Create')}</Button>
             </form>
           </section>
         </div>
 
         <div className="flex justify-end border-t pt-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>{t('Close')}</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}><X />{t('Close')}</Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -58,6 +58,16 @@ export function checkForUpdates(): Promise<void> {
   return running
 }
 
+// How often the app checks by itself, in the background after signing in.
+export const CHECK_EVERY = 12 * 60 * 60 * 1000
+
+// Checks unless the last check is recent enough. Returns whether it started one.
+export function checkForUpdatesIfDue(now = Date.now()): boolean {
+  if (now - state.lastChecked < CHECK_EVERY) return false
+  void checkForUpdates()
+  return true
+}
+
 // Whether `latest` is newer than the version running now.
 export function newerThan(latest: string | 'failed' | undefined, current: string | undefined): boolean {
   const found = parseVersion(latest)

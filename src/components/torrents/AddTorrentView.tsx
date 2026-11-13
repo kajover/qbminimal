@@ -1,8 +1,9 @@
 import { useEffect, useEffectEvent, useRef, useState, type DragEvent, type FormEvent, type ReactNode } from 'react'
-import { ChevronDown, ChevronRight, Loader2, Upload, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, ListChecks, Loader2, Plus, RefreshCw, Upload, X } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PageHeader } from '@/components/PageHeader'
 import { FreeSpaceHint } from './FreeSpaceHint'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -59,23 +60,28 @@ function CheckField({ id, label, checked, onChange }: { id: string; label: strin
   )
 }
 
-export function AddTorrentView() {
+// What was entered stays while other pages are open, until it's added or cleared.
+const EMPTY_DRAFT = { links: '', files: [] as File[], options: DEFAULT_ADD_OPTIONS, showOptions: false, metadata: null as TorrentMetadata | null, metadataSource: null as string | null, priorities: [] as number[] }
+let draft = EMPTY_DRAFT
+
+// The fields and options for adding torrents, on the Add page and in the dialog the torrent list's
+// + button opens. Both share what was entered (see draft above). `onAdded` runs after a success.
+function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
   const queryClient = useQueryClient()
   const { data: categories } = useCategories()
   const { data: tags } = useTags()
-  const [links, setLinks] = useState('')
-  const [files, setFiles] = useState<File[]>([])
-  const [options, setOptions] = useState<AddTorrentOptions>(DEFAULT_ADD_OPTIONS)
-  const [showOptions, setShowOptions] = useState(false)
-  const [showCreator, setShowCreator] = useState(false)
+  const [links, setLinks] = useState(draft.links)
+  const [files, setFiles] = useState<File[]>(draft.files)
+  const [options, setOptions] = useState<AddTorrentOptions>(draft.options)
+  const [showOptions, setShowOptions] = useState(draft.showOptions)
   const [adding, setAdding] = useState(false)
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Choosing files before adding only works for a single link, as qBittorrent requires.
-  const [metadata, setMetadata] = useState<TorrentMetadata | null>(null)
-  const [metadataSource, setMetadataSource] = useState<string | null>(null)
-  const [priorities, setPriorities] = useState<number[]>([])
+  const [metadata, setMetadata] = useState<TorrentMetadata | null>(draft.metadata)
+  const [metadataSource, setMetadataSource] = useState<string | null>(draft.metadataSource)
+  const [priorities, setPriorities] = useState<number[]>(draft.priorities)
   const [fetchingMetadata, setFetchingMetadata] = useState(false)
   const [metadataError, setMetadataError] = useState<string | null>(null)
   const fetchRun = useRef(0)
@@ -93,6 +99,20 @@ export function AddTorrentView() {
 
   // Stops a running file-list request when the page closes.
   useEffect(() => () => { fetchRun.current++ }, [])
+  useEffect(() => {
+    draft = { links, files, options, showOptions, metadata, metadataSource, priorities }
+  }, [links, files, options, showOptions, metadata, metadataSource, priorities])
+
+  const clearEntry = () => {
+    fetchRun.current++
+    setLinks('')
+    setFiles([])
+    setMetadata(null)
+    setMetadataSource(null)
+    setPriorities([])
+    setOptions(prev => ({ ...prev, rename: '' }))
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   const set = <K extends keyof AddTorrentOptions>(key: K, value: AddTorrentOptions[K]) => setOptions(prev => ({ ...prev, [key]: value }))
 
@@ -181,7 +201,8 @@ export function AddTorrentView() {
 
   // Looks up the file list on its own once the single source stops changing.
   // An Effect Event, so the timer below always runs the latest fetchFileList without restarting.
-  const fetchLatest = useEffectEvent(() => { void fetchFileList() })
+  // A file list kept from before another page was opened isn't looked up again.
+  const fetchLatest = useEffectEvent(() => { if (!activeMetadata) void fetchFileList() })
   // A new source clears the last lookup's state while rendering, before the effect starts the next.
   const lookupKey = `${metadataSupported}|${sourceKey}`
   const [lookupFor, setLookupFor] = useState(lookupKey)
@@ -221,11 +242,8 @@ export function AddTorrentView() {
       const { ok, message } = describeAddResult(result, sourceCount)
       if (ok) {
         toast.success(message)
-        setLinks('')
-        setFiles([])
-        setMetadata(null)
-        setOptions(prev => ({ ...prev, rename: '' }))
-        if (fileInputRef.current) fileInputRef.current.value = ''
+        clearEntry()
+        onAdded?.()
       } else {
         toast.error(message)
       }
@@ -243,23 +261,24 @@ export function AddTorrentView() {
   const categoryNames = Object.keys(categories ?? {}).sort()
 
   return (
-    <div className="space-y-4">
-      <PageHeader title={t('Add')} description={t('Add torrents, or create your own')} />
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('Add torrents')}</CardTitle>
-        </CardHeader>
-        <CardContent>
           <form onSubmit={submit} className="space-y-4">
             <Field label={t('Magnet or torrent links, one per line')} htmlFor="add-links">
-              <textarea
-                id="add-links"
-                rows={3}
-                value={links}
-                onChange={(e) => setLinks(e.target.value)}
-                placeholder={t('magnet:?xt=...')}
-                className="border-input dark:bg-input/30 w-full rounded-md border bg-transparent px-3 py-2 text-sm"
-              />
+              <div className="relative">
+                <textarea
+                  id="add-links"
+                  rows={3}
+                  value={links}
+                  onChange={(e) => setLinks(e.target.value)}
+                  placeholder={t('magnet:?xt=...')}
+                  className="border-input dark:bg-input/30 block w-full rounded-md border bg-transparent px-3 py-2 pe-9 text-sm"
+                />
+                {sourceCount > 0 && (
+                  // Clears the links and files, which otherwise stay while other pages are open.
+                  <Button type="button" variant="ghost" size="icon" className="absolute end-1 top-1 size-7 text-muted-foreground" aria-label={t('Clear links and files')} title={t('Clear links and files')} onClick={clearEntry}>
+                    <X className="size-4" />
+                  </Button>
+                )}
+              </div>
             </Field>
 
             <div
@@ -305,6 +324,7 @@ export function AddTorrentView() {
                       <>
                         {metadataError && <span className="text-xs text-destructive">{metadataError}</span>}
                         <Button type="button" size="sm" variant="outline" onClick={fetchFileList}>
+                          {metadataError ? <RefreshCw /> : <ListChecks />}
                           {metadataError ? t('Retry') : t('Choose files first')}
                         </Button>
                         {!metadataError && <span className="text-xs text-muted-foreground">{singleSource instanceof File ? t('Optional.') : t('Optional. Magnet links need peers to share the list.')}</span>}
@@ -424,10 +444,24 @@ export function AddTorrentView() {
             )}
 
             <Button type="submit" className="w-full" disabled={adding}>
-              {adding && <Loader2 className="me-2 size-4 animate-spin" />}
+              {adding ? <Loader2 className="me-2 size-4 animate-spin" /> : <Plus />}
               {sourceCount > 1 ? t('Add {sourceCount} torrents', { sourceCount }) : t('Add torrent')}
             </Button>
           </form>
+  )
+}
+
+export function AddTorrentView() {
+  const [showCreator, setShowCreator] = useState(false)
+  return (
+    <div className="space-y-4">
+      <PageHeader title={t('Add')} />
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('Add torrents')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AddTorrentForm />
         </CardContent>
       </Card>
 
@@ -437,5 +471,19 @@ export function AddTorrentView() {
       </Button>
       {showCreator && <TorrentCreator />}
     </div>
+  )
+}
+
+// The same form over the torrent list, without creating torrents, closing once they're added.
+export function AddTorrentDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent aria-describedby={undefined} className="max-h-[90dvh] overflow-y-auto sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle>{t('Add torrents')}</DialogTitle>
+        </DialogHeader>
+        {open && <AddTorrentForm onAdded={() => onOpenChange(false)} />}
+      </DialogContent>
+    </Dialog>
   )
 }

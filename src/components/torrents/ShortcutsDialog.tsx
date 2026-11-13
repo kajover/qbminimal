@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { t } from '@/i18n'
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
@@ -35,10 +35,9 @@ const GROUPS: { title: string; keys: [string[], string][] }[] = [
 export function ShortcutsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto">
+      <DialogContent aria-describedby={undefined} className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('Keyboard and mouse')}</DialogTitle>
-          <DialogDescription>{t('Shortcuts for the torrent list. On a phone, tap a torrent for its details and hold one to start selecting.')}</DialogDescription>
         </DialogHeader>
         {GROUPS.map(group => (
           <section key={group.title} className="space-y-1.5">

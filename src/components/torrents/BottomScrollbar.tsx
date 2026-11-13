@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent, type RefObject } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from 'react'
 import { useSideSwipes } from '@/hooks/useSideSwipes'
 
 const MIN_THUMB = 40
@@ -95,12 +95,13 @@ export function BottomScrollbar({ target }: { target: RefObject<HTMLElement | nu
     <div
       aria-hidden
       data-own-touch
-      className="fixed z-20 px-1"
+      className="bottom-bar z-20 px-1"
       style={{
         left: geometry.left,
         width: geometry.width,
-        bottom: 'calc(var(--bottom-nav-height, 0px) + var(--details-height, 0px) + 0.25rem)',
-      }}
+        // Above the phone's selection bar too, while there is one.
+        '--bar-bottom': 'calc(var(--bottom-nav-height, 0px) + var(--selection-bar-space, 0px) + var(--details-height, 0px) + 0.25rem)',
+      } as CSSProperties}
     >
       <div ref={track} onPointerDown={page} className="relative h-3 touch-none rounded-full border bg-background/80 shadow-sm backdrop-blur">
         <div

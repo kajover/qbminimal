@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Check, Power } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -147,7 +148,8 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
         )}
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose}>{t('Cancel')}</Button>
-          <Button type="submit" disabled={action.isPending}>{prompt === 'autoOn' ? t('Turn on') : t('Apply')}</Button>
+          <Button type="submit" disabled={action.isPending}>{prompt === 'autoOn' ? <Power /> : <Check />}
+            {prompt === 'autoOn' ? t('Turn on') : t('Apply')}</Button>
         </DialogFooter>
       </form>
     </>

@@ -1,5 +1,6 @@
 import { readStored, writeStored } from './storage'
 import { STATUS_FILTERS, type StatusFilter, type TorrentFilters } from './torrentFilters'
+import { parseColumnFilters, sameColumnFilters } from './columnFilters'
 
 // Named sets of filters, like "Downloading in Movies", one tap away above the torrent list.
 export interface FilterView {
@@ -24,7 +25,7 @@ export function parseFilterViews(raw: string | null): FilterView[] {
     const { name, filters } = item as { name?: unknown; filters?: Record<string, unknown> }
     if (typeof name !== 'string' || !name.trim() || !filters || typeof filters !== 'object') return []
     const status = STATUS_FILTERS.some(option => option.value === filters.status) ? filters.status as StatusFilter : 'all'
-    return [{ name: name.trim(), filters: { name: text(filters.name), status, category: text(filters.category), tag: text(filters.tag), tracker: text(filters.tracker) } }]
+    return [{ name: name.trim(), filters: { name: text(filters.name), status, category: text(filters.category), tag: text(filters.tag), tracker: text(filters.tracker), columns: parseColumnFilters(filters.columns) } }]
   })
 }
 
@@ -32,7 +33,7 @@ export const loadFilterViews = () => parseFilterViews(readStored(STORAGE_KEY))
 export const saveFilterViews = (views: FilterView[]) => writeStored(STORAGE_KEY, JSON.stringify(views))
 
 export function sameFilters(a: TorrentFilters, b: TorrentFilters) {
-  return a.name.trim() === b.name.trim() && a.status === b.status && a.category === b.category && a.tag === b.tag && (a.tracker ?? '') === (b.tracker ?? '')
+  return a.name.trim() === b.name.trim() && a.status === b.status && a.category === b.category && a.tag === b.tag && (a.tracker ?? '') === (b.tracker ?? '') && sameColumnFilters(a.columns, b.columns)
 }
 
 // A view with the same name is replaced, so saving again updates it.

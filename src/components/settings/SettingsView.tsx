@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTheme, type Theme } from '@/lib/theme'
-import { ExternalLink, Monitor, Moon, Sun } from 'lucide-react'
+import { Check, ExternalLink, Monitor, Moon, Sun, Undo2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,7 +17,7 @@ import { PageHeader } from '@/components/PageHeader'
 import { NativeSelect } from '@/components/NativeSelect'
 import { BrowserSettings } from './BrowserSettings'
 import { Switch } from '@/components/ui/switch'
-import { displayOption, setDisplayOption, type DisplayOption } from '@/lib/displayOptions'
+import { setDisplayOption, useDisplayOption, type DisplayOption } from '@/lib/displayOptions'
 import { chosenTextSize, setTextSize, TEXT_SIZES, type TextSize } from '@/lib/textSize'
 import { chosenLanguage, LANGUAGES, setLanguage, t, type LanguageChoice } from '@/i18n'
 
@@ -39,7 +39,7 @@ const SECTIONS = [{ id: 'app', title: t('App') }, ...PREFERENCE_SECTIONS.map(({ 
 
 // An on/off choice from lib/displayOptions, which applies it to the page at once.
 function OptionSwitch({ option, label, className }: { option: DisplayOption; label: string; className?: string }) {
-  const [on, setOn] = useState(() => displayOption(option))
+  const on = useDisplayOption(option)
   const id = `option-${option}`
   return (
     <div className={cn('mt-3 flex items-center justify-between gap-2', className)}>
@@ -47,10 +47,7 @@ function OptionSwitch({ option, label, className }: { option: DisplayOption; lab
       <Switch
         id={id}
         checked={on}
-        onCheckedChange={(checked) => {
-          setDisplayOption(option, checked)
-          setOn(checked)
-        }}
+        onCheckedChange={(checked) => setDisplayOption(option, checked)}
       />
     </div>
   )
@@ -58,6 +55,7 @@ function OptionSwitch({ option, label, className }: { option: DisplayOption; lab
 
 function AppSection() {
   const { theme, setTheme } = useTheme()
+  const menuBar = useDisplayOption('menuBar')
   const [textSize, setTextSizeState] = useState(chosenTextSize)
   const { data: qbittorrentVersion } = useAppVersion()
   const { data: webApiVersion } = useWebApiVersion()
@@ -84,7 +82,6 @@ function AppSection() {
       <Card>
         <CardHeader>
           <CardTitle>{t('Appearance')}</CardTitle>
-          <CardDescription>{t('Theme, language and text size follow your device unless you choose')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -121,9 +118,9 @@ function AppSection() {
             </NativeSelect>
           </div>
           <OptionSwitch option="headerSpeeds" label={t('Speeds in the header')} />
-          <OptionSwitch option="speedLimitButton" label={t('Speed limit button in the header')} />
-          {/* The tab bar is only on phones, so the choice is too. */}
-          <OptionSwitch option="tabLabels" label={t('Tab bar labels')} className="md:hidden" />
+          <OptionSwitch option="menuBar" label={t('Menu bar')} />
+          {/* The tab bar is only on phones, and only with the menu bar, so the choice is too. */}
+          <OptionSwitch option="tabLabels" label={t('Tab bar labels')} className={cn('md:hidden', !menuBar && 'hidden')} />
         </CardContent>
       </Card>
 
@@ -144,7 +141,7 @@ function AppSection() {
           </dl>
           <UpdateCheck />
           <div className="mt-4 space-y-1 border-t pt-4">
-            <p className="text-xs text-muted-foreground">{t('qbminimal is open source. Help translate it, report problems, or improve it on GitHub.')}</p>
+            <p className="text-xs text-muted-foreground">{t('qbminimal is open source. Code, pull requests, ideas, discussions, translations and bug reports are all welcome on GitHub.')}</p>
             <a href="https://github.com/kajover/qbminimal/blob/main/CONTRIBUTING.md" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-2">
               {t('Contribute on GitHub')}
               <ExternalLink className="size-3.5" aria-hidden />
@@ -223,8 +220,8 @@ function PreferencesSection({ sectionId, edits, setEdits }: { sectionId: string;
         <div className="glass sticky bottom-2 z-10 flex items-center justify-between gap-2 rounded-2xl p-3 max-md:bottom-[calc(var(--bottom-nav-height,5rem)+0.5rem)]">
           <span className="text-sm">{changeCount === 1 ? t('1 unsaved change') : t('{changeCount} unsaved changes', { changeCount })}</span>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setEdits(() => ({}))}>{t('Discard')}</Button>
-            <Button size="sm" disabled={save.isPending} onClick={submit}>{save.isPending ? t('Saving...') : t('Save')}</Button>
+            <Button variant="outline" size="sm" onClick={() => setEdits(() => ({}))}><Undo2 />{t('Discard')}</Button>
+            <Button size="sm" disabled={save.isPending} onClick={submit}><Check />{save.isPending ? t('Saving...') : t('Save')}</Button>
           </div>
         </div>
       )}
@@ -238,7 +235,7 @@ export function SettingsView() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title={t('Settings')} description={t('This app\'s look, and qBittorrent\'s own options')} />
+      <PageHeader title={t('Settings')} />
       <nav aria-label={t('Settings sections')} className="flex flex-wrap gap-1">
         {SECTIONS.map(section => (
           <Button key={section.id} size="sm" variant={sectionId === section.id ? 'secondary' : 'ghost'} aria-current={sectionId === section.id ? 'page' : undefined} onClick={() => setSectionId(section.id)}>

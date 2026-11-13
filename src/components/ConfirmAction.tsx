@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { t } from '@/i18n'
@@ -12,19 +13,22 @@ interface ConfirmActionProps {
   onConfirm: () => void
   // Text for a small outlined button. Without it, `children` is shown as an icon button.
   buttonLabel?: string
+  // An icon before that text.
+  buttonIcon?: LucideIcon
   // For a text button that switches something on, so it reads as an off toggle.
   pressed?: boolean
   children?: ReactNode
 }
 
 // An icon button that asks in a pop-up before acting, like the delete prompt.
-export function ConfirmAction({ label, title, message, confirmLabel, disabled, onConfirm, buttonLabel, pressed, children }: ConfirmActionProps) {
+export function ConfirmAction({ label, title, message, confirmLabel, disabled, onConfirm, buttonLabel, buttonIcon: ButtonIcon, pressed, children }: ConfirmActionProps) {
   const [open, setOpen] = useState(false)
 
   return (
     <>
       {buttonLabel ? (
         <Button type="button" size="sm" variant="outline" title={label} aria-pressed={pressed} disabled={disabled} onClick={() => setOpen(true)}>
+          {ButtonIcon && <ButtonIcon />}
           {buttonLabel}
         </Button>
       ) : (

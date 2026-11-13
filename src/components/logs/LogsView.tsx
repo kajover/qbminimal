@@ -99,7 +99,7 @@ function PeerLog() {
 export function LogsView() {
   return (
     <div className="space-y-4">
-      <PageHeader title={t('Logs')} description={t('What qBittorrent has reported, newest first')} />
+      <PageHeader title={t('Logs')} />
       <Card>
       <CardContent>
         <Tabs defaultValue="main">

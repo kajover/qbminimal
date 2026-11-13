@@ -1,4 +1,5 @@
 import type { Torrent } from '@/types'
+import type { ColumnFilters } from './columnFilters'
 import { t } from '@/i18n'
 
 export type StatusFilter = 'all' | 'downloading' | 'seeding' | 'completed' | 'stopped' | 'active' | 'errored'
@@ -21,6 +22,8 @@ export interface TorrentFilters {
   tag: string
   // A tracker host, or TRACKERLESS.
   tracker?: string
+  // Set from the table's column titles, by column id.
+  columns?: ColumnFilters
 }
 
 export const TRACKERLESS = '\u0000trackerless'

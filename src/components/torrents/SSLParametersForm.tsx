@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Check, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useTorrentAction } from '@/hooks/useApi'
@@ -39,11 +40,11 @@ export function SSLParametersForm({ hash }: { hash: string }) {
   }
 
   if (!open) {
-    return <Button type="button" size="sm" variant="ghost" className="px-0" onClick={load}>{t('SSL torrent certificate...')}</Button>
+    return <Button type="button" size="sm" variant="ghost" className="h-8 px-2 text-xs" onClick={load}><ShieldCheck />{t('SSL torrent certificate...')}</Button>
   }
 
   return (
-    <form onSubmit={save} className="space-y-2 rounded-md border p-2">
+    <form onSubmit={save} className="space-y-2 rounded-md border p-3">
       <p className="text-xs text-muted-foreground">{t('Only for SSL torrents. Paste each in PEM format.')}</p>
       {loading ? <p className="text-xs text-muted-foreground">{t('Loading...')}</p> : (
         <>
@@ -54,8 +55,8 @@ export function SSLParametersForm({ hash }: { hash: string }) {
             </div>
           ))}
           <div className="flex gap-2">
-            <Button type="submit" size="sm" variant="outline" disabled={action.isPending}>{t('Save SSL settings')}</Button>
-            <Button type="button" size="sm" variant="ghost" onClick={() => setOpen(false)}>{t('Hide')}</Button>
+            <Button type="submit" size="sm" variant="outline" className="h-8 text-xs" disabled={action.isPending}><Check />{t('Save SSL settings')}</Button>
+            <Button type="button" size="sm" variant="ghost" className="h-8 text-xs" onClick={() => setOpen(false)}>{t('Hide')}</Button>
           </div>
         </>
       )}

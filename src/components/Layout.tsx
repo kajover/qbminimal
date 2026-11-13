@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
-import { ChevronLeft, ChevronRight, LogOut } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LogOut, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { HeaderSlot } from '@/components/HeaderSlot'
 import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { DropOverlay } from '@/components/DropOverlay'
 import { GlobalSpeeds } from '@/components/GlobalSpeeds'
-import { SpeedLimitToggle } from '@/components/SpeedLimitToggle'
 import { PAGES, type PageId } from '@/components/navigation'
 import { useSession } from '@/hooks/useSession'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { useDisplayOption } from '@/lib/displayOptions'
+import { checkForUpdatesIfDue } from '@/lib/updateNotice'
+import { useUpdateNotice } from '@/hooks/useUpdateNotice'
 import { readStored, writeStored } from '@/lib/storage'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
@@ -17,14 +22,41 @@ interface LayoutProps {
   children: ReactNode
 }
 
-function LogoutButton() {
-  const { signOut } = useSession()
-  const [busy, setBusy] = useState(false)
-  const label = busy ? t('Logging out...') : t('Logout')
+// The menu button: the pages and the way out. Settings can add a sidebar or tab bar beside it.
+// A dot beside Settings, and on the menu button, while a newer qbminimal or qBittorrent is out.
+function UpdateDot({ className }: { className?: string }) {
   return (
-    <Button variant="ghost" size="icon" disabled={busy} aria-label={label} title={label} onClick={() => { setBusy(true); void signOut() }}>
-      <LogOut className="size-5" />
-    </Button>
+    <span className={cn('size-2 shrink-0 rounded-full bg-amber-500', className)}>
+      <span className="sr-only">{t('Update available')}</span>
+    </span>
+  )
+}
+
+function PagesMenu({ page, onNavigate, update }: { page: PageId; onNavigate: (page: PageId) => void; update: boolean }) {
+  const { signOut } = useSession()
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative max-md:size-8" aria-label={t('Menu')} title={t('Menu')}>
+          <Menu className="size-5" />
+          {update && <UpdateDot className="absolute end-1 top-1" />}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-52">
+        {PAGES.map(({ id, label, icon: Icon }) => (
+          <DropdownMenuItem key={id} aria-current={page === id ? 'page' : undefined} className={cn(page === id && 'bg-accent text-accent-foreground')} onSelect={() => onNavigate(id)}>
+            <Icon />
+            {label}
+            {update && id === 'settings' && <UpdateDot className="ms-auto" />}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => void signOut()}>
+          <LogOut />
+          {t('Logout')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -65,7 +97,7 @@ const storedWidth = () => {
   return width >= SIDEBAR_MIN && width <= SIDEBAR_MAX ? width : null
 }
 
-// Wide screens only. The sidebar reaches the title's first "r" (150px at the default text size), or is as wide as its labels if they need more, until it's dragged by its edge, which also
+// Wide screens only. The sidebar is 9.5rem wide, or as wide as its labels if they need more, until it's dragged by its edge, which also
 // holds the button that hides and shows it. --sidebar-width lets panels fixed to the window line up
 // with the main column.
 function useSidebar() {
@@ -126,6 +158,16 @@ function useSidebar() {
 export function Layout({ page, onNavigate, children }: LayoutProps) {
   const { shown: sidebarShown, width: sidebarWidth, measured: sidebarMeasured, box: sidebarBox, show: showSidebar, startDrag, resetWidth } = useSidebar()
   const { header: headerRef, nav: navRef } = useBarSizes()
+  const menuBar = useDisplayOption('menuBar')
+  // Signed in now, so look for updates in the background, unless that was done lately.
+  useEffect(() => {
+    if (!__DEMO__) checkForUpdatesIfDue()
+  }, [])
+  const notice = useUpdateNotice()
+  const update = notice.qbminimalNewer || notice.qbittorrentNewer
+  const wide = useMediaQuery('(min-width: 1200px)')
+  // Where each page's title row goes; on phones without the selection bar.
+  const [slot, setSlot] = useState<HTMLDivElement | null>(null)
 
   // A newly opened page starts at its top.
   useEffect(() => {
@@ -137,6 +179,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
       {/* 14px labels like the tab bar's, with 16px icons beside them, as on the other buttons. */}
       <Icon className="size-4" />
       <span className="truncate">{label}</span>
+      {update && id === 'settings' && <UpdateDot className="ms-auto" />}
     </Button>
   ))
 
@@ -148,18 +191,17 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
     // then widen the whole layout, open it zoomed in, and push the tab bar out of sight.
     <div style={{ '--sidebar-width': `${sidebarMeasured}px` } as CSSProperties} className="min-h-screen bg-background max-md:overflow-x-clip">
       <header ref={headerRef} className="glass-bar sticky top-0 z-40 border-b pt-[env(safe-area-inset-top)]">
-        <div className="flex h-14 items-center justify-between gap-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
-          <div className="flex min-w-0 items-center gap-2">
-            {/* The tab bar holds the pages on phones, so this corner only needs a way out. */}
-            <LogoutButton />
-            {/* Its size follows the chosen text size and the screen's width; index.css sets it. */}
-            <h1 className="brand-title">{t('qBittorrent')}</h1>
+        {/* The same side room as the content below, so the menu button lines up with the list's
+            start and the last button with its end: on phones the cards and table reach 0.5rem
+            past the page's 1rem margin. */}
+        <div className="flex h-14 items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(1rem,env(safe-area-inset-right))]">
+          <div className="flex shrink-0 items-center gap-2">
+            <PagesMenu page={page} onNavigate={onNavigate} update={update} />
+            {/* Left out for room; screen readers still hear it. */}
+            <h1 className="sr-only">{t('qBittorrent')}</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <GlobalSpeeds />
-            {/* Last, so it stays put at the right edge whatever the speeds read. */}
-            <SpeedLimitToggle />
-          </div>
+          <div ref={setSlot} className="flex min-w-0 flex-1 items-center md:px-2" />
+          <GlobalSpeeds />
         </div>
         <ConnectionBanner />
       </header>
@@ -167,19 +209,20 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
       <div>
         <div className="flex">
           {/* Above the torrent details panel (z-30), so the edge handle is never covered. */}
-          <div ref={sidebarBox} className="sticky top-14 z-35 hidden h-[calc(100vh-3.5rem)] shrink-0 self-start md:flex">
+          <div ref={sidebarBox} className={cn('sticky top-14 z-35 hidden h-[calc(100vh-3.5rem)] shrink-0 self-start', menuBar && 'md:flex')}>
             {sidebarShown && (
-              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="w-max min-w-(--sidebar-start) overflow-x-hidden overflow-y-auto p-2 pb-4">
+              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="w-max min-w-38 overflow-x-hidden overflow-y-auto p-2 pb-4">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{navButtons}</nav>
               </aside>
             )}
-            {/* The sidebar's edge: drag it to resize, or past a point to hide; the button in its middle hides and shows it. */}
+            {/* The sidebar's edge: drag it to resize, or past a point to hide; the button in its middle hides and shows it.
+                Its background is solid in both themes, so the edge line doesn't show through it. */}
             <div className="group relative w-px bg-border">
               <div aria-hidden className="absolute inset-y-0 -inset-x-1.5 z-10 cursor-col-resize" onPointerDown={startDrag} onDoubleClick={resetWidth} />
               <Button
                 variant="outline"
                 size="icon"
-                className="absolute top-1/2 left-1/2 z-20 h-8 w-3 min-w-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background p-0 text-muted-foreground shadow-none hover:text-foreground"
+                className="absolute top-1/2 left-1/2 z-20 h-8 w-3 min-w-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background p-0 text-muted-foreground shadow-none hover:bg-accent hover:text-foreground dark:bg-background dark:hover:bg-accent"
                 aria-label={sidebarShown ? t('Hide sidebar') : t('Show sidebar')}
                 aria-expanded={sidebarShown}
                 title={sidebarShown ? t('Hide sidebar') : t('Show sidebar')}
@@ -190,7 +233,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
             </div>
           </div>
           <main className="min-w-0 flex-1 pt-4 pb-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] max-md:pb-[calc(var(--bottom-nav-height,5rem)+1rem)]">
-            {children}
+            <HeaderSlot value={slot ? { element: slot, whole: wide } : null}>{children}</HeaderSlot>
           </main>
         </div>
       </div>
@@ -201,7 +244,8 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
       <nav
         ref={navRef}
         aria-label={t('Pages')}
-        className="glass glass-flat fixed inset-x-[max(0.75rem,env(safe-area-inset-left))] bottom-[max(var(--nav-gap),env(safe-area-inset-bottom))] z-30 rounded-full md:hidden"
+        style={{ '--bar-bottom': 'var(--bottom-edge)' } as CSSProperties}
+        className={cn('glass glass-flat bottom-bar inset-x-[max(0.75rem,env(safe-area-inset-left))] z-30 rounded-full md:hidden', !menuBar && 'hidden')}
       >
         <div className="flex justify-around px-1 py-1.5">
           {PAGES.map(({ id, label, icon: Icon }) => (

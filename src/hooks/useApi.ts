@@ -7,7 +7,7 @@ import { findFinished } from '@/lib/finished'
 import { applyMainDataUpdate, totalSpeeds, type MainData } from '@/lib/mainData'
 import { finishNoticesOn, notifyInBackground } from '@/lib/notify'
 import { PIECE_DONE } from '@/lib/pieces'
-import { recordSpeeds } from '@/lib/speedHistory'
+import { recordSpeeds, recordTorrentSpeeds } from '@/lib/speedHistory'
 import type { RSSRule, Torrent } from '@/types'
 import { t } from '@/i18n'
 
@@ -80,7 +80,9 @@ function useMainData<T>(select: (data: MainData) => T) {
     queryFn: async () => {
       const previous = queryClient.getQueryData<MainData>(MAIN_DATA) ?? null
       const next = applyMainDataUpdate(previous, await qbitClient.getMainData(previous?.rid ?? 0))
-      recordSpeeds({ time: Date.now(), ...totalSpeeds(next.torrents) })
+      const now = Date.now()
+      recordSpeeds({ time: now, ...totalSpeeds(next.torrents) })
+      recordTorrentSpeeds(now, next.torrents)
       if (finishNoticesOn()) announceFinished(findFinished(previous?.torrents, next.torrents))
       return next
     },

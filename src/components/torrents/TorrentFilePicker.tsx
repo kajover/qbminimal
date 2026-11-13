@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight, ListChecks, ListX } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { formatBytes } from '@/lib/format'
@@ -54,8 +54,8 @@ export function TorrentFilePicker({ metadata, priorities, onChange }: Props) {
       {open && (
       <>
       <div className="-ms-3 flex gap-1">
-        <Button type="button" size="sm" variant="ghost" onClick={() => onChange(metadata.files.map(() => 1))}>{t('Select all')}</Button>
-        <Button type="button" size="sm" variant="ghost" onClick={() => onChange(metadata.files.map(() => 0))}>{t('Select none')}</Button>
+        <Button type="button" size="sm" variant="ghost" onClick={() => onChange(metadata.files.map(() => 1))}><ListChecks />{t('Select all')}</Button>
+        <Button type="button" size="sm" variant="ghost" onClick={() => onChange(metadata.files.map(() => 0))}><ListX />{t('Select none')}</Button>
       </div>
       <ul className="max-h-64 space-y-1 overflow-y-auto pe-1.5">
         {metadata.files.map((file, i) => {

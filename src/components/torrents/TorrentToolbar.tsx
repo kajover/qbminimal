@@ -1,4 +1,4 @@
-import { ArrowUpDown, Columns3, Keyboard, LayoutList, Search, Table2 } from 'lucide-react'
+import { ArrowUpDown, Columns3, Keyboard, LayoutList, Plus, RotateCcw, Search, Table2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import type { TorrentList } from '@/hooks/useTorrentList'
@@ -16,9 +16,19 @@ interface TorrentToolbarProps {
   columns: ColumnLayout
   onColumnsChange: (layout: ColumnLayout) => void
   onShowShortcuts: () => void
+  onAdd: () => void
 }
 
-export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, onColumnsChange, onShowShortcuts }: TorrentToolbarProps) {
+// Opens the add form over the list, without leaving it.
+export function AddTorrentButton({ onAdd }: { onAdd: () => void }) {
+  return (
+    <Button variant="outline" size="icon" className="size-8" aria-label={t('Add torrents')} title={t('Add torrents')} onClick={onAdd}>
+      <Plus className="size-4" />
+    </Button>
+  )
+}
+
+export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, onColumnsChange, onShowShortcuts, onAdd }: TorrentToolbarProps) {
   const arrow = list.sort.direction === 'asc' ? '↑' : '↓'
   return (
     <>
@@ -26,6 +36,7 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
       <Button variant="ghost" size="icon" className="hidden size-8 pointer-fine:inline-flex" aria-label={t('Keyboard shortcuts')} title={t('Keyboard shortcuts (?)')} onClick={onShowShortcuts}>
         <Keyboard className="size-4" />
       </Button>
+      <AddTorrentButton onAdd={onAdd} />
       <Button variant={filtersOpen || list.filtered ? 'secondary' : 'outline'} size="icon" className="size-8" aria-label={t('Search and filter')} title={t('Search and filter')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
         <Search className="size-4" />
       </Button>
@@ -46,18 +57,20 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
               </DropdownMenuCheckboxItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => { onColumnsChange(DEFAULT_COLUMN_LAYOUT); list.resetSort() }}>{t('Reset columns')}</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => { onColumnsChange(DEFAULT_COLUMN_LAYOUT); list.resetSort() }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2">
+            {/* Just the arrows; the menu says what it sorts by. */}
+            <Button variant="outline" size="icon" className="size-8" aria-label={t('Sort: {column}', { column: getColumn(list.sort.field).label })} title={`${t('Sort: {column}', { column: getColumn(list.sort.field).label })} ${arrow}`}>
               <ArrowUpDown className="size-4" />
-              {t('Sort: {column}', { column: getColumn(list.sort.field).label })} {arrow}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="max-h-[60vh] overflow-y-auto">
+            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">{t('Sort by')}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
             {CARD_SORTS.map(field => (
               <DropdownMenuItem key={field} onClick={() => list.sortBy(field)}>
                 {getColumn(field).label} {list.sort.field === field && arrow}
@@ -67,14 +80,10 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
         </DropdownMenu>
       )}
 
-      <div className="flex rounded-md border" role="group" aria-label={t('View')}>
-        <Button variant={list.showTable ? 'secondary' : 'ghost'} size="icon" className="size-8 rounded-e-none" aria-label={t('Table view')} title={t('Table view')} aria-pressed={list.showTable} onClick={() => list.showAsTable(true)}>
-          <Table2 className="size-4" />
-        </Button>
-        <Button variant={list.showTable ? 'ghost' : 'secondary'} size="icon" className="size-8 rounded-s-none" aria-label={t('Card view')} title={t('Card view')} aria-pressed={!list.showTable} onClick={() => list.showAsTable(false)}>
-          <LayoutList className="size-4" />
-        </Button>
-      </div>
+      {/* One button that switches to the other view, showing that view's icon. */}
+      <Button variant="outline" size="icon" className="size-8" aria-label={list.showTable ? t('Card view') : t('Table view')} title={list.showTable ? t('Card view') : t('Table view')} onClick={() => list.showAsTable(!list.showTable)}>
+        {list.showTable ? <LayoutList className="size-4" /> : <Table2 className="size-4" />}
+      </Button>
     </>
   )
 }

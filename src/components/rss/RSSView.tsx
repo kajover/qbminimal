@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FolderPlus, Plus, RefreshCw } from 'lucide-react'
+import { CheckCheck, FolderPlus, Plus, RefreshCw } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -44,7 +44,7 @@ export function RSSView() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title={t('RSS')} description={t('Feeds, articles, and rules that download new episodes')} />
+      <PageHeader title={t('RSS')} />
 
       {feedsQuery.isLoading ? <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading feeds...')}</p> : (
         <div className="flex flex-col gap-4 md:flex-row md:items-start">
@@ -65,7 +65,7 @@ export function RSSView() {
           <Card className="min-w-0 flex-1 gap-2">
             <CardHeader className="flex flex-wrap items-center justify-between gap-2">
               <CardTitle className="min-w-0 truncate">{feed?.title ?? t('Articles')}</CardTitle>
-              {feed && <Button size="sm" variant="ghost" disabled={feed.unreadCount === 0} onClick={() => markRead(feed.path)}>{t('Mark all as read')}</Button>}
+              {feed && <Button size="sm" variant="ghost" disabled={feed.unreadCount === 0} onClick={() => markRead(feed.path)}><CheckCheck />{t('Mark all as read')}</Button>}
             </CardHeader>
             <CardContent>
               {!feed ? <p className="py-8 text-center text-sm text-muted-foreground">{t('Pick a feed to see its articles')}</p>

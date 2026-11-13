@@ -1,9 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Download, RefreshCw, Trash2, X } from 'lucide-react'
 import { ConfirmAction } from '@/components/ConfirmAction'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useSearchPluginAction, useSearchPlugins } from '@/hooks/useApi'
@@ -63,10 +63,9 @@ export function SearchPluginsDialog({ open, onOpenChange }: { open: boolean; onO
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[80vh] max-w-lg flex-col overflow-hidden">
+      <DialogContent aria-describedby={undefined} className="flex max-h-[80vh] max-w-lg flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>{t('Search plugins')}</DialogTitle>
-          <DialogDescription>{t('Only enabled plugins are used when you search.')}</DialogDescription>
         </DialogHeader>
 
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto">
@@ -111,20 +110,20 @@ export function SearchPluginsDialog({ open, onOpenChange }: { open: boolean; onO
             </ul>
           )}
 
-          <Button type="button" variant="outline" size="sm" disabled={action.isPending} onClick={checkForUpdates}>{t('Check for updates')}</Button>
+          <Button type="button" variant="outline" size="sm" disabled={action.isPending} onClick={checkForUpdates}><RefreshCw />{t('Check for updates')}</Button>
 
           <form onSubmit={install} className="space-y-1 border-t pt-3">
             <Label htmlFor="plugin-source" className="text-xs text-muted-foreground">{t('Install from a link to a plugin\'s .py file')}</Label>
             <div className="flex gap-2">
               <Input id="plugin-source" value={source} placeholder={t('https://example.com/plugin.py')} onChange={(e) => setSource(e.target.value)} className="h-8 text-sm" />
-              <Button type="submit" size="sm" variant="outline" disabled={action.isPending}>{t('Install')}</Button>
+              <Button type="submit" size="sm" variant="outline" disabled={action.isPending}><Download />{t('Install')}</Button>
             </div>
             <p className="text-xs text-muted-foreground">{t('Plugins run as code where qBittorrent is installed, so only install ones you trust.')}</p>
           </form>
         </div>
 
         <div className="flex justify-end border-t pt-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>{t('Close')}</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}><X />{t('Close')}</Button>
         </div>
       </DialogContent>
     </Dialog>

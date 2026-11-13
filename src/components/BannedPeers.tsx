@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { Ban } from 'lucide-react'
 import { useBannedPeers, useUnbanPeer } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { t } from '@/i18n'
@@ -25,6 +26,7 @@ export function BannedPeers() {
             disabled={unban.isPending}
             onClick={() => unban.mutate(ip, { onSuccess: () => { toast.success(t('Peer unbanned')) } })}
           >
+            <Ban />
             {t('Unban')}
           </Button>
         </li>

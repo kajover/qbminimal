@@ -1,10 +1,10 @@
 import { useApiFeature } from '@/hooks/useApi'
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { Download, FolderOpen, Loader2, Trash2 } from 'lucide-react'
+import { Download, FolderOpen, Loader2, Plus, Trash2 } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { FolderPicker } from '@/components/settings/FolderPicker'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -80,7 +80,6 @@ export function TorrentCreator() {
     <Card>
       <CardHeader>
         <CardTitle>{t('Create a torrent')}</CardTitle>
-        <CardDescription>{t('From files on the machine where qBittorrent runs')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <form onSubmit={submit} className="space-y-3">
@@ -146,7 +145,7 @@ export function TorrentCreator() {
           </Field>
 
           <Button type="submit" className="w-full" disabled={creating}>
-            {creating && <Loader2 className="me-2 size-4 animate-spin" />}
+            {creating ? <Loader2 className="me-2 size-4 animate-spin" /> : <Plus />}
             {t('Create torrent')}
           </Button>
         </form>

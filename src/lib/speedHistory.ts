@@ -20,6 +20,34 @@ export function recordSpeeds(sample: SpeedSample) {
 
 export const getSpeedHistory = () => samples
 
+// Each open torrent's own speeds, kept from when its details first open until the page closes.
+// Only watched torrents are recorded, so a long list costs nothing.
+const watched = new Map<string, number>()
+const torrentSamples = new Map<string, SpeedSample[]>()
+const EMPTY: SpeedSample[] = []
+
+export function watchTorrentSpeeds(hash: string) {
+  watched.set(hash, (watched.get(hash) ?? 0) + 1)
+  return () => {
+    const count = (watched.get(hash) ?? 1) - 1
+    if (count > 0) watched.set(hash, count)
+    else watched.delete(hash)
+  }
+}
+
+export function recordTorrentSpeeds(time: number, torrents: Record<string, { dlspeed?: number; upspeed?: number }>) {
+  if (!watched.size) return
+  for (const hash of watched.keys()) {
+    const torrent = torrents[hash]
+    if (!torrent) continue
+    const list = torrentSamples.get(hash) ?? []
+    torrentSamples.set(hash, [...list.slice(-(HISTORY_LENGTH - 1)), { time, down: torrent.dlspeed ?? 0, up: torrent.upspeed ?? 0 }])
+  }
+  listeners.forEach(listener => listener())
+}
+
+export const getTorrentSpeedHistory = (hash: string) => torrentSamples.get(hash) ?? EMPTY
+
 export function onSpeedHistory(listener: () => void) {
   listeners.add(listener)
   return () => {

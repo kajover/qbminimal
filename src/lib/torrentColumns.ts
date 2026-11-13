@@ -1,5 +1,7 @@
 import type { Torrent } from '@/types'
-import { getTrackerHost } from './torrentFilters'
+import { getTrackerHost, parseTags } from './torrentFilters'
+import { getStateLabel } from './torrentState'
+import type { FilterColumn, FilterKind } from './columnFilters'
 import { t } from '@/i18n'
 
 // The torrent table's columns. Each can be shown or hidden, dragged to a new place, and resized,
@@ -203,3 +205,41 @@ export function compareTorrents(a: Torrent, b: Torrent, id: ColumnId): number {
   if (typeof x === 'string' || typeof y === 'string') return String(x).localeCompare(String(y), undefined, { numeric: true, sensitivity: 'base' })
   return x - y
 }
+
+// How each column is filtered from its title (see lib/columnFilters).
+const FILTER_KINDS: Record<ColumnId, FilterKind> = {
+  priority: 'number', name: 'text', size: 'size', progress: 'percent', state: 'set', num_seeds: 'number', num_leechs: 'number',
+  dlspeed: 'speed', upspeed: 'speed', eta: 'duration', ratio: 'number', popularity: 'number', category: 'set', tags: 'set',
+  added_on: 'date', completion_on: 'date', tracker: 'set', downloaded: 'size', uploaded: 'size', amount_left: 'size',
+  time_active: 'duration', seeding_time: 'duration', last_activity: 'date', availability: 'number', dl_limit: 'speed',
+  up_limit: 'speed', save_path: 'text',
+}
+
+// The value a column's filter tests. Unknown values are NaN, which no range matches; unlimited and
+// infinite ones are Infinity, which only a lower bound matches.
+function filterValue(torrent: Torrent, id: ColumnId): number | string | string[] {
+  const date = (seconds: number | undefined) => (seconds && seconds > 0 ? seconds : NaN)
+  switch (id) {
+    case 'priority': return torrent.priority > 0 ? torrent.priority : NaN
+    case 'progress': return torrent.progress * 100
+    case 'state': return getStateLabel(torrent.state, torrent.completion_on)
+    case 'eta': return torrent.eta >= 0 && torrent.eta < 8640000 ? torrent.eta : Infinity
+    case 'popularity': return torrent.popularity === undefined ? NaN : torrent.popularity < 0 ? Infinity : torrent.popularity
+    case 'availability': return torrent.availability !== undefined && torrent.availability >= 0 ? torrent.availability : NaN
+    case 'dl_limit': return torrent.dl_limit > 0 ? torrent.dl_limit : Infinity
+    case 'up_limit': return torrent.up_limit > 0 ? torrent.up_limit : Infinity
+    case 'category': return torrent.category ?? ''
+    case 'tags': return parseTags(torrent.tags)
+    case 'added_on': return date(torrent.added_on)
+    case 'completion_on': return date(torrent.completion_on)
+    case 'last_activity': return date(torrent.last_activity)
+    default: return sortValue(torrent, id)
+  }
+}
+
+export const TORRENT_FILTER_COLUMNS: FilterColumn<Torrent>[] = COLUMNS.map(def => ({
+  id: def.id,
+  label: def.label,
+  kind: FILTER_KINDS[def.id],
+  value: (torrent: Torrent) => filterValue(torrent, def.id),
+}))

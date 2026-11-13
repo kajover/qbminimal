@@ -1,5 +1,5 @@
-import { lazy, useCallback, useEffect, useEffectEvent, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
-import { ChevronLeft, ChevronRight, Pause, Play, Trash2, X } from 'lucide-react'
+import { lazy, useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
+import { ChevronLeft, ChevronRight, FolderCog, Pause, Play, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/NativeSelect'
 import { PageBoundary } from '@/components/PageBoundary'
@@ -12,10 +12,16 @@ import { useTorrentList } from '@/hooks/useTorrentList'
 import { PAGE_SIZES } from '@/lib/listSettings'
 import { loadFilterViews, type FilterView } from '@/lib/filterViews'
 import { announce } from '@/lib/announce'
-import { getColumn, loadColumnLayout, saveColumnLayout, type ColumnLayout } from '@/lib/torrentColumns'
+import { loadBarActions, saveBarActions } from '@/lib/actionBar'
+import { Tooltip } from '@/components/ui/tooltip'
+import { toast } from '@/hooks/use-toast'
+import { getColumn, loadColumnLayout, saveColumnLayout, TORRENT_FILTER_COLUMNS, type ColumnLayout } from '@/lib/torrentColumns'
+import { choiceOptions, NONE } from '@/lib/columnFilters'
+import { ColumnFilterChips, type FilterTarget } from '@/components/ColumnFilters'
 import type { Torrent } from '@/types'
 import { useBulkActions, type BulkPrompt } from './bulkActions'
 import { BulkPromptDialog } from './BulkPromptDialog'
+import { ActionBarDialog } from './ActionBarDialog'
 import { DeleteTorrentsDialog } from './DeleteTorrentsDialog'
 import { FilterViewChips } from './FilterViews'
 import { TorrentCards } from './TorrentCards'
@@ -24,9 +30,10 @@ import { MoreMenu, TorrentContextMenu } from './TorrentMenus'
 import { ShortcutsDialog } from './ShortcutsDialog'
 import { TorrentStats } from './TorrentStats'
 import { TorrentTable } from './TorrentTable'
-import { TorrentToolbar } from './TorrentToolbar'
+import { AddTorrentButton, TorrentToolbar } from './TorrentToolbar'
 import { t } from '@/i18n'
 
+const AddTorrentDialog = lazy(() => import('./AddTorrentView').then(m => ({ default: m.AddTorrentDialog })))
 const CategoriesTagsDialog = lazy(() => import('./CategoriesTagsDialog').then(m => ({ default: m.CategoriesTagsDialog })))
 const TorrentDetailsPanel = lazy(() => import('./TorrentDetails').then(m => ({ default: m.TorrentDetailsPanel })))
 const TorrentDetailsDialog = lazy(() => import('./TorrentDetails').then(m => ({ default: m.TorrentDetailsDialog })))
@@ -62,6 +69,7 @@ export function TorrentsView() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [prompt, setPrompt] = useState<BulkPrompt | null>(null)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
   const [views, setViews] = useState<FilterView[]>(loadFilterViews)
   // The row that Tab reaches and the arrow keys move from.
   const [focusHash, setFocusHash] = useState<string | null>(null)
@@ -71,12 +79,46 @@ export function TorrentsView() {
   const selectedTorrents = torrents.filter(t => selection.selected.has(t.hash))
   const count = selectedTorrents.length
   const groups = useBulkActions(selectedTorrents, setPrompt)
+  // Actions pinned from the More menu to the selection bar.
+  // Chosen apart for wide screens and phones.
+  const barKind = wide ? 'wide' : 'phone'
+  const [allBarActions, setAllBarActions] = useState(() => ({ wide: loadBarActions('wide'), phone: loadBarActions('phone') }))
+  const barActions = allBarActions[barKind]
+  const [barDialogOpen, setBarDialogOpen] = useState(false)
+  const changeBarActions = (ids: string[]) => {
+    setAllBarActions(current => ({ ...current, [barKind]: ids }))
+    saveBarActions(barKind, ids)
+  }
+  // On phones the table's scrollbar moves up above the selection bar, which takes the bottom spot.
+  const phoneBar = count > 0 && !wide
+  useEffect(() => {
+    if (!phoneBar) return
+    const root = document.documentElement.style
+    root.setProperty('--selection-bar-space', 'calc(2.75rem + 0.5rem)')
+    return () => { root.removeProperty('--selection-bar-space') }
+  }, [phoneBar])
+  const entries = groups.flatMap(group => group.entries)
+  const pinnedEntries = barActions.flatMap(id => entries.filter(entry => entry.id === id))
   const closeDetails = useCallback(() => setDetailsHash(null), [])
+
+  // What each column's filter needs. A choice offers the values the torrents have, whatever
+  // the other filters show, with what the empty value means for that column.
+  const filterTargets = useMemo(() => {
+    const none: Record<string, string> = { category: t('No category'), tags: t('No tags'), tracker: t('No tracker') }
+    return new Map(TORRENT_FILTER_COLUMNS.map((column): [string, FilterTarget] => [column.id, {
+      ...column,
+      options: column.kind === 'set' ? () => choiceOptions(torrents, column) : undefined,
+      valueLabel: (value: string) => (value === NONE ? none[column.id] ?? t('None') : value),
+    }]))
+  }, [torrents])
+
 
   // Screen readers hear changes the user made, not the 2 second data refresh.
   const previousCount = useRef(count)
   useEffect(() => {
     if (previousCount.current === count) return
+    // Clearing the selection closes the details too, which belonged to it.
+    if (count === 0 && previousCount.current > 0) setDetailsHash(null)
     previousCount.current = count
     announce(count > 0 ? t('{count} selected', { count }) : t('Selection cleared'))
   }, [count])
@@ -116,15 +158,23 @@ export function TorrentsView() {
     setDeleteRequest(current => ({ id: current.id + 1, torrents: targets }))
     setDeleteOpen(true)
   }
+  // A short note once qBittorrent has done it: the torrent's name for one, or how many.
+  const done = (targets: Torrent[], one: (name: string) => string, many: (count: number) => string) => () =>
+    toast.success(targets.length === 1 ? one(targets[0].name) : many(targets.length))
   const confirmDelete = (withFiles: boolean) => {
-    const hashes = deleteRequest.torrents.map(t => t.hash)
-    remove.mutate({ hashes, deleteFiles: withFiles })
+    const targets = deleteRequest.torrents
+    const hashes = targets.map(t => t.hash)
+    remove.mutate({ hashes, deleteFiles: withFiles }, {
+      onSuccess: withFiles
+        ? done(targets, name => t('Deleted {name} and its files', { name }), count => t('Torrents and their files deleted: {count}', { count }))
+        : done(targets, name => t('Deleted {name}', { name }), count => t('Torrents deleted: {count}', { count })),
+    })
     selection.remove(hashes)
     if (detailsHash && hashes.includes(detailsHash)) closeDetails()
     setDeleteOpen(false)
   }
-  const start = () => resume.mutate(selectedTorrents.map(t => t.hash))
-  const stop = () => pause.mutate(selectedTorrents.map(t => t.hash))
+  const start = () => resume.mutate(selectedTorrents.map(t => t.hash), { onSuccess: done(selectedTorrents, name => t('Started {name}', { name }), count => t('Torrents started: {count}', { count })) })
+  const stop = () => pause.mutate(selectedTorrents.map(t => t.hash), { onSuccess: done(selectedTorrents, name => t('Stopped {name}', { name }), count => t('Torrents stopped: {count}', { count })) })
 
   const press = useRowPress<Torrent>({
     onPress: (event: MouseEvent, torrent, touch) => {
@@ -224,22 +274,32 @@ export function TorrentsView() {
     return () => window.removeEventListener('keydown', onKey)
   })
 
-  // Phones: above the tab bar and the table's scrollbar, where a thumb reaches. Wide screens: in the
-  // title row, between the title and the toolbar, no taller than the title, so the list below
-  // doesn't move when a torrent is selected.
+  // Phones: where a thumb reaches, right above the tab bar, or where the tab bar would be when it's
+  // off. Wide screens: in the header, in the middle of the window, so the list below doesn't move
+  // when a torrent is selected.
   const selectionBar = count > 0 && (
     <div
       role="toolbar"
       aria-label={t('Selected torrents')}
-      className="glass z-30 flex items-center gap-1 overflow-x-auto max-md:fixed max-md:inset-x-3 max-md:bottom-[calc(var(--bottom-nav-height,4rem)+var(--table-scrollbar-space,0px)+0.5rem)] max-md:rounded-full max-md:p-1.5 max-md:px-2 md:w-full md:max-w-xl md:rounded-xl md:p-0.5"
+      className="glass glass-flat-phone z-30 flex items-center gap-1 overflow-x-auto max-md:fixed max-md:inset-x-3 max-md:top-[calc(100dvh-var(--bottom-nav-height,4rem)-var(--selection-bar-gap,0.5rem))] max-md:-translate-y-full max-md:rounded-full max-md:p-1.5 max-md:px-2 md:absolute md:top-1/2 md:left-1/2 md:max-w-[calc(100vw-38rem)] md:-translate-1/2 md:rounded-xl md:p-0.5"
     >
       <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Clear selection')} title={t('Clear selection (Esc)')} onClick={selection.clear}>
         <X className="size-4" />
       </Button>
-      <span className="me-auto pe-2 text-sm whitespace-nowrap tabular-nums">{t('{count} selected', { count })}</span>
+      <span className="pe-1 text-sm whitespace-nowrap tabular-nums">{t('{selected}/{total} selected', { selected: count, total: list.matching.length })}</span>
       <Button variant="ghost" size="sm" className="gap-1" title={t('Start')} onClick={start}><Play className="size-4" /><span className="max-sm:sr-only">{t('Start')}</span></Button>
       <Button variant="ghost" size="sm" className="gap-1" title={t('Stop')} onClick={stop}><Pause className="size-4" /><span className="max-sm:sr-only">{t('Stop')}</span></Button>
-      <MoreMenu torrents={selectedTorrents} groups={groups} />
+      {pinnedEntries.map(entry => {
+        const Icon = entry.icon
+        return Icon && (
+          <Tooltip key={entry.id} label={entry.label}>
+            <Button variant={entry.pressed ? 'secondary' : 'ghost'} size="icon" className="size-8 shrink-0" aria-label={entry.label} aria-pressed={entry.pressed} onClick={entry.onSelect}>
+              <Icon className="size-4" />
+            </Button>
+          </Tooltip>
+        )
+      })}
+      <MoreMenu torrents={selectedTorrents} groups={groups} onCustomize={() => setBarDialogOpen(true)} />
       <Button variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" title={t('Delete (Del)')} onClick={() => askToDelete(selectedTorrents)}><Trash2 className="size-4" /><span className="max-sm:sr-only">{t('Delete')}</span></Button>
     </div>
   )
@@ -247,20 +307,16 @@ export function TorrentsView() {
   const total = torrents.length
   const header = (
     <PageHeader
-      title={t('Torrents')}
-      // Kept in view while scrolling as long as something is selected, so its actions stay at hand. The
-      // shadow carries the background a little lower, over the rows scrolling under it, without taking room.
-      className={count > 0 ? 'md:sticky md:top-14 md:z-20 md:bg-background md:shadow-[0_0.5rem_0_var(--background)]' : undefined}
-      middle={selectionBar}
-      description={!isLoading && (
-        // The count opens the connection status and statistics.
+      // The title opens the connection status and statistics.
+      title={(
         <TorrentStats>
-          <button type="button" className="underline-offset-4 hover:text-foreground hover:underline" title={t('Show connection status and statistics')}>
-            {list.filtered ? t('{length} of {total} torrents', { length: list.matching.length, total }) : (total === 1 ? t('1 torrent') : t('{count} torrents', { count: total }))}
-          </button>
+          <button type="button" className="underline-offset-4 hover:underline" title={t('Show connection status and statistics')}>{t('Torrents')}</button>
         </TorrentStats>
       )}
-      actions={total > 0 && <TorrentToolbar list={list} filtersOpen={filtersOpen} onToggleFilters={() => setFiltersOpen(open => !open)} columns={columns} onColumnsChange={changeColumns} onShowShortcuts={() => setShortcutsOpen(true)} />}
+      middle={selectionBar}
+      actions={total > 0
+        ? <TorrentToolbar list={list} filtersOpen={filtersOpen} onToggleFilters={() => setFiltersOpen(open => !open)} columns={columns} onColumnsChange={changeColumns} onShowShortcuts={() => setShortcutsOpen(true)} onAdd={() => setAddOpen(true)} />
+        : !isLoading && <AddTorrentButton onAdd={() => setAddOpen(true)} />}
     />
   )
 
@@ -282,14 +338,21 @@ export function TorrentsView() {
     )
   }
 
+  const addDialog = addOpen && (
+    <PageBoundary loading={null}>
+      <AddTorrentDialog open onOpenChange={setAddOpen} />
+    </PageBoundary>
+  )
+
   const notice = isError && total === 0 ? t('Couldn\'t load torrents. Check the connection to qBittorrent.')
-    : total === 0 ? t('No torrents yet. Add one from the Add page.')
+    : total === 0 ? t('No torrents yet. Add one with the + button.')
     : null
   if (notice) {
     return (
       <div className="space-y-4">
         {header}
         <p className="py-8 text-center text-sm text-muted-foreground">{notice}</p>
+        {addDialog}
       </div>
     )
   }
@@ -300,10 +363,23 @@ export function TorrentsView() {
     <div className="space-y-4">
       {header}
 
-
       <FilterViewChips list={list} views={views} onViewsChange={setViews} />
 
-      {filtersOpen && <TorrentFilterPanel list={list} categories={Object.keys(categories ?? {})} tags={tags ?? []} onManage={() => setManageOpen(true)} views={views} onViewsChange={setViews} />}
+      <ColumnFilterChips
+        targets={[...filterTargets.values()]}
+        filters={list.filters.columns ?? {}}
+        onChange={list.setColumnFilter}
+        // In the table they're also set from the column titles.
+        showAdd={filtersOpen}
+        end={filtersOpen && (
+          <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 rounded-full" onClick={() => setManageOpen(true)}>
+            <FolderCog className="size-4" />
+            {t('Manage categories and tags')}
+          </Button>
+        )}
+      />
+
+      {filtersOpen && <TorrentFilterPanel list={list} categories={Object.keys(categories ?? {})} tags={tags ?? []} views={views} onViewsChange={setViews} />}
 
       {list.matching.length === 0 ? (
         <div className="flex flex-col items-center gap-2 py-8 text-sm text-muted-foreground">
@@ -326,6 +402,9 @@ export function TorrentsView() {
           onSort={list.sortBy}
           rowProps={rowProps}
           wrapBody={withMenu}
+          columnFilters={list.filters.columns ?? {}}
+          filterTargets={filterTargets}
+          onColumnFilter={list.setColumnFilter}
         />
       ) : (
         <TorrentCards
@@ -363,8 +442,10 @@ export function TorrentsView() {
 
       <DeleteTorrentsDialog key={deleteRequest.id} torrents={deleteRequest.torrents} open={deleteOpen} onOpenChange={setDeleteOpen} onConfirm={confirmDelete} />
       <BulkPromptDialog torrents={selectedTorrents} prompt={prompt} onClose={() => setPrompt(null)} />
+      <ActionBarDialog kind={barKind} open={barDialogOpen} onOpenChange={setBarDialogOpen} groups={groups} pinned={barActions} onChange={changeBarActions} />
       <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
 
+      {addDialog}
       {manageOpen && (
         <PageBoundary loading={null}>
           <CategoriesTagsDialog open onOpenChange={setManageOpen} />

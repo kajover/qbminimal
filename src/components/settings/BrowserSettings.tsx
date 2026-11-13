@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Bell, Magnet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from '@/hooks/use-toast'
 import { magnetHandlerUrl } from '@/lib/incoming'
 import { finishNoticesOn, needsHomeScreen, notificationsSupported, setFinishNotices } from '@/lib/notify'
@@ -51,7 +51,6 @@ export function BrowserSettings() {
     <Card>
       <CardHeader>
         <CardTitle>{t('This browser')}</CardTitle>
-        <CardDescription>{t('Remembered on this device only')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Row icon={<Bell className="size-4" />} title={t('Finished downloads')} description={notificationsSupported()
@@ -70,7 +69,7 @@ export function BrowserSettings() {
             ? t('Magnet links you click on other websites open here, on the Add page.')
             : t('This browser can\'t open magnet links with a web page. It needs a secure (https) address, and Safari doesn\'t offer it.')}
         >
-          <Button variant="outline" size="sm" disabled={!canHandleMagnets()} onClick={registerMagnets}>{t('Open them here')}</Button>
+          <Button variant="outline" size="sm" disabled={!canHandleMagnets()} onClick={registerMagnets}><Magnet />{t('Open them here')}</Button>
         </Row>
       </CardContent>
     </Card>

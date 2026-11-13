@@ -6,8 +6,9 @@ import { checkForUpdates } from '@/lib/updateNotice'
 import { QBITTORRENT_DOWNLOADS, QBMINIMAL_RELEASES } from '@/lib/updates'
 import { t } from '@/i18n'
 
-// Asks GitHub for the newest qbminimal and qBittorrent releases when the button is pressed, and
-// only then. The last answer stays on this device until the next check.
+// Asks GitHub for the newest qbminimal and qBittorrent releases: by itself, in the background after
+// signing in at most every 12 hours (see Layout), or when the button is pressed. The last answer
+// stays on this device until the next check.
 export function UpdateCheck() {
   const notice = useUpdateNotice()
   const [checking, setChecking] = useState(false)
@@ -26,7 +27,7 @@ export function UpdateCheck() {
   return (
     <div className="mt-4 space-y-3 border-t pt-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground">{t('Asks GitHub for the latest releases.')}</p>
+        <p className="text-xs text-muted-foreground">{t('Checks GitHub for new releases by itself every 12 hours.')}</p>
         <Button variant="outline" size="sm" disabled={checking} onClick={() => void check()}>
           <RefreshCw className={checking ? 'animate-spin' : undefined} />
           {checking ? t('Checking for updates...') : t('Check for updates')}

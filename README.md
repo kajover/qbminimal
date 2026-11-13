@@ -13,44 +13,55 @@ Built with React 19, TypeScript 7, Vite 8, and Tailwind CSS 4.
 
 ## Screenshots
 
-On a desktop, as a table with a torrent's details below it, and as cards:
+On a desktop, as a table with a torrent's details below it, and as cards. Without the menu bar, the pages are in the menu button at the top left:
 
 <p>
   <img src="docs/screenshots/desktop-table.png" alt="The torrent list as a table on a desktop, with the selected torrent's details below it" width="49%">
   <img src="docs/screenshots/desktop-cards.png" alt="The torrent list as cards on a desktop" width="49%">
 </p>
 
-On a phone, as cards and as a table:
+With the menu bar on, a sidebar holds the pages:
 
 <p>
-  <img src="docs/screenshots/mobile-cards.png" alt="The torrent list as cards on a phone" width="260">
-  <img src="docs/screenshots/mobile-table.png" alt="The torrent list as a table on a phone" width="260">
+  <img src="docs/screenshots/desktop-table-menubar.png" alt="The torrent table on a desktop with the sidebar of pages" width="49%">
+  <img src="docs/screenshots/desktop-cards-menubar.png" alt="The torrent cards on a desktop with the sidebar of pages" width="49%">
 </p>
 
-In Safari on an iPhone, where the list runs on behind the address bar:
+On a phone, as cards and as a table, without and with the tab bar:
 
 <p>
-  <img src="docs/screenshots/iphone.png" alt="The torrent list as cards in Safari on an iPhone, continuing behind Safari's address bar under the floating tab bar" width="260">
+  <img src="docs/screenshots/mobile-cards.png" alt="The torrent list as cards on a phone" width="200">
+  <img src="docs/screenshots/mobile-table.png" alt="The torrent list as a table on a phone" width="200">
+  <img src="docs/screenshots/mobile-cards-menubar.png" alt="The torrent cards on a phone with the tab bar" width="200">
+  <img src="docs/screenshots/mobile-table-menubar.png" alt="The torrent table on a phone with the tab bar" width="200">
+</p>
+
+In Safari on an iPhone, where the list runs on behind the address bar, without and with the tab bar:
+
+<p>
+  <img src="docs/screenshots/iphone.png" alt="The torrent list as cards in Safari on an iPhone, continuing behind Safari's address bar" width="260">
+  <img src="docs/screenshots/iphone-menubar.png" alt="The torrent list as cards in Safari on an iPhone, with the floating tab bar above Safari's address bar" width="260">
 </p>
 
 ## Features
 
-- **Torrent list** as a table or as cards. In the table you can show, hide (also by right-clicking a header), drag, and resize columns, and sort by any of them. The layout is remembered on each device.
+- **Torrent list** as a table or as cards. In the table you can show, hide (also by right-clicking a header), drag, and resize columns, sort by any of them, and filter each one: a range of sizes, speeds, dates or ratios, text a name or path contains, or a set of states. The column titles stay in view while you scroll. The layout is remembered on each device.
 - **Filters** by name, status, category, tag, and tracker, each showing how many torrents it matches. Save a set of filters as a **view** to apply it again in one tap.
-- **Torrent details**: pieces, transfer facts, files (choose what to download, rename, and save finished files with qBittorrent 5.3), trackers, peers with country flags, and every per-torrent setting: limits, location, queue, category, tags, and more.
-- **Selecting and actions**: click a torrent to open its details in a panel below the list, Ctrl or Cmd-click and Shift-click to select several, and right-click for every action. On phones, tap a torrent for its details and hold one to start selecting.
+- **Torrent details**: pieces, a speed graph, transfer facts with copy buttons for the name, hash, magnet link and paths, files (choose what to download and each file's priority, rename, and save finished files with qBittorrent 5.3), trackers, peers with country flags, and every per-torrent setting: limits, location, queue, category, tags, and more.
+- **Selecting and actions**: click a torrent to open its details in a panel below the list, Ctrl or Cmd-click and Shift-click to select several, and right-click for every action, the everyday ones as a row of icons that name themselves on hover. Choose which actions sit in the selection bar from its More menu, separately for wide screens and phones. On phones, tap a torrent for its details and hold one to start selecting.
 - **Bulk actions** for several torrents at once, from the selection bar or the right-click menu.
-- **Add torrents** from links or .torrent files with all of qBittorrent's options. For a single magnet link or .torrent, see its files first and choose which to download. Drop .torrent files anywhere on the page, or let the browser open magnet links here. **Create torrents** from files on the server.
+- **Add torrents** with the + button above the list or on the Add page, from links or .torrent files with all of qBittorrent's options. For a single magnet link or .torrent, see its files first and choose which to download. Drop .torrent files anywhere on the page, or let the browser open magnet links here. What you've entered stays while you visit other pages, until you add it or clear it with the ×. **Create torrents** from files on the server.
 - **RSS** feeds and folders, articles, and download rules, including import and export.
-- **Search** with qBittorrent's search plugins, and plugin management.
-- **Logs**, statistics with a live speed graph, connection status, and the alternative speed limit switch. A notice says when qBittorrent can't be reached.
+- **Search** with qBittorrent's search plugins, results you can sort and filter by column, and plugin management.
+- **Logs**, statistics with a live speed graph, connection status, storage, and the switch for the alternative speed limits. Open them by tapping the Torrents title. A notice says when qBittorrent can't be reached.
 - **Notifications** when a torrent finishes, if you turn them on.
 - **Keyboard shortcuts** for the torrent list. Press `?` to see them.
 - **30 languages**, listed [below](#languages).
 - **Accessibility options**, described [below](#accessibility).
 - **Settings**: every qBittorrent preference, shown only when your qBittorrent version has it.
 - A sidebar you can hide on wide screens.
-- Light and dark themes that follow your device, and a layout made for phones, including when added to the home screen. Under **Settings > App > Appearance** you can also hide the speeds and the speed limit button in the header.
+- Light and dark themes that follow your device, and a layout made for phones, including when added to the home screen. The header holds each page's title and buttons, and a menu button holds the pages and logout, which leaves the list as much room as possible. Under **Settings > App > Appearance** you can show the current speeds in the header, and turn on **Menu bar** to also show the pages in a sidebar on wide screens and in a tab bar on phones.
+- **Update check**: every 12 hours, in the background after signing in, the app asks GitHub for new qbminimal and qBittorrent releases. Settings, and the menu button, show a dot when there is one.
 
 ## Accessibility
 
@@ -165,7 +176,7 @@ Then run `npm run deploy` for the latest release, or `scripts/deploy.sh --zip qb
 
 ## Credits
 
-qbminimal is influenced by the original project [qbitWebber](https://github.com/ksuaning-au/qbitWebber).
+qbminimal is influenced by [qbitWebber](https://github.com/ksuaning-au/qbitWebber), the project it started from, and by [qui](https://github.com/autobrr/qui), whose torrent table, column filters and details panel inspired qbminimal's.
 
 Third-party components and their licenses are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

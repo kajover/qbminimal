@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-import { Download, Pencil, Plus, Trash2, Upload } from 'lucide-react'
+import { Download, Pencil, Plus, Save, Trash2, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -165,10 +165,9 @@ export function RSSRules() {
       )}
 
       <Dialog open={editorOpen} onOpenChange={setEditorOpen}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto">
+        <DialogContent aria-describedby={undefined} className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing?.isNew ? t('Add rule') : t('Edit rule')}</DialogTitle>
-            <DialogDescription>{t('Downloads matching articles from the selected feeds.')}</DialogDescription>
           </DialogHeader>
           {editing && (
             <form onSubmit={save} className="space-y-3">
@@ -224,7 +223,7 @@ export function RSSRules() {
               </fieldset>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setEditorOpen(false)}>{t('Cancel')}</Button>
-                <Button type="submit" disabled={setRule.isPending}>{t('Save')}</Button>
+                <Button type="submit" disabled={setRule.isPending}><Save />{t('Save')}</Button>
               </DialogFooter>
             </form>
           )}
@@ -239,7 +238,7 @@ export function RSSRules() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setRemoveOpen(false)}>{t('Cancel')}</Button>
-            <Button variant="destructive" disabled={removeRule.isPending} onClick={confirmRemove}>{t('Delete')}</Button>
+            <Button variant="destructive" disabled={removeRule.isPending} onClick={confirmRemove}><Trash2 />{t('Delete')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

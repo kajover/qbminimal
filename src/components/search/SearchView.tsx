@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Loader2, Search, X } from 'lucide-react'
+import { Loader2, Plus, Puzzle, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -58,7 +58,7 @@ export function SearchView() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title={t('Search')} description={t('Find torrents with qBittorrent\'s search plugins')} />
+      <PageHeader title={t('Search')} />
       <Card>
         <CardContent className="space-y-3">
           <form onSubmit={submit} className="space-y-2">
@@ -80,7 +80,7 @@ export function SearchView() {
                 {CATEGORIES.map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}
               </NativeSelect>
             </div>
-            <Button type="button" variant="ghost" size="sm" onClick={() => setPluginsOpen(true)}>{t('Manage plugins')}</Button>
+            <Button type="button" variant="ghost" size="sm" onClick={() => setPluginsOpen(true)}><Puzzle />{t('Manage plugins')}</Button>
           </form>
           <SearchHistory activeId={search.jobId} onOpen={(id) => { if (!search.running) search.open(id) }} />
         </CardContent>
@@ -106,7 +106,7 @@ export function SearchView() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setAdding(null)}>{t('Cancel')}</Button>
             <Button disabled={addBusy} onClick={() => adding && void add(adding)} className="gap-2">
-              {addBusy ? <Loader2 className="size-4 animate-spin" /> : null}
+              {addBusy ? <Loader2 className="size-4 animate-spin" /> : <Plus />}
               {t('Add')}
             </Button>
           </DialogFooter>

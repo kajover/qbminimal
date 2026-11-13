@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/NativeSelect'
 import { STATUS_FILTERS, TRACKERLESS, type StatusFilter } from '@/lib/torrentFilters'
@@ -11,13 +10,12 @@ interface TorrentFilterPanelProps {
   list: TorrentList
   categories: string[]
   tags: string[]
-  onManage: () => void
   views: FilterView[]
   onViewsChange: (views: FilterView[]) => void
 }
 
 // Name search plus status, category, tag, and tracker, each choice showing how many it would match.
-export function TorrentFilterPanel({ list, categories, tags, onManage, views, onViewsChange }: TorrentFilterPanelProps) {
+export function TorrentFilterPanel({ list, categories, tags, views, onViewsChange }: TorrentFilterPanelProps) {
   const { filters, setFilter, counts, trackerHosts } = list
   const withCount = (label: string, count = 0) => `${label} (${count})`
 
@@ -41,7 +39,6 @@ export function TorrentFilterPanel({ list, categories, tags, onManage, views, on
         {trackerHosts.map(host => <option key={host} value={host}>{withCount(host, counts.tracker[host])}</option>)}
       </NativeSelect>
       <SaveViewButton list={list} views={views} onViewsChange={onViewsChange} />
-      <Button type="button" variant="ghost" size="sm" className="col-span-2 justify-start md:col-span-1" onClick={onManage}>{t('Manage categories and tags')}</Button>
     </div>
   )
 }

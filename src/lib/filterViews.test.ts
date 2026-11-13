@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { parseFilterViews, sameFilters, upsertView, type FilterView } from './filterViews'
 
-const movies: FilterView = { name: 'Movies', filters: { name: '', status: 'downloading', category: 'Movies', tag: '', tracker: '' } }
+const movies: FilterView = { name: 'Movies', filters: { name: '', status: 'downloading', category: 'Movies', tag: '', tracker: '', columns: { size: { type: 'range', min: 1024 } } } }
 
 describe('filter views', () => {
   it('reads saved views and drops broken ones', () => {
     const raw = JSON.stringify([movies, { name: '' }, 'junk', { name: 'Odd', filters: { status: 'nonsense', category: 3 } }])
-    expect(parseFilterViews(raw)).toEqual([movies, { name: 'Odd', filters: { name: '', status: 'all', category: '', tag: '', tracker: '' } }])
+    expect(parseFilterViews(raw)).toEqual([movies, { name: 'Odd', filters: { name: '', status: 'all', category: '', tag: '', tracker: '', columns: {} } }])
     expect(parseFilterViews('not json')).toEqual([])
     expect(parseFilterViews(null)).toEqual([])
   })

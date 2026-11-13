@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Save, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -106,6 +107,7 @@ export function RSSPromptDialog({ prompt, folders, onClose }: { prompt: Prompt; 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>{t('Cancel')}</Button>
             <Button type="submit" variant={prompt.kind === 'remove' ? 'destructive' : 'default'} disabled={action.isPending}>
+              {prompt.kind === 'remove' ? <Trash2 /> : <Save />}
               {prompt.kind === 'remove' ? t('Remove') : t('Save')}
             </Button>
           </DialogFooter>

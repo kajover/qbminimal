@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { Copy, Plus, Save, Send, Trash2 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { ConfirmAction } from '@/components/ConfirmAction'
 import { Button } from '@/components/ui/button'
@@ -88,7 +88,7 @@ export function ApiKeyField({ value }: { value: unknown }) {
     <div className="space-y-2">
       <p className="break-all font-mono text-xs">{shown ?? (key ? `${key.slice(0, 6)}${'•'.repeat(12)}` : t('No API key'))}</p>
       <div className="flex flex-wrap gap-2">
-        {shown && <Button type="button" size="sm" variant="outline" onClick={async () => { if (await copyText(shown)) toast.success(t('API key copied')) }}>{t('Copy')}</Button>}
+        {shown && <Button type="button" size="sm" variant="outline" onClick={async () => { if (await copyText(shown)) toast.success(t('API key copied')) }}><Copy />{t('Copy')}</Button>}
         <ConfirmAction buttonLabel={key ? t('Create a new key') : t('Create a key')} label={t('Create an API key')} title={key ? t('Replace the API key?') : t('Create an API key?')} message={t('Apps can use an API key instead of your password. A new key replaces the old one, which stops working.')} confirmLabel={t('Create')} onConfirm={rotate} />
         {key && <ConfirmAction buttonLabel={t('Delete key')} label={t('Delete the API key')} title={t('Delete the API key?')} message={t('Anything using it stops working.')} confirmLabel={t('Delete')} onConfirm={remove} />}
       </div>
@@ -162,7 +162,7 @@ export function TestEmailButton({ disabled, unsaved }: { disabled?: boolean; uns
   }
   return (
     <div className="space-y-1">
-      <Button type="button" size="sm" variant="outline" disabled={disabled || sending || unsaved} onClick={send}>{t('Send a test email')}</Button>
+      <Button type="button" size="sm" variant="outline" disabled={disabled || sending || unsaved} onClick={send}><Send />{t('Send a test email')}</Button>
       {unsaved && <p className="text-xs text-muted-foreground">{t('Save your changes first. The test uses the saved settings.')}</p>}
     </div>
   )
@@ -218,14 +218,14 @@ export function CookiesEditor() {
             onChange={(e) => update(i, { expirationDate: Math.floor(new Date(e.target.value).getTime() / 1000) || row.expirationDate })}
             className="h-8 text-sm"
           />
-          <Button type="button" size="sm" variant="ghost" onClick={() => setRows(rows.filter((_, j) => j !== i))}>{t('Remove')}</Button>
+          <Button type="button" size="sm" variant="ghost" onClick={() => setRows(rows.filter((_, j) => j !== i))}><Trash2 />{t('Remove')}</Button>
         </div>
       ))}
       <div className="flex gap-2">
         <Button type="button" size="sm" variant="outline" onClick={() => setRows([...rows, emptyCookie()])}>
           <Plus className="me-1 size-4" />{' '}{t('Add cookie')}
         </Button>
-        <Button type="button" size="sm" disabled={saving} onClick={save}>{t('Save cookies')}</Button>
+        <Button type="button" size="sm" disabled={saving} onClick={save}><Save />{t('Save cookies')}</Button>
       </div>
     </div>
   )
