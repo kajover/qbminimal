@@ -1311,5 +1311,6 @@
   "Total size of torrents": "टोरेंट का कुल आकार",
   "No torrents yet. Add one with the + button.": "अभी कोई टोरेंट नहीं है। + बटन से एक जोड़ें।",
   "Checks GitHub for new releases by itself every 12 hours.": "हर 12 घंटे में अपने-आप GitHub पर नए रिलीज़ की जाँच करता है।",
-  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent के पास अब इस टॉरेंट की फ़ाइल सूची नहीं है। हो सकता है यह पहले से आपकी सूची में हो; नहीं तो इसकी फ़ाइलें फिर से चुनें, या बिना चुने जोड़ें।"
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent के पास अब इस टॉरेंट की फ़ाइल सूची नहीं है। हो सकता है यह पहले से आपकी सूची में हो; नहीं तो इसकी फ़ाइलें फिर से चुनें, या बिना चुने जोड़ें।",
+  "Already in your list": "पहले से आपकी सूची में है"
 }

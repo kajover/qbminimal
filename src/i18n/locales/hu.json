@@ -1311,5 +1311,6 @@
   "Total size of torrents": "Torrentek teljes mérete",
   "No torrents yet. Add one with the + button.": "Még nincs torrent. Adj hozzá egyet a + gombbal.",
   "Checks GitHub for new releases by itself every 12 hours.": "12 óránként magától ellenőrzi a GitHubon az új kiadásokat.",
-  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "A qBittorrentnek már nincs meg ennek a torrentnek a fájllistája. Lehet, hogy már szerepel a listádban; ha nem, válaszd ki újra a fájljait, vagy add hozzá választás nélkül."
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "A qBittorrentnek már nincs meg ennek a torrentnek a fájllistája. Lehet, hogy már szerepel a listádban; ha nem, válaszd ki újra a fájljait, vagy add hozzá választás nélkül.",
+  "Already in your list": "Már szerepel a listádban"
 }

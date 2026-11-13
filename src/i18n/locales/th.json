@@ -1311,5 +1311,6 @@
   "Total size of torrents": "ขนาดรวมของทอร์เรนต์",
   "No torrents yet. Add one with the + button.": "ยังไม่มีทอร์เรนต์ เพิ่มได้ด้วยปุ่ม +",
   "Checks GitHub for new releases by itself every 12 hours.": "ตรวจสอบรุ่นใหม่บน GitHub โดยอัตโนมัติทุก 12 ชั่วโมง",
-  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent ไม่มีรายการไฟล์ของทอร์เรนต์นี้แล้ว อาจอยู่ในรายการของคุณอยู่แล้ว ไม่เช่นนั้นให้เลือกไฟล์อีกครั้ง หรือเพิ่มโดยไม่เลือก"
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent ไม่มีรายการไฟล์ของทอร์เรนต์นี้แล้ว อาจอยู่ในรายการของคุณอยู่แล้ว ไม่เช่นนั้นให้เลือกไฟล์อีกครั้ง หรือเพิ่มโดยไม่เลือก",
+  "Already in your list": "มีอยู่ในรายการของคุณแล้ว"
 }

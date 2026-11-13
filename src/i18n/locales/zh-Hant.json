@@ -1311,5 +1311,6 @@
   "Total size of torrents": "Torrent 總大小",
   "No torrents yet. Add one with the + button.": "尚無 torrent。點擊 + 按鈕新增。",
   "Checks GitHub for new releases by itself every 12 hours.": "每 12 小時自動檢查一次 GitHub 上的新版本。",
-  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent 已不再保留此種子的檔案清單。它可能已在你的清單中；否則請重新選擇檔案，或不選擇直接新增。"
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent 已不再保留此種子的檔案清單。它可能已在你的清單中；否則請重新選擇檔案，或不選擇直接新增。",
+  "Already in your list": "已在你的清單中"
 }

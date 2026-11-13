@@ -10,14 +10,15 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { TorrentFilePicker } from './TorrentFilePicker'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useCategories, useTags, useWebApiVersion } from '@/hooks/useApi'
+import { useCategories, useFindTorrent, useTags, useWebApiVersion } from '@/hooks/useApi'
 import { supportsFeature } from '@/lib/apiVersion'
 import { toast } from '@/hooks/use-toast'
-import { qbitClient } from '@/lib/api'
+import { hasStatus, qbitClient } from '@/lib/api'
 import {
   DEFAULT_ADD_OPTIONS,
   buildAddParams,
   describeAddResult,
+  magnetHash,
   parseLinks,
   readMetadata,
   type AddTorrentOptions,
@@ -72,6 +73,7 @@ let draft = EMPTY_DRAFT
 // + button opens. Both share what was entered (see draft above). `onAdded` runs after a success.
 function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
   const queryClient = useQueryClient()
+  const findTorrent = useFindTorrent()
   const { data: categories } = useCategories()
   const { data: tags } = useTags()
   const [links, setLinks] = useState(draft.links)
@@ -180,10 +182,12 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
     const source = linkList[0]
     try {
       while (fetchRun.current === run) {
-        const found = readMetadata(await qbitClient.fetchMetadata(source))
+        const body = await qbitClient.fetchMetadata(source)
+        const found = readMetadata(body)
         if (fetchRun.current !== run) return
         if (found) {
-          setMetadata(found)
+          const hash = (body as { hash?: string }).hash
+          setMetadata(hash ? { ...found, hash } : found)
           setMetadataSource(source)
           setPriorities(found.files.map(() => 1))
           return
@@ -260,6 +264,17 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
     const chosen = activeMetadata && priorities.some(priority => priority !== 1) ? priorities : undefined
     const add = () => qbitClient.addTorrents(params, addByHash ? [] : files, chosen)
 
+    // qBittorrent turns away a torrent it already has, saying only "Conflict", so that's checked first.
+    const sourceHashes = [
+      ...(activeMetadata?.hash ? [activeMetadata.hash] : []),
+      ...linkList.map(magnetHash).filter((hash): hash is string => !!hash),
+    ]
+    const existing = [...new Set(sourceHashes)].flatMap(hash => findTorrent(hash) ?? [])
+    if (existing.length && existing.length === sourceCount) {
+      toast.error(t('Already in your list'), { description: existing.map(torrent => torrent.name).join(', ') })
+      return
+    }
+
     setAdding(true)
     try {
       let result: unknown
@@ -285,8 +300,14 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
       const message = error instanceof Error ? error.message : ''
       // Still refused after reading the list again: qBittorrent keeps none for a torrent it already has.
       if (isForgottenFileList(error)) setMetadata(null)
+      // 409 means qBittorrent added none of them, mostly because it already has them.
+      const known = hasStatus(error, 409) ? sourceHashes.flatMap(hash => findTorrent(hash) ?? []) : []
+      if (known.length) {
+        toast.error(t('Already in your list'), { description: known.map(torrent => torrent.name).join(', ') })
+        return
+      }
       toast.error(t('Couldn\'t add the torrent'), {
-        description: isForgottenFileList(error) ? t('qBittorrent no longer has this torrent\'s file list. It may already be in your list; otherwise choose its files again, or add it without choosing.') : message.includes('409') ? t('qBittorrent rejected it. It may already be in your list, or the link may be invalid.') : message || undefined,
+        description: isForgottenFileList(error) ? t('qBittorrent no longer has this torrent\'s file list. It may already be in your list; otherwise choose its files again, or add it without choosing.') : hasStatus(error, 409) ? t('qBittorrent rejected it. It may already be in your list, or the link may be invalid.') : message || undefined,
       })
     } finally {
       setAdding(false)

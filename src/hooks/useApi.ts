@@ -97,6 +97,15 @@ const pickTrackers = (data: MainData) => data.trackers
 const pickSpeeds = (data: MainData) => totalSpeeds(data.torrents)
 
 export const useTorrents = () => useMainData(pickTorrents)
+// Looks a torrent up in the list already fetched, by its hash or, for a hybrid one, its v1 hash.
+export function useFindTorrent() {
+  const queryClient = useQueryClient()
+  return (hash: string): Torrent | undefined => {
+    const wanted = hash.toLowerCase()
+    const torrents = queryClient.getQueryData<MainData>(MAIN_DATA)?.torrents ?? {}
+    return Object.values(torrents).find(torrent => torrent.hash === wanted || torrent.infohash_v1 === wanted)
+  }
+}
 export const useTransferInfo = () => useMainData(pickServerState)
 // Download and upload speed in all, added up from the torrents so it matches the list.
 export const useTotalSpeeds = () => useMainData(pickSpeeds)

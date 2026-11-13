@@ -121,7 +121,7 @@ export function describeAddResult(result: unknown, sourceCount: number): { ok: b
 }
 
 export interface TorrentMetadata {
-  // Set when qBittorrent read a .torrent file, so it can be added by hash.
+  // The torrent's ID in qBittorrent. A .torrent file read this way is added by it.
   hash?: string
   name: string
   size: number
@@ -140,3 +140,16 @@ export function selectedSize(files: { length: number }[], priorities: number[]):
   return files.reduce((sum, file, i) => sum + (priorities[i] > 0 ? file.length : 0), 0)
 }
 
+
+const BASE32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+
+// The v1 info hash of a magnet link, in hex, from its hex or base32 btih; null for anything else.
+export function magnetHash(link: string): string | null {
+  const match = /[?&]xt=urn:btih:([0-9a-f]{40}|[a-z2-7]{32})(?:&|$)/i.exec(link.trim())
+  if (!match) return null
+  const value = match[1].toUpperCase()
+  if (value.length === 40) return value.toLowerCase()
+  let bits = ''
+  for (const char of value) bits += BASE32.indexOf(char).toString(2).padStart(5, '0')
+  return bits.match(/.{4}/g)!.map(nibble => parseInt(nibble, 2).toString(16)).join('')
+}

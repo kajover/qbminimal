@@ -1311,5 +1311,6 @@
   "Total size of torrents": "Celková velikost torrentů",
   "No torrents yet. Add one with the + button.": "Zatím žádné torrenty. Přidejte je tlačítkem +.",
   "Checks GitHub for new releases by itself every 12 hours.": "Sám kontroluje GitHub kvůli novým verzím každých 12 hodin.",
-  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent už nemá seznam souborů tohoto torrentu. Možná už je ve vašem seznamu; jinak znovu vyberte jeho soubory, nebo ho přidejte bez výběru."
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent už nemá seznam souborů tohoto torrentu. Možná už je ve vašem seznamu; jinak znovu vyberte jeho soubory, nebo ho přidejte bez výběru.",
+  "Already in your list": "Už je ve vašem seznamu"
 }

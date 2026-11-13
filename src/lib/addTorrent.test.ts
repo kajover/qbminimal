@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_ADD_OPTIONS, buildAddParams, describeAddResult, parseLinks, readMetadata, selectedSize } from './addTorrent'
+import { DEFAULT_ADD_OPTIONS, buildAddParams, describeAddResult, magnetHash, parseLinks, readMetadata, selectedSize } from './addTorrent'
 
 describe('parseLinks', () => {
   it('keeps one link per non-blank line', () => {
@@ -92,3 +92,17 @@ describe('selectedSize', () => {
   })
 })
 
+
+describe('magnetHash', () => {
+  it('reads a hex btih in lower case', () => {
+    expect(magnetHash('magnet:?xt=urn:btih:AA3156D6D0C719A83429D3DBA9918579360C217E&dn=x')).toBe('aa3156d6d0c719a83429d3dba9918579360c217e')
+  })
+  it('turns a base32 btih into hex', () => {
+    // 32 base32 characters of "A" are 160 zero bits; "7" is 11111.
+    expect(magnetHash('magnet:?xt=urn:btih:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7')).toBe('000000000000000000000000000000000000001f')
+  })
+  it('gives null for links without one', () => {
+    expect(magnetHash('https://example.com/a.torrent')).toBeNull()
+    expect(magnetHash('magnet:?xt=urn:btmh:1220abcd')).toBeNull()
+  })
+})

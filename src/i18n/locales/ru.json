@@ -1311,5 +1311,6 @@
   "Total size of torrents": "Общий размер торрентов",
   "No torrents yet. Add one with the + button.": "Торрентов пока нет. Добавьте кнопкой +.",
   "Checks GitHub for new releases by itself every 12 hours.": "Сам проверяет GitHub на наличие новых версий каждые 12 часов.",
-  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "У qBittorrent больше нет списка файлов этого торрента. Возможно, он уже в вашем списке; иначе выберите его файлы заново или добавьте без выбора."
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "У qBittorrent больше нет списка файлов этого торрента. Возможно, он уже в вашем списке; иначе выберите его файлы заново или добавьте без выбора.",
+  "Already in your list": "Уже в вашем списке"
 }
