@@ -36,13 +36,6 @@ On a phone, as cards and as a table, without and with the tab bar:
   <img src="docs/screenshots/mobile-table-menubar.png" alt="The torrent table on a phone with the tab bar" width="200">
 </p>
 
-In Safari on an iPhone, where the list runs on behind the address bar, without and with the tab bar:
-
-<p>
-  <img src="docs/screenshots/iphone.png" alt="The torrent list as cards in Safari on an iPhone, continuing behind Safari's address bar" width="260">
-  <img src="docs/screenshots/iphone-menubar.png" alt="The torrent list as cards in Safari on an iPhone, with the floating tab bar above Safari's address bar" width="260">
-</p>
-
 ## Features
 
 - **Torrent list** as a table or as cards. In the table you can show, hide (also by right-clicking a header), drag, and resize columns, sort by any of them, and filter each one: a range of sizes, speeds, dates or ratios, text a name or path contains, or a set of states. The column titles stay in view while you scroll. The layout is remembered on each device.
