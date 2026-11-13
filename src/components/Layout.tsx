@@ -6,7 +6,7 @@ import { HeaderSlot } from '@/components/HeaderSlot'
 import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { DropOverlay } from '@/components/DropOverlay'
 import { GlobalSpeeds } from '@/components/GlobalSpeeds'
-import { PAGES, type PageId } from '@/components/navigation'
+import { LOGS_PAGE, MAIN_PAGES, type PageId } from '@/components/navigation'
 import { useSession } from '@/hooks/useSession'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useDisplayOption } from '@/lib/displayOptions'
@@ -23,6 +23,15 @@ interface LayoutProps {
   children: ReactNode
 }
 
+function PageItem({ id, label, icon: Icon, page, onNavigate }: (typeof MAIN_PAGES)[number] & { page: PageId; onNavigate: (page: PageId) => void }) {
+  return (
+    <DropdownMenuItem aria-current={page === id ? 'page' : undefined} className={cn(page === id && 'bg-accent text-accent-foreground')} onSelect={() => onNavigate(id)}>
+      <Icon />
+      {label}
+    </DropdownMenuItem>
+  )
+}
+
 // The menu button: the pages and the way out. Settings can add a sidebar or tab bar beside it.
 function PagesMenu({ page, onNavigate }: { page: PageId; onNavigate: (page: PageId) => void }) {
   const { signOut } = useSession()
@@ -34,17 +43,14 @@ function PagesMenu({ page, onNavigate }: { page: PageId; onNavigate: (page: Page
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-52">
-        {PAGES.map(({ id, label, icon: Icon }) => (
-          <DropdownMenuItem key={id} aria-current={page === id ? 'page' : undefined} className={cn(page === id && 'bg-accent text-accent-foreground')} onSelect={() => onNavigate(id)}>
-            <Icon />
-            {label}
-          </DropdownMenuItem>
-        ))}
+        {MAIN_PAGES.map(item => <PageItem key={item.id} {...item} page={page} onNavigate={onNavigate} />)}
         <DropdownMenuSeparator />
+        <PageItem {...LOGS_PAGE} page={page} onNavigate={onNavigate} />
         <DropdownMenuItem onSelect={openStatistics}>
           <Activity />
           {t('Statistics')}
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void signOut()}>
           <LogOut />
           {t('Logout')}
@@ -167,13 +173,13 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
     window.scrollTo(0, 0)
   }, [page])
 
-  const navButtons = PAGES.map(({ id, label, icon: Icon }) => (
+  const navButton = ({ id, label, icon: Icon }: (typeof MAIN_PAGES)[number]) => (
     <Button key={id} variant={page === id ? 'secondary' : 'ghost'} className="justify-start gap-2 overflow-hidden" title={label} aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
       {/* 14px labels like the tab bar's, with 16px icons beside them, as on the other buttons. */}
       <Icon className="size-4" />
       <span className="truncate">{label}</span>
     </Button>
-  ))
+  )
 
   return (
     // Below the md width (1200px) the window scrolls the page, under a glass header and a floating
@@ -204,8 +210,9 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
           <div ref={sidebarBox} className={cn('sticky top-14 z-35 hidden h-[calc(100vh-3.5rem)] shrink-0 self-start', menuBar && 'md:flex')}>
             {sidebarShown && (
               <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto p-2 pb-4">
-                <nav aria-label={t('Pages')} className="flex flex-col gap-1">{navButtons}</nav>
-                <div className="mt-2 border-t pt-2">
+                <nav aria-label={t('Pages')} className="flex flex-col gap-1">{MAIN_PAGES.map(navButton)}</nav>
+                <div className="mt-2 flex flex-col gap-1 border-t pt-2">
+                  {navButton(LOGS_PAGE)}
                   <Button variant="ghost" className="w-full justify-start gap-2 overflow-hidden" onClick={openStatistics}>
                     <Activity className="size-4" />
                     <span className="truncate">{t('Statistics')}</span>
@@ -252,7 +259,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
         className={cn('glass glass-flat bottom-bar inset-x-[max(0.75rem,env(safe-area-inset-left))] z-30 rounded-full md:hidden', !menuBar && 'hidden')}
       >
         <div className="flex justify-around px-1 py-1.5">
-          {PAGES.map(({ id, label, icon: Icon }) => (
+          {MAIN_PAGES.map(({ id, label, icon: Icon }) => (
             <button key={id} type="button" aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)} className={cn('flex min-w-0 flex-auto flex-col items-center rounded-full px-1 py-1 transition-colors [:root[data-tab-labels=off]_&]:py-2', page === id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground')}>
               {/* 18px icons over 12px names; with the names hidden in Settings, 20px icons on their own. */}
               <Icon className="size-4.5 [:root[data-tab-labels=off]_&]:size-5" />

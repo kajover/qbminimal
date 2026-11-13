@@ -1310,5 +1310,6 @@
   "Storage": "সংরক্ষণ",
   "Total size of torrents": "টরেন্টের মোট আকার",
   "No torrents yet. Add one with the + button.": "এখনো কোনো টরেন্ট নেই। + বোতাম দিয়ে একটি যোগ করুন।",
-  "Checks GitHub for new releases by itself every 12 hours.": "প্রতি ১২ ঘণ্টায় নিজে থেকেই GitHub-এ নতুন রিলিজ খোঁজে।"
+  "Checks GitHub for new releases by itself every 12 hours.": "প্রতি ১২ ঘণ্টায় নিজে থেকেই GitHub-এ নতুন রিলিজ খোঁজে।",
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent-এর কাছে এই টরেন্টের ফাইল তালিকা আর নেই। এটি হয়তো আগেই আপনার তালিকায় আছে; না থাকলে আবার এর ফাইল বেছে নিন, অথবা না বেছেই যোগ করুন।"
 }

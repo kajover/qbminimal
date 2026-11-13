@@ -31,6 +31,10 @@ const selectClass = 'border-input dark:bg-input/30 h-9 w-full rounded-md border 
 const METADATA_POLL_MS = 1500
 const METADATA_TIMEOUT_MS = 60000
 const METADATA_DEBOUNCE_MS = 600
+const REREAD_TIMEOUT_MS = 20000
+
+// qBittorrent's answer to a file choice for a torrent whose file list it doesn't hold.
+const isForgottenFileList = (error: unknown) => error instanceof Error && error.message.includes('filePriorities')
 
 function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
   return (
@@ -218,6 +222,22 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
     return () => clearTimeout(timer)
   }, [sourceKey, metadataSupported])
 
+  // Has qBittorrent read the single source's file list again, so a file choice can go with it.
+  const rereadFileList = async (fileCount: number) => {
+    const matches = (body: unknown) => readMetadata(body)?.files.length === fileCount
+    try {
+      if (singleSource instanceof File) return matches((await qbitClient.parseMetadata([singleSource]))[0])
+      const started = Date.now()
+      while (Date.now() - started < REREAD_TIMEOUT_MS) {
+        if (matches(await qbitClient.fetchMetadata(linkList[0]))) return true
+        await new Promise(resolve => setTimeout(resolve, METADATA_POLL_MS))
+      }
+    } catch {
+      // Treated as not read; the add's own error is shown.
+    }
+    return false
+  }
+
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     if (sourceCount === 0) {
@@ -236,9 +256,22 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
       return
     }
 
+    // Every file at normal priority is what qBittorrent does anyway, so that choice isn't sent.
+    const chosen = activeMetadata && priorities.some(priority => priority !== 1) ? priorities : undefined
+    const add = () => qbitClient.addTorrents(params, addByHash ? [] : files, chosen)
+
     setAdding(true)
     try {
-      const result = await qbitClient.addTorrents(params, addByHash ? [] : files, activeMetadata ? priorities : undefined)
+      let result: unknown
+      try {
+        result = await add()
+      } catch (error) {
+        // qBittorrent takes a file choice only while it still holds the file list it read, which it
+        // forgets once that link is added (even when that fails) and on a new sign-in. Read it again
+        // and retry once.
+        if (!chosen || !isForgottenFileList(error) || !(await rereadFileList(chosen.length))) throw error
+        result = await add()
+      }
       const { ok, message } = describeAddResult(result, sourceCount)
       if (ok) {
         toast.success(message)
@@ -250,8 +283,10 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
       queryClient.invalidateQueries({ queryKey: ['torrents'] })
     } catch (error) {
       const message = error instanceof Error ? error.message : ''
+      // Still refused after reading the list again: qBittorrent keeps none for a torrent it already has.
+      if (isForgottenFileList(error)) setMetadata(null)
       toast.error(t('Couldn\'t add the torrent'), {
-        description: message.includes('409') ? t('qBittorrent rejected it. It may already be in your list, or the link may be invalid.') : message || undefined,
+        description: isForgottenFileList(error) ? t('qBittorrent no longer has this torrent\'s file list. It may already be in your list; otherwise choose its files again, or add it without choosing.') : message.includes('409') ? t('qBittorrent rejected it. It may already be in your list, or the link may be invalid.') : message || undefined,
       })
     } finally {
       setAdding(false)

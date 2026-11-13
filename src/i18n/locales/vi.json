@@ -1310,5 +1310,6 @@
   "Storage": "Lưu trữ",
   "Total size of torrents": "Tổng dung lượng torrent",
   "No torrents yet. Add one with the + button.": "Chưa có torrent nào. Thêm bằng nút +.",
-  "Checks GitHub for new releases by itself every 12 hours.": "Tự động kiểm tra bản phát hành mới trên GitHub mỗi 12 giờ."
+  "Checks GitHub for new releases by itself every 12 hours.": "Tự động kiểm tra bản phát hành mới trên GitHub mỗi 12 giờ.",
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent không còn danh sách tệp của torrent này. Có thể nó đã có trong danh sách của bạn; nếu không, hãy chọn lại các tệp hoặc thêm mà không chọn."
 }

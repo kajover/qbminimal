@@ -1310,5 +1310,6 @@
   "Storage": "التخزين",
   "Total size of torrents": "الحجم الإجمالي للتورنتات",
   "No torrents yet. Add one with the + button.": "لا توجد تورنتات بعد. أضف واحدًا بزر +.",
-  "Checks GitHub for new releases by itself every 12 hours.": "يتحقق من GitHub تلقائيًا من وجود إصدارات جديدة كل 12 ساعة."
+  "Checks GitHub for new releases by itself every 12 hours.": "يتحقق من GitHub تلقائيًا من وجود إصدارات جديدة كل 12 ساعة.",
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "لم تعد قائمة ملفات هذا التورنت لدى qBittorrent. ربما هو في قائمتك بالفعل؛ وإلا فاختر ملفاته مرة أخرى، أو أضفه دون اختيار."
 }

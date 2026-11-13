@@ -1310,5 +1310,6 @@
   "Storage": "Сховище",
   "Total size of torrents": "Загальний розмір торрентів",
   "No torrents yet. Add one with the + button.": "Торрентів ще немає. Додайте кнопкою +.",
-  "Checks GitHub for new releases by itself every 12 hours.": "Сам перевіряє GitHub на нові версії кожні 12 годин."
+  "Checks GitHub for new releases by itself every 12 hours.": "Сам перевіряє GitHub на нові версії кожні 12 годин.",
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "У qBittorrent більше немає списку файлів цього торента. Можливо, він уже у вашому списку; інакше виберіть його файли знову або додайте без вибору."
 }

@@ -1310,5 +1310,6 @@
   "Storage": "Speicher",
   "Total size of torrents": "Gesamtgröße der Torrents",
   "No torrents yet. Add one with the + button.": "Noch keine Torrents. Füge mit der Schaltfläche + einen hinzu.",
-  "Checks GitHub for new releases by itself every 12 hours.": "Prüft GitHub automatisch alle 12 Stunden auf neue Versionen."
+  "Checks GitHub for new releases by itself every 12 hours.": "Prüft GitHub automatisch alle 12 Stunden auf neue Versionen.",
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent hat die Dateiliste dieses Torrents nicht mehr. Vielleicht ist er schon in deiner Liste; sonst wähle seine Dateien erneut oder füge ihn ohne Auswahl hinzu."
 }

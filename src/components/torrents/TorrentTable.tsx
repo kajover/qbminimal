@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent, type PointerEvent, type ReactElement, type ReactNode } from 'react'
 import { textScale } from '@/lib/textSize'
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ArrowDown, ArrowUp, RotateCcw } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format'
@@ -322,7 +322,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
             </ContextMenuCheckboxItem>
           ))}
           <ContextMenuSeparator />
-          <ContextMenuItem onClick={() => { onLayoutChange(DEFAULT_COLUMN_LAYOUT); onResetSort() }}>{t('Reset columns')}</ContextMenuItem>
+          <ContextMenuItem onClick={() => { onLayoutChange(DEFAULT_COLUMN_LAYOUT); onResetSort() }}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
         </ContextMenuContent>
         </ContextMenu>
       </table>

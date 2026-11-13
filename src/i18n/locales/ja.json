@@ -1310,5 +1310,6 @@
   "Storage": "ストレージ",
   "Total size of torrents": "トレントの合計サイズ",
   "No torrents yet. Add one with the + button.": "トレントはまだありません。+ ボタンで追加してください。",
-  "Checks GitHub for new releases by itself every 12 hours.": "12時間ごとに GitHub で新しいリリースを自動的に確認します。"
+  "Checks GitHub for new releases by itself every 12 hours.": "12時間ごとに GitHub で新しいリリースを自動的に確認します。",
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent はこのトレントのファイル一覧をもう保持していません。すでに一覧にある可能性があります。そうでなければ、ファイルをもう一度選ぶか、選ばずに追加してください。"
 }

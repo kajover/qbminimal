@@ -1310,5 +1310,6 @@
   "Storage": "Stocare",
   "Total size of torrents": "Dimensiunea totală a torrentelor",
   "No torrents yet. Add one with the + button.": "Niciun torrent încă. Adaugă unul cu butonul +.",
-  "Checks GitHub for new releases by itself every 12 hours.": "Verifică singur GitHub pentru versiuni noi la fiecare 12 ore."
+  "Checks GitHub for new releases by itself every 12 hours.": "Verifică singur GitHub pentru versiuni noi la fiecare 12 ore.",
+  "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent nu mai are lista de fișiere a acestui torrent. Poate e deja în lista ta; altfel alege din nou fișierele lui sau adaugă-l fără să alegi."
 }

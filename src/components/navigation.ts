@@ -11,3 +11,7 @@ export const PAGES: { id: PageId; label: string; icon: LucideIcon }[] = [
   { id: 'logs', label: t('Logs'), icon: FileText },
   { id: 'settings', label: t('Settings'), icon: Settings },
 ]
+
+// Logs sit apart from the pages, beside Statistics in the menu and sidebar, and stay off the phone tab bar.
+export const MAIN_PAGES = PAGES.filter(page => page.id !== 'logs')
+export const LOGS_PAGE = PAGES.find(page => page.id === 'logs')!
