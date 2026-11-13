@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "برای تغییر اندازه بکشید. برای بازنشانی دوبار کلیک کنید.",
   "Started torrents wait until transfers are resumed.": "تورنت‌های شروع‌شده تا ازسرگیری انتقال‌ها منتظر می‌مانند.",
   "Reset sorting": "بازنشانی مرتب‌سازی",
-  "Torrents with errors: {count}": "تورنت‌های دارای خطا: {count}"
+  "Torrents with errors: {count}": "تورنت‌های دارای خطا: {count}",
+  "Plugin": "افزونه",
+  "Published": "تاریخ انتشار",
+  "Clear all": "پاک کردن همه",
+  "Delete every search": "حذف همه جستجوها",
+  "Delete every search?": "همه جستجوها حذف شوند؟",
+  "qBittorrent forgets these searches and their results.": "qBittorrent این جستجوها و نتایجشان را فراموش می‌کند.",
+  "Delete all": "حذف همه",
+  "Run {value} again": "جستجوی دوباره {value}",
+  "Run again": "جستجوی دوباره",
+  "Couldn't delete every search": "حذف همه جستجوها ممکن نشد",
+  "Keep past searches": "نگه داشتن جستجوهای قبلی",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "جستجوهای قبلی در qBittorrent می‌مانند تا دوباره باز یا اجرا شوند. اگر خاموش باشد، هر جستجوی تازه جستجوهای قبلی را حذف می‌کند."
 }

@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "आकार बदलने के लिए खींचें। रीसेट के लिए डबल-क्लिक करें।",
   "Started torrents wait until transfers are resumed.": "ट्रांसफ़र फिर शुरू होने तक शुरू किए गए टॉरेंट इंतज़ार करेंगे।",
   "Reset sorting": "क्रम रीसेट करें",
-  "Torrents with errors: {count}": "त्रुटि वाले टॉरेंट: {count}"
+  "Torrents with errors: {count}": "त्रुटि वाले टॉरेंट: {count}",
+  "Plugin": "प्लगइन",
+  "Published": "प्रकाशित",
+  "Clear all": "सब साफ़ करें",
+  "Delete every search": "सभी खोजें हटाएँ",
+  "Delete every search?": "सभी खोजें हटाएँ?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent इन खोजों और उनके परिणामों को भूल जाता है।",
+  "Delete all": "सब हटाएँ",
+  "Run {value} again": "{value} फिर से खोजें",
+  "Run again": "फिर से खोजें",
+  "Couldn't delete every search": "सभी खोजें हटाई नहीं जा सकीं",
+  "Keep past searches": "पिछली खोजें रखें",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "पिछली खोजें qBittorrent में रहती हैं, ताकि उन्हें खोला या फिर से चलाया जा सके। बंद होने पर हर नई खोज पिछली खोजें हटा देती है।"
 }

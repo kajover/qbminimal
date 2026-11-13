@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Tažením změníte velikost. Dvojklikem obnovíte.",
   "Started torrents wait until transfers are resumed.": "Spuštěné torrenty počkají, dokud se přenosy neobnoví.",
   "Reset sorting": "Obnovit řazení",
-  "Torrents with errors: {count}": "Torrenty s chybou: {count}"
+  "Torrents with errors: {count}": "Torrenty s chybou: {count}",
+  "Plugin": "Plugin",
+  "Published": "Zveřejněno",
+  "Clear all": "Vymazat vše",
+  "Delete every search": "Smazat všechna hledání",
+  "Delete every search?": "Smazat všechna hledání?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent zapomene tato hledání a jejich výsledky.",
+  "Delete all": "Smazat vše",
+  "Run {value} again": "Hledat znovu: {value}",
+  "Run again": "Hledat znovu",
+  "Couldn't delete every search": "Nepodařilo se smazat všechna hledání",
+  "Keep past searches": "Uchovávat předchozí hledání",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Předchozí hledání zůstávají v qBittorrentu, aby šla otevřít nebo spustit znovu. Když je vypnuto, každé nové hledání smaže ta předchozí."
 }

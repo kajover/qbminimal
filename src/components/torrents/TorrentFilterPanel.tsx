@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SearchInput } from '@/components/SearchInput'
@@ -15,16 +16,18 @@ interface TorrentFilterPanelProps {
   tags: string[]
   views: FilterView[]
   onViewsChange: (views: FilterView[]) => void
+  // More buttons after Reset filters.
+  actions?: ReactNode
 }
 
 // Name search plus status, category, tag, and tracker, each choice showing how many it would match.
-export function TorrentFilterPanel({ list, categories, tags, views, onViewsChange }: TorrentFilterPanelProps) {
+export function TorrentFilterPanel({ list, categories, tags, views, onViewsChange, actions }: TorrentFilterPanelProps) {
   const { filters, setFilter, counts, trackerHosts } = list
   const withCount = (label: string, count = 0) => `${label} (${count})`
 
   return (
     <div id="torrent-filters" className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
-      <SearchInput autoFocus aria-label={t('Filter by name')} placeholder={t('Filter by name')} value={filters.name} onValueChange={(value) => setFilter('name', value)} className="col-span-2 md:w-64" />
+      <SearchInput autoFocus aria-label={t('Filter by name')} placeholder={t('Filter by name')} value={filters.name} onValueChange={(value) => setFilter('name', value)} className="col-span-2 md:w-52" />
       <NativeSelect aria-label={t('Filter by status')} className="col-span-2" value={filters.status} onChange={(e) => setFilter('status', e.target.value as StatusFilter)}>
         {STATUS_FILTERS.map(({ value, label }) => <option key={value} value={value}>{withCount(label, counts.status[value])}</option>)}
       </NativeSelect>
@@ -36,19 +39,22 @@ export function TorrentFilterPanel({ list, categories, tags, views, onViewsChang
         <option value="">{t('All tags')}</option>
         {tags.map(name => <option key={name} value={name}>{withCount(name, counts.tag[name])}</option>)}
       </NativeSelect>
-      <NativeSelect aria-label={t('Filter by tracker')} className="col-span-2" value={filters.tracker} onChange={(e) => setFilter('tracker', e.target.value)}>
+      <NativeSelect aria-label={t('Filter by tracker')} className="col-span-2 md:max-w-52" value={filters.tracker} onChange={(e) => setFilter('tracker', e.target.value)}>
         <option value="">{t('All trackers')}</option>
         <option value={TRACKERLESS}>{withCount('Trackerless', counts.trackerless)}</option>
         {trackerHosts.map(host => <option key={host} value={host}>{withCount(host, counts.tracker[host])}</option>)}
       </NativeSelect>
-      {/* Side by side, as close as the column filter buttons above. */}
-      <div className="col-span-2 flex items-center gap-1">
+      {/* The buttons share one row, which joins the filters' row on wide screens when it fits, and
+          otherwise moves to a row of its own rather than cutting labels short. */}
+      <div className="col-span-2 flex min-w-0 items-center gap-1 md:min-w-fit md:flex-1">
         <SaveViewButton list={list} views={views} onViewsChange={onViewsChange} />
         {/* Clears every filter, the column filters included. */}
-        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full px-2.5" disabled={!list.filtered} onClick={list.clearFilters}>
+        {/* The facing sides have less padding, so the text gap matches the one before the icon buttons. */}
+        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full px-2.5 has-[>svg]:ps-1" disabled={!list.filtered} onClick={list.clearFilters}>
           <RotateCcw className="size-4" />
           {t('Reset filters')}
         </Button>
+        {actions}
       </div>
     </div>
   )

@@ -1,10 +1,11 @@
 import { useState, type ReactNode } from 'react'
-import { Bell, Magnet } from 'lucide-react'
+import { Bell, History, Magnet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from '@/hooks/use-toast'
 import { magnetHandlerUrl } from '@/lib/incoming'
+import { keepSearchesOn, setKeepSearches } from '@/lib/searchPatterns'
 import { finishNoticesOn, needsHomeScreen, notificationsSupported, setFinishNotices } from '@/lib/notify'
 import { t } from '@/i18n'
 
@@ -29,6 +30,7 @@ function Row({ icon, title, description, children }: { icon: ReactNode; title: s
 // Choices that belong to this browser rather than to qBittorrent.
 export function BrowserSettings() {
   const [notices, setNotices] = useState(finishNoticesOn)
+  const [keepSearches, setKeepSearchesState] = useState(keepSearchesOn)
 
   const toggleNotices = async () => {
     const on = await setFinishNotices(!notices)
@@ -61,6 +63,9 @@ export function BrowserSettings() {
               ? t('On iPhone and iPad, notifications only work in the app added to the Home Screen (Share, then Add to Home Screen, iOS 16.4 or later), and only while it is open. In Safari, finished downloads show on this page.')
               : t('This browser can\'t show notifications, so finished downloads show on this page while it is open.')}>
           <Switch aria-label={t('Finished downloads')} checked={notices} onCheckedChange={() => void toggleNotices()} />
+        </Row>
+        <Row icon={<History className="size-4" />} title={t('Keep past searches')} description={t('Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.')}>
+          <Switch aria-label={t('Keep past searches')} checked={keepSearches} onCheckedChange={(on) => { setKeepSearches(on); setKeepSearchesState(on) }} />
         </Row>
         <Row
           icon={<Magnet className="size-4" />}

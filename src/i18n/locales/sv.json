@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Dra för att ändra storlek. Dubbelklicka för att återställa.",
   "Started torrents wait until transfers are resumed.": "Startade torrenter väntar tills överföringarna återupptas.",
   "Reset sorting": "Återställ sortering",
-  "Torrents with errors: {count}": "Torrenter med fel: {count}"
+  "Torrents with errors: {count}": "Torrenter med fel: {count}",
+  "Plugin": "Insticksprogram",
+  "Published": "Publicerad",
+  "Clear all": "Rensa alla",
+  "Delete every search": "Ta bort alla sökningar",
+  "Delete every search?": "Ta bort alla sökningar?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent glömmer dessa sökningar och deras resultat.",
+  "Delete all": "Ta bort alla",
+  "Run {value} again": "Sök {value} igen",
+  "Run again": "Sök igen",
+  "Couldn't delete every search": "Kunde inte ta bort alla sökningar",
+  "Keep past searches": "Behåll tidigare sökningar",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Tidigare sökningar finns kvar i qBittorrent så att de kan öppnas eller köras igen. Av: varje ny sökning tar bort de föregående."
 }

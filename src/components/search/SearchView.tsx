@@ -11,6 +11,7 @@ import { useSearchJob } from '@/hooks/useSearchJob'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import { formatBytes } from '@/lib/format'
+import type { SavedSearch } from '@/lib/searchPatterns'
 import type { SearchResult } from '@/types'
 import { SearchHistory } from './SearchHistory'
 import { SearchPluginsDialog } from './SearchPluginsDialog'
@@ -39,7 +40,18 @@ export function SearchView() {
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
-    if (pattern.trim()) void search.start(pattern.trim(), plugin, category)
+    // The same button stops a running search, and ignores a click that lands just after it ended.
+    if (search.running) void search.cancel()
+    else if (pattern.trim() && !search.justEnded()) void search.start(pattern.trim(), plugin, category)
+  }
+
+  // Runs a saved search with its own plugin and category, shown in the form too.
+  const runAgain = (saved: SavedSearch) => {
+    const plugins = enabled.some(p => p.name === saved.plugins) ? saved.plugins : 'enabled'
+    setPattern(saved.pattern)
+    setPluginChoice(plugins)
+    setCategory(saved.category)
+    return search.start(saved.pattern, plugins, saved.category)
   }
 
   const add = async (result: SearchResult) => {
@@ -64,12 +76,15 @@ export function SearchView() {
           <form onSubmit={submit} className="space-y-2">
             <div className="flex gap-2">
               <SearchInput aria-label={t('Search for')} placeholder={t('Search for...')} value={pattern} onValueChange={setPattern} required className="min-w-0 flex-1" />
-              <Button type="submit" disabled={search.running} aria-label={t('Search')} title={t('Search')}>
-                {search.running ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
+              {/* While searching, the spinner turns into a stop button under the pointer. */}
+              <Button type="submit" className="group" aria-label={search.running ? t('Stop search') : t('Search')} title={search.running ? t('Stop search') : t('Search')}>
+                {search.running ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin group-hover:hidden group-focus-visible:hidden" />
+                    <X className="hidden size-4 group-hover:block group-focus-visible:block" />
+                  </>
+                ) : <Search className="size-4" />}
               </Button>
-              {search.running && (
-                <Button type="button" variant="ghost" size="icon" className="rounded-full" aria-label={t('Stop search')} title={t('Stop search')} onClick={() => void search.cancel()}><X className="size-4" /></Button>
-              )}
             </div>
             <div className="grid grid-cols-2 gap-2">
               <NativeSelect aria-label={t('Search plugin')} value={plugin} onChange={(e) => setPluginChoice(e.target.value)}>
@@ -82,7 +97,7 @@ export function SearchView() {
             </div>
             <Button type="button" variant="ghost" size="sm" onClick={() => setPluginsOpen(true)}><Puzzle />{t('Manage plugins')}</Button>
           </form>
-          <SearchHistory activeId={search.jobId} onOpen={(id) => { if (!search.running) search.open(id) }} />
+          <SearchHistory activeId={search.jobId} busy={search.running} onOpen={(id) => { if (!search.running) search.open(id) }} onRun={runAgain} onCleared={search.close} />
         </CardContent>
       </Card>
 

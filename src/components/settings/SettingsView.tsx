@@ -185,6 +185,8 @@ function PreferencesSection({ sectionId, edits, setEdits }: { sectionId: string;
       onSuccess: () => {
         setEdits(() => ({}))
         toast.success(t('Settings saved'))
+        // qBittorrent now serves a different Web UI, which only a reload shows.
+        if ('alternative_webui_enabled' in changes || 'alternative_webui_path' in changes) setTimeout(() => window.location.reload(), 1000)
       },
     })
   }

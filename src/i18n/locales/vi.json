@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Kéo để đổi kích thước. Nhấp đúp để đặt lại.",
   "Started torrents wait until transfers are resumed.": "Các torrent đã bắt đầu sẽ chờ đến khi truyền tải được tiếp tục.",
   "Reset sorting": "Đặt lại sắp xếp",
-  "Torrents with errors: {count}": "Torrent bị lỗi: {count}"
+  "Torrents with errors: {count}": "Torrent bị lỗi: {count}",
+  "Plugin": "Plugin",
+  "Published": "Ngày đăng",
+  "Clear all": "Xóa tất cả",
+  "Delete every search": "Xóa mọi tìm kiếm",
+  "Delete every search?": "Xóa mọi tìm kiếm?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent sẽ quên các tìm kiếm này và kết quả của chúng.",
+  "Delete all": "Xóa tất cả",
+  "Run {value} again": "Tìm lại {value}",
+  "Run again": "Tìm lại",
+  "Couldn't delete every search": "Không thể xóa mọi tìm kiếm",
+  "Keep past searches": "Giữ các tìm kiếm trước",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Các tìm kiếm trước được giữ trong qBittorrent để mở lại hoặc chạy lại. Khi tắt, mỗi tìm kiếm mới sẽ xóa các tìm kiếm trước đó."
 }

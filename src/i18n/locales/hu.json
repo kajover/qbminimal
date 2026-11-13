@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Húzd az átméretezéshez. Dupla kattintás visszaállítja.",
   "Started torrents wait until transfers are resumed.": "Az elindított torrentek várnak, amíg az átvitelek folytatódnak.",
   "Reset sorting": "Rendezés visszaállítása",
-  "Torrents with errors: {count}": "Hibás torrentek: {count}"
+  "Torrents with errors: {count}": "Hibás torrentek: {count}",
+  "Plugin": "Bővítmény",
+  "Published": "Közzétéve",
+  "Clear all": "Összes törlése",
+  "Delete every search": "Minden keresés törlése",
+  "Delete every search?": "Törli az összes keresést?",
+  "qBittorrent forgets these searches and their results.": "A qBittorrent elfelejti ezeket a kereséseket és találataikat.",
+  "Delete all": "Összes törlése",
+  "Run {value} again": "{value} keresése újra",
+  "Run again": "Keresés újra",
+  "Couldn't delete every search": "Nem sikerült minden keresést törölni",
+  "Keep past searches": "Korábbi keresések megtartása",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "A korábbi keresések megmaradnak a qBittorrentben, így újra megnyithatók vagy futtathatók. Kikapcsolva minden új keresés törli az előzőeket."
 }

@@ -133,7 +133,8 @@ const FEEDS: { feed: RSSFeed; articles: RSSItem[] }[] = [
 
 const SEARCH_HITS: SearchResult[] = SEED.map((t, i) => ({
   fileName: t.name, fileUrl: `https://example.org/download/${i}.torrent`, fileSize: t.size,
-  nbSeeders: 200 - i * 30, nbLeechers: 10 + i, siteUrl: 'https://example.org', descrLink: `https://example.org/view/${i}`, engineName: 'demo',
+  nbSeeders: 200 - i * 30, nbLeechers: 10 + i, siteUrl: i % 2 ? 'https://example.org' : 'https://example.net', descrLink: `https://example.org/view/${i}`,
+  engineName: i % 2 ? 'demo' : 'sample', pubDate: NOW - (i + 1) * 86_400,
 }))
 
 class DemoClient implements ApiClient {
@@ -144,6 +145,7 @@ class DemoClient implements ApiClient {
   private altSpeed = false
   private limits = { down: 0, up: 0 }
   private sessionPaused = false
+  private searches: { id: number; endsAt: number }[] = []
   private rules: Record<string, RSSRule> = {}
   private creatorTasks: TorrentCreatorTask[] = []
   private plugins: SearchPlugin[] = [
@@ -427,11 +429,21 @@ class DemoClient implements ApiClient {
 
   async getRSSMatchingArticles() { return { 'Distro releases': ['Distro releases: item 1'] } }
 
-  async startSearch() { return { id: 1 } }
-  async stopSearch() {}
-  async deleteSearch() {}
-  async getSearchStatus(): Promise<SearchJob[]> { return [] }
-  async getSearchResults() { return { results: SEARCH_HITS, status: 'Stopped' } }
+  // Each search runs for a few seconds, so the spinner and stop button can be seen.
+  async startSearch() {
+    const id = (this.searches.at(-1)?.id ?? 0) + 1
+    this.searches = [...this.searches, { id, endsAt: Date.now() + 4000 }]
+    return { id }
+  }
+  async stopSearch(id: number) { this.searches = this.searches.map(s => (s.id === id ? { ...s, endsAt: Math.min(s.endsAt, Date.now()) } : s)) }
+  async deleteSearch(id: number) { this.searches = this.searches.filter(s => s.id !== id) }
+  async getSearchStatus(): Promise<SearchJob[]> {
+    return this.searches.map(s => ({ id: s.id, status: Date.now() < s.endsAt ? 'Running' : 'Stopped', total: SEARCH_HITS.length }))
+  }
+  async getSearchResults(id: number) {
+    const search = this.searches.find(s => s.id === id)
+    return { results: SEARCH_HITS, status: search && Date.now() < search.endsAt ? 'Running' : 'Stopped' }
+  }
   async downloadSearchTorrent() {}
   async searchPlugins() { return this.plugins }
   async installSearchPlugin() {}

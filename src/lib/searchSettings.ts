@@ -1,21 +1,22 @@
 import { readStored, writeStored } from './storage'
 
-// How the search results are sorted and how wide their columns are, kept on this device like the
+// How the search results are sorted, which columns show and how wide they are, kept on this device like the
 // torrent list's. Anything unreadable falls back to the defaults.
 
-export type SearchSortKey = 'fileName' | 'fileSize' | 'nbSeeders' | 'nbLeechers' | 'siteUrl'
-export const SEARCH_SORT_KEYS: SearchSortKey[] = ['fileName', 'fileSize', 'nbSeeders', 'nbLeechers', 'siteUrl']
+export type SearchSortKey = 'fileName' | 'fileSize' | 'nbSeeders' | 'nbLeechers' | 'engineName' | 'siteUrl' | 'pubDate'
+export const SEARCH_SORT_KEYS: SearchSortKey[] = ['fileName', 'fileSize', 'nbSeeders', 'nbLeechers', 'engineName', 'siteUrl', 'pubDate']
 export interface SearchSort { key: SearchSortKey; desc: boolean }
 // Most seeds first, as those download best.
 export const DEFAULT_SEARCH_SORT: SearchSort = { key: 'nbSeeders', desc: true }
 
 // The columns after the name, which takes the room left over.
 export type ResizableSearchColumn = Exclude<SearchSortKey, 'fileName'>
-export const DEFAULT_SEARCH_WIDTHS: Record<ResizableSearchColumn, number> = { fileSize: 110, nbSeeders: 96, nbLeechers: 104, siteUrl: 170 }
+export const DEFAULT_SEARCH_WIDTHS: Record<ResizableSearchColumn, number> = { fileSize: 110, nbSeeders: 96, nbLeechers: 104, engineName: 130, siteUrl: 170, pubDate: 160 }
 export const MIN_SEARCH_WIDTH = 72
 
 const SORT_KEY = 'qbminimal.searchSort'
 const WIDTHS_KEY = 'qbminimal.searchColumns'
+const HIDDEN_KEY = 'qbminimal.searchHiddenColumns'
 
 const readJson = (raw: string | null): Record<string, unknown> => {
   try {
@@ -48,3 +49,16 @@ export const saveSearchSort = (sort: SearchSort) =>
 
 export const loadSearchWidths = () => parseSearchWidths(readStored(WIDTHS_KEY))
 export const saveSearchWidths = (widths: Record<ResizableSearchColumn, number>) => writeStored(WIDTHS_KEY, JSON.stringify(widths))
+
+// Every column but the name can be hidden.
+export function parseSearchHidden(raw: string | null): ResizableSearchColumn[] {
+  try {
+    const parsed: unknown = raw ? JSON.parse(raw) : []
+    return Array.isArray(parsed) ? SEARCH_SORT_KEYS.filter((key): key is ResizableSearchColumn => key !== 'fileName' && parsed.includes(key)) : []
+  } catch {
+    return []
+  }
+}
+
+export const loadSearchHidden = () => parseSearchHidden(readStored(HIDDEN_KEY))
+export const saveSearchHidden = (hidden: ResizableSearchColumn[]) => writeStored(HIDDEN_KEY, hidden.length ? JSON.stringify(hidden) : null)

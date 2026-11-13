@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "拖动以调整大小，双击以重置。",
   "Started torrents wait until transfers are resumed.": "已开始的种子会等待传输恢复。",
   "Reset sorting": "重置排序",
-  "Torrents with errors: {count}": "出错的种子：{count}"
+  "Torrents with errors: {count}": "出错的种子：{count}",
+  "Plugin": "插件",
+  "Published": "发布时间",
+  "Clear all": "全部清除",
+  "Delete every search": "删除所有搜索",
+  "Delete every search?": "删除所有搜索?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent 将忘记这些搜索及其结果。",
+  "Delete all": "全部删除",
+  "Run {value} again": "重新搜索 {value}",
+  "Run again": "重新搜索",
+  "Couldn't delete every search": "无法删除所有搜索",
+  "Keep past searches": "保留以往搜索",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "以往的搜索保留在 qBittorrent 中,可以重新打开或再次运行。关闭后,每次新搜索都会删除之前的搜索。"
 }

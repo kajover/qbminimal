@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Trage pentru a redimensiona. Dublu clic pentru resetare.",
   "Started torrents wait until transfers are resumed.": "Torrentele pornite așteaptă reluarea transferurilor.",
   "Reset sorting": "Resetează sortarea",
-  "Torrents with errors: {count}": "Torrente cu erori: {count}"
+  "Torrents with errors: {count}": "Torrente cu erori: {count}",
+  "Plugin": "Plugin",
+  "Published": "Publicat",
+  "Clear all": "Șterge tot",
+  "Delete every search": "Șterge toate căutările",
+  "Delete every search?": "Ștergi toate căutările?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent uită aceste căutări și rezultatele lor.",
+  "Delete all": "Șterge tot",
+  "Run {value} again": "Caută din nou {value}",
+  "Run again": "Caută din nou",
+  "Couldn't delete every search": "Nu s-au putut șterge toate căutările",
+  "Keep past searches": "Păstrează căutările anterioare",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Căutările anterioare rămân în qBittorrent, ca să poată fi deschise sau rulate din nou. Dezactivat, fiecare căutare nouă le șterge pe cele dinainte."
 }

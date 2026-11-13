@@ -17,7 +17,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 import { toast } from '@/hooks/use-toast'
 import { getColumn, loadColumnLayout, saveColumnLayout, TORRENT_FILTER_COLUMNS, type ColumnLayout } from '@/lib/torrentColumns'
 import { choiceOptions, NONE } from '@/lib/columnFilters'
-import { ColumnFilterChips, type FilterTarget } from '@/components/ColumnFilters'
+import { AddFilterButton, ColumnFilterChips, type FilterTarget } from '@/components/ColumnFilters'
 import type { Torrent } from '@/types'
 import { useBulkActions, type BulkPrompt } from './bulkActions'
 import { BulkPromptDialog } from './BulkPromptDialog'
@@ -364,23 +364,31 @@ export function TorrentsView() {
         targets={[...filterTargets.values()]}
         filters={list.filters.columns ?? {}}
         onChange={list.setColumnFilter}
-        // In the table they're also set from the column titles.
-        showAdd={filtersOpen}
+        // Added from the filter panel's funnel button, and in the table from the column titles too.
+        showAdd={false}
         start={!filtersOpen && hasPanelFilters && <ListFilterChips list={list} />}
-        end={filtersOpen && (
-          <>
-            <Button type="button" variant="ghost" size="sm" className="h-8 min-w-0 shrink gap-1.5 rounded-full px-2.5" title={t('Categories and tags')} onClick={() => setManageOpen(true)}>
-              <FolderCog className="size-4" />
-              <span className="truncate">{t('Categories and tags')}</span>
-            </Button>
-            <Button type="button" variant="ghost" size="icon" className="ms-auto size-8 shrink-0 rounded-full bg-muted hover:bg-accent" aria-label={t('Close filters')} title={t('Close filters')} onClick={() => setFiltersOpen(false)}>
-              <X className="size-4" />
-            </Button>
-          </>
-        )}
       />
 
-      {filtersOpen && <TorrentFilterPanel list={list} categories={Object.keys(categories ?? {})} tags={tags ?? []} views={views} onViewsChange={setViews} />}
+      {filtersOpen && (
+        <TorrentFilterPanel
+          list={list}
+          categories={Object.keys(categories ?? {})}
+          tags={tags ?? []}
+          views={views}
+          onViewsChange={setViews}
+          actions={(
+            <>
+              <Button type="button" variant="outline" size="icon" className="size-8 shrink-0" aria-label={t('Categories and tags')} title={t('Categories and tags')} onClick={() => setManageOpen(true)}>
+                <FolderCog className="size-4" />
+              </Button>
+              <AddFilterButton targets={[...filterTargets.values()]} onChange={list.setColumnFilter} />
+              <Button type="button" variant="ghost" size="icon" className="ms-auto size-8 shrink-0 rounded-full bg-muted hover:bg-accent" aria-label={t('Close filters')} title={t('Close filters')} onClick={() => setFiltersOpen(false)}>
+                <X className="size-4" />
+              </Button>
+            </>
+          )}
+        />
+      )}
 
       {list.matching.length === 0 ? (
         <div className="flex flex-col items-center gap-2 py-8 text-sm text-muted-foreground">

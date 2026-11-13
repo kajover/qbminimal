@@ -207,7 +207,7 @@ export function RemovableChip({ text, onRemove }: { text: string; onRemove: () =
   )
 }
 
-// A button that adds a column filter without the table: pick a column, then set it.
+// A funnel button that adds a column filter without the table: pick a column, then set it.
 export function AddFilterButton({ targets, onChange }: { targets: FilterTarget[]; onChange: (id: string, filter: ColumnFilter | null) => void }) {
   const [open, setOpen] = useState(false)
   const [targetId, setTargetId] = useState(targets[0]?.id ?? '')
@@ -216,9 +216,8 @@ export function AddFilterButton({ targets, onChange }: { targets: FilterTarget[]
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full px-2.5">
+        <Button type="button" variant="outline" size="icon" className="size-8 shrink-0" aria-label={t('Column filter')} title={t('Column filter')}>
           <Filter className="size-4" />
-          {t('Column filter')}
         </Button>
       </PopoverTrigger>
       <PopoverContent>

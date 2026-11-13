@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Перетащите, чтобы изменить размер. Двойной щелчок — сброс.",
   "Started torrents wait until transfers are resumed.": "Запущенные торренты ждут, пока передачи не возобновятся.",
   "Reset sorting": "Сбросить сортировку",
-  "Torrents with errors: {count}": "Торренты с ошибками: {count}"
+  "Torrents with errors: {count}": "Торренты с ошибками: {count}",
+  "Plugin": "Плагин",
+  "Published": "Опубликовано",
+  "Clear all": "Очистить всё",
+  "Delete every search": "Удалить все поиски",
+  "Delete every search?": "Удалить все поиски?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent забудет эти поиски и их результаты.",
+  "Delete all": "Удалить все",
+  "Run {value} again": "Повторить поиск {value}",
+  "Run again": "Повторить поиск",
+  "Couldn't delete every search": "Не удалось удалить все поиски",
+  "Keep past searches": "Хранить прошлые поиски",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Прошлые поиски остаются в qBittorrent, их можно открыть или повторить. Если выключено, каждый новый поиск удаляет предыдущие."
 }

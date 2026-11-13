@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "ドラッグでサイズ変更、ダブルクリックでリセットします。",
   "Started torrents wait until transfers are resumed.": "開始したトレントは転送が再開されるまで待機します。",
   "Reset sorting": "並べ替えをリセット",
-  "Torrents with errors: {count}": "エラーのあるトレント: {count}"
+  "Torrents with errors: {count}": "エラーのあるトレント: {count}",
+  "Plugin": "プラグイン",
+  "Published": "公開日",
+  "Clear all": "すべて消去",
+  "Delete every search": "すべての検索を削除",
+  "Delete every search?": "すべての検索を削除しますか?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent はこれらの検索と結果を破棄します。",
+  "Delete all": "すべて削除",
+  "Run {value} again": "{value} を再検索",
+  "Run again": "再検索",
+  "Couldn't delete every search": "一部の検索を削除できませんでした",
+  "Keep past searches": "過去の検索を保持",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "過去の検索は qBittorrent に残り、開き直したり再検索したりできます。オフにすると、新しい検索のたびに以前の検索が削除されます。"
 }

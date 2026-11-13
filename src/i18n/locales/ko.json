@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "드래그해 크기를 조절하고, 두 번 클릭해 초기화합니다.",
   "Started torrents wait until transfers are resumed.": "시작한 토렌트는 전송이 재개될 때까지 기다립니다.",
   "Reset sorting": "정렬 초기화",
-  "Torrents with errors: {count}": "오류가 있는 토렌트: {count}"
+  "Torrents with errors: {count}": "오류가 있는 토렌트: {count}",
+  "Plugin": "플러그인",
+  "Published": "게시일",
+  "Clear all": "모두 지우기",
+  "Delete every search": "모든 검색 삭제",
+  "Delete every search?": "모든 검색을 삭제할까요?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent가 이 검색과 결과를 잊습니다.",
+  "Delete all": "모두 삭제",
+  "Run {value} again": "{value} 다시 검색",
+  "Run again": "다시 검색",
+  "Couldn't delete every search": "일부 검색을 삭제하지 못했습니다",
+  "Keep past searches": "이전 검색 유지",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "이전 검색이 qBittorrent에 남아 다시 열거나 실행할 수 있습니다. 끄면 새 검색을 할 때마다 이전 검색이 삭제됩니다."
 }

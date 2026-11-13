@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "আকার বদলাতে টানুন। রিসেট করতে দুবার ক্লিক করুন।",
   "Started torrents wait until transfers are resumed.": "ট্রান্সফার আবার চালু না হওয়া পর্যন্ত চালু করা টরেন্ট অপেক্ষা করবে।",
   "Reset sorting": "সাজানো রিসেট করুন",
-  "Torrents with errors: {count}": "ত্রুটিযুক্ত টরেন্ট: {count}"
+  "Torrents with errors: {count}": "ত্রুটিযুক্ত টরেন্ট: {count}",
+  "Plugin": "প্লাগইন",
+  "Published": "প্রকাশিত",
+  "Clear all": "সব মুছুন",
+  "Delete every search": "সব অনুসন্ধান মুছুন",
+  "Delete every search?": "সব অনুসন্ধান মুছবেন?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent এই অনুসন্ধানগুলি ও তাদের ফলাফল ভুলে যায়।",
+  "Delete all": "সব মুছুন",
+  "Run {value} again": "{value} আবার খুঁজুন",
+  "Run again": "আবার খুঁজুন",
+  "Couldn't delete every search": "সব অনুসন্ধান মোছা যায়নি",
+  "Keep past searches": "আগের অনুসন্ধান রাখুন",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "আগের অনুসন্ধানগুলি qBittorrent-এ থাকে, যাতে খোলা বা আবার চালানো যায়। বন্ধ থাকলে প্রতিটি নতুন অনুসন্ধান আগেরগুলি মুছে দেয়।"
 }

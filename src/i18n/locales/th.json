@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "ลากเพื่อปรับขนาด ดับเบิลคลิกเพื่อรีเซ็ต",
   "Started torrents wait until transfers are resumed.": "ทอร์เรนต์ที่เริ่มแล้วจะรอจนกว่าจะเริ่มการถ่ายโอนต่อ",
   "Reset sorting": "รีเซ็ตการเรียงลำดับ",
-  "Torrents with errors: {count}": "ทอร์เรนต์ที่มีข้อผิดพลาด: {count}"
+  "Torrents with errors: {count}": "ทอร์เรนต์ที่มีข้อผิดพลาด: {count}",
+  "Plugin": "ปลั๊กอิน",
+  "Published": "เผยแพร่เมื่อ",
+  "Clear all": "ล้างทั้งหมด",
+  "Delete every search": "ลบการค้นหาทั้งหมด",
+  "Delete every search?": "ลบการค้นหาทั้งหมดหรือไม่",
+  "qBittorrent forgets these searches and their results.": "qBittorrent จะลืมการค้นหาเหล่านี้และผลลัพธ์",
+  "Delete all": "ลบทั้งหมด",
+  "Run {value} again": "ค้นหา {value} อีกครั้ง",
+  "Run again": "ค้นหาอีกครั้ง",
+  "Couldn't delete every search": "ลบการค้นหาบางรายการไม่ได้",
+  "Keep past searches": "เก็บการค้นหาก่อนหน้า",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "การค้นหาก่อนหน้าจะอยู่ใน qBittorrent เพื่อเปิดหรือค้นหาซ้ำได้ เมื่อปิด การค้นหาใหม่แต่ละครั้งจะลบรายการก่อนหน้า"
 }

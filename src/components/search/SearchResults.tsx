@@ -1,26 +1,34 @@
-import { useMemo, useRef, useState, type PointerEvent } from 'react'
-import { ArrowDown, ArrowUp, ArrowUpDown, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from 'react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Columns3, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { AddFilterButton, ColumnFilterButton, ColumnFilterChips, type FilterTarget } from '@/components/ColumnFilters'
-import { DEFAULT_SEARCH_SORT, DEFAULT_SEARCH_WIDTHS, loadSearchSort, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchSort, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey } from '@/lib/searchSettings'
+import { DEFAULT_SEARCH_SORT, DEFAULT_SEARCH_WIDTHS, loadSearchHidden, loadSearchSort, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchSort, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey } from '@/lib/searchSettings'
 import { applyColumnFilters, choiceOptions, withFilter, type ColumnFilter, type ColumnFilters, type FilterColumn } from '@/lib/columnFilters'
-import { formatBytes } from '@/lib/format'
+import { formatBytes, formatDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { SearchResult } from '@/types'
 import { t } from '@/i18n'
 
-const COLUMNS: { key: SortKey; label: string; numeric?: boolean }[] = [
-  { key: 'fileName', label: t('Name') },
-  { key: 'fileSize', label: t('Size'), numeric: true },
-  { key: 'nbSeeders', label: t('Seeds'), numeric: true },
-  { key: 'nbLeechers', label: t('Leeches'), numeric: true },
-  { key: 'siteUrl', label: t('Source') },
+const host = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+// Older qBittorrent leaves out the plugin and date, and plugins send -1 for a date they don't know.
+const published = (r: SearchResult) => (r.pubDate && r.pubDate > 0 ? r.pubDate : 0)
+
+// qBittorrent's search plugins only report these, so columns like a tracker's freeleech or group can't be shown.
+const COLUMNS: { key: SortKey; label: string; numeric?: boolean; className?: string; cell: (r: SearchResult) => ReactNode }[] = [
+  { key: 'fileName', label: t('Name'), className: 'truncate', cell: r => r.fileName },
+  { key: 'fileSize', label: t('Size'), numeric: true, cell: r => formatBytes(r.fileSize) },
+  { key: 'nbSeeders', label: t('Seeds'), numeric: true, className: 'text-green-600 dark:text-green-400', cell: r => r.nbSeeders },
+  { key: 'nbLeechers', label: t('Leeches'), numeric: true, className: 'text-red-500', cell: r => r.nbLeechers },
+  { key: 'engineName', label: t('Plugin'), className: 'truncate text-muted-foreground', cell: r => r.engineName || '-' },
+  { key: 'siteUrl', label: t('Source'), className: 'truncate text-muted-foreground', cell: r => host(r.siteUrl) },
+  { key: 'pubDate', label: t('Published'), numeric: true, className: 'truncate text-muted-foreground', cell: r => formatDateTime(published(r)) },
 ]
 
 const PER_PAGE = 20
-
-const host = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+const ACTIONS_WIDTH = 96
+// The name keeps at least this share of the table, so it stays the widest column.
+const NAME_SHARE = 0.4
 
 // Each column can be filtered like the torrent table's: a text match, a range, or a choice of sites.
 const FILTER_COLUMNS: FilterColumn<SearchResult>[] = [
@@ -28,7 +36,9 @@ const FILTER_COLUMNS: FilterColumn<SearchResult>[] = [
   { id: 'fileSize', label: t('Size'), kind: 'size', value: r => (r.fileSize >= 0 ? r.fileSize : NaN) },
   { id: 'nbSeeders', label: t('Seeds'), kind: 'number', value: r => r.nbSeeders },
   { id: 'nbLeechers', label: t('Leeches'), kind: 'number', value: r => r.nbLeechers },
+  { id: 'engineName', label: t('Plugin'), kind: 'set', value: r => r.engineName ?? '' },
   { id: 'siteUrl', label: t('Source'), kind: 'set', value: r => host(r.siteUrl) },
+  { id: 'pubDate', label: t('Published'), kind: 'date', value: r => published(r) || NaN },
 ]
 
 // Found torrents, sortable, 20 a page: a table on wide screens and a list on phones.
@@ -38,6 +48,25 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
   const [page, setPage] = useState(1)
   const [filters, setFilters] = useState<ColumnFilters>({})
   const [widths, setWidths] = useState(loadSearchWidths)
+  const [hidden, setHiddenState] = useState(loadSearchHidden)
+  const setHidden = (next: ResizableKey[]) => { setHiddenState(next); saveSearchHidden(next) }
+  const toggleColumn = (key: ResizableKey) => setHidden(hidden.includes(key) ? hidden.filter(k => k !== key) : [...hidden, key])
+  const visible = COLUMNS.filter(c => c.key === 'fileName' || !hidden.includes(c.key))
+  const shows = (key: ResizableKey) => !hidden.includes(key)
+
+  // Narrow tables shrink the other columns rather than the name.
+  const tableBox = useRef<HTMLDivElement>(null)
+  const [tableWidth, setTableWidth] = useState(0)
+  useEffect(() => {
+    const box = tableBox.current
+    if (!box || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(() => setTableWidth(box.clientWidth))
+    observer.observe(box)
+    return () => observer.disconnect()
+  }, [])
+  const fixed = visible.filter(c => c.key !== 'fileName').reduce((sum, c) => sum + widths[c.key as ResizableKey], 0)
+  const scale = tableWidth > 0 && fixed > 0 ? Math.min(1, Math.max(0, tableWidth * (1 - NAME_SHARE) - ACTIONS_WIDTH) / fixed) : 1
+  const shownWidth = (key: ResizableKey) => Math.max(48, Math.round(widths[key] * scale))
   const resizing = useRef<{ key: ResizableKey; x: number; width: number; sign: number } | null>(null)
   const startResize = (e: PointerEvent<HTMLSpanElement>, key: ResizableKey) => {
     e.preventDefault()
@@ -66,7 +95,7 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
   }])), [results])
 
   const sorted = useMemo(() => {
-    const value = (r: SearchResult) => (sort.key === 'siteUrl' ? host(r.siteUrl) : r[sort.key])
+    const value = (r: SearchResult) => (sort.key === 'siteUrl' ? host(r.siteUrl) : sort.key === 'pubDate' ? published(r) : r[sort.key] ?? '')
     return applyColumnFilters(results, FILTER_COLUMNS, filters).sort((a, b) => {
       const x = value(a)
       const y = value(b)
@@ -104,10 +133,27 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between gap-2 md:hidden">
+      <div className="flex items-center justify-between gap-2">
         <span className="text-sm text-muted-foreground">{sorted.length === results.length ? t('{count} results', { count: results.length }) : t('{length} of {total} results', { length: sorted.length, total: results.length })}</span>
         <div className="flex items-center gap-1">
         <AddFilterButton targets={[...targets.values()]} onChange={setFilter} />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="size-8" aria-label={t('Columns')} title={t('Choose columns')}>
+              <Columns3 className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {COLUMNS.map(c => (
+              <DropdownMenuCheckboxItem key={c.key} checked={c.key === 'fileName' || shows(c.key)} disabled={c.key === 'fileName'} onSelect={(e) => e.preventDefault()} onCheckedChange={() => c.key !== 'fileName' && toggleColumn(c.key)}>
+                {c.label}
+              </DropdownMenuCheckboxItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => { setHidden([]); setWidths(DEFAULT_SEARCH_WIDTHS); saveSearchWidths(DEFAULT_SEARCH_WIDTHS) }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <div className="contents md:hidden">
         {/* Like the torrent cards' sort: pick a column, and pick it again to reverse the order. */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -130,6 +176,7 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
           </DropdownMenuContent>
         </DropdownMenu>
         </div>
+        </div>
       </div>
 
       {/* Wide screens filter from the column titles; phones add filters from the row above. */}
@@ -138,16 +185,16 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
       {sorted.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">{t('No results match these filters')}</p>}
 
       {/* Clipped rather than scrolled sideways, so the column titles can stay in view below the header. */}
-      <div className={cn('hidden overflow-x-clip rounded-xl border bg-card', sorted.length > 0 && 'md:block')}>
+      <div ref={tableBox} className={cn('hidden overflow-x-clip rounded-xl border bg-card', sorted.length > 0 && 'md:block')}>
         <table className="w-full table-fixed text-sm tabular-nums">
           <colgroup>
             <col />
-            {COLUMNS.filter(c => c.key !== 'fileName').map(c => <col key={c.key} style={{ width: widths[c.key as ResizableKey] }} />)}
+            {visible.filter(c => c.key !== 'fileName').map(c => <col key={c.key} style={{ width: shownWidth(c.key as ResizableKey) }} />)}
             <col className="w-24" />
           </colgroup>
           <thead className="sticky top-(--header-height,3.5rem) z-10 bg-card shadow-[inset_0_-1px_0_var(--border)]">
             <tr>
-              {COLUMNS.map(c => (
+              {visible.map(c => (
                 <th key={c.key} className="group/th relative h-10 px-3 font-medium text-muted-foreground" aria-sort={sort.key === c.key ? (sort.desc ? 'descending' : 'ascending') : undefined}>
                   <div className="flex items-center gap-0.5">
                     <button type="button" onClick={() => sortBy(c.key)} className={cn('flex min-w-0 flex-1 items-center gap-1 hover:text-foreground', sort.key === c.key && 'text-foreground')}>
@@ -181,11 +228,9 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
           <tbody>
             {shown.map(result => (
               <tr key={`${result.fileUrl}|${result.descrLink}`} className="cursor-pointer border-b last:border-0 hover:bg-muted/50" onClick={() => result.fileUrl && onAdd(result)}>
-                <td className="truncate px-3 py-1.5" title={result.fileName}>{result.fileName}</td>
-                <td className="px-3 py-1.5">{formatBytes(result.fileSize)}</td>
-                <td className="px-3 py-1.5 text-green-600 dark:text-green-400">{result.nbSeeders}</td>
-                <td className="px-3 py-1.5 text-red-500">{result.nbLeechers}</td>
-                <td className="truncate px-3 py-1.5 text-muted-foreground">{host(result.siteUrl)}</td>
+                {visible.map(c => (
+                  <td key={c.key} className={cn('px-3 py-1.5', c.className)} title={c.key === 'fileName' ? result.fileName : undefined}>{c.cell(result)}</td>
+                ))}
                 <td className="px-2 py-1">{links(result)}</td>
               </tr>
             ))}
@@ -199,7 +244,9 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
             <button type="button" className="min-w-0 flex-1 text-start" onClick={() => result.fileUrl && onAdd(result)}>
               <span className="block text-xs text-muted-foreground">{t('{seeds} seeds · {leeches} leeches', { seeds: result.nbSeeders, leeches: result.nbLeechers })}</span>
               <span className="block text-sm font-medium wrap-anywhere">{result.fileName}</span>
-              <span className="block truncate text-xs text-muted-foreground">{formatBytes(result.fileSize)} · {host(result.siteUrl)}</span>
+              <span className="block truncate text-xs text-muted-foreground">
+                {[shows('fileSize') && formatBytes(result.fileSize), shows('engineName') && result.engineName, shows('siteUrl') && host(result.siteUrl), shows('pubDate') && published(result) > 0 && formatDateTime(published(result))].filter(Boolean).join(' · ')}
+              </span>
             </button>
             {links(result)}
           </li>

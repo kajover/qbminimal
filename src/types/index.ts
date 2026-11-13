@@ -220,6 +220,8 @@ export interface SearchResult {
   descrLink: string
   // The plugin that found it, from qBittorrent 4.4.
   engineName?: string
+  // When the site published it, in seconds, from qBittorrent 5.0. -1 or 0 when unknown.
+  pubDate?: number
 }
 
 // --- Logs ---

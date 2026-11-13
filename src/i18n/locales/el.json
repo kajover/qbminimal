@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Σύρετε για αλλαγή μεγέθους. Διπλό κλικ για επαναφορά.",
   "Started torrents wait until transfers are resumed.": "Τα torrent που ξεκινούν περιμένουν μέχρι να συνεχιστούν οι μεταφορές.",
   "Reset sorting": "Επαναφορά ταξινόμησης",
-  "Torrents with errors: {count}": "Torrent με σφάλματα: {count}"
+  "Torrents with errors: {count}": "Torrent με σφάλματα: {count}",
+  "Plugin": "Πρόσθετο",
+  "Published": "Δημοσιεύτηκε",
+  "Clear all": "Εκκαθάριση όλων",
+  "Delete every search": "Διαγραφή όλων των αναζητήσεων",
+  "Delete every search?": "Διαγραφή όλων των αναζητήσεων;",
+  "qBittorrent forgets these searches and their results.": "Το qBittorrent ξεχνά αυτές τις αναζητήσεις και τα αποτελέσματά τους.",
+  "Delete all": "Διαγραφή όλων",
+  "Run {value} again": "Νέα αναζήτηση για {value}",
+  "Run again": "Αναζήτηση ξανά",
+  "Couldn't delete every search": "Δεν ήταν δυνατή η διαγραφή όλων των αναζητήσεων",
+  "Keep past searches": "Διατήρηση προηγούμενων αναζητήσεων",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Οι προηγούμενες αναζητήσεις μένουν στο qBittorrent για να ανοίγουν ή να εκτελούνται ξανά. Όταν είναι ανενεργό, κάθε νέα αναζήτηση διαγράφει τις προηγούμενες."
 }

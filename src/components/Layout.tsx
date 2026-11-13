@@ -245,8 +245,8 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
             </div>
           </div>
           <main className="min-w-0 flex-1 pt-4 pb-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] max-md:pb-[calc(var(--bottom-nav-height,5rem)+1rem)]">
-            {/* The torrent list takes the whole width; the other pages are easier to read narrower. */}
-            <div className={cn(page !== 'torrents' && 'mx-auto w-full max-w-4xl')}>
+            {/* The torrent list and search results take the whole width; the other pages are easier to read narrower. */}
+            <div className={cn(page !== 'torrents' && page !== 'search' && 'mx-auto w-full max-w-4xl')}>
               <HeaderSlot value={slot ? { element: slot, whole: wide } : null}>{children}</HeaderSlot>
             </div>
           </main>

@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "拖曳以調整大小，按兩下以重設。",
   "Started torrents wait until transfers are resumed.": "已開始的種子會等待傳輸恢復。",
   "Reset sorting": "重設排序",
-  "Torrents with errors: {count}": "出錯的種子：{count}"
+  "Torrents with errors: {count}": "出錯的種子：{count}",
+  "Plugin": "外掛程式",
+  "Published": "發佈時間",
+  "Clear all": "全部清除",
+  "Delete every search": "刪除所有搜尋",
+  "Delete every search?": "刪除所有搜尋?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent 會忘記這些搜尋及其結果。",
+  "Delete all": "全部刪除",
+  "Run {value} again": "重新搜尋 {value}",
+  "Run again": "重新搜尋",
+  "Couldn't delete every search": "無法刪除所有搜尋",
+  "Keep past searches": "保留過往搜尋",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "過往的搜尋會保留在 qBittorrent 中,可重新開啟或再次執行。關閉後,每次新搜尋都會刪除先前的搜尋。"
 }

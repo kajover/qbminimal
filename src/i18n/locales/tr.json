@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Boyutlandırmak için sürükleyin. Sıfırlamak için çift tıklayın.",
   "Started torrents wait until transfers are resumed.": "Başlatılan torrentler aktarımlar sürdürülene kadar bekler.",
   "Reset sorting": "Sıralamayı sıfırla",
-  "Torrents with errors: {count}": "Hatalı torrentler: {count}"
+  "Torrents with errors: {count}": "Hatalı torrentler: {count}",
+  "Plugin": "Eklenti",
+  "Published": "Yayınlanma",
+  "Clear all": "Tümünü temizle",
+  "Delete every search": "Tüm aramaları sil",
+  "Delete every search?": "Tüm aramalar silinsin mi?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent bu aramaları ve sonuçlarını unutur.",
+  "Delete all": "Tümünü sil",
+  "Run {value} again": "{value} için yeniden ara",
+  "Run again": "Yeniden ara",
+  "Couldn't delete every search": "Tüm aramalar silinemedi",
+  "Keep past searches": "Geçmiş aramaları sakla",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Önceki aramalar qBittorrent'te kalır, böylece açılabilir veya yeniden çalıştırılabilir. Kapalıyken her yeni arama öncekileri siler."
 }

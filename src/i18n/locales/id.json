@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Seret untuk mengubah ukuran. Klik dua kali untuk mengatur ulang.",
   "Started torrents wait until transfers are resumed.": "Torrent yang dimulai menunggu sampai transfer dilanjutkan.",
   "Reset sorting": "Atur ulang urutan",
-  "Torrents with errors: {count}": "Torrent dengan galat: {count}"
+  "Torrents with errors: {count}": "Torrent dengan galat: {count}",
+  "Plugin": "Plugin",
+  "Published": "Diterbitkan",
+  "Clear all": "Hapus semua",
+  "Delete every search": "Hapus semua pencarian",
+  "Delete every search?": "Hapus semua pencarian?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent melupakan pencarian ini beserta hasilnya.",
+  "Delete all": "Hapus semua",
+  "Run {value} again": "Cari {value} lagi",
+  "Run again": "Cari lagi",
+  "Couldn't delete every search": "Tidak semua pencarian bisa dihapus",
+  "Keep past searches": "Simpan pencarian sebelumnya",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Pencarian sebelumnya tetap di qBittorrent agar bisa dibuka atau dijalankan lagi. Jika mati, setiap pencarian baru menghapus yang sebelumnya."
 }

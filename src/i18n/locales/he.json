@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "גרור כדי לשנות גודל. לחיצה כפולה לאיפוס.",
   "Started torrents wait until transfers are resumed.": "טורנטים שהופעלו ימתינו עד לחידוש ההעברות.",
   "Reset sorting": "איפוס המיון",
-  "Torrents with errors: {count}": "טורנטים עם שגיאות: {count}"
+  "Torrents with errors: {count}": "טורנטים עם שגיאות: {count}",
+  "Plugin": "תוסף",
+  "Published": "פורסם",
+  "Clear all": "ניקוי הכול",
+  "Delete every search": "מחיקת כל החיפושים",
+  "Delete every search?": "למחוק את כל החיפושים?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent ישכח את החיפושים האלה ואת התוצאות שלהם.",
+  "Delete all": "מחיקת הכול",
+  "Run {value} again": "חיפוש חוזר של {value}",
+  "Run again": "חיפוש חוזר",
+  "Couldn't delete every search": "לא ניתן היה למחוק את כל החיפושים",
+  "Keep past searches": "שמירת חיפושים קודמים",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "חיפושים קודמים נשארים ב-qBittorrent כדי לפתוח או להריץ אותם שוב. כשהאפשרות כבויה, כל חיפוש חדש מוחק את הקודמים."
 }

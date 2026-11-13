@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Sleep om de grootte te wijzigen. Dubbelklik om te herstellen.",
   "Started torrents wait until transfers are resumed.": "Gestarte torrents wachten tot de overdrachten worden hervat.",
   "Reset sorting": "Sortering herstellen",
-  "Torrents with errors: {count}": "Torrents met fouten: {count}"
+  "Torrents with errors: {count}": "Torrents met fouten: {count}",
+  "Plugin": "Plug-in",
+  "Published": "Gepubliceerd",
+  "Clear all": "Alles wissen",
+  "Delete every search": "Alle zoekopdrachten verwijderen",
+  "Delete every search?": "Alle zoekopdrachten verwijderen?",
+  "qBittorrent forgets these searches and their results.": "qBittorrent vergeet deze zoekopdrachten en hun resultaten.",
+  "Delete all": "Alles verwijderen",
+  "Run {value} again": "{value} opnieuw zoeken",
+  "Run again": "Opnieuw zoeken",
+  "Couldn't delete every search": "Kon niet alle zoekopdrachten verwijderen",
+  "Keep past searches": "Eerdere zoekopdrachten bewaren",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Eerdere zoekopdrachten blijven in qBittorrent, zodat je ze kunt openen of opnieuw uitvoeren. Uit: elke nieuwe zoekopdracht verwijdert de vorige."
 }

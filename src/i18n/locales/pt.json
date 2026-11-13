@@ -1315,5 +1315,17 @@
   "Drag to resize. Double-click to reset.": "Arraste para redimensionar. Faça duplo clique para repor.",
   "Started torrents wait until transfers are resumed.": "Os torrents iniciados aguardam até as transferências serem retomadas.",
   "Reset sorting": "Repor ordenação",
-  "Torrents with errors: {count}": "Torrents com erros: {count}"
+  "Torrents with errors: {count}": "Torrents com erros: {count}",
+  "Plugin": "Plugin",
+  "Published": "Publicado",
+  "Clear all": "Limpar tudo",
+  "Delete every search": "Eliminar todas as pesquisas",
+  "Delete every search?": "Eliminar todas as pesquisas?",
+  "qBittorrent forgets these searches and their results.": "O qBittorrent esquece estas pesquisas e os seus resultados.",
+  "Delete all": "Eliminar tudo",
+  "Run {value} again": "Repetir {value}",
+  "Run again": "Repetir pesquisa",
+  "Couldn't delete every search": "Não foi possível eliminar todas as pesquisas",
+  "Keep past searches": "Manter pesquisas anteriores",
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "As pesquisas anteriores ficam no qBittorrent para serem abertas ou repetidas. Desativado, cada nova pesquisa elimina as anteriores."
 }
