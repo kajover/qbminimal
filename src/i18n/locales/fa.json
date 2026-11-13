@@ -808,7 +808,6 @@
   "No torrents match these filters": "هیچ تورنتی با این فیلترها مطابقت ندارد",
   "Selected torrents": "تورنت‌های انتخاب‌شده",
   "Show": "نمایش",
-  "Show connection status and statistics": "نمایش وضعیت اتصال و آمار",
   "per page": "در هر صفحه",
   "{count} selected": "{count} انتخاب شده",
   "Add trackers": "افزودن ردیاب‌ها",
@@ -1311,6 +1310,5 @@
   "Storage": "ذخیره‌سازی",
   "Total size of torrents": "اندازه کل تورنت‌ها",
   "No torrents yet. Add one with the + button.": "هنوز تورنتی وجود ندارد. با دکمه + یکی اضافه کنید.",
-  "Update available": "به‌روزرسانی موجود است",
   "Checks GitHub for new releases by itself every 12 hours.": "هر ۱۲ ساعت به‌طور خودکار GitHub را برای انتشارهای جدید بررسی می‌کند."
 }

@@ -808,7 +808,6 @@
   "No torrents match these filters": "これらのフィルターに一致するトレントはありません",
   "Selected torrents": "選択したトレント",
   "Show": "表示",
-  "Show connection status and statistics": "接続状態と統計情報を表示",
   "per page": "件/ページ",
   "{count} selected": "{count} 件を選択中",
   "Add trackers": "トラッカーを追加",
@@ -1311,6 +1310,5 @@
   "Storage": "ストレージ",
   "Total size of torrents": "トレントの合計サイズ",
   "No torrents yet. Add one with the + button.": "トレントはまだありません。+ ボタンで追加してください。",
-  "Update available": "アップデートがあります",
   "Checks GitHub for new releases by itself every 12 hours.": "12時間ごとに GitHub で新しいリリースを自動的に確認します。"
 }

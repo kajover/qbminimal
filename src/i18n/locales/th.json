@@ -808,7 +808,6 @@
   "No torrents match these filters": "ไม่มีทอร์เรนต์ที่ตรงกับตัวกรองเหล่านี้",
   "Selected torrents": "ทอร์เรนต์ที่เลือก",
   "Show": "แสดง",
-  "Show connection status and statistics": "แสดงสถานะการเชื่อมต่อและสถิติ",
   "per page": "ต่อหน้า",
   "{count} selected": "เลือก {count}",
   "Add trackers": "เพิ่มแทรกเกอร์",
@@ -1311,6 +1310,5 @@
   "Storage": "พื้นที่จัดเก็บ",
   "Total size of torrents": "ขนาดรวมของทอร์เรนต์",
   "No torrents yet. Add one with the + button.": "ยังไม่มีทอร์เรนต์ เพิ่มได้ด้วยปุ่ม +",
-  "Update available": "มีอัปเดตใหม่",
   "Checks GitHub for new releases by itself every 12 hours.": "ตรวจสอบรุ่นใหม่บน GitHub โดยอัตโนมัติทุก 12 ชั่วโมง"
 }

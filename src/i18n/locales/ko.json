@@ -808,7 +808,6 @@
   "No torrents match these filters": "이 필터와 일치하는 토렌트 없음",
   "Selected torrents": "선택한 토렌트",
   "Show": "표시",
-  "Show connection status and statistics": "연결 상태 및 통계 표시",
   "per page": "페이지당",
   "{count} selected": "{count}개 선택됨",
   "Add trackers": "트래커 추가",
@@ -1311,6 +1310,5 @@
   "Storage": "저장소",
   "Total size of torrents": "토렌트 총 크기",
   "No torrents yet. Add one with the + button.": "아직 토렌트가 없습니다. + 버튼으로 추가하세요.",
-  "Update available": "업데이트 가능",
   "Checks GitHub for new releases by itself every 12 hours.": "12시간마다 GitHub에서 새 릴리스를 자동으로 확인합니다."
 }

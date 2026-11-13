@@ -808,7 +808,6 @@
   "No torrents match these filters": "Inga torrenter matchar filtren",
   "Selected torrents": "Markerade torrenter",
   "Show": "Visa",
-  "Show connection status and statistics": "Visa anslutningsstatus och statistik",
   "per page": "per sida",
   "{count} selected": "{count} markerade",
   "Add trackers": "Lägg till spårare",
@@ -1311,6 +1310,5 @@
   "Storage": "Lagring",
   "Total size of torrents": "Total storlek för torrenter",
   "No torrents yet. Add one with the + button.": "Inga torrenter ännu. Lägg till en med knappen +.",
-  "Update available": "Uppdatering tillgänglig",
   "Checks GitHub for new releases by itself every 12 hours.": "Söker automatiskt efter nya versioner på GitHub var 12:e timme."
 }

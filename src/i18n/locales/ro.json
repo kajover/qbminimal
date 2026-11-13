@@ -808,7 +808,6 @@
   "No torrents match these filters": "Niciun torent nu se potrivește cu aceste filtre",
   "Selected torrents": "Torente selectate",
   "Show": "Arată",
-  "Show connection status and statistics": "Arată starea conexiunii și statisticile",
   "per page": "pe pagină",
   "{count} selected": "{count} selectate",
   "Add trackers": "Adaugă urmăritori",
@@ -1311,6 +1310,5 @@
   "Storage": "Stocare",
   "Total size of torrents": "Dimensiunea totală a torrentelor",
   "No torrents yet. Add one with the + button.": "Niciun torrent încă. Adaugă unul cu butonul +.",
-  "Update available": "Actualizare disponibilă",
   "Checks GitHub for new releases by itself every 12 hours.": "Verifică singur GitHub pentru versiuni noi la fiecare 12 ore."
 }

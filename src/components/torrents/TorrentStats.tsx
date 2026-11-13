@@ -2,7 +2,8 @@ import { useState, type ReactNode } from 'react'
 import { Activity, Database, Gauge, Globe, HardDrive, History, Network, Pause, Play, Turtle, type LucideIcon } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { setStatisticsOpen, useStatisticsOpen } from '@/lib/statistics'
 import { useApiFeature, usePreferences, useTorrents, useTransferInfo } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
@@ -34,7 +35,6 @@ function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: s
   )
 }
 
-// qBittorrent's connection status and statistics. The trigger is the torrent count above the list.
 // qBittorrent 5.3 can pause every transfer at once and later resume exactly what was running.
 function SessionPauseButton({ paused }: { paused: boolean }) {
   const queryClient = useQueryClient()
@@ -101,7 +101,9 @@ function AlternativeLimitsButton({ on }: { on: boolean }) {
   )
 }
 
-export function TorrentStats({ children }: { children: ReactNode }) {
+// qBittorrent's connection status and statistics, in one dialog for the whole app (lib/statistics).
+export function StatisticsDialog() {
+  const open = useStatisticsOpen()
   const { data: state } = useTransferInfo()
   const { data: torrents } = useTorrents()
   const canPauseSession = useApiFeature('sessionPause') && typeof state?.session_state === 'boolean'
@@ -160,9 +162,8 @@ export function TorrentStats({ children }: { children: ReactNode }) {
     .filter(group => group.rows.length > 0)
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-h-[85vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={setStatisticsOpen}>
+      <DialogContent aria-describedby={undefined} className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('Statistics')}</DialogTitle>
         </DialogHeader>

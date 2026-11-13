@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
-import { ChevronLeft, ChevronRight, LogOut, Menu } from 'lucide-react'
+import { Activity, ChevronLeft, ChevronRight, LogOut, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { HeaderSlot } from '@/components/HeaderSlot'
@@ -11,7 +11,8 @@ import { useSession } from '@/hooks/useSession'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useDisplayOption } from '@/lib/displayOptions'
 import { checkForUpdatesIfDue } from '@/lib/updateNotice'
-import { useUpdateNotice } from '@/hooks/useUpdateNotice'
+import { openStatistics } from '@/lib/statistics'
+import { StatisticsDialog } from '@/components/torrents/TorrentStats'
 import { readStored, writeStored } from '@/lib/storage'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
@@ -23,23 +24,13 @@ interface LayoutProps {
 }
 
 // The menu button: the pages and the way out. Settings can add a sidebar or tab bar beside it.
-// A dot beside Settings, and on the menu button, while a newer qbminimal or qBittorrent is out.
-function UpdateDot({ className }: { className?: string }) {
-  return (
-    <span className={cn('size-2 shrink-0 rounded-full bg-amber-500', className)}>
-      <span className="sr-only">{t('Update available')}</span>
-    </span>
-  )
-}
-
-function PagesMenu({ page, onNavigate, update }: { page: PageId; onNavigate: (page: PageId) => void; update: boolean }) {
+function PagesMenu({ page, onNavigate }: { page: PageId; onNavigate: (page: PageId) => void }) {
   const { signOut } = useSession()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative max-md:size-8" aria-label={t('Menu')} title={t('Menu')}>
+        <Button variant="ghost" size="icon" className="max-md:size-8" aria-label={t('Menu')} title={t('Menu')}>
           <Menu className="size-5" />
-          {update && <UpdateDot className="absolute end-1 top-1" />}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-52">
@@ -47,10 +38,13 @@ function PagesMenu({ page, onNavigate, update }: { page: PageId; onNavigate: (pa
           <DropdownMenuItem key={id} aria-current={page === id ? 'page' : undefined} className={cn(page === id && 'bg-accent text-accent-foreground')} onSelect={() => onNavigate(id)}>
             <Icon />
             {label}
-            {update && id === 'settings' && <UpdateDot className="ms-auto" />}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={openStatistics}>
+          <Activity />
+          {t('Statistics')}
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => void signOut()}>
           <LogOut />
           {t('Logout')}
@@ -156,6 +150,7 @@ function useSidebar() {
 }
 
 export function Layout({ page, onNavigate, children }: LayoutProps) {
+  const { signOut } = useSession()
   const { shown: sidebarShown, width: sidebarWidth, measured: sidebarMeasured, box: sidebarBox, show: showSidebar, startDrag, resetWidth } = useSidebar()
   const { header: headerRef, nav: navRef } = useBarSizes()
   const menuBar = useDisplayOption('menuBar')
@@ -163,8 +158,6 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
   useEffect(() => {
     if (!__DEMO__) checkForUpdatesIfDue()
   }, [])
-  const notice = useUpdateNotice()
-  const update = notice.qbminimalNewer || notice.qbittorrentNewer
   const wide = useMediaQuery('(min-width: 1200px)')
   // Where each page's title row goes; on phones without the selection bar.
   const [slot, setSlot] = useState<HTMLDivElement | null>(null)
@@ -179,7 +172,6 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
       {/* 14px labels like the tab bar's, with 16px icons beside them, as on the other buttons. */}
       <Icon className="size-4" />
       <span className="truncate">{label}</span>
-      {update && id === 'settings' && <UpdateDot className="ms-auto" />}
     </Button>
   ))
 
@@ -196,7 +188,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
             past the page's 1rem margin. */}
         <div className="flex h-14 items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(1rem,env(safe-area-inset-right))]">
           <div className="flex shrink-0 items-center gap-2">
-            <PagesMenu page={page} onNavigate={onNavigate} update={update} />
+            <PagesMenu page={page} onNavigate={onNavigate} />
             {/* Left out for room; screen readers still hear it. */}
             <h1 className="sr-only">{t('qBittorrent')}</h1>
           </div>
@@ -211,8 +203,19 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
           {/* Above the torrent details panel (z-30), so the edge handle is never covered. */}
           <div ref={sidebarBox} className={cn('sticky top-14 z-35 hidden h-[calc(100vh-3.5rem)] shrink-0 self-start', menuBar && 'md:flex')}>
             {sidebarShown && (
-              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="w-max min-w-38 overflow-x-hidden overflow-y-auto p-2 pb-4">
+              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto p-2 pb-4">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{navButtons}</nav>
+                <div className="mt-2 border-t pt-2">
+                  <Button variant="ghost" className="w-full justify-start gap-2 overflow-hidden" onClick={openStatistics}>
+                    <Activity className="size-4" />
+                    <span className="truncate">{t('Statistics')}</span>
+                  </Button>
+                </div>
+                {/* At the bottom and quieter, apart from the pages. */}
+                <Button variant="ghost" className="mt-auto w-full justify-start gap-2 overflow-hidden text-muted-foreground" onClick={() => void signOut()}>
+                  <LogOut className="size-4" />
+                  <span className="truncate">{t('Logout')}</span>
+                </Button>
               </aside>
             )}
             {/* The sidebar's edge: drag it to resize, or past a point to hide; the button in its middle hides and shows it.
@@ -239,6 +242,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
       </div>
 
       <DropOverlay />
+      <StatisticsDialog />
 
       {/* Phones: a floating glass capsule, clear of the screen's edges and the home indicator. */}
       <nav

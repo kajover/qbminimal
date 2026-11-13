@@ -808,7 +808,6 @@
   "No torrents match these filters": "Không có torrent nào khớp với các bộ lọc này",
   "Selected torrents": "Torrent đã chọn",
   "Show": "Hiện",
-  "Show connection status and statistics": "Hiện trạng thái kết nối và thống kê",
   "per page": "mỗi trang",
   "{count} selected": "Đã chọn {count}",
   "Add trackers": "Thêm tracker",
@@ -1311,6 +1310,5 @@
   "Storage": "Lưu trữ",
   "Total size of torrents": "Tổng dung lượng torrent",
   "No torrents yet. Add one with the + button.": "Chưa có torrent nào. Thêm bằng nút +.",
-  "Update available": "Có bản cập nhật",
   "Checks GitHub for new releases by itself every 12 hours.": "Tự động kiểm tra bản phát hành mới trên GitHub mỗi 12 giờ."
 }

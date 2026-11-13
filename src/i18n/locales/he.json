@@ -808,7 +808,6 @@
   "No torrents match these filters": "אין טורנטים שתואמים למסננים האלה",
   "Selected torrents": "טורנטים שנבחרו",
   "Show": "הצגה",
-  "Show connection status and statistics": "הצגת מצב החיבור וסטטיסטיקות",
   "per page": "בכל עמוד",
   "{count} selected": "נבחרו: {count}",
   "Add trackers": "הוספת עוקבים",
@@ -1311,6 +1310,5 @@
   "Storage": "אחסון",
   "Total size of torrents": "הגודל הכולל של הטורנטים",
   "No torrents yet. Add one with the + button.": "אין עדיין טורנטים. הוסיפו אחד עם הכפתור +.",
-  "Update available": "עדכון זמין",
   "Checks GitHub for new releases by itself every 12 hours.": "בודק ב-GitHub אם יש גרסאות חדשות באופן אוטומטי כל 12 שעות."
 }

@@ -808,7 +808,6 @@
   "No torrents match these filters": "Těmto filtrům neodpovídají žádné torrenty",
   "Selected torrents": "Vybrané torrenty",
   "Show": "Zobrazit",
-  "Show connection status and statistics": "Zobrazit stav připojení a statistiky",
   "per page": "na stránku",
   "{count} selected": "Vybráno: {count}",
   "Add trackers": "Přidat trackery",
@@ -1311,6 +1310,5 @@
   "Storage": "Úložiště",
   "Total size of torrents": "Celková velikost torrentů",
   "No torrents yet. Add one with the + button.": "Zatím žádné torrenty. Přidejte je tlačítkem +.",
-  "Update available": "K dispozici je aktualizace",
   "Checks GitHub for new releases by itself every 12 hours.": "Sám kontroluje GitHub kvůli novým verzím každých 12 hodin."
 }

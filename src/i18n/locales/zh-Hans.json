@@ -808,7 +808,6 @@
   "No torrents match these filters": "没有符合这些筛选条件的种子",
   "Selected torrents": "所选种子",
   "Show": "显示",
-  "Show connection status and statistics": "显示连接状态和统计信息",
   "per page": "每页",
   "{count} selected": "已选择 {count} 个",
   "Add trackers": "添加 Tracker",
@@ -1311,6 +1310,5 @@
   "Storage": "存储",
   "Total size of torrents": "Torrent 总大小",
   "No torrents yet. Add one with the + button.": "还没有 torrent。点击 + 按钮添加。",
-  "Update available": "有可用更新",
   "Checks GitHub for new releases by itself every 12 hours.": "每 12 小时自动检查一次 GitHub 上的新版本。"
 }

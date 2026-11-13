@@ -1,13 +1,14 @@
 import { useTotalSpeeds, useTransferInfo } from '@/hooks/useApi'
 import { formatBytes } from '@/lib/format'
+import { openStatistics } from '@/lib/statistics'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
 
 // Current speeds in the header, download above upload, when turned on in Settings. Each arrow
 // keeps its place at the start of a slot with room for "999.9 KB/s", and the number ends at the
 // slot's end. A limit that's set shows faintly below its speed; while qBittorrent's alternative
-// ("slow") limits are on, the speeds are amber. Only a readout: the limits are set in Settings, and
-// the alternative ones switched in the statistics.
+// ("slow") limits are on, the speeds are amber. Clicking opens the statistics, which hold the switch
+// for the alternative limits; the limits themselves are set in Settings.
 export function GlobalSpeeds() {
   const { data: speeds } = useTotalSpeeds()
   const { data: state } = useTransferInfo()
@@ -24,16 +25,18 @@ export function GlobalSpeeds() {
     </span>
   )
   return (
-    <div
-      role="status"
-      aria-label={`${t('Current speeds')}: ↓ ${formatBytes(speeds.down)}/s, ↑ ${formatBytes(speeds.up)}/s${alternative ? `. ${t('Alternative speed limits are on')}` : ''}`}
+    <button
+      type="button"
+      onClick={openStatistics}
+      title={t('Statistics')}
+      aria-label={`${t('Current speeds')}: ↓ ${formatBytes(speeds.down)}/s, ↑ ${formatBytes(speeds.up)}/s${alternative ? `. ${t('Alternative speed limits are on')}` : ''}. ${t('Statistics')}`}
       className={cn(
-        'hidden shrink-0 flex-col rounded-md px-1 py-0.5 text-xs leading-tight tabular-nums whitespace-nowrap [:root[data-header-speeds=on]_&]:flex',
-        alternative && 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
+        'hidden shrink-0 flex-col rounded-md px-1 py-0.5 text-xs leading-tight tabular-nums whitespace-nowrap outline-hidden hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring [:root[data-header-speeds=on]_&]:flex',
+        alternative && 'bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 dark:text-amber-400',
       )}
     >
       {row('↓', speeds.down, state?.dl_rate_limit)}
       {row('↑', speeds.up, state?.up_rate_limit)}
-    </div>
+    </button>
   )
 }

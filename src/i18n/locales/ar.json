@@ -808,7 +808,6 @@
   "No torrents match these filters": "لا توجد تورنتات تطابق عوامل التصفية هذه",
   "Selected torrents": "التورنتات المحددة",
   "Show": "عرض",
-  "Show connection status and statistics": "عرض حالة الاتصال والإحصائيات",
   "per page": "في الصفحة",
   "{count} selected": "تم تحديد {count}",
   "Add trackers": "إضافة متتبعات",
@@ -1311,6 +1310,5 @@
   "Storage": "التخزين",
   "Total size of torrents": "الحجم الإجمالي للتورنتات",
   "No torrents yet. Add one with the + button.": "لا توجد تورنتات بعد. أضف واحدًا بزر +.",
-  "Update available": "يتوفر تحديث",
   "Checks GitHub for new releases by itself every 12 hours.": "يتحقق من GitHub تلقائيًا من وجود إصدارات جديدة كل 12 ساعة."
 }

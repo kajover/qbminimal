@@ -1,4 +1,4 @@
-import { lazy, useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
 import { ChevronLeft, ChevronRight, FolderCog, Pause, Play, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/NativeSelect'
@@ -28,15 +28,14 @@ import { TorrentCards } from './TorrentCards'
 import { TorrentFilterPanel } from './TorrentFilterPanel'
 import { MoreMenu, TorrentContextMenu } from './TorrentMenus'
 import { ShortcutsDialog } from './ShortcutsDialog'
-import { TorrentStats } from './TorrentStats'
 import { TorrentTable } from './TorrentTable'
+// Loaded with the list rather than on first use, so the details and dialogs open at once.
+import { AddTorrentDialog } from './AddTorrentView'
+import { CategoriesTagsDialog } from './CategoriesTagsDialog'
+import { TorrentDetailsDialog, TorrentDetailsPanel } from './TorrentDetails'
 import { AddTorrentButton, TorrentToolbar } from './TorrentToolbar'
 import { t } from '@/i18n'
 
-const AddTorrentDialog = lazy(() => import('./AddTorrentView').then(m => ({ default: m.AddTorrentDialog })))
-const CategoriesTagsDialog = lazy(() => import('./CategoriesTagsDialog').then(m => ({ default: m.CategoriesTagsDialog })))
-const TorrentDetailsPanel = lazy(() => import('./TorrentDetails').then(m => ({ default: m.TorrentDetailsPanel })))
-const TorrentDetailsDialog = lazy(() => import('./TorrentDetails').then(m => ({ default: m.TorrentDetailsDialog })))
 
 const EMPTY: Torrent[] = []
 
@@ -308,11 +307,7 @@ export function TorrentsView() {
   const header = (
     <PageHeader
       // The title opens the connection status and statistics.
-      title={(
-        <TorrentStats>
-          <button type="button" className="underline-offset-4 hover:underline" title={t('Show connection status and statistics')}>{t('Torrents')}</button>
-        </TorrentStats>
-      )}
+      title={t('Torrents')}
       middle={selectionBar}
       actions={total > 0
         ? <TorrentToolbar list={list} filtersOpen={filtersOpen} onToggleFilters={() => setFiltersOpen(open => !open)} columns={columns} onColumnsChange={changeColumns} onShowShortcuts={() => setShortcutsOpen(true)} onAdd={() => setAddOpen(true)} />
@@ -338,11 +333,7 @@ export function TorrentsView() {
     )
   }
 
-  const addDialog = addOpen && (
-    <PageBoundary loading={null}>
-      <AddTorrentDialog open onOpenChange={setAddOpen} />
-    </PageBoundary>
-  )
+  const addDialog = addOpen && <AddTorrentDialog open onOpenChange={setAddOpen} />
 
   const notice = isError && total === 0 ? t('Couldn\'t load torrents. Check the connection to qBittorrent.')
     : total === 0 ? t('No torrents yet. Add one with the + button.')
@@ -446,11 +437,7 @@ export function TorrentsView() {
       <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
 
       {addDialog}
-      {manageOpen && (
-        <PageBoundary loading={null}>
-          <CategoriesTagsDialog open onOpenChange={setManageOpen} />
-        </PageBoundary>
-      )}
+      {manageOpen && <CategoriesTagsDialog open onOpenChange={setManageOpen} />}
       {detailsTorrent && (
         <PageBoundary loading={null}>
           {wide

@@ -808,7 +808,6 @@
   "No torrents match these filters": "Нет торрентов, подходящих под эти фильтры",
   "Selected torrents": "Выбранные торренты",
   "Show": "Показывать",
-  "Show connection status and statistics": "Показать состояние подключения и статистику",
   "per page": "на странице",
   "{count} selected": "Выбрано: {count}",
   "Add trackers": "Добавить трекеры",
@@ -1311,6 +1310,5 @@
   "Storage": "Хранилище",
   "Total size of torrents": "Общий размер торрентов",
   "No torrents yet. Add one with the + button.": "Торрентов пока нет. Добавьте кнопкой +.",
-  "Update available": "Доступно обновление",
   "Checks GitHub for new releases by itself every 12 hours.": "Сам проверяет GitHub на наличие новых версий каждые 12 часов."
 }

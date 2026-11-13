@@ -808,7 +808,6 @@
   "No torrents match these filters": "Nenhum torrent corresponde a estes filtros",
   "Selected torrents": "Torrents selecionados",
   "Show": "Mostrar",
-  "Show connection status and statistics": "Mostrar status da conexão e estatísticas",
   "per page": "por página",
   "{count} selected": "Selecionados: {count}",
   "Add trackers": "Adicionar trackers",
@@ -1311,6 +1310,5 @@
   "Storage": "Armazenamento",
   "Total size of torrents": "Tamanho total dos torrents",
   "No torrents yet. Add one with the + button.": "Nenhum torrent ainda. Adicione um com o botão +.",
-  "Update available": "Atualização disponível",
   "Checks GitHub for new releases by itself every 12 hours.": "Verifica o GitHub automaticamente a cada 12 horas em busca de novas versões."
 }

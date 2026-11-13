@@ -808,7 +808,6 @@
   "No torrents match these filters": "Κανένα torrent δεν ταιριάζει με αυτά τα φίλτρα",
   "Selected torrents": "Επιλεγμένα torrents",
   "Show": "Εμφάνιση",
-  "Show connection status and statistics": "Εμφάνιση κατάστασης σύνδεσης και στατιστικών",
   "per page": "ανά σελίδα",
   "{count} selected": "{count} επιλεγμένα",
   "Add trackers": "Προσθήκη ιχνηλατών",
@@ -1311,6 +1310,5 @@
   "Storage": "Αποθήκευση",
   "Total size of torrents": "Συνολικό μέγεθος torrent",
   "No torrents yet. Add one with the + button.": "Δεν υπάρχουν torrent ακόμα. Προσθέστε ένα με το κουμπί +.",
-  "Update available": "Διαθέσιμη ενημέρωση",
   "Checks GitHub for new releases by itself every 12 hours.": "Ελέγχει αυτόματα το GitHub για νέες εκδόσεις κάθε 12 ώρες."
 }

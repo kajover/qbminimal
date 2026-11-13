@@ -808,7 +808,6 @@
   "No torrents match these filters": "沒有符合這些篩選條件的種子",
   "Selected torrents": "所選種子",
   "Show": "顯示",
-  "Show connection status and statistics": "顯示連線狀態與統計資料",
   "per page": "每頁",
   "{count} selected": "已選取 {count} 個",
   "Add trackers": "新增 Tracker",
@@ -1311,6 +1310,5 @@
   "Storage": "儲存空間",
   "Total size of torrents": "Torrent 總大小",
   "No torrents yet. Add one with the + button.": "尚無 torrent。點擊 + 按鈕新增。",
-  "Update available": "有可用更新",
   "Checks GitHub for new releases by itself every 12 hours.": "每 12 小時自動檢查一次 GitHub 上的新版本。"
 }

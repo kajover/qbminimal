@@ -808,7 +808,6 @@
   "No torrents match these filters": "এই ফিল্টারের সাথে কোনো টরেন্ট মেলে না",
   "Selected torrents": "নির্বাচিত টরেন্ট",
   "Show": "দেখান",
-  "Show connection status and statistics": "সংযোগের অবস্থা ও পরিসংখ্যান দেখান",
   "per page": "প্রতি পৃষ্ঠায়",
   "{count} selected": "{count}টি নির্বাচিত",
   "Add trackers": "ট্র্যাকার যোগ করুন",
@@ -1311,6 +1310,5 @@
   "Storage": "সংরক্ষণ",
   "Total size of torrents": "টরেন্টের মোট আকার",
   "No torrents yet. Add one with the + button.": "এখনো কোনো টরেন্ট নেই। + বোতাম দিয়ে একটি যোগ করুন।",
-  "Update available": "আপডেট উপলব্ধ",
   "Checks GitHub for new releases by itself every 12 hours.": "প্রতি ১২ ঘণ্টায় নিজে থেকেই GitHub-এ নতুন রিলিজ খোঁজে।"
 }

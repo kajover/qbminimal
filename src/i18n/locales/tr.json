@@ -808,7 +808,6 @@
   "No torrents match these filters": "Bu süzgeçlerle eşleşen torrent yok",
   "Selected torrents": "Seçili torrentler",
   "Show": "Göster",
-  "Show connection status and statistics": "Bağlantı durumunu ve istatistikleri göster",
   "per page": "/ sayfa",
   "{count} selected": "{count} seçili",
   "Add trackers": "İzleyicileri ekle",
@@ -1311,6 +1310,5 @@
   "Storage": "Depolama",
   "Total size of torrents": "Torrent'lerin toplam boyutu",
   "No torrents yet. Add one with the + button.": "Henüz torrent yok. + düğmesiyle bir tane ekle.",
-  "Update available": "Güncelleme var",
   "Checks GitHub for new releases by itself every 12 hours.": "Yeni sürümler için GitHub'ı her 12 saatte bir kendiliğinden denetler."
 }

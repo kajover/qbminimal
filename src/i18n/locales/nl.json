@@ -808,7 +808,6 @@
   "No torrents match these filters": "Geen torrents komen overeen met deze filters",
   "Selected torrents": "Geselecteerde torrents",
   "Show": "Toon",
-  "Show connection status and statistics": "Verbindingsstatus en statistieken tonen",
   "per page": "per pagina",
   "{count} selected": "{count} geselecteerd",
   "Add trackers": "Trackers toevoegen",
@@ -1311,6 +1310,5 @@
   "Storage": "Opslag",
   "Total size of torrents": "Totale grootte van torrents",
   "No torrents yet. Add one with the + button.": "Nog geen torrents. Voeg er een toe met de knop +.",
-  "Update available": "Update beschikbaar",
   "Checks GitHub for new releases by itself every 12 hours.": "Controleert elke 12 uur automatisch GitHub op nieuwe versies."
 }

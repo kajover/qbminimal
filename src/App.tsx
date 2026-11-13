@@ -6,23 +6,30 @@ import { LoginForm } from '@/components/LoginForm'
 import { PageBoundary } from '@/components/PageBoundary'
 import type { PageId } from '@/components/navigation'
 import { TorrentsView } from '@/components/torrents/TorrentsView'
+import { AddTorrentView } from '@/components/torrents/AddTorrentView'
 import { SessionProvider } from '@/components/SessionProvider'
 import { useSession } from '@/hooks/useSession'
 import { hasIncoming, onIncoming } from '@/lib/incoming'
 import { registerServiceWorker } from '@/lib/notify'
 import { t } from '@/i18n'
 
-const named = <K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K) => lazy(() => load().then(module => ({ default: module[name] })))
-
-// The torrent list opens first, so it ships in the main script. The other pages load when opened.
+// The torrent list and the Add page (whose form the list's + button opens too) ship in the main
+// script. The other pages load in the background once signed in, so they open at once later.
+const LOADERS = {
+  rss: () => import('@/components/rss/RSSView').then(m => ({ default: m.RSSView })),
+  search: () => import('@/components/search/SearchView').then(m => ({ default: m.SearchView })),
+  logs: () => import('@/components/logs/LogsView').then(m => ({ default: m.LogsView })),
+  settings: () => import('@/components/settings/SettingsView').then(m => ({ default: m.SettingsView })),
+}
 const PAGE_VIEWS: Record<PageId, ComponentType> = {
   torrents: TorrentsView,
-  add: named(() => import('@/components/torrents/AddTorrentView'), 'AddTorrentView'),
-  rss: named(() => import('@/components/rss/RSSView'), 'RSSView'),
-  search: named(() => import('@/components/search/SearchView'), 'SearchView'),
-  logs: named(() => import('@/components/logs/LogsView'), 'LogsView'),
-  settings: named(() => import('@/components/settings/SettingsView'), 'SettingsView'),
+  add: AddTorrentView,
+  rss: lazy(LOADERS.rss),
+  search: lazy(LOADERS.search),
+  logs: lazy(LOADERS.logs),
+  settings: lazy(LOADERS.settings),
 }
+const preloadPages = () => Object.values(LOADERS).forEach(load => void load())
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 5000, retry: 1 } } })
 
@@ -36,6 +43,17 @@ function Screens() {
   const [selected, setSelected] = useState(page)
   // So do torrents dropped on the page or handed over later.
   useEffect(() => onIncoming(() => { setSelected('add'); setPage('add') }), [])
+
+  // Once signed in, the other pages load while the browser is idle.
+  useEffect(() => {
+    if (status !== 'signedIn') return
+    if (typeof requestIdleCallback === 'function') {
+      const id = requestIdleCallback(preloadPages)
+      return () => cancelIdleCallback(id)
+    }
+    const timer = setTimeout(preloadPages, 1000)
+    return () => clearTimeout(timer)
+  }, [status])
 
   if (status === 'checking') return <p className="grid min-h-dvh place-items-center text-sm text-muted-foreground">{t('Connecting...')}</p>
   if (status === 'signedOut') return <LoginForm />

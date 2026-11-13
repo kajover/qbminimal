@@ -808,7 +808,6 @@
   "No torrents match these filters": "Няма торенти, съвпадащи с тези филтри",
   "Selected torrents": "Избрани торенти",
   "Show": "Показване",
-  "Show connection status and statistics": "Показване на състоянието на връзката и статистиката",
   "per page": "на страница",
   "{count} selected": "Избрани: {count}",
   "Add trackers": "Добавяне на тракери",
@@ -1311,6 +1310,5 @@
   "Storage": "Хранилище",
   "Total size of torrents": "Общ размер на торентите",
   "No torrents yet. Add one with the + button.": "Още няма торенти. Добавете с бутона +.",
-  "Update available": "Налична е актуализация",
   "Checks GitHub for new releases by itself every 12 hours.": "Проверява GitHub за нови версии автоматично на всеки 12 часа."
 }

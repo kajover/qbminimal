@@ -46,7 +46,7 @@ On a phone, as cards and as a table, without and with the tab bar:
 - **Add torrents** with the + button above the list or on the Add page, from links or .torrent files with all of qBittorrent's options. For a single magnet link or .torrent, see its files first and choose which to download. Drop .torrent files anywhere on the page, or let the browser open magnet links here. What you've entered stays while you visit other pages, until you add it or clear it with the ×. **Create torrents** from files on the server.
 - **RSS** feeds and folders, articles, and download rules, including import and export.
 - **Search** with qBittorrent's search plugins, results you can sort and filter by column, and plugin management.
-- **Logs**, statistics with a live speed graph, connection status, storage, and the switch for the alternative speed limits. Open them by tapping the Torrents title. A notice says when qBittorrent can't be reached.
+- **Logs**, statistics with a live speed graph, connection status, storage, and the switch for the alternative speed limits. Open them from **Statistics** in the menu or the sidebar, or by tapping the speeds in the header. A notice says when qBittorrent can't be reached.
 - **Notifications** when a torrent finishes, if you turn them on.
 - **Keyboard shortcuts** for the torrent list. Press `?` to see them.
 - **30 languages**, listed [below](#languages).
@@ -54,7 +54,7 @@ On a phone, as cards and as a table, without and with the tab bar:
 - **Settings**: every qBittorrent preference, shown only when your qBittorrent version has it.
 - A sidebar you can hide on wide screens.
 - Light and dark themes that follow your device, and a layout made for phones, including when added to the home screen. The header holds each page's title and buttons, and a menu button holds the pages and logout, which leaves the list as much room as possible. Under **Settings > App > Appearance** you can show the current speeds in the header, and turn on **Menu bar** to also show the pages in a sidebar on wide screens and in a tab bar on phones.
-- **Update check**: every 12 hours, in the background after signing in, the app asks GitHub for new qbminimal and qBittorrent releases. Settings, and the menu button, show a dot when there is one.
+- **Update check**: every 12 hours, in the background after signing in, the app asks GitHub for new qbminimal and qBittorrent releases, and **Settings > App > About** shows what it found.
 
 ## Accessibility
 

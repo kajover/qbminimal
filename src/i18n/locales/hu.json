@@ -808,7 +808,6 @@
   "No torrents match these filters": "Egy torrent sem felel meg ezeknek a szűrőknek",
   "Selected torrents": "Kijelölt torrentek",
   "Show": "Megjelenítés",
-  "Show connection status and statistics": "Kapcsolat állapotának és statisztikáinak megjelenítése",
   "per page": "oldalanként",
   "{count} selected": "{count} kijelölve",
   "Add trackers": "Követők hozzáadása",
@@ -1311,6 +1310,5 @@
   "Storage": "Tárhely",
   "Total size of torrents": "Torrentek teljes mérete",
   "No torrents yet. Add one with the + button.": "Még nincs torrent. Adj hozzá egyet a + gombbal.",
-  "Update available": "Frissítés érhető el",
   "Checks GitHub for new releases by itself every 12 hours.": "12 óránként magától ellenőrzi a GitHubon az új kiadásokat."
 }

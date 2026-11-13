@@ -808,7 +808,6 @@
   "No torrents match these filters": "Tidak ada torrent yang cocok dengan filter ini",
   "Selected torrents": "Torrent yang dipilih",
   "Show": "Tampilkan",
-  "Show connection status and statistics": "Tampilkan status koneksi dan statistik",
   "per page": "per halaman",
   "{count} selected": "{count} dipilih",
   "Add trackers": "Tambah tracker",
@@ -1311,6 +1310,5 @@
   "Storage": "Penyimpanan",
   "Total size of torrents": "Total ukuran torrent",
   "No torrents yet. Add one with the + button.": "Belum ada torrent. Tambahkan dengan tombol +.",
-  "Update available": "Pembaruan tersedia",
   "Checks GitHub for new releases by itself every 12 hours.": "Memeriksa rilis baru di GitHub secara otomatis setiap 12 jam."
 }
