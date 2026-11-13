@@ -2,7 +2,7 @@ import { ArrowUpDown, Columns3, Keyboard, LayoutList, Plus, RotateCcw, Search, T
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import type { TorrentList } from '@/hooks/useTorrentList'
-import type { SortField } from '@/lib/listSettings'
+import { DEFAULT_LIST_SETTINGS, type SortField } from '@/lib/listSettings'
 import { DEFAULT_COLUMN_LAYOUT, getColumn, toggleColumn, type ColumnLayout } from '@/lib/torrentColumns'
 import { t } from '@/i18n'
 
@@ -78,6 +78,11 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
                 {getColumn(field).label} {list.sort.field === field && arrow}
               </DropdownMenuItem>
             ))}
+            <DropdownMenuSeparator />
+            {/* Back to qBittorrent's queue order. */}
+            <DropdownMenuItem disabled={list.sort.field === DEFAULT_LIST_SETTINGS.sortField && list.sort.direction === DEFAULT_LIST_SETTINGS.sortDirection} onClick={list.resetSort}>
+              <RotateCcw className="size-4" />{t('Reset sorting')}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )}

@@ -1,4 +1,6 @@
-import { Input } from '@/components/ui/input'
+import { RotateCcw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { SearchInput } from '@/components/SearchInput'
 import { NativeSelect } from '@/components/NativeSelect'
 import { RemovableChip } from '@/components/ColumnFilters'
 import { STATUS_FILTERS, TRACKERLESS, type StatusFilter } from '@/lib/torrentFilters'
@@ -22,7 +24,7 @@ export function TorrentFilterPanel({ list, categories, tags, views, onViewsChang
 
   return (
     <div id="torrent-filters" className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
-      <Input type="search" autoFocus aria-label={t('Filter by name')} placeholder={t('Filter by name')} value={filters.name} onChange={(e) => setFilter('name', e.target.value)} className="col-span-2 h-9 md:w-64" />
+      <SearchInput autoFocus aria-label={t('Filter by name')} placeholder={t('Filter by name')} value={filters.name} onValueChange={(value) => setFilter('name', value)} className="col-span-2 md:w-64" />
       <NativeSelect aria-label={t('Filter by status')} className="col-span-2" value={filters.status} onChange={(e) => setFilter('status', e.target.value as StatusFilter)}>
         {STATUS_FILTERS.map(({ value, label }) => <option key={value} value={value}>{withCount(label, counts.status[value])}</option>)}
       </NativeSelect>
@@ -39,7 +41,15 @@ export function TorrentFilterPanel({ list, categories, tags, views, onViewsChang
         <option value={TRACKERLESS}>{withCount('Trackerless', counts.trackerless)}</option>
         {trackerHosts.map(host => <option key={host} value={host}>{withCount(host, counts.tracker[host])}</option>)}
       </NativeSelect>
-      <SaveViewButton list={list} views={views} onViewsChange={onViewsChange} />
+      {/* Side by side, as close as the column filter buttons above. */}
+      <div className="col-span-2 flex items-center gap-1">
+        <SaveViewButton list={list} views={views} onViewsChange={onViewsChange} />
+        {/* Clears every filter, the column filters included. */}
+        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full px-2.5" disabled={!list.filtered} onClick={list.clearFilters}>
+          <RotateCcw className="size-4" />
+          {t('Reset filters')}
+        </Button>
+      </div>
     </div>
   )
 }

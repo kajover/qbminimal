@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { PageHeader } from '@/components/PageHeader'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
+import { SearchInput } from '@/components/SearchInput'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useLogs, usePeerLog } from '@/hooks/useApi'
@@ -48,7 +48,7 @@ function MainLog() {
           </div>
         ))}
       </div>
-      <Input type="search" aria-label={t('Filter log messages')} placeholder={t('Filter messages')} value={search} onChange={(e) => setSearch(e.target.value)} className="h-9" />
+      <SearchInput aria-label={t('Filter log messages')} placeholder={t('Filter messages')} value={search} onValueChange={setSearch} />
 
       {isLoading ? (
         <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading logs...')}</p>

@@ -1,6 +1,5 @@
 import { useTotalSpeeds, useTransferInfo } from '@/hooks/useApi'
 import { formatBytes } from '@/lib/format'
-import { openStatistics } from '@/lib/statistics'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
 
@@ -9,7 +8,7 @@ import { t } from '@/i18n'
 // slot's end. A limit that's set shows faintly below its speed; while qBittorrent's alternative
 // ("slow") limits are on, the speeds are amber. Clicking opens the statistics, which hold the switch
 // for the alternative limits; the limits themselves are set in Settings.
-export function GlobalSpeeds() {
+export function GlobalSpeeds({ onOpen }: { onOpen: () => void }) {
   const { data: speeds } = useTotalSpeeds()
   const { data: state } = useTransferInfo()
   if (!speeds) return null
@@ -27,7 +26,7 @@ export function GlobalSpeeds() {
   return (
     <button
       type="button"
-      onClick={openStatistics}
+      onClick={onOpen}
       title={t('Statistics')}
       aria-label={`${t('Current speeds')}: ↓ ${formatBytes(speeds.down)}/s, ↑ ${formatBytes(speeds.up)}/s${alternative ? `. ${t('Alternative speed limits are on')}` : ''}. ${t('Statistics')}`}
       className={cn(

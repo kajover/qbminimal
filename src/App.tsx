@@ -1,6 +1,7 @@
 import { lazy, startTransition, useEffect, useState, type ComponentType } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
+import { HoverLabels } from '@/components/HoverLabels'
 import { Layout } from '@/components/Layout'
 import { LoginForm } from '@/components/LoginForm'
 import { PageBoundary } from '@/components/PageBoundary'
@@ -9,6 +10,7 @@ import { TorrentsView } from '@/components/torrents/TorrentsView'
 import { AddTorrentView } from '@/components/torrents/AddTorrentView'
 import { SessionProvider } from '@/components/SessionProvider'
 import { useSession } from '@/hooks/useSession'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { hasIncoming, onIncoming } from '@/lib/incoming'
 import { registerServiceWorker } from '@/lib/notify'
 import { t } from '@/i18n'
@@ -19,6 +21,7 @@ const LOADERS = {
   rss: () => import('@/components/rss/RSSView').then(m => ({ default: m.RSSView })),
   search: () => import('@/components/search/SearchView').then(m => ({ default: m.SearchView })),
   logs: () => import('@/components/logs/LogsView').then(m => ({ default: m.LogsView })),
+  statistics: () => import('@/components/torrents/TorrentStats').then(m => ({ default: m.StatisticsView })),
   settings: () => import('@/components/settings/SettingsView').then(m => ({ default: m.SettingsView })),
 }
 const PAGE_VIEWS: Record<PageId, ComponentType> = {
@@ -27,14 +30,17 @@ const PAGE_VIEWS: Record<PageId, ComponentType> = {
   rss: lazy(LOADERS.rss),
   search: lazy(LOADERS.search),
   logs: lazy(LOADERS.logs),
+  statistics: lazy(LOADERS.statistics),
   settings: lazy(LOADERS.settings),
 }
 const preloadPages = () => Object.values(LOADERS).forEach(load => void load())
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 5000, retry: 1 } } })
 
-// Notifications drop down over the header, clear of a phone's notch.
-const TOAST_OFFSET = { top: 'calc(env(safe-area-inset-top) + 0.125rem)' }
+// Notifications rise just above the bars at the bottom: on phones above the tab bar, or the
+// selection bar while torrents are selected, where the tap that caused them was; on wide screens in
+// the corner, away from the selection bar and the page's buttons in the header. Swiped down to go.
+const PHONE_TOAST_OFFSET = { bottom: 'calc(var(--bottom-nav-height, 0px) + var(--selection-bar-space, 0px) + 0.5rem)' }
 
 function Screens() {
   const { status } = useSession()
@@ -77,10 +83,12 @@ function Screens() {
 }
 
 export default function App() {
+  const wide = useMediaQuery('(min-width: 1200px)')
   useEffect(registerServiceWorker, [])
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster position="top-center" offset={TOAST_OFFSET} mobileOffset={TOAST_OFFSET} />
+      <Toaster position={wide ? 'bottom-right' : 'bottom-center'} offset={wide ? undefined : PHONE_TOAST_OFFSET} mobileOffset={PHONE_TOAST_OFFSET} />
+      <HoverLabels />
       <SessionProvider>
         <Screens />
       </SessionProvider>

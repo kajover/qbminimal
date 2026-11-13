@@ -3,8 +3,8 @@ import { Loader2, Plus, Puzzle, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/NativeSelect'
+import { SearchInput } from '@/components/SearchInput'
 import { PageHeader } from '@/components/PageHeader'
 import { useSearchPlugins } from '@/hooks/useApi'
 import { useSearchJob } from '@/hooks/useSearchJob'
@@ -63,12 +63,12 @@ export function SearchView() {
         <CardContent className="space-y-3">
           <form onSubmit={submit} className="space-y-2">
             <div className="flex gap-2">
-              <Input type="search" aria-label={t('Search for')} placeholder={t('Search for...')} value={pattern} onChange={(e) => setPattern(e.target.value)} required />
+              <SearchInput aria-label={t('Search for')} placeholder={t('Search for...')} value={pattern} onValueChange={setPattern} required className="min-w-0 flex-1" />
               <Button type="submit" disabled={search.running} aria-label={t('Search')} title={t('Search')}>
                 {search.running ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
               </Button>
               {search.running && (
-                <Button type="button" variant="ghost" size="icon" aria-label={t('Stop search')} title={t('Stop search')} onClick={() => void search.cancel()}><X className="size-4" /></Button>
+                <Button type="button" variant="ghost" size="icon" className="rounded-full" aria-label={t('Stop search')} title={t('Stop search')} onClick={() => void search.cancel()}><X className="size-4" /></Button>
               )}
             </div>
             <div className="grid grid-cols-2 gap-2">

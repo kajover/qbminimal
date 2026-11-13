@@ -35,7 +35,7 @@ export function onIncoming(listener: () => void) {
 export const isTorrentFile = (file: File) => file.name.toLowerCase().endsWith('.torrent')
 
 // The address a browser opens for a magnet link once the app is registered for them.
-export const MAGNET_PARAM = 'magnet'
+const MAGNET_PARAM = 'magnet'
 
 export function magnetHandlerUrl(location: Pick<Location, 'origin' | 'pathname'>) {
   return `${location.origin}${location.pathname}?${MAGNET_PARAM}=%s`

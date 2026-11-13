@@ -5,7 +5,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/NativeSelect'
-import { useCategories, useTorrentAction } from '@/hooks/useApi'
+import { useCategories, useTorrentAction, useTorrents } from '@/hooks/useApi'
+import { moveToQueuePosition, planQueueMoves, queueLength } from '@/lib/queuePosition'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import { parseShareLimits, type ShareLimitMode } from '@/lib/shareLimits'
@@ -22,6 +23,7 @@ const TITLES: Record<BulkPrompt, string> = {
   limits: 'Speed limits',
   shareLimits: 'Seeding limits',
   autoOn: 'Turn on automatic management?',
+  queuePosition: 'Set queue position',
 }
 
 interface BulkPromptDialogProps {
@@ -45,10 +47,14 @@ export function BulkPromptDialog({ torrents, prompt, onClose }: BulkPromptDialog
 function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrents: Torrent[]; onClose: () => void }) {
   const action = useTorrentAction()
   const { data: categories } = useCategories()
+  const { data: allTorrents } = useTorrents()
+  const queued = torrents.filter(torrent => torrent.priority > 0).sort((a, b) => a.priority - b.priority)
+  const length = queueLength(allTorrents ?? [])
   const first = torrents[0]
   const [value, setValue] = useState(() => {
     if (prompt === 'category') return torrents.every(t => t.category === first?.category) ? first?.category ?? '' : ''
     if (prompt === 'location') return first?.save_path ?? ''
+    if (prompt === 'queuePosition') return queued[0] ? String(queued[0].priority) : ''
     return ''
   })
   const [second, setSecond] = useState('')
@@ -90,12 +96,21 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
         if (!limits) return toast.error(t('Check the seeding limits'), { description: t('Use 0 or higher, with whole minutes. Leave a box blank for no limit.') })
         return apply(() => qbitClient.setShareLimits(hashes, limits), t('Seeding limits saved'), t('Failed to save seeding limits'))
       }
+      case 'queuePosition': {
+        const target = Number(value)
+        if (!Number.isInteger(target) || target < 1) return toast.error(t('Enter a whole number from 1'))
+        // Torrents outside the queue have no position to change.
+        const moves = planQueueMoves(queued.length === 1 ? queued[0].priority : null, target, queued.length, length)
+        return apply(() => moveToQueuePosition(queued.map(torrent => torrent.hash), moves), t('Queue order changed'), t('Failed to change queue order'))
+      }
       case 'autoOn':
         return apply(() => qbitClient.setAutoManagement(hashes, true), t('Automatic management on'), t('Failed to change automatic management'))
     }
   }
 
-  const description = prompt === 'autoOn'
+  const description = prompt === 'queuePosition'
+    ? t('1 is the top of the queue, {length} its end.', { length })
+    : prompt === 'autoOn'
     ? t('qBittorrent will set the location of {count} {noun} from their categories, and may move their files.', { count, noun })
     : prompt === 'location'
       ? t('Moves the files of {count} {noun} to this folder on qBittorrent\'s machine.', { count, noun })
@@ -118,6 +133,7 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
           <Input aria-label={t('Tags, separated by commas')} placeholder={t('Tags, separated by commas')} autoFocus value={value} onChange={(e) => setValue(e.target.value)} />
         )}
         {prompt === 'location' && <Input aria-label={t('Folder')} autoFocus value={value} onChange={(e) => setValue(e.target.value)} />}
+        {prompt === 'queuePosition' && <Input aria-label={t('Queue position')} type="number" inputMode="numeric" min={1} max={length} step={1} autoFocus value={value} onChange={(e) => setValue(e.target.value)} />}
         {prompt === 'limits' && (
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">

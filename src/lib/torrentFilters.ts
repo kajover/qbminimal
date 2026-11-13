@@ -56,7 +56,7 @@ export function matchesTracker(hash: string, tracker: string | undefined, hosts:
 
 const isStopped = (state: string) => state.startsWith('paused') || state.startsWith('stopped')
 
-export function matchesStatus(torrent: Torrent, status: StatusFilter): boolean {
+function matchesStatus(torrent: Torrent, status: StatusFilter): boolean {
   const state: string = torrent.state
   switch (status) {
     case 'all':

@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowDownToLine, ArrowLeftRight, ArrowUp, ArrowUpToLine, FileCheck, Folder, FolderInput, Gauge, Hash, ListOrdered, Magnet, Megaphone, Rocket, Sprout, Tag, TagX, Type, WandSparkles, Zap, ZapOff, type LucideIcon } from 'lucide-react'
+import { ArrowDown, ArrowDownToLine, ArrowLeftRight, ArrowUp, ArrowUpToLine, FileCheck, Fingerprint, Folder, FolderInput, Gauge, Hash, ListOrdered, Magnet, Megaphone, Rocket, Sprout, Tag, TagX, Type, WandSparkles, Zap, ZapOff, type LucideIcon } from 'lucide-react'
 import { useTorrentAction } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
@@ -7,7 +7,7 @@ import type { Torrent } from '@/types'
 import { t } from '@/i18n'
 
 // Actions that need a value first open a small dialog.
-export type BulkPrompt = 'category' | 'addTags' | 'removeTags' | 'location' | 'limits' | 'shareLimits' | 'autoOn'
+export type BulkPrompt = 'category' | 'addTags' | 'removeTags' | 'location' | 'limits' | 'shareLimits' | 'autoOn' | 'queuePosition'
 
 export interface MenuEntry {
   // Stable, for remembering which actions are pinned to the selection bar.
@@ -17,6 +17,8 @@ export interface MenuEntry {
   icon?: LucideIcon
   // For an entry that turns something off again, shown pressed in a row of icons.
   pressed?: boolean
+  // For an on/off option: whether it's on for every torrent, shown with a check mark.
+  checked?: boolean
   disabled?: boolean
 }
 
@@ -51,6 +53,19 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
   const queueFailed = t('Failed to change queue order')
   // One button forces them all, or, when they all are already, stops forcing.
   const allForced = torrents.length > 0 && torrents.every(torrent => torrent.force_start)
+  // An on/off option, named the same either way and checked while it's on for all of them. Picking it
+  // turns it on for those without it, or, when all have it, off for all.
+  const option = (id: string, label: string, isOn: (torrent: Torrent) => boolean, set: (hashes: string[], on: boolean) => Promise<unknown>, onDone: string, offDone: string, failed: string, icon: LucideIcon): MenuEntry => {
+    const allOn = torrents.length > 0 && torrents.every(isOn)
+    const change = allOn ? hashes : torrents.filter(torrent => !isOn(torrent)).map(torrent => torrent.hash)
+    return {
+      id,
+      label,
+      icon,
+      checked: allOn,
+      onSelect: () => void action.mutateAsync({ work: () => set(change, !allOn), failed }).then(() => toast.success(allOn ? offDone : onDone), () => undefined),
+    }
+  }
 
   return [
     {
@@ -83,24 +98,28 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
         run('queueUp', t('Move up'), h => qbitClient.moveInQueue(h, 'up'), queue, queueFailed, ArrowUp),
         run('queueDown', t('Move down'), h => qbitClient.moveInQueue(h, 'down'), queue, queueFailed, ArrowDown),
         run('queueBottom', t('Move to bottom'), h => qbitClient.moveInQueue(h, 'bottom'), queue, queueFailed, ArrowDownToLine),
+        // A number for the position, typed in.
+        { ...prompt('queuePosition', t('Set queue position...'), 'queuePosition', Hash), disabled: !torrents.some(torrent => torrent.priority > 0) },
       ],
     },
     {
       name: 'Options',
       entries: [
-        run('sequential', t('Switch sequential download'), h => qbitClient.toggleSequentialDownload(h), t('Sequential download switched'), t('Failed to change sequential download'), ListOrdered),
-        run('firstLast', t('Switch first and last pieces first'), h => qbitClient.toggleFirstLastPiecePrio(h), t('Piece order switched'), t('Failed to change piece order'), ArrowLeftRight),
-        run('superSeedingOn', t('Super seeding on'), h => qbitClient.setSuperSeeding(h, true), t('Super seeding on'), t('Failed to change super seeding'), Rocket),
-        run('superSeedingOff', t('Super seeding off'), h => qbitClient.setSuperSeeding(h, false), t('Super seeding off'), t('Failed to change super seeding'), Rocket),
-        prompt('autoOn', t('Automatic management on'), 'autoOn', WandSparkles),
-        run('autoOff', t('Automatic management off'), h => qbitClient.setAutoManagement(h, false), t('Automatic management off'), t('Failed to change automatic management'), WandSparkles),
+        // qBittorrent only toggles these two, so each torrent that needs the change is toggled.
+        option('sequential', t('Sequential download'), torrent => !!torrent.seq_dl, h => qbitClient.toggleSequentialDownload(h), t('Sequential download on'), t('Sequential download off'), t('Failed to change sequential download'), ListOrdered),
+        option('firstLast', t('Download first and last pieces first'), torrent => !!torrent.f_l_piece_prio, h => qbitClient.toggleFirstLastPiecePrio(h), t('First and last pieces first on'), t('First and last pieces first off'), t('Failed to change piece order'), ArrowLeftRight),
+        option('superSeeding', t('Super seeding'), torrent => !!torrent.super_seeding, (h, on) => qbitClient.setSuperSeeding(h, on), t('Super seeding on'), t('Super seeding off'), t('Failed to change super seeding'), Rocket),
+        // Turning it on can move files, so that asks first.
+        torrents.length > 0 && torrents.every(torrent => torrent.auto_tmm)
+          ? { ...run('auto', t('Automatic management'), h => qbitClient.setAutoManagement(h, false), t('Automatic management off'), t('Failed to change automatic management'), WandSparkles), checked: true }
+          : { ...prompt('auto', t('Automatic management'), 'autoOn', WandSparkles), checked: false },
       ],
     },
     {
       name: 'Copy',
       entries: [
         copy('copyName', one ? t('Copy name') : t('Copy names'), torrents.map(torrent => torrent.name), one ? t('Name copied') : t('Names copied'), one ? t("Couldn't copy the name") : t("Couldn't copy the names"), Type),
-        copy('copyHash', one ? t('Copy hash') : t('Copy hashes'), hashes, one ? t('Hash copied') : t('Hashes copied'), one ? t("Couldn't copy the hash") : t("Couldn't copy the hashes"), Hash),
+        copy('copyHash', one ? t('Copy hash') : t('Copy hashes'), hashes, one ? t('Hash copied') : t('Hashes copied'), one ? t("Couldn't copy the hash") : t("Couldn't copy the hashes"), Fingerprint),
         copy('copyMagnet', one ? t('Copy magnet link') : t('Copy magnet links'), torrents.map(torrent => torrent.magnet_uri).filter(Boolean), one ? t('Magnet link copied') : t('Magnet links copied'), one ? t("Couldn't copy the magnet link") : t("Couldn't copy the magnet links"), Magnet),
       ],
     },

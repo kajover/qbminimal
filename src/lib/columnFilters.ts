@@ -120,7 +120,7 @@ export const fromDateInput = (text: string, end = false): number | undefined => 
 const trimNumber = (n: number) => String(Math.round(n * 100) / 100)
 
 // One bound as text, in the units the column shows.
-export function formatBound(kind: FilterKind, value: number): string {
+function formatBound(kind: FilterKind, value: number): string {
   switch (kind) {
     case 'size': return formatBytes(value)
     case 'speed': return `${formatBytes(value)}/s`

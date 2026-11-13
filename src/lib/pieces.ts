@@ -1,5 +1,5 @@
 // Values from qBittorrent's torrents/pieceStates.
-export const PIECE_DOWNLOADING = 1
+const PIECE_DOWNLOADING = 1
 export const PIECE_DONE = 2
 
 export interface PieceCounts {

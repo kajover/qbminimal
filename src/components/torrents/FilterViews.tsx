@@ -57,8 +57,8 @@ export function SaveViewButton({ list, views, onViewsChange }: FilterViewsProps)
 
   return (
     <>
-      <Button type="button" variant="ghost" size="sm" className="col-span-2 justify-start gap-1 md:col-span-1" disabled={!list.filtered} title={list.filtered ? t('Save these filters as a view') : t('Choose some filters first')} onClick={() => { setName(''); setOpen(true) }}>
-        <Bookmark className="size-4" />{' '}{t('Save as view')}
+      <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full px-2.5" disabled={!list.filtered} title={list.filtered ? t('Save these filters as a view') : t('Choose some filters first')} onClick={() => { setName(''); setOpen(true) }}>
+        <Bookmark className="size-4" />{t('Save as view')}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent aria-describedby={undefined}>

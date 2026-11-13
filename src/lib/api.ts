@@ -23,7 +23,7 @@ import { demoClient } from './demoClient'
 // Relative, so the app also works when qBittorrent sits under a sub-path behind a reverse proxy.
 const API_ROOT = 'api/v2'
 
-export class ApiError extends Error {
+class ApiError extends Error {
   readonly status: number
 
   constructor(status: number, message: string) {
@@ -80,7 +80,7 @@ export interface LogLevels {
 }
 
 // The browser keeps qBittorrent's session in an HttpOnly cookie, so the app never stores a password.
-export class QbitClient {
+class QbitClient {
   private sessionEnded: (() => void) | null = null
 
   // Called when qBittorrent turns a request away because the session is gone.

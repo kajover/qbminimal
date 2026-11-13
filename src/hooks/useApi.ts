@@ -7,6 +7,7 @@ import { findFinished } from '@/lib/finished'
 import { applyMainDataUpdate, totalSpeeds, type MainData } from '@/lib/mainData'
 import { finishNoticesOn, notifyInBackground } from '@/lib/notify'
 import { PIECE_DONE } from '@/lib/pieces'
+import { isErrored } from '@/lib/statusNotes'
 import { recordSpeeds, recordTorrentSpeeds } from '@/lib/speedHistory'
 import type { RSSRule, Torrent } from '@/types'
 import { t } from '@/i18n'
@@ -97,6 +98,8 @@ const pickTrackers = (data: MainData) => data.trackers
 const pickSpeeds = (data: MainData) => totalSpeeds(data.torrents)
 
 export const useTorrents = () => useMainData(pickTorrents)
+const pickErrored = (data: MainData) => Object.values(data.torrents).filter(torrent => isErrored(torrent.state)).length
+export const useErroredCount = () => useMainData(pickErrored)
 // Looks a torrent up in the list already fetched, by its hash or, for a hybrid one, its v1 hash.
 export function useFindTorrent() {
   const queryClient = useQueryClient()
@@ -143,6 +146,24 @@ export const useTorrentAction = () =>
 
 export const usePauseTorrents = () => useServerChange((hashes: string[]) => qbitClient.pauseTorrents(hashes), [['torrents']], t('Failed to pause'))
 export const useResumeTorrents = () => useServerChange((hashes: string[]) => qbitClient.resumeTorrents(hashes), [['torrents']], t('Failed to resume'))
+
+// While every transfer is paused (Statistics > Pause all transfers), started torrents wait. The
+// returned function says so, with a way to resume them all, and tells whether it did.
+export function useSessionPausedWarning() {
+  const queryClient = useQueryClient()
+  return (): boolean => {
+    if (queryClient.getQueryData<MainData>(MAIN_DATA)?.serverState.session_state !== true) return false
+    toast.warning(t('All transfers are paused'), {
+      description: t('Started torrents wait until transfers are resumed.'),
+      duration: 10000,
+      action: {
+        label: t('Resume all transfers'),
+        onClick: () => void qbitClient.resumeSession().then(() => queryClient.invalidateQueries({ queryKey: ['torrents'] }), (error: unknown) => reportFailure(t('Couldn\'t resume transfers'), error)),
+      },
+    })
+    return true
+  }
+}
 export const useDeleteTorrents = () =>
   useServerChange(({ hashes, deleteFiles }: { hashes: string[]; deleteFiles?: boolean }) => qbitClient.deleteTorrents(hashes, deleteFiles), [['torrents']], t('Failed to delete'))
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent, type PointerEvent, type ReactElement, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent, type PointerEvent, type ReactElement, type ReactNode } from 'react'
 import { textScale } from '@/lib/textSize'
 import { ArrowDown, ArrowUp, RotateCcw } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -23,11 +23,12 @@ const SELECT_WIDTH = 40
 const LINKED_SCROLL = typeof CSS !== 'undefined' && typeof CSS.supports === 'function' && CSS.supports('animation-timeline: --a') && CSS.supports('timeline-scope: --a')
 
 // The checkbox stays in view while the other columns scroll sideways. Its background has to be
-// solid, so it mixes the row's hover tint into the card color.
+// solid, so it mixes the row's hover tint into the card color. Neither fades: the highlight follows
+// the pointer at once, on the whole row together.
 // Columns of words, which follow the language's direction; all others are numbers or paths.
 const WORD_COLUMNS: ReadonlySet<ColumnId> = new Set(['name', 'state', 'category', 'tags'])
 
-const PINNED_LEFT = 'sticky start-0 z-10 bg-card transition-colors group-hover:bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]'
+const PINNED_LEFT = 'sticky start-0 z-10 bg-card group-hover:bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]'
 const PINNED_SELECTED = 'bg-muted group-hover:bg-muted'
 
 // A dash in place of a speed of zero, so the moving torrents stand out.
@@ -112,6 +113,15 @@ interface TorrentTableProps {
   onColumnFilter: (id: ColumnId, filter: ColumnFilter | null) => void
 }
 
+// How wide a column title is in the table's medium-weight header font.
+let measure: CanvasRenderingContext2D | null = null
+function textWidth(text: string, px: number): number {
+  measure ??= document.createElement('canvas').getContext('2d')
+  if (!measure) return text.length * px * 0.6
+  measure.font = `500 ${px}px ${getComputedStyle(document.body).fontFamily}`
+  return measure.measureText(text).width
+}
+
 // The width that shows every given cell's content whole: each is copied, unclipped, into a hidden
 // box beside the table, which keeps the table's fonts.
 function naturalWidth(cells: Element[], host: HTMLElement): number {
@@ -147,7 +157,16 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   // Widths are saved as they were for 12px text, so the table's 14px text and a larger text size
   // widen them to keep their text fitting.
   const scale = textScale() * (14 / 12)
-  const widthOf = (id: ColumnId) => (resizing?.id === id ? resizing.width : columnWidth(layout, id) * scale)
+  // No column is narrower than its title needs, with room for the sort arrow and the filter button,
+  // in any language and text size.
+  const columnKey = columns.map(def => def.id).join()
+  const titleWidths = useMemo(() => Object.fromEntries(columns.map(def =>
+    // The title's own width, plus its padding (16px), the arrow (14px and its gap), the filter button (20px and its gap), and a margin.
+    [def.id, Math.ceil(textWidth(def.header ?? def.label, 12 * scale) + 16 + 18 + 22 + 4)])) as Partial<Record<ColumnId, number>>,
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- the ids stand for the columns
+  [columnKey, scale])
+  const minWidthOf = (id: ColumnId) => Math.max(getColumn(id).minWidth * scale, titleWidths[id] ?? 0)
+  const widthOf = (id: ColumnId) => (resizing?.id === id ? resizing.width : Math.max(columnWidth(layout, id) * scale, minWidthOf(id)))
   const total = SELECT_WIDTH * scale + columns.reduce((sum, def) => sum + widthOf(def.id), 0)
 
   const startResize = (e: PointerEvent<HTMLSpanElement>, id: ColumnId) => {
@@ -159,8 +178,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   }
   const moveResize = (e: PointerEvent<HTMLSpanElement>, id: ColumnId) => {
     if (!resizeStart.current || resizing?.id !== id) return
-    const def = getColumn(id)
-    setResizing({ id, width: Math.max(def.minWidth * scale, resizeStart.current.width + (e.clientX - resizeStart.current.x) * resizeStart.current.sign) })
+    setResizing({ id, width: Math.max(minWidthOf(id), resizeStart.current.width + (e.clientX - resizeStart.current.x) * resizeStart.current.sign) })
   }
   const endResize = () => {
     if (resizing) onLayoutChange(resizeColumn(layout, resizing.id, resizing.width / scale))
@@ -342,7 +360,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
                   aria-selected={isSelected}
                   aria-current={openHash === torrent.hash ? 'true' : undefined}
                   className={cn(
-                    'group cursor-default border-b transition-colors outline-hidden select-none last:border-0 hover:bg-muted/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary [-webkit-touch-callout:none]',
+                    'group cursor-default border-b outline-hidden select-none last:border-0 hover:bg-muted/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary [-webkit-touch-callout:none]',
                     isSelected && 'bg-muted',
                     openHash === torrent.hash && 'bg-primary/10 hover:bg-primary/15 shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]',
                   )}

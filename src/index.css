@@ -319,11 +319,12 @@
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09);
 }
 
-/* Bars kept at the bottom of the window: --bar-bottom from the bottom, placed from the top. */
+/* Bars kept at the bottom of the window, --bar-bottom from it. Placed from the bottom, so Safari
+   moves them with its toolbar as that grows and shrinks while scrolling, every frame; placed from
+   the top at 100dvh, they only caught up a few times a second, in steps. */
 .bottom-bar {
   position: fixed;
-  top: calc(100dvh - var(--bar-bottom, 0px));
-  translate: 0 -100%;
+  bottom: var(--bar-bottom, 0px);
 }
 
 /* The phone's selection bar sits where the tab bar does, flat like it, without a shadow. */
@@ -351,10 +352,7 @@
    indicator. Bars and panels kept above it, and the page's room at its end, use this. */
 :root {
   --nav-gap: 0.5rem;
-  /* How far the tab bar, or the selection bar in its place, sits from the bottom of the page.
-     Bars at the bottom are placed from the top, at 100dvh less their height (bottom-bar class
-     below): Safari 26 lifts an element placed with `bottom` 16px higher than asked, clear of its
-     floating address bar, which would leave a gap above that bar. */
+  /* How far the tab bar, or the selection bar in its place, sits from the bottom of the page. */
   --bottom-edge: max(var(--nav-gap), env(safe-area-inset-bottom));
   --bottom-nav-height: calc(var(--nav-bar-height, 3.75rem) + var(--bottom-edge));
 }

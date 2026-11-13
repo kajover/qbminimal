@@ -59,7 +59,7 @@ export function checkForUpdates(): Promise<void> {
 }
 
 // How often the app checks by itself, in the background after signing in.
-export const CHECK_EVERY = 12 * 60 * 60 * 1000
+const CHECK_EVERY = 12 * 60 * 60 * 1000
 
 // Checks unless the last check is recent enough. Returns whether it started one.
 export function checkForUpdatesIfDue(now = Date.now()): boolean {

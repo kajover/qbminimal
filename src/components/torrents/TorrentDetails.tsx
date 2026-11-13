@@ -144,7 +144,7 @@ export function TorrentDetailsPanel({ torrent, onClose }: DetailsProps) {
             torrent={torrent}
             listClassName="max-w-xl"
             end={(
-              <Button variant="ghost" size="icon" className="size-7" aria-label={t('Close details')} title={t('Close (Esc)')} onClick={onClose}>
+              <Button variant="ghost" size="icon" className="size-8 rounded-full bg-muted hover:bg-accent" aria-label={t('Close details')} title={t('Close (Esc)')} onClick={onClose}>
                 <X className="size-4" />
               </Button>
             )}
@@ -227,7 +227,7 @@ export function TorrentDetailsDialog({ torrent, onClose }: DetailsProps) {
               torrent={torrent}
               end={(
                 <DialogPrimitive.Close asChild>
-                  <Button variant="ghost" size="icon" className="size-8 rounded-full bg-muted" aria-label={t('Close details')}>
+                  <Button variant="ghost" size="icon" className="size-8 rounded-full bg-muted hover:bg-accent" aria-label={t('Close details')} title={t('Close')}>
                     <X className="size-4" />
                   </Button>
                 </DialogPrimitive.Close>

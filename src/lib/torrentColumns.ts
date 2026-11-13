@@ -119,7 +119,7 @@ export function parseColumnLayout(raw: string | null): ColumnLayout {
   return { order, hidden: savedOrder.length ? [...new Set([...hidden, ...newColumns])] : hidden, widths }
 }
 
-export function clampWidth(id: ColumnId, width: number): number {
+function clampWidth(id: ColumnId, width: number): number {
   return Math.round(Math.min(MAX_WIDTH, Math.max(getColumn(id).minWidth, width)))
 }
 
@@ -178,7 +178,7 @@ export function saveColumnLayout(layout: ColumnLayout): void {
 export const trackerHost = (url: string | undefined): string => (url ? getTrackerHost(url) : '')
 
 // What each column sorts by. Text sorts alphabetically, everything else by number.
-export function sortValue(torrent: Torrent, id: ColumnId): number | string {
+function sortValue(torrent: Torrent, id: ColumnId): number | string {
   switch (id) {
     case 'name': return torrent.name
     case 'state': return torrent.state

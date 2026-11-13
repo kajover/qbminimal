@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
-import { Activity, ChevronLeft, ChevronRight, LogOut, Menu } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LogOut, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { HeaderSlot } from '@/components/HeaderSlot'
 import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { DropOverlay } from '@/components/DropOverlay'
 import { GlobalSpeeds } from '@/components/GlobalSpeeds'
-import { LOGS_PAGE, MAIN_PAGES, type PageId } from '@/components/navigation'
+import { EXTRA_PAGES, MAIN_PAGES, type PageId } from '@/components/navigation'
+import { StatusDots } from '@/components/StatusDots'
+import { usePageNotes } from '@/hooks/useStatusNotes'
 import { useSession } from '@/hooks/useSession'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useDisplayOption } from '@/lib/displayOptions'
 import { checkForUpdatesIfDue } from '@/lib/updateNotice'
-import { openStatistics } from '@/lib/statistics'
-import { StatisticsDialog } from '@/components/torrents/TorrentStats'
 import { readStored, writeStored } from '@/lib/storage'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
@@ -24,10 +24,12 @@ interface LayoutProps {
 }
 
 function PageItem({ id, label, icon: Icon, page, onNavigate }: (typeof MAIN_PAGES)[number] & { page: PageId; onNavigate: (page: PageId) => void }) {
+  const notes = usePageNotes()
   return (
     <DropdownMenuItem aria-current={page === id ? 'page' : undefined} className={cn(page === id && 'bg-accent text-accent-foreground')} onSelect={() => onNavigate(id)}>
       <Icon />
       {label}
+      {(id === 'torrents' || id === 'statistics') && <StatusDots notes={notes[id]} />}
     </DropdownMenuItem>
   )
 }
@@ -38,21 +40,20 @@ function PagesMenu({ page, onNavigate }: { page: PageId; onNavigate: (page: Page
   // Closing gives focus back to the button, which browsers then ring as if reached by keyboard.
   // That's kept for the keyboard and left out after a click or tap.
   const byPointer = useRef(false)
+  // A dot in the colour of the first thing out of the ordinary, as the statistics show it.
+  const notes = usePageNotes().all
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="max-md:size-8" aria-label={t('Menu')} title={t('Menu')} onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }}>
+        <Button variant="ghost" size="icon" className="relative max-md:size-8" aria-label={notes.length ? `${t('Menu')}: ${notes.map(note => note.label).join(', ')}` : t('Menu')} title={t('Menu')} onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }}>
           <Menu className="size-5" />
+          {notes[0] && <span aria-hidden className={cn('absolute end-0.5 top-0.5 size-2.5 rounded-full ring-2 ring-background', notes[0].dot)} />}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-52" onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }} onCloseAutoFocus={(e) => { if (byPointer.current) e.preventDefault() }}>
         {MAIN_PAGES.map(item => <PageItem key={item.id} {...item} page={page} onNavigate={onNavigate} />)}
         <DropdownMenuSeparator />
-        <PageItem {...LOGS_PAGE} page={page} onNavigate={onNavigate} />
-        <DropdownMenuItem onSelect={openStatistics}>
-          <Activity />
-          {t('Statistics')}
-        </DropdownMenuItem>
+        {EXTRA_PAGES.map(item => <PageItem key={item.id} {...item} page={page} onNavigate={onNavigate} />)}
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void signOut()}>
           <LogOut />
@@ -176,11 +177,13 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
     window.scrollTo(0, 0)
   }, [page])
 
+  const notes = usePageNotes()
   const navButton = ({ id, label, icon: Icon }: (typeof MAIN_PAGES)[number]) => (
     <Button key={id} variant={page === id ? 'secondary' : 'ghost'} className="justify-start gap-2 overflow-hidden" title={label} aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
       {/* 14px labels like the tab bar's, with 16px icons beside them, as on the other buttons. */}
       <Icon className="size-4" />
       <span className="truncate">{label}</span>
+      {(id === 'torrents' || id === 'statistics') && <StatusDots notes={notes[id]} />}
     </Button>
   )
 
@@ -202,7 +205,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
             <h1 className="sr-only">{t('qBittorrent')}</h1>
           </div>
           <div ref={setSlot} className="flex min-w-0 flex-1 items-center md:px-2" />
-          <GlobalSpeeds />
+          <GlobalSpeeds onOpen={() => onNavigate('statistics')} />
         </div>
         <ConnectionBanner />
       </header>
@@ -215,11 +218,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
               <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto p-2 pb-4">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{MAIN_PAGES.map(navButton)}</nav>
                 <div className="mt-2 flex flex-col gap-1 border-t pt-2">
-                  {navButton(LOGS_PAGE)}
-                  <Button variant="ghost" className="w-full justify-start gap-2 overflow-hidden" onClick={openStatistics}>
-                    <Activity className="size-4" />
-                    <span className="truncate">{t('Statistics')}</span>
-                  </Button>
+                  {EXTRA_PAGES.map(navButton)}
                 </div>
                 {/* At the bottom and quieter, apart from the pages. */}
                 <Button variant="ghost" className="mt-auto w-full justify-start gap-2 overflow-hidden text-muted-foreground" onClick={() => void signOut()}>
@@ -246,13 +245,15 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
             </div>
           </div>
           <main className="min-w-0 flex-1 pt-4 pb-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] max-md:pb-[calc(var(--bottom-nav-height,5rem)+1rem)]">
-            <HeaderSlot value={slot ? { element: slot, whole: wide } : null}>{children}</HeaderSlot>
+            {/* The torrent list takes the whole width; the other pages are easier to read narrower. */}
+            <div className={cn(page !== 'torrents' && 'mx-auto w-full max-w-4xl')}>
+              <HeaderSlot value={slot ? { element: slot, whole: wide } : null}>{children}</HeaderSlot>
+            </div>
           </main>
         </div>
       </div>
 
       <DropOverlay />
-      <StatisticsDialog />
 
       {/* Phones: a floating glass capsule, clear of the screen's edges and the home indicator. */}
       <nav
@@ -265,9 +266,13 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
           {MAIN_PAGES.map(({ id, label, icon: Icon }) => (
             <button key={id} type="button" aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)} className={cn('flex min-w-0 flex-auto flex-col items-center rounded-full px-1 py-1 transition-colors [:root[data-tab-labels=off]_&]:py-2', page === id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground')}>
               {/* 18px icons over 12px names; with the names hidden in Settings, 20px icons on their own. */}
-              <Icon className="size-4.5 [:root[data-tab-labels=off]_&]:size-5" />
+              <span className="relative">
+                <Icon className="size-4.5 [:root[data-tab-labels=off]_&]:size-5" />
+                {id === 'torrents' && notes.torrents[0] && <span aria-hidden className={cn('absolute -end-1 -top-0.5 size-2 rounded-full ring-2 ring-background', notes.torrents[0].dot)} />}
+              </span>
               {/* Hidden in Settings, the names stay for screen readers. */}
               <span className="max-w-full truncate text-xs [:root[data-tab-labels=off]_&]:sr-only">{label}</span>
+              {id === 'torrents' && notes.torrents[0] && <span className="sr-only">{notes.torrents[0].label}</span>}
             </button>
           ))}
         </div>

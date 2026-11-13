@@ -1,11 +1,12 @@
 import { useId, useState, type FormEvent, type ReactNode } from 'react'
-import { Filter, ListFilter, Plus, X } from 'lucide-react'
+import { Filter, ListFilter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { NativeSelect } from '@/components/NativeSelect'
+import { SearchInput } from '@/components/SearchInput'
 import {
   describeFilter, fromDateInput, isActive, NONE, TEXT_OPERATORS, toDateInput, UNITS,
   type ColumnFilter, type ColumnFilters, type FilterKind, type TextOperator,
@@ -37,7 +38,7 @@ function startUnit(kind: FilterKind, filter: ColumnFilter | undefined) {
 }
 
 // The form inside the popover: a text match, a range, or a choice of values, by the column's kind.
-export function ColumnFilterEditor({ target, filter, onApply }: { target: FilterTarget; filter?: ColumnFilter; onApply: (filter: ColumnFilter | null) => void }) {
+function ColumnFilterEditor({ target, filter, onApply }: { target: FilterTarget; filter?: ColumnFilter; onApply: (filter: ColumnFilter | null) => void }) {
   const id = useId()
   const { kind } = target
   const valueLabel = target.valueLabel ?? defaultValueLabel
@@ -109,7 +110,7 @@ export function ColumnFilterEditor({ target, filter, onApply }: { target: Filter
       )}
       {kind === 'set' && (
         <div className="grid gap-2">
-          {options.length > 8 && <Input type="search" aria-label={t('Search values')} placeholder={t('Search values')} value={search} onChange={(e) => setSearch(e.target.value)} className="h-8 text-sm" />}
+          {options.length > 8 && <SearchInput aria-label={t('Search values')} placeholder={t('Search values')} value={search} onValueChange={setSearch} inputClassName="h-8 text-sm" />}
           {options.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t('Nothing to choose from')}</p>
           ) : (
@@ -207,7 +208,7 @@ export function RemovableChip({ text, onRemove }: { text: string; onRemove: () =
 }
 
 // A button that adds a column filter without the table: pick a column, then set it.
-function AddFilterButton({ targets, onChange }: { targets: FilterTarget[]; onChange: (id: string, filter: ColumnFilter | null) => void }) {
+export function AddFilterButton({ targets, onChange }: { targets: FilterTarget[]; onChange: (id: string, filter: ColumnFilter | null) => void }) {
   const [open, setOpen] = useState(false)
   const [targetId, setTargetId] = useState(targets[0]?.id ?? '')
   const target = targets.find(c => c.id === targetId) ?? targets[0]
@@ -215,8 +216,8 @@ function AddFilterButton({ targets, onChange }: { targets: FilterTarget[]; onCha
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 rounded-full">
-          <Plus className="size-4" />
+        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full px-2.5">
+          <Filter className="size-4" />
           {t('Column filter')}
         </Button>
       </PopoverTrigger>
@@ -251,8 +252,13 @@ export function ColumnFilterChips({ targets, filters, onChange, showAdd, start, 
     <div className={cn('flex flex-wrap items-center gap-2', className)} aria-label={t('Column filters')} role="group">
       {start}
       {chips.map(c => <FilterChip key={c.id} target={c} filter={filters[c.id]} onChange={(next) => onChange(c.id, next)} />)}
-      {showAdd && <span className={typeof showAdd === 'string' ? showAdd : undefined}><AddFilterButton targets={targets} onChange={onChange} /></span>}
-      {end}
+      {/* One row that doesn't wrap, even on phones; the buttons in `end` shorten their labels instead. */}
+      {(showAdd || end) && (
+        <div className="flex min-w-0 max-w-full flex-1 items-center gap-1">
+          {showAdd && <span className={cn('shrink-0', typeof showAdd === 'string' && showAdd)}><AddFilterButton targets={targets} onChange={onChange} /></span>}
+          {end}
+        </div>
+      )}
     </div>
   )
 }

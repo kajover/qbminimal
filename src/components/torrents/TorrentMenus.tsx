@@ -1,5 +1,5 @@
 import { Fragment, type ComponentType, type ReactNode } from 'react'
-import { Eye, MoreHorizontal, Pin, Pause, Play, Settings2, Copy, Trash2, type LucideIcon } from 'lucide-react'
+import { Check, Eye, MoreHorizontal, Pin, Pause, Play, Settings2, Copy, Trash2, type LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -15,7 +15,7 @@ const GROUP_ICONS: Record<string, LucideIcon> = { Options: Settings2, Copy }
 
 const countLabel = (torrents: Torrent[]) => (torrents.length === 1 ? torrents[0].name : t('{count} torrents', { count: torrents.length }))
 
-type MenuItem = ComponentType<{ className?: string; disabled?: boolean; onSelect?: (event: Event) => void; 'aria-label'?: string; 'aria-pressed'?: boolean; children?: ReactNode }>
+type MenuItem = ComponentType<{ className?: string; disabled?: boolean; onSelect?: (event: Event) => void; role?: string; 'aria-label'?: string; 'aria-pressed'?: boolean; 'aria-checked'?: boolean; children?: ReactNode }>
 
 // A row of icon-only menu items, each named by a label on hover and focus. The arrow keys move
 // along it like along the rest of the menu.
@@ -42,9 +42,17 @@ function IconRow({ entries, Item }: { entries: MenuEntry[]; Item: MenuItem }) {
   )
 }
 
+// On/off options carry a check mark at the end while they're on.
 const EntryItems = ({ entries, Item }: { entries: MenuEntry[]; Item: MenuItem }) => entries.map(entry => {
   const Icon = entry.icon
-  return <Item key={entry.id} onSelect={entry.onSelect}>{Icon && <Icon />}{entry.label}</Item>
+  const toggle = entry.checked !== undefined
+  return (
+    <Item key={entry.id} onSelect={entry.onSelect} role={toggle ? 'menuitemcheckbox' : undefined} aria-checked={toggle ? entry.checked : undefined}>
+      {Icon && <Icon />}
+      {entry.label}
+      {entry.checked && <Check className="ms-auto !text-foreground" />}
+    </Item>
+  )
 })
 
 const DropdownItem: MenuItem = DropdownMenuItem
@@ -60,12 +68,14 @@ export function MoreMenu({ torrents, groups, onCustomize }: { torrents: Torrent[
           <span className="max-sm:sr-only">{t('More')}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="max-h-[70vh] w-60 overflow-y-auto">
-        <DropdownMenuLabel className="truncate">{countLabel(torrents)}</DropdownMenuLabel>
+      {/* As wide as its longest item, so none is cut off, but never wider than the screen. */}
+      <DropdownMenuContent align="end" className="max-h-[70vh] w-max min-w-60 max-w-[calc(100vw-1rem)] overflow-y-auto">
+        <DropdownMenuLabel className="max-w-72 truncate">{countLabel(torrents)}</DropdownMenuLabel>
         {groups.map(group => (
           <Fragment key={group.name}>
             <DropdownMenuSeparator />
-            {group.icons ? <IconRow entries={group.entries} Item={DropdownItem} /> : <EntryItems entries={group.entries} Item={DropdownItem} />}
+            {/* Force start, recheck and reannounce read as a list here, with their names. */}
+            {group.icons && group.name !== 'Transfer' ? <IconRow entries={group.entries} Item={DropdownItem} /> : <EntryItems entries={group.entries} Item={DropdownItem} />}
           </Fragment>
         ))}
         {onCustomize && (

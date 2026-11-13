@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/NativeSelect'
 import { PageBoundary } from '@/components/PageBoundary'
 import { PageHeader } from '@/components/PageHeader'
-import { useCategories, useDeleteTorrents, usePauseTorrents, useResumeTorrents, useTags, useTorrents, useTrackerMap } from '@/hooks/useApi'
+import { useCategories, useDeleteTorrents, usePauseTorrents, useResumeTorrents, useSessionPausedWarning, useTags, useTorrents, useTrackerMap } from '@/hooks/useApi'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useRowPress, type RowProps } from '@/hooks/useRowPress'
 import { useSelection } from '@/hooks/useSelection'
@@ -54,6 +54,7 @@ export function TorrentsView() {
   const list = useTorrentList(torrents, trackerMap)
   const pause = usePauseTorrents()
   const resume = useResumeTorrents()
+  const warnIfPaused = useSessionPausedWarning()
   const remove = useDeleteTorrents()
   const wide = useMediaQuery('(min-width: 1200px)')
   const mouse = useMediaQuery('(pointer: fine)')
@@ -172,7 +173,9 @@ export function TorrentsView() {
     if (detailsHash && hashes.includes(detailsHash)) closeDetails()
     setDeleteOpen(false)
   }
-  const start = () => resume.mutate(selectedTorrents.map(t => t.hash), { onSuccess: done(selectedTorrents, name => t('Started {name}', { name }), count => t('Torrents started: {count}', { count })) })
+  const started = done(selectedTorrents, name => t('Started {name}', { name }), count => t('Torrents started: {count}', { count }))
+  // While all transfers are paused, the warning stands in for "Started".
+  const start = () => resume.mutate(selectedTorrents.map(t => t.hash), { onSuccess: () => { if (!warnIfPaused()) started() } })
   const stop = () => pause.mutate(selectedTorrents.map(t => t.hash), { onSuccess: done(selectedTorrents, name => t('Stopped {name}', { name }), count => t('Torrents stopped: {count}', { count })) })
 
   const press = useRowPress<Torrent>({
@@ -280,9 +283,9 @@ export function TorrentsView() {
     <div
       role="toolbar"
       aria-label={t('Selected torrents')}
-      className="glass glass-flat-phone z-30 flex items-center gap-1 overflow-x-auto max-md:fixed max-md:inset-x-3 max-md:top-[calc(100dvh-var(--bottom-nav-height,4rem)-var(--selection-bar-gap,0.5rem))] max-md:-translate-y-full max-md:rounded-full max-md:p-1.5 max-md:px-2 md:absolute md:top-1/2 md:left-1/2 md:max-w-[calc(100vw-38rem)] md:-translate-1/2 md:rounded-xl md:p-0.5"
+      className="glass glass-flat-phone z-30 flex items-center gap-1 overflow-x-auto max-md:fixed max-md:inset-x-3 max-md:bottom-[calc(var(--bottom-nav-height,4rem)+var(--selection-bar-gap,0.5rem))] max-md:rounded-full max-md:p-1.5 max-md:px-2 md:absolute md:top-1/2 md:left-1/2 md:max-w-[calc(100vw-38rem)] md:-translate-1/2 md:rounded-xl md:p-0.5"
     >
-      <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Clear selection')} title={t('Clear selection (Esc)')} onClick={selection.clear}>
+      <Button variant="ghost" size="icon" className="size-8 shrink-0 rounded-full" aria-label={t('Clear selection')} title={t('Clear selection (Esc)')} onClick={selection.clear}>
         <X className="size-4" />
       </Button>
       <span className="pe-1 text-sm whitespace-nowrap tabular-nums">{t('{selected}/{total} selected', { selected: count, total: list.matching.length })}</span>
@@ -292,7 +295,7 @@ export function TorrentsView() {
         const Icon = entry.icon
         return Icon && (
           <Tooltip key={entry.id} label={entry.label}>
-            <Button variant={entry.pressed ? 'secondary' : 'ghost'} size="icon" className="size-8 shrink-0" aria-label={entry.label} aria-pressed={entry.pressed} onClick={entry.onSelect}>
+            <Button variant={entry.pressed || entry.checked ? 'secondary' : 'ghost'} size="icon" className="size-8 shrink-0" aria-label={entry.label} aria-pressed={entry.pressed ?? entry.checked} onClick={entry.onSelect}>
               <Icon className="size-4" />
             </Button>
           </Tooltip>
@@ -365,10 +368,15 @@ export function TorrentsView() {
         showAdd={filtersOpen}
         start={!filtersOpen && hasPanelFilters && <ListFilterChips list={list} />}
         end={filtersOpen && (
-          <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 rounded-full" onClick={() => setManageOpen(true)}>
-            <FolderCog className="size-4" />
-            {t('Manage categories and tags')}
-          </Button>
+          <>
+            <Button type="button" variant="ghost" size="sm" className="h-8 min-w-0 shrink gap-1.5 rounded-full px-2.5" title={t('Categories and tags')} onClick={() => setManageOpen(true)}>
+              <FolderCog className="size-4" />
+              <span className="truncate">{t('Categories and tags')}</span>
+            </Button>
+            <Button type="button" variant="ghost" size="icon" className="ms-auto size-8 shrink-0 rounded-full bg-muted hover:bg-accent" aria-label={t('Close filters')} title={t('Close filters')} onClick={() => setFiltersOpen(false)}>
+              <X className="size-4" />
+            </Button>
+          </>
         )}
       />
 

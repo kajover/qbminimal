@@ -4,7 +4,7 @@ import { readStored, writeStored } from './storage'
 // On/off choices under Settings > App > Appearance, remembered on this device. Each one that
 // differs from its default marks the page with a data attribute, such as data-tab-labels="off",
 // which the components and index.css style by. No React state is needed to follow them.
-export const DISPLAY_OPTIONS = {
+const DISPLAY_OPTIONS = {
   tabLabels: true,
   // Off by default, to keep the header for the page's own title and buttons.
   headerSpeeds: false,

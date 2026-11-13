@@ -4,7 +4,8 @@ import { ConfirmAction } from '@/components/ConfirmAction'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useCategories, useTorrentAction } from '@/hooks/useApi'
+import { useCategories, useTorrentAction, useTorrents } from '@/hooks/useApi'
+import { moveToQueuePosition, planQueueMoves, queueLength } from '@/lib/queuePosition'
 import { qbitClient, type QueueMove } from '@/lib/api'
 import { parseTags } from '@/lib/torrentFilters'
 import { toast } from '@/hooks/use-toast'
@@ -65,9 +66,27 @@ export function TorrentActions({ torrent }: { torrent: Torrent }) {
   const [upLimit, setUpLimit] = useState(toKiB(torrent.up_limit))
   const [comment, setComment] = useState(torrent.comment ?? '')
   const [downloadPath, setDownloadPath] = useState(torrent.download_path ?? '')
-  const complete = torrent.progress >= 1
   // qBittorrent reports 0 for torrents outside the queue, including all of them when queueing is off.
   const queued = torrent.priority > 0
+  const { data: allTorrents } = useTorrents()
+  const length = queueLength(allTorrents ?? [])
+  // The field follows the torrent's position until something else is typed.
+  const [position, setPosition] = useState(String(torrent.priority))
+  const [shownFor, setShownFor] = useState(torrent.priority)
+  if (shownFor !== torrent.priority) {
+    setShownFor(torrent.priority)
+    setPosition(String(torrent.priority))
+  }
+  const applyPosition = () => {
+    if (!queued || position.trim() === '' || Number(position) === torrent.priority) return
+    const target = Number(position)
+    if (!Number.isInteger(target) || target < 1) {
+      toast.error(t('Enter a whole number from 1'))
+      setPosition(String(torrent.priority))
+      return
+    }
+    void run(() => moveToQueuePosition(hashes, planQueueMoves(torrent.priority, target, 1, length)), t('Queue order changed'), t('Failed to change queue order'))
+  }
 
   const run = (work: () => Promise<unknown>, done: string, failed: string) =>
     action.mutateAsync({ work, failed }).then(() => { toast.success(done) }, () => undefined)
@@ -113,21 +132,16 @@ export function TorrentActions({ torrent }: { torrent: Torrent }) {
 
       <Section title={t('Download options')}>
         <div className="flex flex-wrap gap-2">
-          {!complete && (
-            <>
-              <Button type="button" size="sm" variant={torrent.seq_dl ? 'secondary' : 'outline'} aria-pressed={!!torrent.seq_dl} disabled={action.isPending} onClick={() => run(() => qbitClient.toggleSequentialDownload(hashes), torrent.seq_dl ? t('Sequential download off') : t('Sequential download on'), t('Failed to change sequential download'))}>
-                <ListOrdered />{t('Sequential download')}
-              </Button>
-              <Button type="button" size="sm" variant={torrent.f_l_piece_prio ? 'secondary' : 'outline'} aria-pressed={!!torrent.f_l_piece_prio} disabled={action.isPending} onClick={() => run(() => qbitClient.toggleFirstLastPiecePrio(hashes), torrent.f_l_piece_prio ? t('First and last pieces first off') : t('First and last pieces first on'), t('Failed to change piece order'))}>
-                <ArrowLeftRight />{t('First and last pieces first')}
-              </Button>
-            </>
-          )}
-          {complete && (
-            <Button type="button" size="sm" variant={torrent.super_seeding ? 'secondary' : 'outline'} aria-pressed={!!torrent.super_seeding} title={t('Sends each peer different pieces, to spread a new torrent faster')} disabled={action.isPending} onClick={() => run(() => qbitClient.setSuperSeeding(hashes, !torrent.super_seeding), torrent.super_seeding ? t('Super seeding off') : t('Super seeding on'), t('Failed to change super seeding'))}>
-              <Rocket />{t('Super seeding')}
-            </Button>
-          )}
+          {/* Every option shows, whether or not the torrent is complete. */}
+          <Button type="button" size="sm" variant={torrent.seq_dl ? 'secondary' : 'outline'} aria-pressed={!!torrent.seq_dl} disabled={action.isPending} onClick={() => run(() => qbitClient.toggleSequentialDownload(hashes), torrent.seq_dl ? t('Sequential download off') : t('Sequential download on'), t('Failed to change sequential download'))}>
+            <ListOrdered />{t('Sequential download')}
+          </Button>
+          <Button type="button" size="sm" variant={torrent.f_l_piece_prio ? 'secondary' : 'outline'} aria-pressed={!!torrent.f_l_piece_prio} disabled={action.isPending} onClick={() => run(() => qbitClient.toggleFirstLastPiecePrio(hashes), torrent.f_l_piece_prio ? t('First and last pieces first off') : t('First and last pieces first on'), t('Failed to change piece order'))}>
+            <ArrowLeftRight />{t('Download first and last pieces first')}
+          </Button>
+          <Button type="button" size="sm" variant={torrent.super_seeding ? 'secondary' : 'outline'} aria-pressed={!!torrent.super_seeding} title={t('Sends each peer different pieces, to spread a new torrent faster')} disabled={action.isPending} onClick={() => run(() => qbitClient.setSuperSeeding(hashes, !torrent.super_seeding), torrent.super_seeding ? t('Super seeding off') : t('Super seeding on'), t('Failed to change super seeding'))}>
+            <Rocket />{t('Super seeding')}
+          </Button>
           {torrent.auto_tmm ? (
             <Button type="button" size="sm" variant="secondary" aria-pressed title={t('qBittorrent sets this torrent\'s location from its category')} disabled={action.isPending} onClick={() => run(() => qbitClient.setAutoManagement(hashes, false), t('Automatic management off'), t('Failed to change automatic management'))}>
               <WandSparkles />{t('Automatic management')}
@@ -163,6 +177,10 @@ export function TorrentActions({ torrent }: { torrent: Torrent }) {
               <Icon className="size-4" />
             </Button>
           ))}
+          {/* Or a position, typed in: applied with Enter, or on leaving the field. */}
+          <form className="flex" onSubmit={(e) => { e.preventDefault(); applyPosition() }}>
+            <Input aria-label={t('Queue position')} title={queued ? t('Set queue position') : undefined} type="number" inputMode="numeric" enterKeyHint="done" min={1} max={length} step={1} className="h-8 w-20" disabled={!queued || action.isPending} value={queued ? position : ''} placeholder="#" onChange={(e) => setPosition(e.target.value)} onBlur={applyPosition} />
+          </form>
         </div>
       </Section>
 

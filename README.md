@@ -42,12 +42,12 @@ On a phone, as cards and as a table, without and with the tab bar:
 - **Filters** by name, status, category, tag, and tracker, each showing how many torrents it matches. They start cleared on each visit; while any is on, the search button shows a dot and chips above the list name them. Save a set of filters as a **view** to apply it again in one tap.
 - **Torrent details**: pieces, a speed graph, transfer facts with copy buttons for the name, hash, magnet link and paths, files (choose what to download and each file's priority, rename, and save finished files with qBittorrent 5.3), trackers, peers with country flags, and every per-torrent setting: limits, location, queue, category, tags, and more.
 - **Selecting and actions**: click a torrent to open its details in a panel below the list, Ctrl or Cmd-click and Shift-click to select several, and right-click for every action, the everyday ones as a row of icons that name themselves on hover. Choose which actions sit in the selection bar from its More menu, separately for wide screens and phones. On phones, tap a torrent for its details and hold one to start selecting.
-- **Bulk actions** for several torrents at once, from the selection bar or the right-click menu.
+- **Bulk actions** for several torrents at once, from the selection bar or the right-click menu, including on/off options such as sequential download, and a typed-in queue position.
 - **Add torrents** with the + button above the list or on the Add page, from links or .torrent files with all of qBittorrent's options. For a single magnet link or .torrent, see its files first and choose which to download. Drop .torrent files anywhere on the page, or let the browser open magnet links here. What you've entered stays while you visit other pages, until you add it or clear it with the ×. **Create torrents** from files on the server.
 - **RSS** feeds and folders, articles, and download rules, including import and export.
-- **Search** with qBittorrent's search plugins, results you can sort and filter by column, and plugin management.
-- **Logs**, statistics with a live speed graph, connection status, storage, and the switch for the alternative speed limits. Open **Logs** and **Statistics** from the menu, where they sit together below the pages, or from the sidebar; the speeds in the header open the statistics too. A notice says when qBittorrent can't be reached.
-- **Notifications** when a torrent finishes, if you turn them on.
+- **Search** with qBittorrent's search plugins, results you can sort, filter and resize by column, with the sort remembered, and plugin management.
+- **Logs**, and a **Statistics** page with a live speed graph, the speed limits in force, connection status, storage, and the switches to pause all transfers and for the alternative speed limits. Open them from the menu, where they sit together below the pages, or from the sidebar; the speeds in the header open the statistics too. Dots on the menu button and beside Torrents and Statistics show what's out of the ordinary from every page: torrents with errors, paused transfers, a connection problem, or the alternative limits. A notice says when qBittorrent can't be reached.
+- **Notifications** when a torrent finishes, if you turn them on. Messages appear above the bars at the bottom of a phone, and in the bottom corner on wide screens.
 - **Keyboard shortcuts** for the torrent list. Press `?` to see them.
 - **30 languages**, listed [below](#languages).
 - **Accessibility options**, described [below](#accessibility).
@@ -60,7 +60,7 @@ On a phone, as cards and as a table, without and with the tab bar:
 
 - **Text size**: Small, Default, Large, or Larger under **Settings > App > Appearance**. Spacing, icons, and table columns grow with the text, and the sizes build on the browser's own text size, so a larger default set there still counts. On iPhone and iPad you can still pinch to zoom.
 - **Color-blind-safe colors** are applied throughout: every status, speed, ratio, and pieces color comes from the [Okabe–Ito](https://jfly.uni-koeln.de/color/) set (bluish green, blue, orange, and vermillion), chosen to stay easy to tell apart with any kind of color blindness. Colors never carry meaning alone either: statuses have labels, speeds have arrows, the upload line in the speed graph is dashed, and pieces being downloaded are striped.
-- **Screen readers** hear when the selection, the sort order, the view, or the number of matching torrents changes. Icon buttons have names, and the tab bar's names stay readable to screen readers when they are hidden on screen.
+- **Screen readers** hear when the selection, the sort order, the view, or the number of matching torrents changes. Icon buttons have names, shown as a label when the mouse rests on them or the keyboard reaches them, and the tab bar's names stay readable to screen readers when they are hidden on screen.
 - **Tab bar labels** can be turned off on phones under **Settings > App > Appearance**, leaving larger icons.
 - **Keyboard shortcuts** for the torrent list. Press `?` to see them.
 

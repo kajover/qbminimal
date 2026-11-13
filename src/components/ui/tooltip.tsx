@@ -9,7 +9,7 @@ function Tooltip({ label, children, side = "top" }: { label: string; children: R
   return (
     <TooltipPrimitive.Provider delayDuration={300} skipDelayDuration={200}>
       <TooltipPrimitive.Root>
-        <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
+        <TooltipPrimitive.Trigger asChild data-own-tooltip>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Portal>
           <TooltipPrimitive.Content
             side={side}

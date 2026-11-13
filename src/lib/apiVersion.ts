@@ -1,5 +1,5 @@
 // Web API versions that added features this app uses. qBittorrent 5.2.3 reports 2.15.1.
-export const API_FEATURES = {
+const API_FEATURES = {
   // torrents/parseMetadata and torrents/fetchMetadata (qBittorrent 5.2)
   metadata: [2, 15, 0],
   // app/getFreeSpaceAtPath

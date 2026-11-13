@@ -1,9 +1,9 @@
 import type { Torrent } from '@/types'
 
 // qBittorrent's special values for a torrent's ratio and time limits.
-export const USE_GLOBAL_LIMIT = -2
+const USE_GLOBAL_LIMIT = -2
 export const NO_LIMIT = -1
-export const DEFAULT_LIMIT_ACTION = 'Default'
+const DEFAULT_LIMIT_ACTION = 'Default'
 
 export type ShareLimitMode = 'global' | 'none' | 'custom'
 

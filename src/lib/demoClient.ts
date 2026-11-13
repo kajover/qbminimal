@@ -136,7 +136,7 @@ const SEARCH_HITS: SearchResult[] = SEED.map((t, i) => ({
   nbSeeders: 200 - i * 30, nbLeechers: 10 + i, siteUrl: 'https://example.org', descrLink: `https://example.org/view/${i}`, engineName: 'demo',
 }))
 
-export class DemoClient implements ApiClient {
+class DemoClient implements ApiClient {
   private torrents = demoTorrents()
   private prefs: Record<string, unknown> | null = null
   private banned: string[] = []
@@ -282,7 +282,22 @@ export class DemoClient implements ApiClient {
   async deleteTorrents(hashes: string[]) { this.torrents = this.torrents.filter(t => !hashes.includes(fakeHash(t.name))) }
   async recheckTorrents() {}
   async reannounceTorrents() {}
-  async moveInQueue(_hashes: string[], _move: QueueMove) {}
+  // The queue is the unfinished torrents in list order; moving them reorders those places only.
+  async moveInQueue(hashes: string[], move: QueueMove) {
+    const slots = this.torrents.flatMap((t, i) => (t.progress < 1 ? [i] : []))
+    const queue = slots.map(i => this.torrents[i])
+    const picked = (t: DemoTorrent) => hashes.includes(fakeHash(t.name))
+    if (move === 'top' || move === 'bottom') {
+      const moving = queue.filter(picked)
+      const rest = queue.filter(t => !picked(t))
+      queue.splice(0, queue.length, ...(move === 'top' ? [...moving, ...rest] : [...rest, ...moving]))
+    } else if (move === 'up') {
+      for (let i = 1; i < queue.length; i++) if (picked(queue[i]) && !picked(queue[i - 1])) [queue[i - 1], queue[i]] = [queue[i], queue[i - 1]]
+    } else {
+      for (let i = queue.length - 2; i >= 0; i--) if (picked(queue[i]) && !picked(queue[i + 1])) [queue[i], queue[i + 1]] = [queue[i + 1], queue[i]]
+    }
+    slots.forEach((slot, i) => { this.torrents[slot] = queue[i] })
+  }
   async setForceStart(hashes: string[], value: boolean) { if (value) this.each(hashes, t => { t.stopped = false }) }
   async toggleSequentialDownload() {}
   async toggleFirstLastPiecePrio() {}

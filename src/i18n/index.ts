@@ -99,8 +99,6 @@ export function setLanguage(choice: LanguageChoice) {
   window.location.reload()
 }
 
-export const currentLanguage = () => current
-
 // Text in the current language. {name} in it is replaced with vars.name.
 export function t(text: string, vars?: Record<string, string | number | null | undefined>): string {
   const template = catalog[text] || text

@@ -1,7 +1,7 @@
 {
   "name": "qbminimal",
   "description": "A minimal, phone-friendly Web UI for qBittorrent",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "license": "GPL-3.0-only",
   "private": true,
   "type": "module",
@@ -27,7 +27,8 @@
     "demo": "VITE_DEMO_MODE=true npm run dev",
     "demo:build": "VITE_DEMO_MODE=true vite build",
     "package": "npm run release && rm -rf .pkg qbminimal-release.zip && mkdir -p .pkg/qbminimal && cp -R release/public .pkg/qbminimal/ && cp LICENSE README.md THIRD_PARTY_NOTICES.md src/assets/fonts/Silkscreen-OFL.txt .pkg/qbminimal/ && (cd .pkg && zip -qr ../qbminimal-release.zip qbminimal) && rm -rf .pkg",
-    "i18n:check": "node scripts/check-translations.mjs"
+    "i18n:check": "node scripts/check-translations.mjs",
+    "check": "node scripts/check.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",

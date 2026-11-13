@@ -2,8 +2,8 @@ import { useState, type ReactNode } from 'react'
 import { Activity, Database, Gauge, Globe, HardDrive, History, Network, Pause, Play, Turtle, type LucideIcon } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { setStatisticsOpen, useStatisticsOpen } from '@/lib/statistics'
+import { PageHeader } from '@/components/PageHeader'
+import { Card, CardContent } from '@/components/ui/card'
 import { useApiFeature, usePreferences, useTorrents, useTransferInfo } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
@@ -11,17 +11,12 @@ import { formatDuration } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { formatBytes } from '@/lib/format'
 import { SpeedChart } from './SpeedChart'
+import { CONNECTION_LABELS } from '@/lib/statusNotes'
 import { t } from '@/i18n'
-
-const CONNECTION_LABELS: Record<string, { label: string; description: string; dot: string; text: string }> = {
-  connected: { label: t('Connected'), description: t('Other peers can reach qBittorrent'), dot: 'bg-green-500', text: 'text-green-600 dark:text-green-400' },
-  firewalled: { label: t('Firewalled'), description: t('Peers can\'t connect in, so only outgoing connections work'), dot: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
-  disconnected: { label: t('Disconnected'), description: t('qBittorrent has no network connection'), dot: 'bg-red-500', text: 'text-red-600 dark:text-red-400' },
-}
 
 const size = (bytes: number | undefined) => (bytes === undefined ? '-' : formatBytes(bytes))
 const count = (value: number | undefined) => (value === undefined ? '-' : value.toLocaleString())
-const limit = (bytes: number | undefined) => (bytes === undefined ? '-' : bytes > 0 ? `${formatBytes(bytes)}/s` : 'Unlimited')
+const limit = (bytes: number | undefined) => (bytes === undefined ? '-' : bytes > 0 ? `${formatBytes(bytes)}/s` : t('Unlimited'))
 
 function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
@@ -67,7 +62,7 @@ function AlternativeLimitsButton({ on }: { on: boolean }) {
   const queryClient = useQueryClient()
   const { data: prefs } = usePreferences()
   const [pending, setPending] = useState(false)
-  const rate = (bytes: unknown) => (Number(bytes) > 0 ? `${formatBytes(Number(bytes))}/s` : t('unlimited'))
+  const rate = (bytes: unknown) => (Number(bytes) > 0 ? `${formatBytes(Number(bytes))}/s` : t('Unlimited'))
   const rates = prefs ? `↓ ${rate(prefs.alt_dl_limit)} · ↑ ${rate(prefs.alt_up_limit)}` : undefined
 
   const toggle = async () => {
@@ -96,14 +91,13 @@ function AlternativeLimitsButton({ on }: { on: boolean }) {
       className={cn('mt-2 w-full gap-2', on && 'border-amber-500/40 bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 dark:text-amber-400')}
     >
       <Turtle className="size-4" />
-      {on ? t('Alternative speed limits are on') : t('Alternative speed limits are off')}
+      {t('Alternative speed limits')}
     </Button>
   )
 }
 
-// qBittorrent's connection status and statistics, in one dialog for the whole app (lib/statistics).
-export function StatisticsDialog() {
-  const open = useStatisticsOpen()
+// qBittorrent's connection status and statistics, as a page like Logs.
+export function StatisticsView() {
   const { data: state } = useTransferInfo()
   const { data: torrents } = useTorrents()
   const canPauseSession = useApiFeature('sessionPause') && typeof state?.session_state === 'boolean'
@@ -138,8 +132,6 @@ export function StatisticsDialog() {
         [t('Uploaded'), size(state.up_info_data)],
         [t('Wasted'), size(state.total_wasted_session)],
         [t('Connected peers'), count(state.total_peer_connections)],
-        [t('Download limit'), limit(state.dl_rate_limit)],
-        [t('Upload limit'), limit(state.up_rate_limit)],
       ],
     },
     {
@@ -162,11 +154,10 @@ export function StatisticsDialog() {
     .filter(group => group.rows.length > 0)
 
   return (
-    <Dialog open={open} onOpenChange={setStatisticsOpen}>
-      <DialogContent aria-describedby={undefined} className="max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{t('Statistics')}</DialogTitle>
-        </DialogHeader>
+    <div className="space-y-4">
+      <PageHeader title={t('Statistics')} />
+      <Card>
+        <CardContent className="space-y-4">
 
         {!state ? (
           <p className="py-6 text-center text-sm text-muted-foreground">{t('Loading statistics...')}</p>
@@ -188,16 +179,24 @@ export function StatisticsDialog() {
             <section>
               <h3 className="mb-1 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><Gauge className="size-3.5" />{t('Speed')}</h3>
               <SpeedChart />
+              {/* The limits in force, which are the alternative ones while those are on. */}
+              <dl className={cn('mt-2 grid grid-cols-2 gap-2 text-sm', state.use_alt_speed_limits && 'text-amber-700 dark:text-amber-400')}>
+                <div className="rounded-md bg-muted/60 px-3 py-1.5">
+                  <dt className="text-xs text-muted-foreground">{t('Download limit')}</dt>
+                  <dd className="tabular-nums">↓ {limit(state.dl_rate_limit)}</dd>
+                </div>
+                <div className="rounded-md bg-muted/60 px-3 py-1.5">
+                  <dt className="text-xs text-muted-foreground">{t('Upload limit')}</dt>
+                  <dd className="tabular-nums">↑ {limit(state.up_rate_limit)}</dd>
+                </div>
+              </dl>
               <AlternativeLimitsButton on={state.use_alt_speed_limits === true} />
             </section>
 
-            <div className="grid grid-cols-2 gap-2">
+            {/* One row: the node count needs little room, the addresses the rest. */}
+            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
               <Fact icon={<Network className="size-4" />} label={t('DHT nodes')} value={count(state.dht_nodes)} />
-              {externalAddress && (
-                <div className="col-span-2">
-                  <Fact icon={<Globe className="size-4" />} label={t('External address')} value={externalAddress} />
-                </div>
-              )}
+              {externalAddress && <Fact icon={<Globe className="size-4" />} label={t('External address')} value={externalAddress} />}
             </div>
 
             {groups.map(group => (
@@ -219,7 +218,8 @@ export function StatisticsDialog() {
             )}
           </>
         )}
-      </DialogContent>
-    </Dialog>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
