@@ -1312,5 +1312,6 @@
   "No torrents yet. Add one with the + button.": "Aucun torrent pour l'instant. Ajoutez-en un avec le bouton +.",
   "Checks GitHub for new releases by itself every 12 hours.": "Vérifie automatiquement GitHub toutes les 12 heures pour trouver de nouvelles versions.",
   "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent n'a plus la liste des fichiers de ce torrent. Il est peut-être déjà dans votre liste ; sinon, choisissez à nouveau ses fichiers ou ajoutez-le sans choisir.",
-  "Already in your list": "Déjà dans votre liste"
+  "Already in your list": "Déjà dans votre liste",
+  "Search and filter (filters on)": "Rechercher et filtrer (filtres actifs)"
 }

@@ -1,5 +1,6 @@
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/NativeSelect'
+import { RemovableChip } from '@/components/ColumnFilters'
 import { STATUS_FILTERS, TRACKERLESS, type StatusFilter } from '@/lib/torrentFilters'
 import type { TorrentList } from '@/hooks/useTorrentList'
 import type { FilterView } from '@/lib/filterViews'
@@ -40,5 +41,21 @@ export function TorrentFilterPanel({ list, categories, tags, views, onViewsChang
       </NativeSelect>
       <SaveViewButton list={list} views={views} onViewsChange={onViewsChange} />
     </div>
+  )
+}
+
+// The panel's filters in force, as chips above the list while it's closed. They're kept between
+// visits, so without these a saved status or category could hide torrents unnoticed.
+export function ListFilterChips({ list }: { list: TorrentList }) {
+  const { filters, setFilter } = list
+  const status = STATUS_FILTERS.find(option => option.value === filters.status)
+  return (
+    <>
+      {filters.name.trim() && <RemovableChip text={`${t('Name')}: ${filters.name.trim()}`} onRemove={() => setFilter('name', '')} />}
+      {filters.status !== 'all' && status && <RemovableChip text={status.label} onRemove={() => setFilter('status', 'all')} />}
+      {filters.category && <RemovableChip text={`${t('Category')}: ${filters.category}`} onRemove={() => setFilter('category', '')} />}
+      {filters.tag && <RemovableChip text={`${t('Tags')}: ${filters.tag}`} onRemove={() => setFilter('tag', '')} />}
+      {filters.tracker && <RemovableChip text={`${t('Tracker')}: ${filters.tracker === TRACKERLESS ? 'Trackerless' : filters.tracker}`} onRemove={() => setFilter('tracker', '')} />}
+    </>
   )
 }

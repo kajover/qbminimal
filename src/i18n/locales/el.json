@@ -1312,5 +1312,6 @@
   "No torrents yet. Add one with the + button.": "Δεν υπάρχουν torrent ακόμα. Προσθέστε ένα με το κουμπί +.",
   "Checks GitHub for new releases by itself every 12 hours.": "Ελέγχει αυτόματα το GitHub για νέες εκδόσεις κάθε 12 ώρες.",
   "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "Το qBittorrent δεν έχει πλέον τη λίστα αρχείων αυτού του torrent. Ίσως είναι ήδη στη λίστα σας· αλλιώς επιλέξτε ξανά τα αρχεία του ή προσθέστε το χωρίς επιλογή.",
-  "Already in your list": "Υπάρχει ήδη στη λίστα σας"
+  "Already in your list": "Υπάρχει ήδη στη λίστα σας",
+  "Search and filter (filters on)": "Αναζήτηση και φίλτρο (ενεργά φίλτρα)"
 }

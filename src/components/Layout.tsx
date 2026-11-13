@@ -35,14 +35,17 @@ function PageItem({ id, label, icon: Icon, page, onNavigate }: (typeof MAIN_PAGE
 // The menu button: the pages and the way out. Settings can add a sidebar or tab bar beside it.
 function PagesMenu({ page, onNavigate }: { page: PageId; onNavigate: (page: PageId) => void }) {
   const { signOut } = useSession()
+  // Closing gives focus back to the button, which browsers then ring as if reached by keyboard.
+  // That's kept for the keyboard and left out after a click or tap.
+  const byPointer = useRef(false)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="max-md:size-8" aria-label={t('Menu')} title={t('Menu')}>
+        <Button variant="ghost" size="icon" className="max-md:size-8" aria-label={t('Menu')} title={t('Menu')} onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }}>
           <Menu className="size-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-52">
+      <DropdownMenuContent align="start" className="w-52" onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }} onCloseAutoFocus={(e) => { if (byPointer.current) e.preventDefault() }}>
         {MAIN_PAGES.map(item => <PageItem key={item.id} {...item} page={page} onNavigate={onNavigate} />)}
         <DropdownMenuSeparator />
         <PageItem {...LOGS_PAGE} page={page} onNavigate={onNavigate} />

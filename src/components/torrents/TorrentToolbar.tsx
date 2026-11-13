@@ -37,8 +37,10 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
         <Keyboard className="size-4" />
       </Button>
       <AddTorrentButton onAdd={onAdd} />
-      <Button variant={filtersOpen || list.filtered ? 'secondary' : 'outline'} size="icon" className="size-8" aria-label={t('Search and filter')} title={t('Search and filter')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
+      <Button variant={filtersOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={list.filtered ? t('Search and filter (filters on)') : t('Search and filter')} title={list.filtered ? t('Search and filter (filters on)') : t('Search and filter')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
         <Search className="size-4" />
+        {/* A dot while any filter hides torrents, as the chips above the list may be out of view. */}
+        {list.filtered && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
       </Button>
 
       {list.showTable ? (

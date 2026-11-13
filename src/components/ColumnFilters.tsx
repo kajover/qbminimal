@@ -191,6 +191,21 @@ function FilterChip({ target, filter, onChange }: { target: FilterTarget; filter
   )
 }
 
+// A filter set elsewhere, such as the status, shown as a chip that only removes it.
+export function RemovableChip({ text, onRemove }: { text: string; onRemove: () => void }) {
+  return (
+    <span className="flex max-w-full items-center rounded-full border bg-card text-sm">
+      <span className="flex min-w-0 items-center gap-1.5 py-1 ps-3 pe-1">
+        <ListFilter className="size-3.5 shrink-0 text-muted-foreground" />
+        <span className="truncate" dir="auto">{text}</span>
+      </span>
+      <button type="button" className="me-1 flex size-6 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground" aria-label={t('Remove filter: {filter}', { filter: text })} title={t('Remove filter')} onClick={onRemove}>
+        <X className="size-3.5" />
+      </button>
+    </span>
+  )
+}
+
 // A button that adds a column filter without the table: pick a column, then set it.
 function AddFilterButton({ targets, onChange }: { targets: FilterTarget[]; onChange: (id: string, filter: ColumnFilter | null) => void }) {
   const [open, setOpen] = useState(false)
@@ -219,20 +234,22 @@ function AddFilterButton({ targets, onChange }: { targets: FilterTarget[]; onCha
 
 // The column filters in force, as chips that open their editor or remove them, plus a way to add
 // one, which is the only way on phones and in the card view, where no titles show.
-export function ColumnFilterChips({ targets, filters, onChange, showAdd, end, className }: {
+export function ColumnFilterChips({ targets, filters, onChange, showAdd, start, end, className }: {
   targets: FilterTarget[]
   filters: ColumnFilters
   onChange: (id: string, filter: ColumnFilter | null) => void
   // Whether the add button shows; a string of classes shows it only where they say, such as 'md:hidden'.
   showAdd: boolean | string
-  // More buttons after the add button.
+  // Other chips before these, and more buttons after the add button.
+  start?: ReactNode
   end?: ReactNode
   className?: string
 }) {
   const chips = targets.filter(c => isActive(filters[c.id]))
-  if (!chips.length && !showAdd && !end) return null
+  if (!chips.length && !showAdd && !start && !end) return null
   return (
     <div className={cn('flex flex-wrap items-center gap-2', className)} aria-label={t('Column filters')} role="group">
+      {start}
       {chips.map(c => <FilterChip key={c.id} target={c} filter={filters[c.id]} onChange={(next) => onChange(c.id, next)} />)}
       {showAdd && <span className={typeof showAdd === 'string' ? showAdd : undefined}><AddFilterButton targets={targets} onChange={onChange} /></span>}
       {end}

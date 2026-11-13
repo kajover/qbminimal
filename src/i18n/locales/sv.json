@@ -1312,5 +1312,6 @@
   "No torrents yet. Add one with the + button.": "Inga torrenter ännu. Lägg till en med knappen +.",
   "Checks GitHub for new releases by itself every 12 hours.": "Söker automatiskt efter nya versioner på GitHub var 12:e timme.",
   "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent har inte längre den här torrentens fillista. Den kanske redan finns i din lista; välj annars dess filer igen, eller lägg till den utan att välja.",
-  "Already in your list": "Finns redan i din lista"
+  "Already in your list": "Finns redan i din lista",
+  "Search and filter (filters on)": "Sök och filtrera (filter på)"
 }

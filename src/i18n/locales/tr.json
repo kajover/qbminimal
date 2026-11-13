@@ -1312,5 +1312,6 @@
   "No torrents yet. Add one with the + button.": "Henüz torrent yok. + düğmesiyle bir tane ekle.",
   "Checks GitHub for new releases by itself every 12 hours.": "Yeni sürümler için GitHub'ı her 12 saatte bir kendiliğinden denetler.",
   "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent artık bu torrentin dosya listesine sahip değil. Zaten listenizde olabilir; değilse dosyalarını yeniden seçin veya seçmeden ekleyin.",
-  "Already in your list": "Zaten listenizde"
+  "Already in your list": "Zaten listenizde",
+  "Search and filter (filters on)": "Ara ve süz (süzgeçler açık)"
 }

@@ -1312,5 +1312,6 @@
   "No torrents yet. Add one with the + button.": "Още няма торенти. Добавете с бутона +.",
   "Checks GitHub for new releases by itself every 12 hours.": "Проверява GitHub за нови версии автоматично на всеки 12 часа.",
   "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent вече няма списъка с файлове на този торент. Възможно е вече да е в списъка ви; иначе изберете файловете му отново или го добавете без избор.",
-  "Already in your list": "Вече е в списъка ви"
+  "Already in your list": "Вече е в списъка ви",
+  "Search and filter (filters on)": "Търсене и филтриране (има филтри)"
 }

@@ -25,7 +25,7 @@ import { ActionBarDialog } from './ActionBarDialog'
 import { DeleteTorrentsDialog } from './DeleteTorrentsDialog'
 import { FilterViewChips } from './FilterViews'
 import { TorrentCards } from './TorrentCards'
-import { TorrentFilterPanel } from './TorrentFilterPanel'
+import { ListFilterChips, TorrentFilterPanel } from './TorrentFilterPanel'
 import { MoreMenu, TorrentContextMenu } from './TorrentMenus'
 import { ShortcutsDialog } from './ShortcutsDialog'
 import { TorrentTable } from './TorrentTable'
@@ -348,6 +348,7 @@ export function TorrentsView() {
     )
   }
 
+  const hasPanelFilters = !!list.filters.name.trim() || list.filters.status !== 'all' || !!list.filters.category || !!list.filters.tag || !!list.filters.tracker
   const matchingSelected = list.matching.filter(t => selection.selected.has(t.hash)).length
 
   return (
@@ -362,6 +363,7 @@ export function TorrentsView() {
         onChange={list.setColumnFilter}
         // In the table they're also set from the column titles.
         showAdd={filtersOpen}
+        start={!filtersOpen && hasPanelFilters && <ListFilterChips list={list} />}
         end={filtersOpen && (
           <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 rounded-full" onClick={() => setManageOpen(true)}>
             <FolderCog className="size-4" />

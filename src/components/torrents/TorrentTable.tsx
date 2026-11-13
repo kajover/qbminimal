@@ -27,7 +27,7 @@ const LINKED_SCROLL = typeof CSS !== 'undefined' && typeof CSS.supports === 'fun
 // Columns of words, which follow the language's direction; all others are numbers or paths.
 const WORD_COLUMNS: ReadonlySet<ColumnId> = new Set(['name', 'state', 'category', 'tags'])
 
-const PINNED_LEFT = 'sticky start-0 z-10 bg-card group-hover:bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]'
+const PINNED_LEFT = 'sticky start-0 z-10 bg-card transition-colors group-hover:bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]'
 const PINNED_SELECTED = 'bg-muted group-hover:bg-muted'
 
 // A dash in place of a speed of zero, so the moving torrents stand out.

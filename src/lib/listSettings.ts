@@ -1,7 +1,7 @@
-import { STATUS_FILTERS, type StatusFilter } from './torrentFilters'
 import { COLUMN_IDS, type ColumnId } from './torrentColumns'
 
-// The torrent list's sort, filters, view, and page size, kept per device so the list opens the way it was left.
+// The torrent list's sort, view, and page size, kept per device so the list opens the way it was left.
+// Its filters aren't kept: each visit starts with every torrent showing, so none can hide unnoticed.
 export type SortField = ColumnId
 export type SortDirection = 'asc' | 'desc'
 // 'auto' shows the table on wide screens and cards on phones.
@@ -11,16 +11,12 @@ export const PAGE_SIZES = [20, 50, 100, 250] as const
 export interface ListSettings {
   sortField: SortField
   sortDirection: SortDirection
-  status: StatusFilter
-  category: string
-  tag: string
-  tracker: string
   view: ListView
   pageSize: number
 }
 
 // Sorted by queue position (#), as qBittorrent sorts its list until you choose otherwise.
-export const DEFAULT_LIST_SETTINGS: ListSettings = { sortField: 'priority', sortDirection: 'asc', status: 'all', category: '', tag: '', tracker: '', view: 'auto', pageSize: 20 }
+export const DEFAULT_LIST_SETTINGS: ListSettings = { sortField: 'priority', sortDirection: 'asc', view: 'auto', pageSize: 20 }
 
 const STORAGE_KEY = 'qbminimal.torrentList'
 // Settings saved before version 2 kept the old default sort by name, so that one is left behind.
@@ -36,14 +32,9 @@ export function parseListSettings(raw: string | null): ListSettings {
     return DEFAULT_LIST_SETTINGS
   }
   const current = saved.version === SETTINGS_VERSION
-  const text = (key: keyof ListSettings) => (typeof saved[key] === 'string' ? saved[key] as string : DEFAULT_LIST_SETTINGS[key] as string)
   return {
     sortField: current && COLUMN_IDS.includes(saved.sortField as SortField) ? saved.sortField as SortField : DEFAULT_LIST_SETTINGS.sortField,
     sortDirection: current && saved.sortDirection === 'desc' ? 'desc' : 'asc',
-    status: STATUS_FILTERS.some(({ value }) => value === saved.status) ? saved.status as StatusFilter : DEFAULT_LIST_SETTINGS.status,
-    category: text('category'),
-    tag: text('tag'),
-    tracker: text('tracker'),
     view: saved.view === 'table' || saved.view === 'cards' ? saved.view : 'auto',
     pageSize: PAGE_SIZES.includes(saved.pageSize as typeof PAGE_SIZES[number]) ? saved.pageSize as number : DEFAULT_LIST_SETTINGS.pageSize,
   }

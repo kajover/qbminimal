@@ -1312,5 +1312,6 @@
   "No torrents yet. Add one with the + button.": "还没有 torrent。点击 + 按钮添加。",
   "Checks GitHub for new releases by itself every 12 hours.": "每 12 小时自动检查一次 GitHub 上的新版本。",
   "qBittorrent no longer has this torrent's file list. It may already be in your list; otherwise choose its files again, or add it without choosing.": "qBittorrent 已不再保留此种子的文件列表。它可能已在你的列表中；否则请重新选择文件，或不选择直接添加。",
-  "Already in your list": "已在你的列表中"
+  "Already in your list": "已在你的列表中",
+  "Search and filter (filters on)": "搜索和筛选（筛选已开启）"
 }

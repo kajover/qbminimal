@@ -3,8 +3,12 @@ import { DEFAULT_LIST_SETTINGS, parseListSettings } from './listSettings'
 
 describe('parseListSettings', () => {
   it('reads saved settings', () => {
-    const saved = { sortField: 'added_on', sortDirection: 'desc', status: 'seeding', category: 'Linux', tag: 'iso', tracker: 'example.org', view: 'table', pageSize: 100 }
+    const saved = { sortField: 'added_on', sortDirection: 'desc', view: 'table', pageSize: 100 }
     expect(parseListSettings(JSON.stringify({ ...saved, version: 2 }))).toEqual(saved)
+  })
+
+  it('leaves filters saved by older versions behind', () => {
+    expect(parseListSettings(JSON.stringify({ status: 'seeding', category: 'Linux', version: 2 }))).toEqual(DEFAULT_LIST_SETTINGS)
   })
 
   it('sorts by queue position, as qBittorrent does, unless chosen otherwise since', () => {

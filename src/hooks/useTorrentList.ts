@@ -13,10 +13,11 @@ const NO_FILTERS: TorrentFilters = { name: '', status: 'all', category: '', tag:
 const COLUMN_FILTERS_TABLE = 'torrents'
 
 // Everything about how the torrent list is narrowed, ordered, split into pages, and shown.
-// All of it except the name search is remembered on this device, the column filters included.
+// The sort, view, page size, and column filters, which show as chips, are remembered on this device;
+// the other filters start cleared on each visit.
 export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, string[]> | undefined) {
   const [saved] = useState(loadListSettings)
-  const [filters, setFilters] = useState<TorrentFilters>(() => ({ ...NO_FILTERS, status: saved.status, category: saved.category, tag: saved.tag, tracker: saved.tracker, columns: loadColumnFilters(COLUMN_FILTERS_TABLE) }))
+  const [filters, setFilters] = useState<TorrentFilters>(() => ({ ...NO_FILTERS, columns: loadColumnFilters(COLUMN_FILTERS_TABLE) }))
   const [sort, setSort] = useState<{ field: SortField; direction: SortDirection }>({ field: saved.sortField, direction: saved.sortDirection })
   const [view, setView] = useState<ListView>(saved.view)
   const [pageSize, setPageSize] = useState(saved.pageSize)
@@ -24,8 +25,8 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
   const wide = useMediaQuery(WIDE_SCREEN)
 
   useEffect(() => {
-    saveListSettings({ sortField: sort.field, sortDirection: sort.direction, status: filters.status, category: filters.category, tag: filters.tag, tracker: filters.tracker ?? '', view, pageSize })
-  }, [sort, filters.status, filters.category, filters.tag, filters.tracker, view, pageSize])
+    saveListSettings({ sortField: sort.field, sortDirection: sort.direction, view, pageSize })
+  }, [sort, view, pageSize])
   useEffect(() => { saveColumnFilters(COLUMN_FILTERS_TABLE, filters.columns ?? {}) }, [filters.columns])
 
   const hosts = useMemo(() => groupTrackersByHost(trackerMap ?? {}), [trackerMap])
