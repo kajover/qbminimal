@@ -769,8 +769,6 @@
   "Choose columns": "בחירת עמודות",
   "Columns": "עמודות",
   "Drag headers to reorder, or drag their edges to resize": "גרור כותרות כדי לסדר מחדש, או גרור את הקצוות שלהן כדי לשנות גודל",
-  "Keyboard shortcuts": "קיצורי מקלדת",
-  "Keyboard shortcuts (?)": "קיצורי מקלדת (?)",
   "Reset columns": "איפוס עמודות",
   "Sort: {column}": "מיון: {column}",
   "Table view": "תצוגת טבלה",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "כבר קיימת קטגוריה בשם {name}",
   "There is already a tag called {name}": "כבר קיימת תגית בשם {name}",
   "There is already a view called {name}": "כבר קיימת תצוגה בשם {name}",
-  "View updated": "התצוגה עודכנה"
+  "View updated": "התצוגה עודכנה",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "מחפש בשמות, בקטגוריות ובתגיות. אפשר להשתמש ב-* וב-? כתווים כלליים, כמו *.mkv."
 }

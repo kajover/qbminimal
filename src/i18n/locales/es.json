@@ -769,8 +769,6 @@
   "Choose columns": "Elegir columnas",
   "Columns": "Columnas",
   "Drag headers to reorder, or drag their edges to resize": "Arrastra los encabezados para reordenarlos, o sus bordes para cambiar el ancho",
-  "Keyboard shortcuts": "Atajos de teclado",
-  "Keyboard shortcuts (?)": "Atajos de teclado (?)",
   "Reset columns": "Restablecer columnas",
   "Sort: {column}": "Orden: {column}",
   "Table view": "Vista de tabla",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Ya existe una categoría llamada {name}",
   "There is already a tag called {name}": "Ya existe una etiqueta llamada {name}",
   "There is already a view called {name}": "Ya existe una vista llamada {name}",
-  "View updated": "Vista actualizada"
+  "View updated": "Vista actualizada",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Busca en nombres, categorías y etiquetas. Usa * y ? como comodines, como en *.mkv."
 }

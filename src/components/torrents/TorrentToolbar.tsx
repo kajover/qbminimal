@@ -1,4 +1,7 @@
-import { ArrowUpDown, Columns3, Keyboard, LayoutList, ListFilter, Plus, RotateCcw, Search, Table2 } from 'lucide-react'
+import { ArrowUpDown, Columns3, LayoutList, ListFilter, Plus, RotateCcw, Search, Table2 } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { SearchInput } from '@/components/SearchInput'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import type { TorrentList } from '@/hooks/useTorrentList'
@@ -13,11 +16,11 @@ interface TorrentToolbarProps {
   list: TorrentList
   filtersOpen: boolean
   onToggleFilters: () => void
+  // The search bar over the list on phones, opened from its button.
   searchOpen: boolean
-  onToggleSearch: () => void
+  onSearchOpenChange: (open: boolean) => void
   columns: ColumnLayout
   onColumnsChange: (layout: ColumnLayout) => void
-  onShowShortcuts: () => void
   onAdd: () => void
 }
 
@@ -30,20 +33,48 @@ export function AddTorrentButton({ onAdd }: { onAdd: () => void }) {
   )
 }
 
-export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen, onToggleSearch, columns, onColumnsChange, onShowShortcuts, onAdd }: TorrentToolbarProps) {
+// The quick search: a bar in the header on wide screens. On phones a button first in the row opens
+// the bar over the list, right under it; the search stays while the bar is closed, marked by a dot.
+// Esc empties it. Typing searches after a short pause, Enter at once. Wildcards like *.mkv work.
+function QuickSearch({ list, open, onOpenChange }: { list: TorrentList; open: boolean; onOpenChange: (open: boolean) => void }) {
+  const wide = useMediaQuery('(min-width: 1200px)')
+  const field = (
+    <SearchInput
+      id="torrent-search"
+      autoFocus={!wide}
+      aria-label={t('Search')}
+      placeholder={t('Search')}
+      title={t('Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.')}
+      value={list.draft}
+      onValueChange={(text) => (text ? list.setDraft(text) : list.setQuery(''))}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') list.searchNow()
+        if (e.key === 'Escape') { list.setQuery(''); if (!wide) onOpenChange(false) }
+      }}
+      className={wide ? 'w-56' : undefined}
+      inputClassName="h-8"
+    />
+  )
+  if (wide) return field
+  return (
+    <Popover open={open} onOpenChange={onOpenChange}>
+      <PopoverTrigger asChild>
+        <Button variant={open ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={t('Search')} title={t('Search')}>
+          <Search className="size-4" />
+          {list.searched && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[min(22rem,calc(100vw-1rem))] p-2">{field}</PopoverContent>
+    </Popover>
+  )
+}
+
+export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen, onSearchOpenChange, columns, onColumnsChange, onAdd }: TorrentToolbarProps) {
   const arrow = list.sort.direction === 'asc' ? '↑' : '↓'
   return (
     <>
-      {/* Only where there's a mouse, which usually means a keyboard too. */}
-      <Button variant="ghost" size="icon" className="hidden size-8 pointer-fine:inline-flex" aria-label={t('Keyboard shortcuts')} title={t('Keyboard shortcuts (?)')} onClick={onShowShortcuts}>
-        <Keyboard className="size-4" />
-      </Button>
+      <QuickSearch list={list} open={searchOpen} onOpenChange={onSearchOpenChange} />
       <AddTorrentButton onAdd={onAdd} />
-      {/* A quick search by name, without opening the filters. A dot shows while it narrows the list. */}
-      <Button variant={searchOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={t('Search')} title={t('Search')} aria-expanded={searchOpen} onClick={onToggleSearch}>
-        <Search className="size-4" />
-        {list.searched && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
-      </Button>
 
       {list.showTable ? (
         <DropdownMenu>

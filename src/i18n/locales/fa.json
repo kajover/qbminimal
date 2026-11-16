@@ -769,8 +769,6 @@
   "Choose columns": "انتخاب ستون‌ها",
   "Columns": "ستون‌ها",
   "Drag headers to reorder, or drag their edges to resize": "سرستون‌ها را برای ترتیب‌دهی بکشید یا لبه‌هایشان را برای تغییر اندازه بکشید",
-  "Keyboard shortcuts": "میان‌برهای صفحه‌کلید",
-  "Keyboard shortcuts (?)": "میان‌برهای صفحه‌کلید (?)",
   "Reset columns": "بازنشانی ستون‌ها",
   "Sort: {column}": "مرتب‌سازی: {column}",
   "Table view": "نمای جدول",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "دسته‌ای به نام {name} از قبل وجود دارد",
   "There is already a tag called {name}": "برچسبی به نام {name} از قبل وجود دارد",
   "There is already a view called {name}": "نمایی به نام {name} از قبل وجود دارد",
-  "View updated": "نما به‌روز شد"
+  "View updated": "نما به‌روز شد",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "در نام‌ها، دسته‌ها و برچسب‌ها جستجو می‌کند. از * و ? به‌عنوان نویسه عام استفاده کنید، مانند *.mkv."
 }

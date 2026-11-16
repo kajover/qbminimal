@@ -769,8 +769,6 @@
   "Choose columns": "कॉलम चुनें",
   "Columns": "कॉलम",
   "Drag headers to reorder, or drag their edges to resize": "क्रम बदलने के लिए हेडर खींचें, या आकार बदलने के लिए उनके किनारे खींचें",
-  "Keyboard shortcuts": "कीबोर्ड शॉर्टकट",
-  "Keyboard shortcuts (?)": "कीबोर्ड शॉर्टकट (?)",
   "Reset columns": "कॉलम रीसेट करें",
   "Sort: {column}": "क्रम: {column}",
   "Table view": "टेबल व्यू",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "{name} नाम की श्रेणी पहले से है",
   "There is already a tag called {name}": "{name} नाम का टैग पहले से है",
   "There is already a view called {name}": "{name} नाम का दृश्य पहले से है",
-  "View updated": "दृश्य अपडेट हुआ"
+  "View updated": "दृश्य अपडेट हुआ",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "नामों, श्रेणियों और टैग में खोजता है। * और ? को वाइल्डकार्ड की तरह इस्तेमाल करें, जैसे *.mkv।"
 }

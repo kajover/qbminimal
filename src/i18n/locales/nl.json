@@ -769,8 +769,6 @@
   "Choose columns": "Kolommen kiezen",
   "Columns": "Kolommen",
   "Drag headers to reorder, or drag their edges to resize": "Sleep kolomkoppen om ze te herschikken, of sleep hun randen om de breedte te wijzigen",
-  "Keyboard shortcuts": "Sneltoetsen",
-  "Keyboard shortcuts (?)": "Sneltoetsen (?)",
   "Reset columns": "Kolommen herstellen",
   "Sort: {column}": "Sortering: {column}",
   "Table view": "Tabelweergave",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Er is al een categorie met de naam {name}",
   "There is already a tag called {name}": "Er is al een label met de naam {name}",
   "There is already a view called {name}": "Er is al een weergave met de naam {name}",
-  "View updated": "Weergave bijgewerkt"
+  "View updated": "Weergave bijgewerkt",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Zoekt in namen, categorieën en labels. Gebruik * en ? als jokers, zoals in *.mkv."
 }

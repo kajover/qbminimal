@@ -769,8 +769,6 @@
   "Choose columns": "Pilih kolom",
   "Columns": "Kolom",
   "Drag headers to reorder, or drag their edges to resize": "Seret header untuk mengurutkan ulang, atau seret tepinya untuk mengubah ukuran",
-  "Keyboard shortcuts": "Pintasan papan ketik",
-  "Keyboard shortcuts (?)": "Pintasan papan ketik (?)",
   "Reset columns": "Atur ulang kolom",
   "Sort: {column}": "Urutkan: {column}",
   "Table view": "Tampilan tabel",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Sudah ada kategori bernama {name}",
   "There is already a tag called {name}": "Sudah ada tag bernama {name}",
   "There is already a view called {name}": "Sudah ada tampilan bernama {name}",
-  "View updated": "Tampilan diperbarui"
+  "View updated": "Tampilan diperbarui",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Mencari di nama, kategori, dan tag. Gunakan * dan ? sebagai wildcard, seperti *.mkv."
 }

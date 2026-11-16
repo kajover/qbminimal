@@ -769,8 +769,6 @@
   "Choose columns": "Alege coloanele",
   "Columns": "Coloane",
   "Drag headers to reorder, or drag their edges to resize": "Trage antetele pentru a reordona sau marginile lor pentru a redimensiona",
-  "Keyboard shortcuts": "Comenzi rapide de la tastatură",
-  "Keyboard shortcuts (?)": "Comenzi rapide de la tastatură (?)",
   "Reset columns": "Resetează coloanele",
   "Sort: {column}": "Sortare: {column}",
   "Table view": "Vizualizare tabel",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Există deja o categorie numită {name}",
   "There is already a tag called {name}": "Există deja o etichetă numită {name}",
   "There is already a view called {name}": "Există deja o vizualizare numită {name}",
-  "View updated": "Vizualizare actualizată"
+  "View updated": "Vizualizare actualizată",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Caută în nume, categorii și etichete. Folosește * și ? ca metacaractere, ca în *.mkv."
 }

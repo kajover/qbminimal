@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight, Pause, Play, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { NativeSelect } from '@/components/NativeSelect'
-import { SearchInput } from '@/components/SearchInput'
 import { PageBoundary } from '@/components/PageBoundary'
 import { PageHeader } from '@/components/PageHeader'
 import { useCategories, useDeleteTorrents, usePauseTorrents, useResumeTorrents, useSessionPausedWarning, useTags, useTorrents, useTrackerMap } from '@/hooks/useApi'
@@ -12,6 +11,7 @@ import { useRowPress, type RowProps } from '@/hooks/useRowPress'
 import { useSelection } from '@/hooks/useSelection'
 import { useTorrentList } from '@/hooks/useTorrentList'
 import { PAGE_SIZES } from '@/lib/listSettings'
+import { SIDEBAR_COLUMNS } from '@/lib/torrentFilters'
 import { loadFilterViews, type FilterView } from '@/lib/filterViews'
 import { announce } from '@/lib/announce'
 import { loadBarActions, saveBarActions } from '@/lib/actionBar'
@@ -26,7 +26,7 @@ import { BulkPromptDialog } from './BulkPromptDialog'
 import { ActionBarDialog } from './ActionBarDialog'
 import { DeleteTorrentsDialog } from './DeleteTorrentsDialog'
 import { TorrentCards } from './TorrentCards'
-import { FilterSheet, FilterSidebar } from './TorrentFilterPanel'
+import { FilterChoices, FilterSheet, FilterSidebar } from './TorrentFilterPanel'
 import { MoreMenu, TorrentContextMenu } from './TorrentMenus'
 import { ShortcutsDialog } from './ShortcutsDialog'
 import { TorrentTable } from './TorrentTable'
@@ -61,7 +61,7 @@ export function TorrentsView() {
 
   const selection = useSelection(list.rows.map(t => t.hash))
   const [filtersOpen, setFiltersOpen] = useState(false)
-  // The quick search by name above the list. Closing it clears its text.
+  // The search bar over the list on phones.
   const [searchOpen, setSearchOpen] = useState(false)
   const [detailsHash, setDetailsHash] = useState<string | null>(null)
   const [columns, setColumns] = useState<ColumnLayout>(loadColumnLayout)
@@ -106,7 +106,8 @@ export function TorrentsView() {
   // the other filters show, with what the empty value means for that column.
   const filterTargets = useMemo(() => {
     const none: Record<string, string> = { category: t('No category'), tags: t('No tags'), tracker: t('No tracker') }
-    return new Map(TORRENT_FILTER_COLUMNS.map((column): [string, FilterTarget] => [column.id, {
+    // Columns the sidebar covers are filtered there only.
+    return new Map(TORRENT_FILTER_COLUMNS.filter(column => !(column.id in SIDEBAR_COLUMNS)).map((column): [string, FilterTarget] => [column.id, {
       ...column,
       options: column.kind === 'set' ? () => choiceOptions(torrents, column) : undefined,
       valueLabel: (value: string) => (value === NONE ? none[column.id] ?? t('None') : value),
@@ -281,7 +282,8 @@ export function TorrentsView() {
         else selection.clear()
       } else if (event.key === '/') {
         event.preventDefault()
-        if (searchOpen) document.getElementById('torrent-search')?.focus()
+        const field = document.getElementById('torrent-search')
+        if (field) field.focus()
         else setSearchOpen(true)
       } else if (event.key === '?') {
         event.preventDefault()
@@ -292,10 +294,6 @@ export function TorrentsView() {
     return () => window.removeEventListener('keydown', onKey)
   })
 
-  const toggleSearch = () => {
-    if (searchOpen) list.setQuery('')
-    setSearchOpen(!searchOpen)
-  }
 
   // Phones: where a thumb reaches, just above the tab bar, or where the tab bar would be when it's
   // off; on tablets as wide as the tab bar. The buttons sit at the end, Delete last. No margin from
@@ -335,7 +333,7 @@ export function TorrentsView() {
       title={t('Torrents')}
       middle={selectionBar}
       actions={total > 0
-        ? <TorrentToolbar list={list} filtersOpen={filtersOpen} onToggleFilters={() => setFiltersOpen(open => !open)} searchOpen={searchOpen} onToggleSearch={toggleSearch} columns={columns} onColumnsChange={changeColumns} onShowShortcuts={() => setShortcutsOpen(true)} onAdd={() => setAddOpen(true)} />
+        ? <TorrentToolbar list={list} filtersOpen={filtersOpen} onToggleFilters={() => setFiltersOpen(open => !open)} searchOpen={searchOpen} onSearchOpenChange={setSearchOpen} columns={columns} onColumnsChange={changeColumns} onAdd={() => setAddOpen(true)} />
         : !isLoading && <AddTorrentButton onAdd={() => setAddOpen(true)} />}
     />
   )
@@ -396,18 +394,6 @@ export function TorrentsView() {
       <div className={cn(filtersOpen && wide && 'flex items-start gap-4')}>
         {!wide && <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}>{sidebar}</FilterSheet>}
         <div className="min-w-0 flex-1 space-y-4">
-          {searchOpen && (
-            <SearchInput
-              id="torrent-search"
-              autoFocus
-              aria-label={t('Search')}
-              placeholder={t('Search')}
-              value={list.query}
-              onValueChange={list.setQuery}
-              onKeyDown={(e) => { if (e.key === 'Escape') toggleSearch() }}
-              className="md:max-w-sm"
-            />
-          )}
 
         {list.matching.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-8 text-sm text-muted-foreground">
@@ -432,6 +418,11 @@ export function TorrentsView() {
             wrapBody={withMenu}
             columnFilters={list.filters.columns ?? {}}
             filterTargets={filterTargets}
+            sidebarFilter={{
+              has: (id) => id in SIDEBAR_COLUMNS,
+              active: (id) => (list.filters[SIDEBAR_COLUMNS[id]] as string[]).length > 0,
+              choices: (id) => <FilterChoices list={list} listKey={SIDEBAR_COLUMNS[id]} categories={categories ?? {}} tags={tags ?? []} />,
+            }}
             onColumnFilter={list.setColumnFilter}
           />
         ) : (

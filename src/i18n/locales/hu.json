@@ -769,8 +769,6 @@
   "Choose columns": "Oszlopok kiválasztása",
   "Columns": "Oszlopok",
   "Drag headers to reorder, or drag their edges to resize": "Húzd a fejléceket az átrendezéshez, vagy a széleiket az átméretezéshez",
-  "Keyboard shortcuts": "Gyorsbillentyűk",
-  "Keyboard shortcuts (?)": "Gyorsbillentyűk (?)",
   "Reset columns": "Oszlopok visszaállítása",
   "Sort: {column}": "Rendezés: {column}",
   "Table view": "Táblázatnézet",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Már van {name} nevű kategória",
   "There is already a tag called {name}": "Már van {name} nevű címke",
   "There is already a view called {name}": "Már van {name} nevű nézet",
-  "View updated": "Nézet frissítve"
+  "View updated": "Nézet frissítve",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Nevekben, kategóriákban és címkékben keres. A * és a ? helyettesítő karakter, például *.mkv."
 }

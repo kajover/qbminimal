@@ -769,8 +769,6 @@
   "Choose columns": "Vybrat sloupce",
   "Columns": "Sloupce",
   "Drag headers to reorder, or drag their edges to resize": "Tažením záhlaví změníte pořadí, tažením jejich okrajů změníte velikost",
-  "Keyboard shortcuts": "Klávesové zkratky",
-  "Keyboard shortcuts (?)": "Klávesové zkratky (?)",
   "Reset columns": "Obnovit sloupce",
   "Sort: {column}": "Řazení: {column}",
   "Table view": "Zobrazení tabulky",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Kategorie s názvem {name} už existuje",
   "There is already a tag called {name}": "Štítek s názvem {name} už existuje",
   "There is already a view called {name}": "Pohled s názvem {name} už existuje",
-  "View updated": "Pohled aktualizován"
+  "View updated": "Pohled aktualizován",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Hledá v názvech, kategoriích a štítcích. * a ? fungují jako zástupné znaky, např. *.mkv."
 }

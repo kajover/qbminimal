@@ -769,8 +769,6 @@
   "Choose columns": "اختيار الأعمدة",
   "Columns": "الأعمدة",
   "Drag headers to reorder, or drag their edges to resize": "اسحب رؤوس الأعمدة لإعادة ترتيبها، أو اسحب حوافها لتغيير حجمها",
-  "Keyboard shortcuts": "اختصارات لوحة المفاتيح",
-  "Keyboard shortcuts (?)": "اختصارات لوحة المفاتيح (?)",
   "Reset columns": "إعادة تعيين الأعمدة",
   "Sort: {column}": "الترتيب: {column}",
   "Table view": "عرض الجدول",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "توجد فئة باسم {name} بالفعل",
   "There is already a tag called {name}": "يوجد وسم باسم {name} بالفعل",
   "There is already a view called {name}": "توجد طريقة عرض باسم {name} بالفعل",
-  "View updated": "حُدّثت طريقة العرض"
+  "View updated": "حُدّثت طريقة العرض",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "يبحث في الأسماء والفئات والوسوم. استخدم * و ? كأحرف بدل، مثل *.mkv."
 }

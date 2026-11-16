@@ -769,8 +769,6 @@
   "Choose columns": "Chọn cột",
   "Columns": "Cột",
   "Drag headers to reorder, or drag their edges to resize": "Kéo tiêu đề để sắp xếp lại, hoặc kéo cạnh để đổi kích thước",
-  "Keyboard shortcuts": "Phím tắt",
-  "Keyboard shortcuts (?)": "Phím tắt (?)",
   "Reset columns": "Đặt lại cột",
   "Sort: {column}": "Sắp xếp: {column}",
   "Table view": "Dạng bảng",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Đã có danh mục tên {name}",
   "There is already a tag called {name}": "Đã có thẻ tên {name}",
   "There is already a view called {name}": "Đã có chế độ xem tên {name}",
-  "View updated": "Đã cập nhật chế độ xem"
+  "View updated": "Đã cập nhật chế độ xem",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Tìm trong tên, danh mục và thẻ. Dùng * và ? làm ký tự đại diện, như *.mkv."
 }

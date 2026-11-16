@@ -38,6 +38,15 @@ export const TRACKERLESS = '\u0000trackerless'
 // The lists the sidebar can toggle choices in.
 export type FilterList = 'statuses' | 'categories' | 'tags' | 'trackers'
 
+// Table columns the sidebar already filters. Their titles open the sidebar instead of a filter of
+// their own, so there's one way to filter each.
+export const SIDEBAR_COLUMNS: Record<string, FilterList> = { state: 'statuses', category: 'categories', tags: 'tags', tracker: 'trackers' }
+
+// Column filters on those columns, from before, have no place to be seen or changed, so they go.
+export function withoutSidebarColumns<T extends Record<string, unknown>>(columns: T | undefined): T {
+  return Object.fromEntries(Object.entries(columns ?? {}).filter(([id]) => !(id in SIDEBAR_COLUMNS))) as T
+}
+
 // Adds a choice to a list, or takes it out again.
 export const toggleChoice = <T,>(list: readonly T[], value: T): T[] => (list.includes(value) ? list.filter(item => item !== value) : [...list, value])
 
@@ -108,14 +117,57 @@ function hostsByHash(trackerHosts: Map<string, Set<string>>) {
   return byHash
 }
 
-// The torrents whose name, category, tags or trackers' hosts contain the text, for the quick search
+// Dots, underscores, dashes and brackets count as spaces, so "breaking bad" finds Breaking.Bad.
+const words = (text: string) => text.toLowerCase().replace(/[._\-()[\]{}]+/g, ' ').split(/\s+/).filter(Boolean)
+
+// A wildcard pattern as a regular expression for the whole value: * for any text, ? for one
+// character, and [0-9] or [!a-z] for one of (or none of) a set.
+export function globToRegExp(pattern: string): RegExp | null {
+  let source = ''
+  for (let i = 0; i < pattern.length; i++) {
+    const char = pattern[i]
+    if (char === '*') source += '.*'
+    else if (char === '?') source += '.'
+    else if (char === '[') {
+      const end = pattern.indexOf(']', i + 2)
+      if (end < 0) { source += '\\['; continue }
+      const set = pattern.slice(i + 1, end)
+      source += `[${set.startsWith('!') ? '^' + set.slice(1) : set}]`
+      i = end
+    } else source += char.replace(/[.+^${}()|\\/\]]/g, '\\$&')
+  }
+  try {
+    return new RegExp(`^${source}$`, 'i')
+  } catch {
+    return null
+  }
+}
+
+// What the quick search tests each value with. With * or ? it's a wildcard pattern for the whole
+// value, such as *.mkv or *S[0-9][0-9]E[0-9][0-9]*. Otherwise every word has to be in the value,
+// in any order.
+export function searchMatcher(search: string): ((value: string) => boolean) | null {
+  const text = search.trim()
+  if (!text) return null
+  if (/[*?]/.test(text)) {
+    const pattern = globToRegExp(text)
+    return pattern ? value => pattern.test(value) : () => false
+  }
+  const wanted = words(text)
+  return value => {
+    const have = words(value).join(' ')
+    return wanted.every(word => have.includes(word))
+  }
+}
+
+// The torrents whose name, category, tags or trackers' hosts match the search, for the quick search
 // and for a name filter kept in a saved view.
 export function searchTorrents(torrents: Torrent[], search: string, trackerHosts: Map<string, Set<string>> = new Map()): Torrent[] {
-  const text = search.trim().toLowerCase()
-  if (!text) return torrents
+  const matches = searchMatcher(search)
+  if (!matches) return torrents
   const hosts = hostsByHash(trackerHosts)
   return torrents.filter(torrent =>
-    [torrent.name, torrent.category ?? '', ...parseTags(torrent.tags), ...(hosts.get(torrent.hash) ?? [])].some(value => value.toLowerCase().includes(text)))
+    [torrent.name, torrent.category ?? '', ...parseTags(torrent.tags), ...(hosts.get(torrent.hash) ?? [])].some(matches))
 }
 
 export function filterTorrents(torrents: Torrent[], filters: TorrentFilters, trackerHosts: Map<string, Set<string>> = new Map()): Torrent[] {

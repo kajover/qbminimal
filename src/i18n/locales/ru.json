@@ -769,8 +769,6 @@
   "Choose columns": "Выбрать столбцы",
   "Columns": "Столбцы",
   "Drag headers to reorder, or drag their edges to resize": "Перетаскивайте заголовки, чтобы изменить порядок, или их края, чтобы изменить ширину",
-  "Keyboard shortcuts": "Сочетания клавиш",
-  "Keyboard shortcuts (?)": "Сочетания клавиш (?)",
   "Reset columns": "Сбросить столбцы",
   "Sort: {column}": "Сортировка: {column}",
   "Table view": "Таблица",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Категория {name} уже существует",
   "There is already a tag called {name}": "Метка {name} уже существует",
   "There is already a view called {name}": "Вид {name} уже существует",
-  "View updated": "Вид обновлён"
+  "View updated": "Вид обновлён",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Ищет по названиям, категориям и меткам. * и ? — подстановочные знаки, например *.mkv."
 }

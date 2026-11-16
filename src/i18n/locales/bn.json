@@ -769,8 +769,6 @@
   "Choose columns": "কলাম বেছে নিন",
   "Columns": "কলাম",
   "Drag headers to reorder, or drag their edges to resize": "ক্রম বদলাতে হেডার টানুন, অথবা আকার বদলাতে এর কিনারা টানুন",
-  "Keyboard shortcuts": "কিবোর্ড শর্টকাট",
-  "Keyboard shortcuts (?)": "কিবোর্ড শর্টকাট (?)",
   "Reset columns": "কলাম আগের অবস্থায় ফেরান",
   "Sort: {column}": "সাজানো: {column}",
   "Table view": "টেবিল ভিউ",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "{name} নামে একটি বিভাগ আগে থেকেই আছে",
   "There is already a tag called {name}": "{name} নামে একটি ট্যাগ আগে থেকেই আছে",
   "There is already a view called {name}": "{name} নামে একটি ভিউ আগে থেকেই আছে",
-  "View updated": "ভিউ হালনাগাদ হয়েছে"
+  "View updated": "ভিউ হালনাগাদ হয়েছে",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "নাম, বিভাগ ও ট্যাগে খোঁজে। * ও ? ওয়াইল্ডকার্ড হিসেবে ব্যবহার করুন, যেমন *.mkv।"
 }

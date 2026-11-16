@@ -3,7 +3,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { DEFAULT_LIST_SETTINGS, loadListSettings, saveListSettings, type ListView, type SortDirection, type SortField } from '@/lib/listSettings'
 import { compareTorrents, TORRENT_FILTER_COLUMNS } from '@/lib/torrentColumns'
 import { activeCount, applyColumnFilters, loadColumnFilters, saveColumnFilters, withFilter, type ColumnFilter } from '@/lib/columnFilters'
-import { countFilterOptions, filterTorrents, searchTorrents, groupTrackersByHost, hasSidebarFilters, NO_FILTERS, toggleChoice, type FilterList, type TorrentFilters } from '@/lib/torrentFilters'
+import { countFilterOptions, filterTorrents, searchTorrents, withoutSidebarColumns, groupTrackersByHost, hasSidebarFilters, NO_FILTERS, toggleChoice, type FilterList, type TorrentFilters } from '@/lib/torrentFilters'
 import type { Torrent } from '@/types'
 
 // Matches --breakpoint-md in index.css.
@@ -17,13 +17,25 @@ const COLUMN_FILTERS_TABLE = 'torrents'
 export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, string[]> | undefined) {
   const [saved] = useState(loadListSettings)
   // The quick search narrows the list for a moment, apart from the filters: views don't keep it.
+  // What's typed (the draft) applies after a 500ms pause, or at once on Enter.
+  const [draft, setDraft] = useState('')
   const [query, setQuery] = useState('')
-  const [filters, setFilters] = useState<TorrentFilters>(() => ({ ...NO_FILTERS, columns: loadColumnFilters(COLUMN_FILTERS_TABLE) }))
+  const [filters, setFilters] = useState<TorrentFilters>(() => ({ ...NO_FILTERS, columns: withoutSidebarColumns(loadColumnFilters(COLUMN_FILTERS_TABLE)) }))
   const [sort, setSort] = useState<{ field: SortField; direction: SortDirection }>({ field: saved.sortField, direction: saved.sortDirection })
   const [view, setView] = useState<ListView>(saved.view)
   const [pageSize, setPageSize] = useState(saved.pageSize)
   const [requestedPage, setRequestedPage] = useState(1)
   const wide = useMediaQuery(WIDE_SCREEN)
+
+  // The draft becomes the search after a pause in typing.
+  useEffect(() => {
+    if (draft === query) return
+    const timer = setTimeout(() => {
+      setQuery(draft)
+      setRequestedPage(1)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [draft, query])
 
   useEffect(() => {
     saveListSettings({ sortField: sort.field, sortDirection: sort.direction, view, pageSize })
@@ -47,7 +59,16 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
   return {
     filters,
     query,
+    draft,
+    setDraft,
+    // Searches for what's typed now, without waiting for the pause.
+    searchNow: () => {
+      setQuery(draft)
+      setRequestedPage(1)
+    },
+    // Sets both at once, for emptying the search.
     setQuery: (text: string) => {
+      setDraft(text)
       setQuery(text)
       setRequestedPage(1)
     },
@@ -66,10 +87,11 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
     },
     // A saved view sets them all at once.
     applyFilters: (next: TorrentFilters) => {
-      setFilters({ ...NO_FILTERS, ...next })
+      setFilters({ ...NO_FILTERS, ...next, columns: withoutSidebarColumns(next.columns) })
       setRequestedPage(1)
     },
     clearFilters: () => {
+      setDraft('')
       setQuery('')
       setFilters(NO_FILTERS)
       setRequestedPage(1)

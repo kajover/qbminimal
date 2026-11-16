@@ -769,8 +769,6 @@
   "Choose columns": "เลือกคอลัมน์",
   "Columns": "คอลัมน์",
   "Drag headers to reorder, or drag their edges to resize": "ลากหัวคอลัมน์เพื่อจัดลำดับใหม่ หรือลากขอบเพื่อปรับขนาด",
-  "Keyboard shortcuts": "แป้นพิมพ์ลัด",
-  "Keyboard shortcuts (?)": "แป้นพิมพ์ลัด (?)",
   "Reset columns": "รีเซ็ตคอลัมน์",
   "Sort: {column}": "เรียง: {column}",
   "Table view": "มุมมองตาราง",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "มีหมวดหมู่ชื่อ {name} อยู่แล้ว",
   "There is already a tag called {name}": "มีแท็กชื่อ {name} อยู่แล้ว",
   "There is already a view called {name}": "มีมุมมองชื่อ {name} อยู่แล้ว",
-  "View updated": "อัปเดตมุมมองแล้ว"
+  "View updated": "อัปเดตมุมมองแล้ว",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "ค้นหาในชื่อ หมวดหมู่ และแท็ก ใช้ * และ ? เป็นไวลด์การ์ดได้ เช่น *.mkv"
 }

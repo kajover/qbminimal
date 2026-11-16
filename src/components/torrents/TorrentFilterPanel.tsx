@@ -29,6 +29,37 @@ const STATUS_ICONS: Record<StatusFilter, LucideIcon> = {
   downloading: Download, seeding: Upload, completed: CircleCheck, stopped: Pause, active: Activity, errored: TriangleAlert,
 }
 
+interface Choice { value: string; label: string; icon: LucideIcon; count: number }
+
+// The choices of one list, in the order the sidebar shows them: the "none" choice first, then
+// the names. The table's column titles offer the same ones.
+function choicesFor(key: FilterList, list: TorrentList, categories: Record<string, TorrentCategory>, tags: string[]): Choice[] {
+  const { counts, trackerHosts } = list
+  const named = (value: string, icon: LucideIcon, count: number): Choice => ({ value, label: choiceLabel(value), icon, count })
+  const sorted = (names: string[]) => [...names].sort((a, b) => a.localeCompare(b))
+  switch (key) {
+    case 'statuses': return STATUS_FILTERS.map(({ value, label }) => ({ value, label, icon: STATUS_ICONS[value], count: counts.status[value] }))
+    case 'categories': return [named(UNCATEGORIZED, FolderX, counts.category[UNCATEGORIZED] ?? 0), ...sorted(Object.keys(categories)).map(name => named(name, Folder, counts.category[name] ?? 0))]
+    case 'tags': return [named(UNTAGGED, CircleOff, counts.tag[UNTAGGED] ?? 0), ...sorted(tags).map(name => named(name, Tag, counts.tag[name] ?? 0))]
+    case 'trackers': return [named(TRACKERLESS, CircleOff, counts.trackerless), ...trackerHosts.map(host => named(host, Globe, counts.tracker[host] ?? 0))]
+  }
+}
+
+function ChoiceItem({ list, listKey, choice, menu }: { list: TorrentList; listKey: FilterList; choice: Choice; menu?: ReactNode }) {
+  const checked = (list.filters[listKey] as string[]).includes(choice.value)
+  return <FilterItem icon={choice.icon} label={choice.label} muted={choice.value.startsWith('\u0000')} count={choice.count} checked={checked} onToggle={() => list.toggleFilter(listKey, choice.value)} menu={menu} />
+}
+
+// One list's tick boxes on their own, for the popup of a table column the sidebar covers. Ticking
+// one here ticks it in the sidebar too: it's the same filter.
+export function FilterChoices({ list, listKey, categories, tags }: { list: TorrentList; listKey: FilterList; categories: Record<string, TorrentCategory>; tags: string[] }) {
+  return (
+    <ul className="max-h-80 space-y-px overflow-y-auto">
+      {choicesFor(listKey, list, categories, tags).map(choice => <ChoiceItem key={choice.value} list={list} listKey={listKey} choice={choice} />)}
+    </ul>
+  )
+}
+
 // Sections folded away stay folded on this device.
 const FOLDED_KEY = 'qbminimal.filterSections'
 const loadFolded = (): string[] => {
@@ -225,7 +256,7 @@ interface FilterSidebarProps {
 // choices and a count of the torrents each would show. Views, categories and tags can be added,
 // renamed, changed and deleted right here.
 export function FilterSidebar({ list, torrents, categories, tags, views, onViewsChange, columnTargets, onClose }: FilterSidebarProps) {
-  const { filters, counts, trackerHosts } = list
+  const { filters } = list
   const [folded, setFolded] = useState(loadFolded)
   const [prompt, setPrompt] = useState<Prompt | null>(null)
   const fold = (id: string) => setFolded(current => {
@@ -234,9 +265,8 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
     return next
   })
   const chosen = (key: FilterList, value: string) => (filters[key] as string[]).includes(value)
-  const item = (key: FilterList, value: string, icon: LucideIcon, count: number, menu?: ReactNode, label = choiceLabel(value)) => (
-    <FilterItem key={value} icon={icon} label={label} muted={value.startsWith('\u0000')} count={count} checked={chosen(key, value)} onToggle={() => list.toggleFilter(key, value)} menu={menu} />
-  )
+  const items = (key: FilterList, menu?: (name: string) => ReactNode) =>
+    choicesFor(key, list, categories, tags).map(choice => <ChoiceItem key={choice.value} list={list} listKey={key} choice={choice} menu={menu && !choice.value.startsWith('\u0000') ? menu(choice.value) : undefined} />)
   // A deleted category or tag can't stay chosen, or it would hide every torrent.
   const forget = (key: FilterList, value: string) => { if (chosen(key, value)) list.toggleFilter(key, value) }
   // The quick search narrows the views by name too.
@@ -267,8 +297,8 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
           <X className="size-4" />
         </Button>
       </div>
-      <div className="flex flex-wrap items-center gap-1">
-        <SaveViewButton list={list} views={views} onViewsChange={onViewsChange} />
+      {/* Reset and the column filter funnel first, then saving the filters as a view. */}
+      <div className="flex items-center gap-1">
         {/* Clears every filter, the column filters included. */}
         <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full px-2.5" disabled={!list.filtered} onClick={list.clearFilters}>
           <RotateCcw className="size-4" />
@@ -276,6 +306,7 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
         </Button>
         <span className="ms-auto"><AddFilterButton targets={columnTargets} onChange={list.setColumnFilter} /></span>
       </div>
+      <SaveViewButton list={list} views={views} onViewsChange={onViewsChange} />
 
       {shownViews.length > 0 && (
         <Section id="views" title={t('Views')} icon={Bookmark} chosen={0} folded={folded.includes('views')} onFold={fold}>
@@ -311,32 +342,29 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
       )}
 
       <Section id="status" title={t('Status')} icon={Activity} chosen={filters.statuses.length} folded={folded.includes('status')} onFold={fold}>
-        {STATUS_FILTERS.map(({ value, label }) => item('statuses', value, STATUS_ICONS[value], counts.status[value], undefined, label))}
+        {items('statuses')}
       </Section>
 
       <Section id="categories" title={t('Categories')} icon={Folder} chosen={filters.categories.length} folded={folded.includes('categories')} onFold={fold} onAdd={() => setPrompt({ kind: 'newCategory' })} addLabel={t('New category')}>
-        {item('categories', UNCATEGORIZED, FolderX, counts.category[UNCATEGORIZED] ?? 0)}
-        {categoryNames.map(name => item('categories', name, Folder, counts.category[name] ?? 0, (
+        {items('categories', name => (
           <ItemMenu name={name}>
             <DropdownMenuItem onClick={() => setPrompt({ kind: 'editCategory', name, savePath: categories[name]?.savePath ?? '' })}><Pencil />{t('Edit category')}</DropdownMenuItem>
             <DropdownMenuItem variant="destructive" onClick={() => setPrompt({ kind: 'deleteCategory', name })}><Trash2 />{t('Delete')}</DropdownMenuItem>
           </ItemMenu>
-        )))}
+        ))}
       </Section>
 
       <Section id="tags" title={t('Tags')} icon={Tags} chosen={filters.tags.length} folded={folded.includes('tags')} onFold={fold} onAdd={() => setPrompt({ kind: 'newTags' })} addLabel={t('New tags')}>
-        {item('tags', UNTAGGED, CircleOff, counts.tag[UNTAGGED] ?? 0)}
-        {tagNames.map(name => item('tags', name, Tag, counts.tag[name] ?? 0, (
+        {items('tags', name => (
           <ItemMenu name={name}>
             <DropdownMenuItem onClick={() => setPrompt({ kind: 'editTag', name })}><Pencil />{t('Rename')}</DropdownMenuItem>
             <DropdownMenuItem variant="destructive" onClick={() => setPrompt({ kind: 'deleteTag', name })}><Trash2 />{t('Delete')}</DropdownMenuItem>
           </ItemMenu>
-        )))}
+        ))}
       </Section>
 
       <Section id="trackers" title={t('Trackers')} icon={Globe} chosen={filters.trackers.length} folded={folded.includes('trackers')} onFold={fold}>
-        {item('trackers', TRACKERLESS, CircleOff, counts.trackerless)}
-        {trackerHosts.map(host => item('trackers', host, Globe, counts.tracker[host] ?? 0))}
+        {items('trackers')}
       </Section>
 
       {/* Keyed so each prompt starts with empty fields, or the category's own save path. */}

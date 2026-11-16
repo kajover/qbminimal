@@ -769,8 +769,6 @@
   "Choose columns": "Избор на колони",
   "Columns": "Колони",
   "Drag headers to reorder, or drag their edges to resize": "Плъзнете заглавията за пренареждане или краищата им за промяна на размера",
-  "Keyboard shortcuts": "Клавишни комбинации",
-  "Keyboard shortcuts (?)": "Клавишни комбинации (?)",
   "Reset columns": "Нулиране на колоните",
   "Sort: {column}": "Сортиране: {column}",
   "Table view": "Табличен изглед",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Вече има категория с име {name}",
   "There is already a tag called {name}": "Вече има етикет с име {name}",
   "There is already a view called {name}": "Вече има изглед с име {name}",
-  "View updated": "Изгледът е обновен"
+  "View updated": "Изгледът е обновен",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Търси в имена, категории и етикети. Използвайте * и ? като заместващи знаци, напр. *.mkv."
 }

@@ -114,19 +114,31 @@ describe('the torrent list', () => {
     expect(await screen.findByRole('dialog')).toBeInTheDocument()
   })
 
-  it('searches by name from its own button, and Esc closes and clears it', async () => {
+  it('searches from the bar in the header, and Esc empties it', async () => {
     await renderView()
     const user = userEvent.setup()
-    await user.click(screen.getByRole('button', { name: 'Search' }))
-    await user.type(screen.getByRole('searchbox', { name: 'Search' }), 'brav')
+    const search = screen.getByRole('searchbox', { name: 'Search' })
+    await user.type(search, 'brav')
+    // Enter searches at once, without the pause typing waits for.
+    expect(row('alpha')).toBeTruthy()
+    await user.keyboard('{Enter}')
     expect(within(screen.getAllByRole('table').at(-1)!).queryByText('alpha')).toBeNull()
     expect(row('bravo')).toBeTruthy()
     expect(screen.queryByRole('complementary', { name: 'Filters' })).toBeNull()
-    // The dot is on the search button, not on the filter button.
+    // A search isn't a filter, so the filter button shows none.
     expect(screen.getByRole('button', { name: 'Search and filter' })).toBeInTheDocument()
     await user.keyboard('{Escape}')
-    expect(screen.queryByRole('searchbox', { name: 'Search' })).toBeNull()
+    expect(search).toHaveValue('')
     expect(row('alpha')).toBeTruthy()
+  })
+
+  it('searches by itself after a pause in typing, with wildcards', async () => {
+    await renderView()
+    const user = userEvent.setup()
+    await user.type(screen.getByRole('searchbox', { name: 'Search' }), '*l?a')
+    await waitFor(() => expect(within(screen.getAllByRole('table').at(-1)!).queryByText('bravo')).toBeNull())
+    expect(row('delta')).toBeTruthy()
+    expect(within(screen.getAllByRole('table').at(-1)!).queryByText('alpha')).toBeNull()
   })
 
   it('starts selecting on a long press and toggles with taps after that', async () => {

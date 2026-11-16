@@ -101,9 +101,10 @@ const FIELD_CLASSES = "placeholder:text-muted-foreground selection:bg-primary se
 // Options of the fields: `className` styles the field; `wrapperClassName` sizes the frame around it,
 // which holds the × and the note for a missing entry; `clearable={false}` leaves out the ×, for a
 // field that brings a clear button of its own.
-type FieldOptions = { wrapperClassName?: string; clearable?: boolean }
+type FieldOptions = { wrapperClassName?: string; clearable?: boolean; icon?: React.ReactNode }
 
-function Input({ className, wrapperClassName, clearable: allowClear = true, type, ref, ...props }: React.ComponentProps<"input"> & FieldOptions) {
+// `icon` shows at the field's start, such as a search field's magnifying glass.
+function Input({ className, wrapperClassName, clearable: allowClear = true, icon, type, ref, ...props }: React.ComponentProps<"input"> & FieldOptions) {
   const { filled, invalid, fieldProps, clear } = useFieldExtras<HTMLInputElement>({ ...props, ref })
   const kind = type ?? "text"
   const withClear = allowClear && CLEARABLE.has(kind)
@@ -118,6 +119,7 @@ function Input({ className, wrapperClassName, clearable: allowClear = true, type
         className,
         // Room for the ×, kept over any padding the field sets, and no second × from the browser.
         withClear && "pe-8",
+        icon && "ps-8",
         kind === "search" && "[&::-webkit-search-cancel-button]:appearance-none"
       )}
       {...props}
@@ -128,6 +130,7 @@ function Input({ className, wrapperClassName, clearable: allowClear = true, type
   if (UNWRAPPED.has(kind)) return input
   return (
     <div className={cn("relative w-full min-w-0", wrapperClassName)}>
+      {icon && <span aria-hidden className="pointer-events-none absolute inset-y-0 start-0 flex w-8 items-center justify-center text-muted-foreground">{icon}</span>}
       {input}
       {clearable && filled && <ClearButton onClear={clear} className="inset-y-0" />}
       {invalid && <InvalidNote message={invalid} />}

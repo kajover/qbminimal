@@ -769,8 +769,6 @@
   "Choose columns": "열 선택",
   "Columns": "열",
   "Drag headers to reorder, or drag their edges to resize": "머리글을 끌어서 순서를 바꾸거나, 가장자리를 끌어서 크기를 조절하세요",
-  "Keyboard shortcuts": "키보드 단축키",
-  "Keyboard shortcuts (?)": "키보드 단축키 (?)",
   "Reset columns": "열 초기화",
   "Sort: {column}": "정렬: {column}",
   "Table view": "표 보기",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "{name} 카테고리가 이미 있습니다",
   "There is already a tag called {name}": "{name} 태그가 이미 있습니다",
   "There is already a view called {name}": "{name} 보기가 이미 있습니다",
-  "View updated": "보기를 업데이트했습니다"
+  "View updated": "보기를 업데이트했습니다",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "이름, 카테고리, 태그에서 찾습니다. * 와 ? 를 와일드카드로 쓸 수 있습니다(예: *.mkv)."
 }

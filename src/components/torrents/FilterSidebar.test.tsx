@@ -172,4 +172,25 @@ describe('the filter sidebar', () => {
     expect(shown()).toEqual(['alpha', 'bravo', 'charlie'])
     expect(within(sidebar).queryByRole('group', { name: 'Column filters' })).toBeNull()
   })
+
+  it('filters a column the sidebar covers with the sidebar\'s own tick boxes', async () => {
+    localStorage.setItem('qbminimal.columnFilters.torrents', JSON.stringify({ state: { type: 'set', values: ['uploading'] } }))
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    render(<QueryClientProvider client={client}><TorrentsView /></QueryClientProvider>)
+    await screen.findAllByText('alpha')
+    // An old Status column filter is gone, so nothing is hidden by it.
+    expect(shown()).toEqual(['alpha', 'bravo', 'charlie'])
+
+    await userEvent.click(screen.getByRole('button', { name: 'Filter Status' }))
+    const popup = await screen.findByRole('dialog')
+    await userEvent.click(within(popup).getByRole('checkbox', { name: /Errored/ }))
+    expect(screen.getByText('No torrents match these filters')).toBeInTheDocument()
+    await userEvent.keyboard('{Escape}')
+
+    // The same choice is ticked in the sidebar, and there's no column filter for it.
+    await userEvent.click(screen.getByRole('button', { name: /^Search and filter/ }))
+    const sidebar = screen.getByRole('complementary', { name: 'Filters' })
+    expect(within(sidebar).getByRole('checkbox', { name: /Errored/ })).toHaveAttribute('aria-checked', 'true')
+    expect(within(sidebar).queryByRole('group', { name: 'Column filters' })).toBeNull()
+  })
 })

@@ -769,8 +769,6 @@
   "Choose columns": "Välj kolumner",
   "Columns": "Kolumner",
   "Drag headers to reorder, or drag their edges to resize": "Dra rubriker för att ändra ordning, eller dra i kanterna för att ändra storlek",
-  "Keyboard shortcuts": "Tangentbordsgenvägar",
-  "Keyboard shortcuts (?)": "Tangentbordsgenvägar (?)",
   "Reset columns": "Återställ kolumner",
   "Sort: {column}": "Sortering: {column}",
   "Table view": "Tabellvy",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Det finns redan en kategori som heter {name}",
   "There is already a tag called {name}": "Det finns redan en tagg som heter {name}",
   "There is already a view called {name}": "Det finns redan en vy som heter {name}",
-  "View updated": "Vyn har uppdaterats"
+  "View updated": "Vyn har uppdaterats",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Söker i namn, kategorier och taggar. Använd * och ? som jokertecken, som i *.mkv."
 }

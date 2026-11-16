@@ -37,28 +37,37 @@ const GROUPS: { title: string; keys: [string[], string][] }[] = [
   },
 ]
 
+// The list of keys and clicks, in Settings > App and in the window ? opens on the torrent list.
+export function ShortcutsList() {
+  return (
+    <>
+      {GROUPS.map(group => (
+        <section key={group.title} className="space-y-1.5">
+          <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{group.title}</h3>
+          <dl className="space-y-1 text-sm">
+            {group.keys.map(([keys, what]) => (
+              <div key={what + keys.join()} className="flex items-center justify-between gap-4">
+                <dt className="flex shrink-0 gap-1">
+                  {keys.map(key => <kbd key={key} className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs">{key}</kbd>)}
+                </dt>
+                <dd className="text-end text-muted-foreground">{what}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ))}
+    </>
+  )
+}
+
 export function ShortcutsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent aria-describedby={undefined} className="max-h-[85vh] overflow-y-auto">
+      <DialogContent aria-describedby={undefined} className="max-h-[85vh] space-y-3 overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('Keyboard and mouse')}</DialogTitle>
         </DialogHeader>
-        {GROUPS.map(group => (
-          <section key={group.title} className="space-y-1.5">
-            <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{group.title}</h3>
-            <dl className="space-y-1 text-sm">
-              {group.keys.map(([keys, what]) => (
-                <div key={what + keys.join()} className="flex items-center justify-between gap-4">
-                  <dt className="flex shrink-0 gap-1">
-                    {keys.map(key => <kbd key={key} className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs">{key}</kbd>)}
-                  </dt>
-                  <dd className="text-end text-muted-foreground">{what}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-        ))}
+        <ShortcutsList />
       </DialogContent>
     </Dialog>
   )

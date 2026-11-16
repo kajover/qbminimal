@@ -769,8 +769,6 @@
   "Choose columns": "Choisir les colonnes",
   "Columns": "Colonnes",
   "Drag headers to reorder, or drag their edges to resize": "Faites glisser les en-têtes pour les réorganiser, ou leurs bords pour les redimensionner",
-  "Keyboard shortcuts": "Raccourcis clavier",
-  "Keyboard shortcuts (?)": "Raccourcis clavier (?)",
   "Reset columns": "Réinitialiser les colonnes",
   "Sort: {column}": "Tri : {column}",
   "Table view": "Vue en tableau",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Une catégorie nommée {name} existe déjà",
   "There is already a tag called {name}": "Une étiquette nommée {name} existe déjà",
   "There is already a view called {name}": "Une vue nommée {name} existe déjà",
-  "View updated": "Vue mise à jour"
+  "View updated": "Vue mise à jour",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Cherche dans les noms, catégories et étiquettes. * et ? sont des jokers, comme dans *.mkv."
 }

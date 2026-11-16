@@ -769,8 +769,6 @@
   "Choose columns": "Sütunları seç",
   "Columns": "Sütunlar",
   "Drag headers to reorder, or drag their edges to resize": "Sıralamak için başlıkları, boyutlandırmak için kenarlarını sürükleyin",
-  "Keyboard shortcuts": "Klavye kısayolları",
-  "Keyboard shortcuts (?)": "Klavye kısayolları (?)",
   "Reset columns": "Sütunları sıfırla",
   "Sort: {column}": "Sıralama: {column}",
   "Table view": "Tablo görünümü",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "{name} adlı bir kategori zaten var",
   "There is already a tag called {name}": "{name} adlı bir etiket zaten var",
   "There is already a view called {name}": "{name} adlı bir görünüm zaten var",
-  "View updated": "Görünüm güncellendi"
+  "View updated": "Görünüm güncellendi",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Adlarda, kategorilerde ve etiketlerde arar. * ve ? joker karakterdir, örneğin *.mkv."
 }

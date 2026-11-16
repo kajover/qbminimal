@@ -769,8 +769,6 @@
   "Choose columns": "Επιλογή στηλών",
   "Columns": "Στήλες",
   "Drag headers to reorder, or drag their edges to resize": "Σύρετε τις κεφαλίδες για αναδιάταξη ή τις άκρες τους για αλλαγή μεγέθους",
-  "Keyboard shortcuts": "Συντομεύσεις πληκτρολογίου",
-  "Keyboard shortcuts (?)": "Συντομεύσεις πληκτρολογίου (?)",
   "Reset columns": "Επαναφορά στηλών",
   "Sort: {column}": "Ταξινόμηση: {column}",
   "Table view": "Προβολή πίνακα",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Υπάρχει ήδη κατηγορία με όνομα {name}",
   "There is already a tag called {name}": "Υπάρχει ήδη ετικέτα με όνομα {name}",
   "There is already a view called {name}": "Υπάρχει ήδη προβολή με όνομα {name}",
-  "View updated": "Η προβολή ενημερώθηκε"
+  "View updated": "Η προβολή ενημερώθηκε",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Αναζητά σε ονόματα, κατηγορίες και ετικέτες. Χρησιμοποιήστε * και ? ως μπαλαντέρ, όπως *.mkv."
 }

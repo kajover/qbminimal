@@ -1,4 +1,4 @@
-import { useId, useState, type FormEvent } from 'react'
+import { useId, useState, type FormEvent, type ReactNode } from 'react'
 import { Filter, ListFilter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -140,6 +140,30 @@ function ColumnFilterEditor({ target, filter, onApply }: { target: FilterTarget;
   )
 }
 
+const funnelClass = (active: boolean, open = false) => cn(
+  'flex size-5 shrink-0 items-center justify-center rounded-sm outline-hidden hover:bg-accent hover:text-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring',
+  active ? 'text-primary' : 'opacity-0 group-hover/th:opacity-100 [@media(hover:none)]:opacity-50',
+  open && 'opacity-100',
+)
+
+// The same funnel for a column the filter sidebar covers. Its popup holds the sidebar's own tick
+// boxes, so a choice made here shows there too, not as a separate column filter.
+export function SidebarFilterButton({ label, active, children }: { label: string; active: boolean; children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button type="button" aria-label={label} title={label} className={funnelClass(active, open)} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+          <Filter className={cn('size-3.5', active && 'fill-current')} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-60 p-1.5" onClick={(e) => e.stopPropagation()} onContextMenu={(e) => e.stopPropagation()}>
+        {children}
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 // The funnel in a column title. Faint until the title is hovered, and marked while a filter is set.
 export function ColumnFilterButton({ target, filter, onChange }: { target: FilterTarget; filter?: ColumnFilter; onChange: (filter: ColumnFilter | null) => void }) {
   const [open, setOpen] = useState(false)
@@ -152,11 +176,7 @@ export function ColumnFilterButton({ target, filter, onChange }: { target: Filte
           type="button"
           aria-label={label}
           title={label}
-          className={cn(
-            'flex size-5 shrink-0 items-center justify-center rounded-sm outline-hidden hover:bg-accent hover:text-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring',
-            active ? 'text-primary' : 'opacity-0 group-hover/th:opacity-100 [@media(hover:none)]:opacity-50',
-            open && 'opacity-100',
-          )}
+          className={funnelClass(active, open)}
           onPointerDown={(e) => e.stopPropagation()}
         >
           <Filter className={cn('size-3.5', active && 'fill-current')} />

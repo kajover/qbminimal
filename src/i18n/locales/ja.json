@@ -769,8 +769,6 @@
   "Choose columns": "列を選択",
   "Columns": "列",
   "Drag headers to reorder, or drag their edges to resize": "見出しをドラッグして並べ替え、端をドラッグして幅を変更",
-  "Keyboard shortcuts": "キーボードショートカット",
-  "Keyboard shortcuts (?)": "キーボードショートカット (?)",
   "Reset columns": "列をリセット",
   "Sort: {column}": "並べ替え: {column}",
   "Table view": "テーブル表示",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "{name} という名前のカテゴリーはすでにあります",
   "There is already a tag called {name}": "{name} という名前のタグはすでにあります",
   "There is already a view called {name}": "{name} という名前のビューはすでにあります",
-  "View updated": "ビューを更新しました"
+  "View updated": "ビューを更新しました",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "名前、カテゴリー、タグを検索します。* と ? はワイルドカードとして使えます（例: *.mkv）。"
 }

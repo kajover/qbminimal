@@ -769,8 +769,6 @@
   "Choose columns": "選擇欄位",
   "Columns": "欄位",
   "Drag headers to reorder, or drag their edges to resize": "拖曳欄位標題以重新排列，或拖曳邊緣以調整寬度",
-  "Keyboard shortcuts": "鍵盤快速鍵",
-  "Keyboard shortcuts (?)": "鍵盤快速鍵（?）",
   "Reset columns": "重設欄位",
   "Sort: {column}": "排序：{column}",
   "Table view": "表格檢視",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "已有名為 {name} 的分類",
   "There is already a tag called {name}": "已有名為 {name} 的標籤",
   "There is already a view called {name}": "已有名為 {name} 的檢視",
-  "View updated": "檢視已更新"
+  "View updated": "檢視已更新",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "搜尋名稱、分類和標籤。可用 * 和 ? 作萬用字元，如 *.mkv。"
 }

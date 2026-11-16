@@ -769,8 +769,6 @@
   "Choose columns": "Spalten wählen",
   "Columns": "Spalten",
   "Drag headers to reorder, or drag their edges to resize": "Spaltenköpfe ziehen zum Umordnen, ihre Ränder ziehen für die Breite",
-  "Keyboard shortcuts": "Tastenkürzel",
-  "Keyboard shortcuts (?)": "Tastenkürzel (?)",
   "Reset columns": "Spalten zurücksetzen",
   "Sort: {column}": "Sortierung: {column}",
   "Table view": "Tabellenansicht",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Es gibt bereits eine Kategorie namens {name}",
   "There is already a tag called {name}": "Es gibt bereits einen Tag namens {name}",
   "There is already a view called {name}": "Es gibt bereits eine Ansicht namens {name}",
-  "View updated": "Ansicht aktualisiert"
+  "View updated": "Ansicht aktualisiert",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Sucht in Namen, Kategorien und Tags. * und ? sind Platzhalter, etwa *.mkv."
 }

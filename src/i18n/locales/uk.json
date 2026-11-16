@@ -769,8 +769,6 @@
   "Choose columns": "Вибрати стовпці",
   "Columns": "Стовпці",
   "Drag headers to reorder, or drag their edges to resize": "Перетягуйте заголовки, щоб змінити порядок, або їхні краї, щоб змінити розмір",
-  "Keyboard shortcuts": "Клавіатурні скорочення",
-  "Keyboard shortcuts (?)": "Клавіатурні скорочення (?)",
   "Reset columns": "Скинути стовпці",
   "Sort: {column}": "Сортування: {column}",
   "Table view": "Вигляд таблиці",
@@ -1341,5 +1339,6 @@
   "There is already a category called {name}": "Категорія {name} уже існує",
   "There is already a tag called {name}": "Мітка {name} уже існує",
   "There is already a view called {name}": "Вигляд {name} уже існує",
-  "View updated": "Вигляд оновлено"
+  "View updated": "Вигляд оновлено",
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Шукає в назвах, категоріях і мітках. * і ? — символи підстановки, наприклад *.mkv."
 }

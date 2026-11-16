@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { countFilterOptions, filterTorrents, parseTags, type TorrentFilters, getTrackerHost, groupTrackersByHost, matchesTracker, NO_FILTERS, toggleChoice, TRACKERLESS, UNCATEGORIZED, UNTAGGED } from './torrentFilters'
+import { countFilterOptions, filterTorrents, parseTags, searchMatcher, type TorrentFilters, getTrackerHost, groupTrackersByHost, matchesTracker, NO_FILTERS, toggleChoice, TRACKERLESS, UNCATEGORIZED, UNTAGGED } from './torrentFilters'
 import type { Torrent } from '@/types'
 
 const torrent = (over: Partial<Torrent>) => ({ name: 'Ubuntu', state: 'downloading', progress: 0.5, dlspeed: 0, upspeed: 0, category: '', tags: '', ...over }) as Torrent
@@ -90,4 +90,28 @@ describe('countFilterOptions', () => {
     expect(counts.tracker).toEqual({ 'tracker.example': 1 })
     expect(counts.trackerless).toBe(1)
   })
+})
+
+describe('searchMatcher', () => {
+  const matches = (search: string, value: string) => searchMatcher(search)!(value)
+  it('finds words across dots, underscores, dashes and brackets, in any order', () => {
+    expect(matches('breaking bad', 'Breaking.Bad.S01E01.720p')).toBe(true)
+    expect(matches('bad breaking', 'Breaking_Bad')).toBe(true)
+    expect(matches('horriblesubs', '[HorribleSubs] Show - 01')).toBe(true)
+    expect(matches('breaking good', 'Breaking.Bad')).toBe(false)
+  })
+  it('matches wildcard patterns against the whole value', () => {
+    expect(matches('*.mkv', 'Sintel.2010.1080p.MKV')).toBe(true)
+    expect(matches('*.mkv', 'Sintel.mkv.nfo')).toBe(false)
+    expect(matches('*1080p*', 'Sintel.2010.1080p.mkv')).toBe(true)
+    expect(matches('*S[0-9][0-9]E[0-9][0-9]*', 'Show.S01E02.mkv')).toBe(true)
+    expect(matches('*S[0-9][0-9]E[0-9][0-9]*', 'Show.Season.1.mkv')).toBe(false)
+    expect(matches('ubuntu-??.04*', 'ubuntu-24.04-desktop.iso')).toBe(true)
+    expect(matches('*[!0-9].iso', 'archlinux.iso')).toBe(true)
+  })
+  it('treats regular expression characters in a pattern as plain text', () => {
+    expect(matches('*(2008)*', 'Big Buck Bunny (2008) [4K]')).toBe(true)
+    expect(matches('a+b*', 'aab')).toBe(false)
+  })
+  it('matches nothing for an empty search', () => expect(searchMatcher('  ')).toBeNull())
 })
