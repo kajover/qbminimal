@@ -1322,7 +1322,6 @@
   "Install version {version}?": "تثبيت الإصدار {version}؟",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "ينزّل qBittorrent الإصدار الجديد من GitHub إلى مجلد جديد بجوار المجلد الحالي، ثم ينتقل إليه. يبقى المجلد القديم ويمكن حذفه.",
   "Downloading update... {percent}%": "جارٍ تنزيل التحديث... {percent}%",
-  "Update installed. Reloading...": "تم تثبيت التحديث. جارٍ إعادة التحميل...",
   "Couldn't add the update to qBittorrent": "تعذّرت إضافة التحديث إلى qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "تنزيل التحديث متوقف. تأكد من أن qBittorrent يستطيع الوصول إلى github.com.",
   "qBittorrent reported an error while downloading the update": "أبلغ qBittorrent عن خطأ أثناء تنزيل التحديث",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "يوجد وسم باسم {name} بالفعل",
   "There is already a view called {name}": "توجد طريقة عرض باسم {name} بالفعل",
   "View updated": "حُدّثت طريقة العرض",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "يبحث في الأسماء والفئات والوسوم. استخدم * و ? كأحرف بدل، مثل *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "يبحث في الأسماء والفئات والوسوم. استخدم * و ? كأحرف بدل، مثل *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "ثُبّت التحديث وأُزيل الإصدار السابق. جارٍ إعادة التحميل...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "ثُبّت التحديث. يبقى الإصدار السابق في {folder} ويمكن حذفه. جارٍ إعادة التحميل..."
 }

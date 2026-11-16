@@ -1322,7 +1322,6 @@
   "Install version {version}?": "نسخهٔ {version} نصب شود؟",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent نسخهٔ جدید را از GitHub در پوشه‌ای تازه کنار پوشهٔ فعلی دانلود می‌کند و سپس به آن می‌رود. پوشهٔ قدیمی می‌ماند و می‌توان آن را حذف کرد.",
   "Downloading update... {percent}%": "در حال دانلود به‌روزرسانی... {percent}٪",
-  "Update installed. Reloading...": "به‌روزرسانی نصب شد. در حال بارگذاری مجدد...",
   "Couldn't add the update to qBittorrent": "افزودن به‌روزرسانی به qBittorrent ممکن نشد",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "دانلود به‌روزرسانی پیش نمی‌رود. بررسی کنید qBittorrent به github.com دسترسی دارد.",
   "qBittorrent reported an error while downloading the update": "qBittorrent هنگام دانلود به‌روزرسانی خطایی گزارش کرد",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "برچسبی به نام {name} از قبل وجود دارد",
   "There is already a view called {name}": "نمایی به نام {name} از قبل وجود دارد",
   "View updated": "نما به‌روز شد",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "در نام‌ها، دسته‌ها و برچسب‌ها جستجو می‌کند. از * و ? به‌عنوان نویسه عام استفاده کنید، مانند *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "در نام‌ها، دسته‌ها و برچسب‌ها جستجو می‌کند. از * و ? به‌عنوان نویسه عام استفاده کنید، مانند *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "به‌روزرسانی نصب شد و نسخه قبلی حذف شد. در حال بارگذاری دوباره...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "به‌روزرسانی نصب شد. نسخه قبلی در {folder} می‌ماند و می‌توان آن را حذف کرد. در حال بارگذاری دوباره..."
 }

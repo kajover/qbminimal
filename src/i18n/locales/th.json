@@ -1322,7 +1322,6 @@
   "Install version {version}?": "ติดตั้งเวอร์ชัน {version} หรือไม่?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent จะดาวน์โหลดเวอร์ชันใหม่จาก GitHub ไปยังโฟลเดอร์ใหม่ข้างโฟลเดอร์ปัจจุบัน แล้วสลับไปใช้โฟลเดอร์นั้น โฟลเดอร์เก่ายังอยู่และลบได้",
   "Downloading update... {percent}%": "กำลังดาวน์โหลดอัปเดต... {percent}%",
-  "Update installed. Reloading...": "ติดตั้งอัปเดตแล้ว กำลังโหลดใหม่...",
   "Couldn't add the update to qBittorrent": "เพิ่มอัปเดตลงใน qBittorrent ไม่ได้",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "การดาวน์โหลดอัปเดตไม่คืบหน้า ตรวจสอบว่า qBittorrent เข้าถึง github.com ได้",
   "qBittorrent reported an error while downloading the update": "qBittorrent รายงานข้อผิดพลาดขณะดาวน์โหลดอัปเดต",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "มีแท็กชื่อ {name} อยู่แล้ว",
   "There is already a view called {name}": "มีมุมมองชื่อ {name} อยู่แล้ว",
   "View updated": "อัปเดตมุมมองแล้ว",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "ค้นหาในชื่อ หมวดหมู่ และแท็ก ใช้ * และ ? เป็นไวลด์การ์ดได้ เช่น *.mkv"
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "ค้นหาในชื่อ หมวดหมู่ และแท็ก ใช้ * และ ? เป็นไวลด์การ์ดได้ เช่น *.mkv",
+  "Update installed and the previous version removed. Reloading...": "ติดตั้งอัปเดตและลบเวอร์ชันก่อนหน้าแล้ว กำลังโหลดใหม่...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "ติดตั้งอัปเดตแล้ว เวอร์ชันก่อนหน้ายังอยู่ใน {folder} และลบได้ กำลังโหลดใหม่..."
 }

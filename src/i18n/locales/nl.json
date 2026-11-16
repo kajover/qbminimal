@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Versie {version} installeren?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent downloadt de nieuwe versie van GitHub naar een nieuwe map naast de huidige en schakelt er dan naartoe over. De oude map blijft staan en kan worden verwijderd.",
   "Downloading update... {percent}%": "Update downloaden... {percent}%",
-  "Update installed. Reloading...": "Update geïnstalleerd. Opnieuw laden...",
   "Couldn't add the update to qBittorrent": "De update kon niet aan qBittorrent worden toegevoegd",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "De download van de update schiet niet op. Controleer of qBittorrent github.com kan bereiken.",
   "qBittorrent reported an error while downloading the update": "qBittorrent meldde een fout bij het downloaden van de update",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Er is al een label met de naam {name}",
   "There is already a view called {name}": "Er is al een weergave met de naam {name}",
   "View updated": "Weergave bijgewerkt",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Zoekt in namen, categorieën en labels. Gebruik * en ? als jokers, zoals in *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Zoekt in namen, categorieën en labels. Gebruik * en ? als jokers, zoals in *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Update geïnstalleerd en vorige versie verwijderd. Herladen...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Update geïnstalleerd. De vorige versie blijft in {folder} en kan worden verwijderd. Herladen..."
 }

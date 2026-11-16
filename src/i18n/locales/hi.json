@@ -1322,7 +1322,6 @@
   "Install version {version}?": "संस्करण {version} इंस्टॉल करें?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent नया संस्करण GitHub से मौजूदा फ़ोल्डर के बगल में एक नए फ़ोल्डर में डाउनलोड करता है, फिर उस पर स्विच कर देता है। पुराना फ़ोल्डर बना रहता है और उसे हटाया जा सकता है।",
   "Downloading update... {percent}%": "अपडेट डाउनलोड हो रहा है... {percent}%",
-  "Update installed. Reloading...": "अपडेट इंस्टॉल हो गया। फिर से लोड हो रहा है...",
   "Couldn't add the update to qBittorrent": "अपडेट को qBittorrent में नहीं जोड़ा जा सका",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "अपडेट का डाउनलोड आगे नहीं बढ़ रहा। जाँचें कि qBittorrent github.com तक पहुँच सकता है।",
   "qBittorrent reported an error while downloading the update": "अपडेट डाउनलोड करते समय qBittorrent ने त्रुटि बताई",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "{name} नाम का टैग पहले से है",
   "There is already a view called {name}": "{name} नाम का दृश्य पहले से है",
   "View updated": "दृश्य अपडेट हुआ",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "नामों, श्रेणियों और टैग में खोजता है। * और ? को वाइल्डकार्ड की तरह इस्तेमाल करें, जैसे *.mkv।"
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "नामों, श्रेणियों और टैग में खोजता है। * और ? को वाइल्डकार्ड की तरह इस्तेमाल करें, जैसे *.mkv।",
+  "Update installed and the previous version removed. Reloading...": "अपडेट इंस्टॉल हुआ और पिछला संस्करण हटाया गया। फिर से लोड हो रहा है...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "अपडेट इंस्टॉल हुआ। पिछला संस्करण {folder} में रहता है और हटाया जा सकता है। फिर से लोड हो रहा है..."
 }

@@ -1322,7 +1322,6 @@
   "Install version {version}?": "バージョン {version} をインストールしますか?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent が GitHub から新しいバージョンを現在のフォルダーの隣の新しいフォルダーにダウンロードし、そのフォルダーに切り替えます。古いフォルダーは残り、削除できます。",
   "Downloading update... {percent}%": "アップデートをダウンロード中... {percent}%",
-  "Update installed. Reloading...": "アップデートをインストールしました。再読み込みしています...",
   "Couldn't add the update to qBittorrent": "アップデートを qBittorrent に追加できませんでした",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "アップデートのダウンロードが進んでいません。qBittorrent が github.com に接続できるか確認してください。",
   "qBittorrent reported an error while downloading the update": "アップデートのダウンロード中に qBittorrent がエラーを報告しました",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "{name} という名前のタグはすでにあります",
   "There is already a view called {name}": "{name} という名前のビューはすでにあります",
   "View updated": "ビューを更新しました",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "名前、カテゴリー、タグを検索します。* と ? はワイルドカードとして使えます（例: *.mkv）。"
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "名前、カテゴリー、タグを検索します。* と ? はワイルドカードとして使えます（例: *.mkv）。",
+  "Update installed and the previous version removed. Reloading...": "アップデートをインストールし、以前のバージョンを削除しました。再読み込みしています...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "アップデートをインストールしました。以前のバージョンは {folder} に残っており、削除できます。再読み込みしています..."
 }

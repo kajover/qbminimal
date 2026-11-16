@@ -1322,7 +1322,6 @@
   "Install version {version}?": "安装版本 {version}?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent 会从 GitHub 把新版本下载到当前文件夹旁边的新文件夹,然后切换过去。旧文件夹会保留,可以删除。",
   "Downloading update... {percent}%": "正在下载更新... {percent}%",
-  "Update installed. Reloading...": "更新已安装。正在重新加载...",
   "Couldn't add the update to qBittorrent": "无法把更新添加到 qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "更新下载没有进展。请检查 qBittorrent 能否访问 github.com。",
   "qBittorrent reported an error while downloading the update": "qBittorrent 在下载更新时报告了错误",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "已有名为 {name} 的标签",
   "There is already a view called {name}": "已有名为 {name} 的视图",
   "View updated": "视图已更新",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "搜索名称、分类和标签。可用 * 和 ? 作通配符，如 *.mkv。"
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "搜索名称、分类和标签。可用 * 和 ? 作通配符，如 *.mkv。",
+  "Update installed and the previous version removed. Reloading...": "已安装更新并移除旧版本。正在重新加载...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "已安装更新。旧版本仍在 {folder} 中，可以删除。正在重新加载..."
 }

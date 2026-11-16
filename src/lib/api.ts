@@ -192,7 +192,8 @@ class QbitClient {
     this.addTorrents(Object.fromEntries(Object.entries({ urls: url, savepath: options.savePath, category: options.category, downloader: options.downloader }).filter(([, value]) => value)) as Record<string, string>, [])
 
   // The torrents with one tag, in the same shape as the main data list.
-  getTorrentsByTag = (tag: string) => this.get<Torrent[]>('torrents/info', { tag })
+  // Every torrent with all its fields, for finding the update download by name and folder.
+  getTorrentsInfo = () => this.get<Torrent[]>('torrents/info')
 
   // Reads .torrent files without adding them. qBittorrent keeps the result, so they can then be added by hash.
   parseMetadata(files: File[]): Promise<unknown[]> {

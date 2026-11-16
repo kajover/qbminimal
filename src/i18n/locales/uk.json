@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Установити версію {version}?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent завантажує нову версію з GitHub у нову теку поруч із поточною, а потім перемикається на неї. Стара тека залишається, її можна видалити.",
   "Downloading update... {percent}%": "Завантаження оновлення... {percent}%",
-  "Update installed. Reloading...": "Оновлення встановлено. Перезавантаження...",
   "Couldn't add the update to qBittorrent": "Не вдалося додати оновлення до qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "Завантаження оновлення не просувається. Перевірте, чи qBittorrent може дістатися до github.com.",
   "qBittorrent reported an error while downloading the update": "qBittorrent повідомив про помилку під час завантаження оновлення",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Мітка {name} уже існує",
   "There is already a view called {name}": "Вигляд {name} уже існує",
   "View updated": "Вигляд оновлено",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Шукає в назвах, категоріях і мітках. * і ? — символи підстановки, наприклад *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Шукає в назвах, категоріях і мітках. * і ? — символи підстановки, наприклад *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Оновлення встановлено, попередню версію видалено. Перезавантаження...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Оновлення встановлено. Попередня версія лишилася в {folder}, її можна видалити. Перезавантаження..."
 }

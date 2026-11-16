@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Installera version {version}?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent laddar ner den nya versionen från GitHub till en ny mapp bredvid den nuvarande och byter sedan till den. Den gamla mappen finns kvar och kan raderas.",
   "Downloading update... {percent}%": "Laddar ner uppdatering... {percent} %",
-  "Update installed. Reloading...": "Uppdateringen är installerad. Läser in igen...",
   "Couldn't add the update to qBittorrent": "Det gick inte att lägga till uppdateringen i qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "Nedladdningen av uppdateringen går inte framåt. Kontrollera att qBittorrent når github.com.",
   "qBittorrent reported an error while downloading the update": "qBittorrent rapporterade ett fel när uppdateringen laddades ner",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Det finns redan en tagg som heter {name}",
   "There is already a view called {name}": "Det finns redan en vy som heter {name}",
   "View updated": "Vyn har uppdaterats",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Söker i namn, kategorier och taggar. Använd * och ? som jokertecken, som i *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Söker i namn, kategorier och taggar. Använd * och ? som jokertecken, som i *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Uppdateringen är installerad och den förra versionen borttagen. Laddar om...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Uppdateringen är installerad. Den förra versionen finns kvar i {folder} och kan tas bort. Laddar om..."
 }

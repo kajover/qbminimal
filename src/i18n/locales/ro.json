@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Instalezi versiunea {version}?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent descarcă noua versiune de pe GitHub într-un folder nou, lângă cel curent, apoi trece la el. Folderul vechi rămâne și poate fi șters.",
   "Downloading update... {percent}%": "Se descarcă actualizarea... {percent}%",
-  "Update installed. Reloading...": "Actualizare instalată. Se reîncarcă...",
   "Couldn't add the update to qBittorrent": "Nu s-a putut adăuga actualizarea în qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "Descărcarea actualizării nu avansează. Verifică dacă qBittorrent poate ajunge la github.com.",
   "qBittorrent reported an error while downloading the update": "qBittorrent a raportat o eroare la descărcarea actualizării",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Există deja o etichetă numită {name}",
   "There is already a view called {name}": "Există deja o vizualizare numită {name}",
   "View updated": "Vizualizare actualizată",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Caută în nume, categorii și etichete. Folosește * și ? ca metacaractere, ca în *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Caută în nume, categorii și etichete. Folosește * și ? ca metacaractere, ca în *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Actualizare instalată și versiunea anterioară eliminată. Se reîncarcă...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Actualizare instalată. Versiunea anterioară rămâne în {folder} și poate fi ștearsă. Se reîncarcă..."
 }

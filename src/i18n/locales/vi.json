@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Cài đặt phiên bản {version}?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent tải phiên bản mới từ GitHub vào một thư mục mới cạnh thư mục hiện tại, rồi chuyển sang thư mục đó. Thư mục cũ vẫn còn và có thể xóa.",
   "Downloading update... {percent}%": "Đang tải bản cập nhật... {percent}%",
-  "Update installed. Reloading...": "Đã cài đặt bản cập nhật. Đang tải lại...",
   "Couldn't add the update to qBittorrent": "Không thể thêm bản cập nhật vào qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "Bản cập nhật không tải tiếp được. Hãy kiểm tra qBittorrent có truy cập được github.com không.",
   "qBittorrent reported an error while downloading the update": "qBittorrent báo lỗi khi tải bản cập nhật",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Đã có thẻ tên {name}",
   "There is already a view called {name}": "Đã có chế độ xem tên {name}",
   "View updated": "Đã cập nhật chế độ xem",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Tìm trong tên, danh mục và thẻ. Dùng * và ? làm ký tự đại diện, như *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Tìm trong tên, danh mục và thẻ. Dùng * và ? làm ký tự đại diện, như *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Đã cài bản cập nhật và xóa phiên bản trước. Đang tải lại...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Đã cài bản cập nhật. Phiên bản trước vẫn ở {folder} và có thể xóa. Đang tải lại..."
 }

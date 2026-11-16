@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Telepíted a(z) {version} verziót?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "A qBittorrent letölti az új verziót a GitHubról a jelenlegi mappa melletti új mappába, majd átvált rá. A régi mappa megmarad, és törölhető.",
   "Downloading update... {percent}%": "Frissítés letöltése... {percent}%",
-  "Update installed. Reloading...": "A frissítés telepítve. Újratöltés...",
   "Couldn't add the update to qBittorrent": "Nem sikerült hozzáadni a frissítést a qBittorrenthez",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "A frissítés letöltése nem halad. Ellenőrizd, hogy a qBittorrent eléri-e a github.com oldalt.",
   "qBittorrent reported an error while downloading the update": "A qBittorrent hibát jelzett a frissítés letöltésekor",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Már van {name} nevű címke",
   "There is already a view called {name}": "Már van {name} nevű nézet",
   "View updated": "Nézet frissítve",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Nevekben, kategóriákban és címkékben keres. A * és a ? helyettesítő karakter, például *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Nevekben, kategóriákban és címkékben keres. A * és a ? helyettesítő karakter, például *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "A frissítés telepítve, az előző verzió eltávolítva. Újratöltés...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "A frissítés telepítve. Az előző verzió a(z) {folder} mappában marad, és törölhető. Újratöltés..."
 }

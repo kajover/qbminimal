@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Да се инсталира ли версия {version}?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent изтегля новата версия от GitHub в нова папка до текущата и после превключва към нея. Старата папка остава и може да се изтрие.",
   "Downloading update... {percent}%": "Изтегляне на актуализацията... {percent}%",
-  "Update installed. Reloading...": "Актуализацията е инсталирана. Презареждане...",
   "Couldn't add the update to qBittorrent": "Актуализацията не можа да се добави към qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "Изтеглянето на актуализацията не напредва. Проверете дали qBittorrent има достъп до github.com.",
   "qBittorrent reported an error while downloading the update": "qBittorrent съобщи за грешка при изтеглянето на актуализацията",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Вече има етикет с име {name}",
   "There is already a view called {name}": "Вече има изглед с име {name}",
   "View updated": "Изгледът е обновен",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Търси в имена, категории и етикети. Използвайте * и ? като заместващи знаци, напр. *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Търси в имена, категории и етикети. Използвайте * и ? като заместващи знаци, напр. *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Актуализацията е инсталирана, а предишната версия е премахната. Презареждане...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Актуализацията е инсталирана. Предишната версия остава в {folder} и може да бъде изтрита. Презареждане..."
 }

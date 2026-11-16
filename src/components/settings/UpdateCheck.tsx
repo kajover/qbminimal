@@ -32,11 +32,13 @@ export function UpdateCheck() {
     stop.current = control
     setInstalling(0)
     try {
-      await installUpdate({
-        client: qbitClient, torrentUrl, version: latestVersion, currentPath: String(prefs?.alternative_webui_path),
-        onProgress: setInstalling, signal: control.signal,
+      const oldPath = String(prefs?.alternative_webui_path)
+      const { oldRemoved } = await installUpdate({
+        client: qbitClient, torrentUrl, version: latestVersion, currentPath: oldPath,
+        onProgress: setInstalling, signal: control.signal, currentVersion: __APP_VERSION__,
       })
-      toast.success(t('Update installed. Reloading...'))
+      toast.success(oldRemoved ? t('Update installed and the previous version removed. Reloading...')
+        : t('Update installed. The previous version stays in {folder} and can be deleted. Reloading...', { folder: oldPath }))
       setTimeout(pageActions.reload, 1000)
     } catch (error) {
       const messages: Record<UpdateFailure, string> = {

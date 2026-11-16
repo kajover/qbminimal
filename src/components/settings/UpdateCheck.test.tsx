@@ -10,7 +10,7 @@ const api = vi.hoisted(() => {
     state,
     getPreferences: vi.fn(async () => ({ alternative_webui_enabled: true, alternative_webui_path: '/opt/qbminimal' })),
     addTorrents: vi.fn(async () => { state.added = true; return { success_count: 1, failure_count: 0, pending_count: 0 } }),
-    getTorrentsByTag: vi.fn(async () => (state.added ? [{ hash: 'abc', name: 'qbminimal-9.9.9', state: 'downloading', progress: (state.progress = Math.min(1, state.progress + 0.5)) }] : [])),
+    getTorrentsInfo: vi.fn(async () => (state.added ? [{ hash: 'abc', name: 'qbminimal-9.9.9', state: 'downloading', save_path: '/opt', progress: (state.progress = Math.min(1, state.progress + 0.5)) }] : [])),
     setPreferences: vi.fn(async () => undefined),
     deleteTorrents: vi.fn(async () => undefined),
   }
@@ -53,7 +53,8 @@ describe('install update', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Install' }))
 
     await waitFor(() => expect(api.setPreferences).toHaveBeenCalledWith({ alternative_webui_path: '/opt/qbminimal-9.9.9' }), { timeout: 5000 })
-    expect(api.addTorrents).toHaveBeenCalledWith(expect.objectContaining({ savepath: '/opt', tags: 'qbminimal-update' }), [])
+    expect(api.addTorrents).toHaveBeenCalledWith(expect.objectContaining({ savepath: '/opt' }), [])
+    expect((api.addTorrents.mock.calls as unknown as [Record<string, string>][])[0][0]).not.toHaveProperty('tags')
     await waitFor(() => expect(api.deleteTorrents).toHaveBeenCalledWith(['abc'], false))
     await waitFor(() => expect(pageActions.reload).toHaveBeenCalled(), { timeout: 3000 })
   })

@@ -3,8 +3,14 @@
 // web seed on GitHub, so it is added next to the current Web UI folder, and the Web UI path is then
 // pointed at the new folder.
 import type { Torrent } from '@/types'
+import { isNewer, parseVersion, UPDATE_TORRENT_ASSET } from './updates'
 
-export const UPDATE_TAG = 'qbminimal-update'
+// Tags earlier versions put on their update torrents. The update torrents are now found by their
+// name and folder instead, so no tag shows in the filters; these are deleted when they're left over.
+export const OLD_TAGS = ['qbminimal-update', 'qbminimal-cleanup']
+
+// Whether two folders are the same, whatever slash ends them.
+const sameFolder = (a: string | undefined, b: string) => (a ?? '').replace(/[\\/]+$/, '') === b.replace(/[\\/]+$/, '')
 // How long the download may stay at the same progress.
 export const STALL_MS = 60_000
 
@@ -44,7 +50,8 @@ export class UpdateError extends Error {
 
 export interface UpdateClient {
   addTorrents(params: Record<string, string>, files: File[]): Promise<unknown>
-  getTorrentsByTag(tag: string): Promise<Pick<Torrent, 'hash' | 'name' | 'state' | 'progress'>[]>
+  getTorrentsInfo(): Promise<Pick<Torrent, 'hash' | 'name' | 'state' | 'progress' | 'save_path'>[]>
+  deleteTags(tags: string[]): Promise<unknown>
   setPreferences(changes: Record<string, unknown>): Promise<unknown>
   deleteTorrents(hashes: string[], deleteFiles?: boolean): Promise<unknown>
 }
@@ -59,6 +66,43 @@ export interface InstallOptions {
   signal?: AbortSignal
   pollMs?: number
   stallMs?: number
+  // The version that's running now, whose folder is removed once the new one is in use.
+  currentVersion?: string
+}
+
+// The torrent of a release, which every release from 1.6.8 on has. Older folders can't be removed
+// this way, as qBittorrent only deletes files that belong to a torrent.
+export function releaseTorrentUrl(version: string): string | null {
+  const parsed = parseVersion(version)
+  if (!parsed || isNewer([1, 6, 8], parsed)) return null
+  return `https://github.com/kajover/qbminimal/releases/download/v${parsed.join('.')}/${UPDATE_TORRENT_ASSET}`
+}
+
+// Removes the previous version's files from its folder: its own release torrent is added over the
+// folder, stopped and unchecked, and deleted with its files. Only the files that release had go;
+// anything else in the folder stays. Says whether it worked.
+export async function removeOldVersion(client: UpdateClient, version: string, folder: string, pollMs = 1000): Promise<boolean> {
+  const url = releaseTorrentUrl(version)
+  if (!url || !folder.trim()) return false
+  try {
+    await client.addTorrents({
+      urls: url, savepath: folder, autoTMM: 'false', contentLayout: 'NoSubfolder',
+      paused: 'true', stopped: 'true', skip_checking: 'true',
+    }, [])
+    // qBittorrent downloads the .torrent first, which takes a moment.
+    for (let tries = 0; tries < 30; tries++) {
+      // Only this release's torrent in exactly that folder, so no other torrent's files are touched.
+      const found = (await client.getTorrentsInfo()).find(torrent => torrent.name === `qbminimal-${version}` && sameFolder(torrent.save_path, folder))
+      if (found) {
+        await client.deleteTorrents([found.hash], true)
+        return true
+      }
+      await sleep(pollMs)
+    }
+  } catch {
+    // The update itself worked; the old folder just stays.
+  }
+  return false
 }
 
 const sleep = (ms: number, signal?: AbortSignal) => new Promise<void>(resolve => {
@@ -77,12 +121,13 @@ export const pageActions = { reload: () => window.location.reload() }
 // Adds the update torrent, waits until it is complete, then switches the Web UI to its folder and
 // removes the torrent, keeping the files. Throws an UpdateError; stopping it with `signal`
 // removes the torrent and its files.
-export async function installUpdate({ client, torrentUrl, version, currentPath, onProgress, signal, pollMs = 1000, stallMs = STALL_MS }: InstallOptions): Promise<void> {
+// Says whether the previous version's files were removed too.
+export async function installUpdate({ client, torrentUrl, version, currentPath, onProgress, signal, pollMs = 1000, stallMs = STALL_MS, currentVersion }: InstallOptions): Promise<{ oldRemoved: boolean }> {
   const target = updateTarget(currentPath, version)
   if (!target) throw new UpdateError('add')
-  const mine = async () => (await client.getTorrentsByTag(UPDATE_TAG)).filter(torrent => torrent.name === target.name)
+  const mine = async () => (await client.getTorrentsInfo()).filter(torrent => torrent.name === target.name && sameFolder(torrent.save_path, target.savePath))
   const removeAll = async (deleteFiles: boolean) => {
-    const hashes = (await client.getTorrentsByTag(UPDATE_TAG).catch(() => [])).map(torrent => torrent.hash)
+    const hashes = (await mine().catch(() => [])).map(torrent => torrent.hash)
     if (hashes.length) await client.deleteTorrents(hashes, deleteFiles).catch(() => undefined)
   }
 
@@ -91,7 +136,7 @@ export async function installUpdate({ client, torrentUrl, version, currentPath, 
     if (!(await mine()).length) {
       const result = await client.addTorrents({
         urls: torrentUrl, savepath: target.savePath, autoTMM: 'false', contentLayout: 'Original',
-        paused: 'false', stopped: 'false', tags: UPDATE_TAG,
+        paused: 'false', stopped: 'false',
       }, []) as { failure_count?: number; success_count?: number; pending_count?: number } | undefined
       if (result?.failure_count && !result.success_count && !result.pending_count) throw new Error('refused')
     }
@@ -137,4 +182,8 @@ export async function installUpdate({ client, torrentUrl, version, currentPath, 
     throw new UpdateError('switch')
   }
   await client.deleteTorrents([hash], false).catch(() => undefined)
+  // Only once qBittorrent serves the new folder, so the old one is no longer in use.
+  const oldRemoved = currentVersion ? await removeOldVersion(client, currentVersion, currentPath.trim(), pollMs) : false
+  await client.deleteTags(OLD_TAGS).catch(() => undefined)
+  return { oldRemoved }
 }

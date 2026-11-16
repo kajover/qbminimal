@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { canInstall, installUpdate, updateTarget, UpdateError, type UpdateClient } from './selfUpdate'
+import { canInstall, installUpdate, OLD_TAGS, releaseTorrentUrl, removeOldVersion, updateTarget, UpdateError, type UpdateClient } from './selfUpdate'
 
 describe('update folder', () => {
   it('puts the new version next to the current folder, in the same path style', () => {
@@ -37,13 +37,16 @@ function fakeClient(progress: number[], state = 'downloading') {
   let added = false
   const client = {
     addTorrents: vi.fn(async () => { added = true; return { success_count: 1, failure_count: 0, pending_count: 0 } }),
-    getTorrentsByTag: vi.fn(async () => {
-      if (!added) return []
+    getTorrentsInfo: vi.fn(async () => {
+      // Another torrent of the same name elsewhere is never taken for the update.
+      const other = { hash: 'other', name: 'qbminimal-1.2.3', state: 'stalledUP', progress: 1, save_path: '/downloads' }
+      if (!added) return [other]
       const value = progress[Math.min(polls++, progress.length - 1)]
-      return [{ hash: 'abc', name: 'qbminimal-1.2.3', state, progress: value }]
+      return [other, { hash: 'abc', name: 'qbminimal-1.2.3', state, progress: value, save_path: '/opt/' }]
     }),
     setPreferences: vi.fn(async () => undefined),
     deleteTorrents: vi.fn(async () => undefined),
+    deleteTags: vi.fn(async () => undefined),
   } satisfies UpdateClient
   return client
 }
@@ -59,8 +62,9 @@ describe('install update', () => {
     const percents: number[] = []
     await run(client, { onProgress: percent => percents.push(percent) })
     expect(client.addTorrents).toHaveBeenCalledWith(expect.objectContaining({
-      urls: 'https://example.org/qbminimal-update.torrent', savepath: '/opt', autoTMM: 'false', contentLayout: 'Original', tags: 'qbminimal-update', stopped: 'false',
+      urls: 'https://example.org/qbminimal-update.torrent', savepath: '/opt', autoTMM: 'false', contentLayout: 'Original', stopped: 'false',
     }), [])
+    expect(client.addTorrents.mock.calls[0]).not.toHaveProperty('0.tags')
     expect(percents).toEqual([0, 40, 100])
     expect(client.setPreferences).toHaveBeenCalledWith({ alternative_webui_path: '/opt/qbminimal-1.2.3' })
     expect(client.deleteTorrents).toHaveBeenCalledWith(['abc'], false)
@@ -109,5 +113,68 @@ describe('install update', () => {
 describe('updateTarget and the folder in use', () => {
   it('refuses a new folder that is the one qBittorrent uses now', () => {
     expect(updateTarget('/opt/qbminimal-1.6.8', '1.6.8')).toBeNull()
+  })
+})
+
+describe('removing the previous version', () => {
+  // qBittorrent with the update torrent finished, and the old release's torrent once it's added.
+  function cleanupClient(old = '1.6.9') {
+    let cleanupAdded = false
+    return {
+      addTorrents: vi.fn(async (params: Record<string, string>) => {
+        if (params.contentLayout === 'NoSubfolder') cleanupAdded = true
+        return { success_count: 1, failure_count: 0, pending_count: 0 }
+      }),
+      getTorrentsInfo: vi.fn(async () => [
+        { hash: 'new', name: 'qbminimal-1.2.3', state: 'stalledUP', progress: 1, save_path: '/opt' },
+        ...(cleanupAdded ? [{ hash: 'old', name: `qbminimal-${old}`, state: 'stoppedDL', progress: 0, save_path: '/opt/qbminimal' }] : []),
+      ]),
+      setPreferences: vi.fn(async () => undefined),
+      deleteTorrents: vi.fn(async () => undefined),
+      deleteTags: vi.fn(async () => undefined),
+    } satisfies UpdateClient
+  }
+
+  it('knows the release torrents, which start with 1.6.8', () => {
+    expect(releaseTorrentUrl('1.6.9')).toBe('https://github.com/kajover/qbminimal/releases/download/v1.6.9/qbminimal-update.torrent')
+    expect(releaseTorrentUrl('1.6.8')).not.toBeNull()
+    expect(releaseTorrentUrl('1.6.7')).toBeNull()
+    expect(releaseTorrentUrl('test')).toBeNull()
+  })
+
+  it('adds the old release over its folder, unchecked and stopped, and deletes it with its files', async () => {
+    const client = cleanupClient()
+    expect(await removeOldVersion(client, '1.6.9', '/opt/qbminimal', 1)).toBe(true)
+    expect(client.addTorrents).toHaveBeenCalledWith(expect.objectContaining({
+      urls: 'https://github.com/kajover/qbminimal/releases/download/v1.6.9/qbminimal-update.torrent',
+      savepath: '/opt/qbminimal', contentLayout: 'NoSubfolder', skip_checking: 'true', stopped: 'true',
+    }), [])
+    // No tag, which would show in the filters.
+    expect(client.addTorrents.mock.calls[0][0]).not.toHaveProperty('tags')
+    expect(client.deleteTorrents).toHaveBeenCalledWith(['old'], true)
+  })
+
+  it('leaves a version without a release torrent alone', async () => {
+    const client = cleanupClient('1.6.7')
+    expect(await removeOldVersion(client, '1.6.7', '/opt/qbminimal', 1)).toBe(false)
+    expect(client.addTorrents).not.toHaveBeenCalled()
+  })
+
+  it('gives up quietly when the old torrent never shows up', async () => {
+    const client = cleanupClient()
+    client.getTorrentsInfo.mockResolvedValue([])
+    expect(await removeOldVersion(client, '1.6.9', '/opt/qbminimal', 1)).toBe(false)
+    expect(client.deleteTorrents).not.toHaveBeenCalled()
+  })
+
+  it('removes the old folder once the update is in use', async () => {
+    const client = cleanupClient()
+    const result = await run(client, { currentVersion: '1.6.9' })
+    expect(result).toEqual({ oldRemoved: true })
+    expect(client.setPreferences).toHaveBeenCalledWith({ alternative_webui_path: '/opt/qbminimal-1.2.3' })
+    expect(client.deleteTorrents).toHaveBeenNthCalledWith(1, ['new'], false)
+    expect(client.deleteTorrents).toHaveBeenNthCalledWith(2, ['old'], true)
+    // Tags earlier versions left behind are deleted.
+    expect(client.deleteTags).toHaveBeenCalledWith(OLD_TAGS)
   })
 })

@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Nainstalovat verzi {version}?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent stáhne novou verzi z GitHubu do nové složky vedle té současné a pak se na ni přepne. Stará složka zůstane a můžete ji smazat.",
   "Downloading update... {percent}%": "Stahování aktualizace... {percent} %",
-  "Update installed. Reloading...": "Aktualizace je nainstalována. Načítá se znovu...",
   "Couldn't add the update to qBittorrent": "Aktualizaci se nepodařilo přidat do qBittorrentu",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "Stahování aktualizace se nehýbe. Zkontrolujte, zda se qBittorrent dostane na github.com.",
   "qBittorrent reported an error while downloading the update": "qBittorrent ohlásil při stahování aktualizace chybu",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Štítek s názvem {name} už existuje",
   "There is already a view called {name}": "Pohled s názvem {name} už existuje",
   "View updated": "Pohled aktualizován",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Hledá v názvech, kategoriích a štítcích. * a ? fungují jako zástupné znaky, např. *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Hledá v názvech, kategoriích a štítcích. * a ? fungují jako zástupné znaky, např. *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Aktualizace nainstalována a předchozí verze odstraněna. Načítání...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Aktualizace nainstalována. Předchozí verze zůstává v {folder} a lze ji smazat. Načítání..."
 }

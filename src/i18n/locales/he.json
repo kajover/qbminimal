@@ -1322,7 +1322,6 @@
   "Install version {version}?": "להתקין את גרסה {version}?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent מוריד את הגרסה החדשה מ-GitHub לתיקייה חדשה לצד התיקייה הנוכחית ואז עובר אליה. התיקייה הישנה נשארת וניתן למחוק אותה.",
   "Downloading update... {percent}%": "מוריד עדכון... {percent}%",
-  "Update installed. Reloading...": "העדכון הותקן. טוען מחדש...",
   "Couldn't add the update to qBittorrent": "לא ניתן היה להוסיף את העדכון ל-qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "הורדת העדכון לא מתקדמת. בדוק ש-qBittorrent יכול להגיע ל-github.com.",
   "qBittorrent reported an error while downloading the update": "qBittorrent דיווח על שגיאה בהורדת העדכון",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "כבר קיימת תגית בשם {name}",
   "There is already a view called {name}": "כבר קיימת תצוגה בשם {name}",
   "View updated": "התצוגה עודכנה",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "מחפש בשמות, בקטגוריות ובתגיות. אפשר להשתמש ב-* וב-? כתווים כלליים, כמו *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "מחפש בשמות, בקטגוריות ובתגיות. אפשר להשתמש ב-* וב-? כתווים כלליים, כמו *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "העדכון הותקן והגרסה הקודמת הוסרה. טוען מחדש...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "העדכון הותקן. הגרסה הקודמת נשארת ב-{folder} ואפשר למחוק אותה. טוען מחדש..."
 }

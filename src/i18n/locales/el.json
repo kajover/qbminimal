@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Εγκατάσταση της έκδοσης {version};",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "Το qBittorrent κατεβάζει τη νέα έκδοση από το GitHub σε έναν νέο φάκελο δίπλα στον τρέχοντα και μετά μεταβαίνει σε αυτόν. Ο παλιός φάκελος παραμένει και μπορεί να διαγραφεί.",
   "Downloading update... {percent}%": "Λήψη ενημέρωσης... {percent}%",
-  "Update installed. Reloading...": "Η ενημέρωση εγκαταστάθηκε. Επαναφόρτωση...",
   "Couldn't add the update to qBittorrent": "Δεν ήταν δυνατή η προσθήκη της ενημέρωσης στο qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "Η λήψη της ενημέρωσης δεν προχωρά. Ελέγξτε ότι το qBittorrent μπορεί να φτάσει στο github.com.",
   "qBittorrent reported an error while downloading the update": "Το qBittorrent ανέφερε σφάλμα κατά τη λήψη της ενημέρωσης",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Υπάρχει ήδη ετικέτα με όνομα {name}",
   "There is already a view called {name}": "Υπάρχει ήδη προβολή με όνομα {name}",
   "View updated": "Η προβολή ενημερώθηκε",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Αναζητά σε ονόματα, κατηγορίες και ετικέτες. Χρησιμοποιήστε * και ? ως μπαλαντέρ, όπως *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Αναζητά σε ονόματα, κατηγορίες και ετικέτες. Χρησιμοποιήστε * και ? ως μπαλαντέρ, όπως *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Η ενημέρωση εγκαταστάθηκε και η προηγούμενη έκδοση αφαιρέθηκε. Επαναφόρτωση...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Η ενημέρωση εγκαταστάθηκε. Η προηγούμενη έκδοση μένει στο {folder} και μπορεί να διαγραφεί. Επαναφόρτωση..."
 }

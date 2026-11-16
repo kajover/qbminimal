@@ -1322,7 +1322,6 @@
   "Install version {version}?": "সংস্করণ {version} ইনস্টল করবেন?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent নতুন সংস্করণটি GitHub থেকে বর্তমান ফোল্ডারের পাশে একটি নতুন ফোল্ডারে ডাউনলোড করে, তারপর সেটিতে বদলে যায়। পুরনো ফোল্ডারটি থেকে যায় এবং মুছে ফেলা যায়।",
   "Downloading update... {percent}%": "আপডেট ডাউনলোড হচ্ছে... {percent}%",
-  "Update installed. Reloading...": "আপডেট ইনস্টল হয়েছে। রিলোড হচ্ছে...",
   "Couldn't add the update to qBittorrent": "আপডেটটি qBittorrent-এ যোগ করা যায়নি",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "আপডেটের ডাউনলোড এগোচ্ছে না। qBittorrent github.com-এ পৌঁছাতে পারছে কি না দেখুন।",
   "qBittorrent reported an error while downloading the update": "আপডেট ডাউনলোডের সময় qBittorrent একটি ত্রুটি জানিয়েছে",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "{name} নামে একটি ট্যাগ আগে থেকেই আছে",
   "There is already a view called {name}": "{name} নামে একটি ভিউ আগে থেকেই আছে",
   "View updated": "ভিউ হালনাগাদ হয়েছে",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "নাম, বিভাগ ও ট্যাগে খোঁজে। * ও ? ওয়াইল্ডকার্ড হিসেবে ব্যবহার করুন, যেমন *.mkv।"
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "নাম, বিভাগ ও ট্যাগে খোঁজে। * ও ? ওয়াইল্ডকার্ড হিসেবে ব্যবহার করুন, যেমন *.mkv।",
+  "Update installed and the previous version removed. Reloading...": "আপডেট ইনস্টল হয়েছে এবং আগের সংস্করণ সরানো হয়েছে। আবার লোড হচ্ছে...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "আপডেট ইনস্টল হয়েছে। আগের সংস্করণ {folder}-এ থাকে এবং মুছে ফেলা যায়। আবার লোড হচ্ছে..."
 }

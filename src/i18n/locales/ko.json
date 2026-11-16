@@ -1322,7 +1322,6 @@
   "Install version {version}?": "버전 {version}을(를) 설치할까요?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent가 GitHub에서 새 버전을 현재 폴더 옆의 새 폴더로 내려받은 뒤 그 폴더로 전환합니다. 이전 폴더는 그대로 남으며 삭제해도 됩니다.",
   "Downloading update... {percent}%": "업데이트 내려받는 중... {percent}%",
-  "Update installed. Reloading...": "업데이트를 설치했습니다. 다시 불러오는 중...",
   "Couldn't add the update to qBittorrent": "업데이트를 qBittorrent에 추가하지 못했습니다",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "업데이트 내려받기가 진행되지 않습니다. qBittorrent가 github.com에 접속할 수 있는지 확인하세요.",
   "qBittorrent reported an error while downloading the update": "업데이트를 내려받는 중 qBittorrent가 오류를 보고했습니다",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "{name} 태그가 이미 있습니다",
   "There is already a view called {name}": "{name} 보기가 이미 있습니다",
   "View updated": "보기를 업데이트했습니다",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "이름, 카테고리, 태그에서 찾습니다. * 와 ? 를 와일드카드로 쓸 수 있습니다(예: *.mkv)."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "이름, 카테고리, 태그에서 찾습니다. * 와 ? 를 와일드카드로 쓸 수 있습니다(예: *.mkv).",
+  "Update installed and the previous version removed. Reloading...": "업데이트를 설치하고 이전 버전을 제거했습니다. 다시 불러오는 중...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "업데이트를 설치했습니다. 이전 버전은 {folder}에 남아 있으며 삭제할 수 있습니다. 다시 불러오는 중..."
 }

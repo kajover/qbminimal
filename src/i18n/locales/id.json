@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Pasang versi {version}?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent mengunduh versi baru dari GitHub ke folder baru di samping folder saat ini, lalu beralih ke folder itu. Folder lama tetap ada dan bisa dihapus.",
   "Downloading update... {percent}%": "Mengunduh pembaruan... {percent}%",
-  "Update installed. Reloading...": "Pembaruan terpasang. Memuat ulang...",
   "Couldn't add the update to qBittorrent": "Tidak bisa menambahkan pembaruan ke qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "Unduhan pembaruan tidak bergerak. Periksa apakah qBittorrent bisa menjangkau github.com.",
   "qBittorrent reported an error while downloading the update": "qBittorrent melaporkan kesalahan saat mengunduh pembaruan",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Sudah ada tag bernama {name}",
   "There is already a view called {name}": "Sudah ada tampilan bernama {name}",
   "View updated": "Tampilan diperbarui",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Mencari di nama, kategori, dan tag. Gunakan * dan ? sebagai wildcard, seperti *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Mencari di nama, kategori, dan tag. Gunakan * dan ? sebagai wildcard, seperti *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Pembaruan terpasang dan versi sebelumnya dihapus. Memuat ulang...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Pembaruan terpasang. Versi sebelumnya tetap di {folder} dan bisa dihapus. Memuat ulang..."
 }

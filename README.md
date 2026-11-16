@@ -115,7 +115,7 @@ qBittorrent 5.0 or newer. A few features need a newer version and stay hidden or
 
 ### Updating
 
-The quick way: **Settings > App > About** shows when a new version is out and, if qBittorrent uses an alternative Web UI folder, an **Install update** button. qBittorrent then downloads the new version from GitHub into a new folder next to the current one, switches to it, and the page reloads. It needs qBittorrent to reach github.com. The previous version's folder stays in place and can be deleted. Or by hand:
+The quick way: **Settings > App > About** shows when a new version is out and, if qBittorrent uses an alternative Web UI folder, an **Install update** button. qBittorrent then downloads the new version from GitHub into a new folder next to the current one, switches to it, and the page reloads. It needs qBittorrent to reach github.com. When the version you update from is 1.6.8 or newer, its files are removed afterwards, which can leave an empty folder; older versions' folders stay and can be deleted. Or by hand:
 
 1. Replace the contents of the `qbminimal` folder with the new release.
 2. Restart qBittorrent, or turn **Use alternative Web UI** off, apply, and turn it on again. qBittorrent keeps the page in memory and only reads it again when the file looks newer than the copy it holds, and files unpacked from a zip keep the time they were built.

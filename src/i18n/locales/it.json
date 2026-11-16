@@ -1322,7 +1322,6 @@
   "Install version {version}?": "Installare la versione {version}?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent scarica la nuova versione da GitHub in una nuova cartella accanto a quella attuale, poi passa a quella. La cartella precedente resta e si può eliminare.",
   "Downloading update... {percent}%": "Download dell'aggiornamento... {percent}%",
-  "Update installed. Reloading...": "Aggiornamento installato. Ricaricamento...",
   "Couldn't add the update to qBittorrent": "Impossibile aggiungere l'aggiornamento a qBittorrent",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "Il download dell'aggiornamento non avanza. Controlla che qBittorrent possa raggiungere github.com.",
   "qBittorrent reported an error while downloading the update": "qBittorrent ha segnalato un errore durante il download dell'aggiornamento",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "Esiste già un tag chiamato {name}",
   "There is already a view called {name}": "Esiste già una vista chiamata {name}",
   "View updated": "Vista aggiornata",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Cerca nei nomi, nelle categorie e nei tag. Usa * e ? come caratteri jolly, come in *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Cerca nei nomi, nelle categorie e nei tag. Usa * e ? come caratteri jolly, come in *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Aggiornamento installato e versione precedente rimossa. Ricaricamento...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Aggiornamento installato. La versione precedente resta in {folder} e può essere eliminata. Ricaricamento..."
 }

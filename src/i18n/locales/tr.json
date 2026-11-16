@@ -1322,7 +1322,6 @@
   "Install version {version}?": "{version} sürümü yüklensin mi?",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.": "qBittorrent yeni sürümü GitHub'dan mevcut klasörün yanındaki yeni bir klasöre indirir, sonra ona geçer. Eski klasör yerinde kalır ve silinebilir.",
   "Downloading update... {percent}%": "Güncelleme indiriliyor... %{percent}",
-  "Update installed. Reloading...": "Güncelleme yüklendi. Yeniden yükleniyor...",
   "Couldn't add the update to qBittorrent": "Güncelleme qBittorrent'e eklenemedi",
   "The update download isn't moving. Check that qBittorrent can reach github.com.": "Güncelleme indirmesi ilerlemiyor. qBittorrent'in github.com'a ulaşabildiğini kontrol edin.",
   "qBittorrent reported an error while downloading the update": "qBittorrent güncellemeyi indirirken bir hata bildirdi",
@@ -1340,5 +1339,7 @@
   "There is already a tag called {name}": "{name} adlı bir etiket zaten var",
   "There is already a view called {name}": "{name} adlı bir görünüm zaten var",
   "View updated": "Görünüm güncellendi",
-  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Adlarda, kategorilerde ve etiketlerde arar. * ve ? joker karakterdir, örneğin *.mkv."
+  "Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.": "Adlarda, kategorilerde ve etiketlerde arar. * ve ? joker karakterdir, örneğin *.mkv.",
+  "Update installed and the previous version removed. Reloading...": "Güncelleme kuruldu ve önceki sürüm kaldırıldı. Yeniden yükleniyor...",
+  "Update installed. The previous version stays in {folder} and can be deleted. Reloading...": "Güncelleme kuruldu. Önceki sürüm {folder} içinde kalıyor ve silinebilir. Yeniden yükleniyor..."
 }
