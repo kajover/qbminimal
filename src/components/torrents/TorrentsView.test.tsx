@@ -24,6 +24,7 @@ const api = vi.hoisted(() => ({
   getWebApiVersion: async () => '2.11.3',
   deleteTorrents: vi.fn(async () => undefined),
   pauseTorrents: vi.fn(async () => undefined),
+  resumeTorrents: vi.fn(async () => undefined),
 }))
 
 // Anything else the page asks for answers with an empty list.
@@ -47,6 +48,7 @@ describe('the torrent list', () => {
   beforeEach(() => {
     api.deleteTorrents.mockClear()
     api.pauseTorrents.mockClear()
+    api.resumeTorrents.mockClear()
   })
 
   it('selects a clicked row and opens its details', async () => {
@@ -88,6 +90,43 @@ describe('the torrent list', () => {
     expect(selectedNames()).toEqual(['bravo', 'charlie'])
     await user.keyboard('{Escape}{Escape}')
     expect(selectedNames()).toEqual([])
+  })
+
+  it('unselects all with Ctrl+Shift+A and swaps the selection with Ctrl+I', async () => {
+    await renderView()
+    const user = userEvent.setup()
+    await user.click(row('alpha'))
+    await user.keyboard('{Control>}i{/Control}')
+    expect(selectedNames()).toEqual(['bravo', 'charlie', 'delta'])
+    await user.keyboard('{Control>}{Shift>}a{/Shift}{/Control}')
+    expect(selectedNames()).toEqual([])
+  })
+
+  it('starts with Ctrl+S, stops with Ctrl+P, and opens Add with Ctrl+O', async () => {
+    await renderView()
+    const user = userEvent.setup()
+    await user.click(row('bravo'))
+    await user.keyboard('{Control>}s{/Control}')
+    expect(api.resumeTorrents).toHaveBeenCalledWith(['h1'])
+    await user.keyboard('{Control>}p{/Control}')
+    expect(api.pauseTorrents).toHaveBeenCalledWith(['h1'])
+    await user.keyboard('{Control>}o{/Control}')
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('searches by name from its own button, and Esc closes and clears it', async () => {
+    await renderView()
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Search' }))
+    await user.type(screen.getByRole('searchbox', { name: 'Search' }), 'brav')
+    expect(within(screen.getAllByRole('table').at(-1)!).queryByText('alpha')).toBeNull()
+    expect(row('bravo')).toBeTruthy()
+    expect(screen.queryByRole('complementary', { name: 'Filters' })).toBeNull()
+    // The dot is on the search button, not on the filter button.
+    expect(screen.getByRole('button', { name: 'Search and filter' })).toBeInTheDocument()
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('searchbox', { name: 'Search' })).toBeNull()
+    expect(row('alpha')).toBeTruthy()
   })
 
   it('starts selecting on a long press and toggles with taps after that', async () => {

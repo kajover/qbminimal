@@ -11,6 +11,7 @@ import type {
   TorrentFile,
   TorrentPeer,
   TorrentPeers,
+  Torrent,
   TorrentTracker,
   WebSeed,
 } from '@/types'
@@ -189,6 +190,9 @@ class QbitClient {
   // A search plugin can download the .torrent itself, for sites that need its login.
   addTorrentUrl = (url: string, options: { savePath?: string; category?: string; downloader?: string } = {}) =>
     this.addTorrents(Object.fromEntries(Object.entries({ urls: url, savepath: options.savePath, category: options.category, downloader: options.downloader }).filter(([, value]) => value)) as Record<string, string>, [])
+
+  // The torrents with one tag, in the same shape as the main data list.
+  getTorrentsByTag = (tag: string) => this.get<Torrent[]>('torrents/info', { tag })
 
   // Reads .torrent files without adding them. qBittorrent keeps the result, so they can then be added by hash.
   parseMetadata(files: File[]): Promise<unknown[]> {

@@ -1,4 +1,4 @@
-import { formatVersion, isNewer, latestQbittorrent, latestQbminimal, parseVersion } from './updates'
+import { formatVersion, isNewer, latestQbittorrent, latestQbminimalRelease, parseVersion } from './updates'
 import { readStored, writeStored } from './storage'
 
 // What the last update check found, kept on this device. It keeps the newest versions rather than
@@ -7,7 +7,8 @@ export interface UpdateState {
   // Milliseconds since 1970; 0 before the first check.
   lastChecked: number
   // The newest release of each, or 'failed'. Null before the first check.
-  latest: { qbminimal: string | 'failed'; qbittorrent: string | 'failed' } | null
+  // `qbminimalTorrent` is where qbminimal's update torrent is, when the newest release has one.
+  latest: { qbminimal: string | 'failed'; qbittorrent: string | 'failed'; qbminimalTorrent?: string } | null
 }
 
 const KEY = 'qbminimal.updates'
@@ -19,7 +20,13 @@ export function parseUpdateState(raw: string | null): UpdateState {
     const text = (value: unknown) => (typeof value === 'string' ? value : 'failed')
     return {
       lastChecked: typeof saved.lastChecked === 'number' ? saved.lastChecked : 0,
-      latest: saved.latest && typeof saved.latest === 'object' ? { qbminimal: text(saved.latest.qbminimal), qbittorrent: text(saved.latest.qbittorrent) } : null,
+      latest: saved.latest && typeof saved.latest === 'object'
+        ? {
+            qbminimal: text(saved.latest.qbminimal),
+            qbittorrent: text(saved.latest.qbittorrent),
+            ...(typeof saved.latest.qbminimalTorrent === 'string' ? { qbminimalTorrent: saved.latest.qbminimalTorrent } : {}),
+          }
+        : null,
     }
   } catch {
     return empty
@@ -44,16 +51,26 @@ let running: Promise<void> | null = null
 // Asks GitHub for both newest releases. A second call while one runs waits for the first.
 export function checkForUpdates(): Promise<void> {
   running ??= (async () => {
-    const ask = async (latest: () => ReturnType<typeof latestQbminimal>) => {
+    const ask = async (latest: () => Promise<string | null>) => {
       try {
-        const found = await latest()
-        return found ? formatVersion(found) : 'failed'
+        return (await latest()) ?? 'failed'
       } catch {
         return 'failed'
       }
     }
-    const [qbminimal, qbittorrent] = await Promise.all([ask(latestQbminimal), ask(latestQbittorrent)])
-    setState({ ...state, lastChecked: Date.now(), latest: { qbminimal, qbittorrent } })
+    let qbminimalTorrent: string | undefined
+    const [qbminimal, qbittorrent] = await Promise.all([
+      ask(async () => {
+        const release = await latestQbminimalRelease()
+        qbminimalTorrent = release.torrentUrl
+        return release.version && formatVersion(release.version)
+      }),
+      ask(async () => {
+        const found = await latestQbittorrent()
+        return found && formatVersion(found)
+      }),
+    ])
+    setState({ ...state, lastChecked: Date.now(), latest: { qbminimal, qbittorrent, ...(qbminimalTorrent ? { qbminimalTorrent } : {}) } })
   })().finally(() => { running = null })
   return running
 }

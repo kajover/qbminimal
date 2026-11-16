@@ -320,8 +320,10 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
           <form onSubmit={submit} className="space-y-4">
             <Field label={t('Magnet or torrent links, one per line')} htmlFor="add-links">
               <div className="relative">
+                {/* Its own × below also clears the chosen files, so the field's is left out. */}
                 <Textarea
                   id="add-links"
+                  clearable={false}
                   rows={3}
                   value={links}
                   onChange={(e) => setLinks(e.target.value)}

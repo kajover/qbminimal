@@ -34,9 +34,17 @@ async function getJson(url: string) {
   return response.json() as Promise<unknown>
 }
 
+export const UPDATE_TORRENT_ASSET = 'qbminimal-update.torrent'
+
+// The newest qbminimal release, and where its update torrent is, if it has one.
+export async function latestQbminimalRelease(): Promise<{ version: Version | null; torrentUrl?: string }> {
+  const release = await getJson('https://api.github.com/repos/kajover/qbminimal/releases/latest') as { tag_name?: string; assets?: { name?: string; browser_download_url?: string }[] }
+  const torrentUrl = release.assets?.find(asset => asset.name === UPDATE_TORRENT_ASSET)?.browser_download_url
+  return { version: parseVersion(release.tag_name), torrentUrl: torrentUrl?.startsWith('https://') ? torrentUrl : undefined }
+}
+
 export async function latestQbminimal(): Promise<Version | null> {
-  const release = await getJson('https://api.github.com/repos/kajover/qbminimal/releases/latest') as { tag_name?: string }
-  return parseVersion(release.tag_name)
+  return (await latestQbminimalRelease()).version
 }
 
 export async function latestQbittorrent(): Promise<Version | null> {

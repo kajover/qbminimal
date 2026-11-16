@@ -17,11 +17,13 @@ interface ConfirmActionProps {
   buttonIcon?: LucideIcon
   // For a text button that switches something on, so it reads as an off toggle.
   pressed?: boolean
+  // The confirm button is red, as for deleting, unless the action is a safe one.
+  safe?: boolean
   children?: ReactNode
 }
 
 // An icon button that asks in a pop-up before acting, like the delete prompt.
-export function ConfirmAction({ label, title, message, confirmLabel, disabled, onConfirm, buttonLabel, buttonIcon: ButtonIcon, pressed, children }: ConfirmActionProps) {
+export function ConfirmAction({ label, title, message, confirmLabel, disabled, onConfirm, buttonLabel, buttonIcon: ButtonIcon, pressed, safe, children }: ConfirmActionProps) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -44,7 +46,7 @@ export function ConfirmAction({ label, title, message, confirmLabel, disabled, o
           </DialogHeader>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>{t('Cancel')}</Button>
-            <Button type="button" variant="destructive" onClick={() => { setOpen(false); onConfirm() }}>{confirmLabel}</Button>
+            <Button type="button" variant={safe ? 'default' : 'destructive'} onClick={() => { setOpen(false); onConfirm() }}>{confirmLabel}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

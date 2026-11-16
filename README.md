@@ -39,7 +39,8 @@ On a phone, as cards and as a table, without and with the tab bar:
 ## Features
 
 - **Torrent list** as a table or as cards. In the table you can show, hide (also by right-clicking a header), drag, and resize columns, sort by any of them, and filter each one: a range of sizes, speeds, dates or ratios, text a name or path contains, or a set of states. The column titles stay in view while you scroll. The layout is remembered on each device.
-- **Filters** by name, status, category, tag, and tracker, each showing how many torrents it matches. They start cleared on each visit; while any is on, the search button shows a dot and chips above the list name them. Save a set of filters as a **view** to apply it again in one tap.
+- **Filter sidebar** beside the list (sliding in on phones): tick any number of statuses, categories, tags and trackers, each with how many torrents it matches, including those without a category, tag or tracker. Categories, tags and saved **views** can be created, renamed, edited and deleted right there, and the column filters in force are listed too. While any filter is on, the filter button shows a dot.
+- **Quick search** from its own button: it looks in names, categories, tags and trackers, narrows the list until you close it, and isn't saved with a view.
 - **Torrent details**: pieces, a speed graph, transfer facts with copy buttons for the name, hash, magnet link and paths, files (choose what to download and each file's priority, rename, and save finished files with qBittorrent 5.3), trackers, peers with country flags, and every per-torrent setting: limits, location, queue, category, tags, and more.
 - **Selecting and actions**: click a torrent to open its details in a panel below the list, Ctrl or Cmd-click and Shift-click to select several, and right-click for every action, the everyday ones as a row of icons that name themselves on hover. Choose which actions sit in the selection bar from its More menu, separately for wide screens and phones. On phones, tap a torrent for its details and hold one to start selecting.
 - **Bulk actions** for several torrents at once, from the selection bar or the right-click menu, including on/off options such as sequential download, and a typed-in queue position.
@@ -54,7 +55,7 @@ On a phone, as cards and as a table, without and with the tab bar:
 - **Settings**: every qBittorrent preference, shown only when your qBittorrent version has it.
 - A sidebar you can hide on wide screens.
 - Light and dark themes that follow your device, and a layout made for phones, including when added to the home screen. The header holds each page's title and buttons, and a menu button holds the pages, Logs, Statistics, and logout, which leaves the list as much room as possible. Under **Settings > App > Appearance** you can show the current speeds in the header, and turn on **Menu bar** to also show the pages in a sidebar on wide screens and in a tab bar on phones (Logs stays in the menu there).
-- **Update check**: every 12 hours, in the background after signing in, the app asks GitHub for new qbminimal and qBittorrent releases, and **Settings > App > About** shows what it found.
+- **Update check**: every 12 hours, in the background after signing in, the app asks GitHub for new qbminimal and qBittorrent releases, and **Settings > App > About** shows what it found, with an **Install update** button for qbminimal.
 
 ## Accessibility
 
@@ -62,7 +63,6 @@ On a phone, as cards and as a table, without and with the tab bar:
 - **Color-blind-safe colors** are applied throughout: every status, speed, ratio, and pieces color comes from the [Okabe–Ito](https://jfly.uni-koeln.de/color/) set (bluish green, blue, orange, and vermillion), chosen to stay easy to tell apart with any kind of color blindness. Colors never carry meaning alone either: statuses have labels, speeds have arrows, the upload line in the speed graph is dashed, and pieces being downloaded are striped.
 - **Screen readers** hear when the selection, the sort order, the view, or the number of matching torrents changes. Icon buttons have names, shown as a label when the mouse rests on them or the keyboard reaches them, and the tab bar's names stay readable to screen readers when they are hidden on screen.
 - **Tab bar labels** can be turned off on phones under **Settings > App > Appearance**, leaving larger icons.
-- **Keyboard shortcuts** for the torrent list. Press `?` to see them.
 
 ## Languages
 
@@ -115,6 +115,8 @@ qBittorrent 5.0 or newer. A few features need a newer version and stay hidden or
 
 ### Updating
 
+The quick way: **Settings > App > About** shows when a new version is out and, if qBittorrent uses an alternative Web UI folder, an **Install update** button. qBittorrent then downloads the new version from GitHub into a new folder next to the current one, switches to it, and the page reloads. It needs qBittorrent to reach github.com. The previous version's folder stays in place and can be deleted. Or by hand:
+
 1. Replace the contents of the `qbminimal` folder with the new release.
 2. Restart qBittorrent, or turn **Use alternative Web UI** off, apply, and turn it on again. qBittorrent keeps the page in memory and only reads it again when the file looks newer than the copy it holds, and files unpacked from a zip keep the time they were built.
 3. Reload the page. **Settings > App > About** shows the version that's running.
@@ -156,7 +158,7 @@ npm run package
 
 This builds into `release/public` and packs it as `qbminimal-release.zip`, the same layout the install steps describe.
 
-Pushing a tag like `v1.1.0` that matches the version in `package.json` runs the same build on GitHub and publishes the zip and its SHA-256 checksum as a release.
+Pushing a tag like `v1.1.0` that matches the version in `package.json` runs the same build on GitHub and publishes the zip, its SHA-256 checksum, and `qbminimal-update.torrent` as a release. That torrent has no trackers: its files come from a web seed on the `updates` branch, which is what **Install update** downloads. `scripts/make-update-torrent.mjs` writes it.
 
 `scripts/deploy.sh` copies a release to a server over SSH with `rsync`, then checks that the server is serving it. Put your settings in `.deploy.env`, which git ignores:
 

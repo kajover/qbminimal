@@ -10,6 +10,12 @@ export interface FilterView {
 
 const STORAGE_KEY = 'qbminimal.filterViews'
 const text = (value: unknown) => (typeof value === 'string' ? value : '')
+const isStatus = (value: unknown): value is StatusFilter => STATUS_FILTERS.some(option => option.value === value)
+// A list of texts, or, from views saved before the sidebar allowed several, a single one ('' or
+// 'all' meaning none).
+const texts = (list: unknown, single: unknown): string[] =>
+  Array.isArray(list) ? [...new Set(list.filter((item): item is string => typeof item === 'string'))]
+    : typeof single === 'string' && single && single !== 'all' ? [single] : []
 
 // Anything unreadable is left out rather than breaking the list.
 export function parseFilterViews(raw: string | null): FilterView[] {
@@ -24,16 +30,29 @@ export function parseFilterViews(raw: string | null): FilterView[] {
     if (!item || typeof item !== 'object') return []
     const { name, filters } = item as { name?: unknown; filters?: Record<string, unknown> }
     if (typeof name !== 'string' || !name.trim() || !filters || typeof filters !== 'object') return []
-    const status = STATUS_FILTERS.some(option => option.value === filters.status) ? filters.status as StatusFilter : 'all'
-    return [{ name: name.trim(), filters: { name: text(filters.name), status, category: text(filters.category), tag: text(filters.tag), tracker: text(filters.tracker), columns: parseColumnFilters(filters.columns) } }]
+    return [{
+      name: name.trim(),
+      filters: {
+        name: text(filters.name),
+        statuses: texts(filters.statuses, filters.status).filter(isStatus),
+        categories: texts(filters.categories, filters.category),
+        tags: texts(filters.tags, filters.tag),
+        trackers: texts(filters.trackers, filters.tracker),
+        columns: parseColumnFilters(filters.columns),
+      },
+    }]
   })
 }
 
 export const loadFilterViews = () => parseFilterViews(readStored(STORAGE_KEY))
 export const saveFilterViews = (views: FilterView[]) => writeStored(STORAGE_KEY, JSON.stringify(views))
 
+// The same choices in any order.
+const sameSet = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every(item => b.includes(item))
+
 export function sameFilters(a: TorrentFilters, b: TorrentFilters) {
-  return a.name.trim() === b.name.trim() && a.status === b.status && a.category === b.category && a.tag === b.tag && (a.tracker ?? '') === (b.tracker ?? '') && sameColumnFilters(a.columns, b.columns)
+  return a.name.trim() === b.name.trim() && sameSet(a.statuses, b.statuses) && sameSet(a.categories, b.categories) &&
+    sameSet(a.tags, b.tags) && sameSet(a.trackers, b.trackers) && sameColumnFilters(a.columns, b.columns)
 }
 
 // A view with the same name is replaced, so saving again updates it.

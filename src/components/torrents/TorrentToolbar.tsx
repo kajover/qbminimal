@@ -1,4 +1,4 @@
-import { ArrowUpDown, Columns3, Keyboard, LayoutList, Plus, RotateCcw, Search, Table2 } from 'lucide-react'
+import { ArrowUpDown, Columns3, Keyboard, LayoutList, ListFilter, Plus, RotateCcw, Search, Table2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import type { TorrentList } from '@/hooks/useTorrentList'
@@ -13,6 +13,8 @@ interface TorrentToolbarProps {
   list: TorrentList
   filtersOpen: boolean
   onToggleFilters: () => void
+  searchOpen: boolean
+  onToggleSearch: () => void
   columns: ColumnLayout
   onColumnsChange: (layout: ColumnLayout) => void
   onShowShortcuts: () => void
@@ -28,7 +30,7 @@ export function AddTorrentButton({ onAdd }: { onAdd: () => void }) {
   )
 }
 
-export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, onColumnsChange, onShowShortcuts, onAdd }: TorrentToolbarProps) {
+export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen, onToggleSearch, columns, onColumnsChange, onShowShortcuts, onAdd }: TorrentToolbarProps) {
   const arrow = list.sort.direction === 'asc' ? '↑' : '↓'
   return (
     <>
@@ -37,10 +39,10 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
         <Keyboard className="size-4" />
       </Button>
       <AddTorrentButton onAdd={onAdd} />
-      <Button variant={filtersOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={list.filtered ? t('Search and filter (filters on)') : t('Search and filter')} title={list.filtered ? t('Search and filter (filters on)') : t('Search and filter')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
+      {/* A quick search by name, without opening the filters. A dot shows while it narrows the list. */}
+      <Button variant={searchOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={t('Search')} title={t('Search')} aria-expanded={searchOpen} onClick={onToggleSearch}>
         <Search className="size-4" />
-        {/* A dot while any filter hides torrents, as the chips above the list may be out of view. */}
-        {list.filtered && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
+        {list.searched && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
       </Button>
 
       {list.showTable ? (
@@ -90,6 +92,13 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, columns, on
       {/* One button that switches to the other view, showing that view's icon. */}
       <Button variant="outline" size="icon" className="size-8" aria-label={list.showTable ? t('Card view') : t('Table view')} title={list.showTable ? t('Card view') : t('Table view')} onClick={() => list.showAsTable(!list.showTable)}>
         {list.showTable ? <LayoutList className="size-4" /> : <Table2 className="size-4" />}
+      </Button>
+      {/* Last, at the edge where the filter sidebar opens. */}
+      <Button variant={filtersOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={list.narrowed ? t('Search and filter (filters on)') : t('Search and filter')} title={list.narrowed ? t('Search and filter (filters on)') : t('Search and filter')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
+        {/* Opens the filter sidebar. */}
+        <ListFilter className="size-4" />
+        {/* A dot while any filter hides torrents, as the chips above the list may be out of view. */}
+        {list.narrowed && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
       </Button>
     </>
   )

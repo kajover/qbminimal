@@ -1,7 +1,12 @@
-import { useState } from 'react'
-import { ExternalLink, RefreshCw } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Download, ExternalLink, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ConfirmAction } from '@/components/ConfirmAction'
+import { usePreferences } from '@/hooks/useApi'
+import { toast } from '@/hooks/use-toast'
 import { useUpdateNotice } from '@/hooks/useUpdateNotice'
+import { qbitClient } from '@/lib/api'
+import { canInstall, installUpdate, pageActions, UpdateError, type UpdateFailure } from '@/lib/selfUpdate'
 import { checkForUpdates } from '@/lib/updateNotice'
 import { QBITTORRENT_DOWNLOADS, QBMINIMAL_RELEASES } from '@/lib/updates'
 import { t } from '@/i18n'
@@ -11,7 +16,43 @@ import { t } from '@/i18n'
 // stays on this device until the next check.
 export function UpdateCheck() {
   const notice = useUpdateNotice()
+  const { data: prefs } = usePreferences()
   const [checking, setChecking] = useState(false)
+  // The percent downloaded while an update installs, null otherwise.
+  const [installing, setInstalling] = useState<number | null>(null)
+  const stop = useRef<AbortController | null>(null)
+
+  const torrentUrl = notice.latest?.qbminimalTorrent
+  const latestVersion = notice.latest?.qbminimal
+  const installable = notice.qbminimalNewer && canInstall(prefs, torrentUrl) && !!latestVersion
+
+  const install = async () => {
+    if (!installable || !torrentUrl || !latestVersion) return
+    const control = new AbortController()
+    stop.current = control
+    setInstalling(0)
+    try {
+      await installUpdate({
+        client: qbitClient, torrentUrl, version: latestVersion, currentPath: String(prefs?.alternative_webui_path),
+        onProgress: setInstalling, signal: control.signal,
+      })
+      toast.success(t('Update installed. Reloading...'))
+      setTimeout(pageActions.reload, 1000)
+    } catch (error) {
+      const messages: Record<UpdateFailure, string> = {
+        add: t('Couldn\'t add the update to qBittorrent'),
+        stalled: t('The update download isn\'t moving. Check that qBittorrent can reach github.com.'),
+        failed: t('qBittorrent reported an error while downloading the update'),
+        missing: t('The update was removed from qBittorrent before it finished'),
+        switch: t('Couldn\'t switch qBittorrent to the new version'),
+        canceled: t('Update canceled'),
+      }
+      const reason = error instanceof UpdateError ? error.reason : 'add'
+      if (reason === 'canceled') toast(messages.canceled)
+      else toast.error(messages[reason])
+      setInstalling(null)
+    }
+  }
 
   const check = async () => {
     setChecking(true)
@@ -52,6 +93,27 @@ export function UpdateCheck() {
               </dd>
             </div>
           ))}
+          {installable && (
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+              {installing === null ? (
+                <ConfirmAction
+                  safe
+                  label={t('Install update')}
+                  title={t('Install version {version}?', { version: latestVersion })}
+                  message={t('qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.')}
+                  confirmLabel={t('Install')}
+                  buttonLabel={t('Install update')}
+                  buttonIcon={Download}
+                  onConfirm={() => void install()}
+                />
+              ) : (
+                <>
+                  <span role="status">{t('Downloading update... {percent}%', { percent: installing })}</span>
+                  <Button variant="outline" size="sm" onClick={() => stop.current?.abort()}>{t('Cancel')}</Button>
+                </>
+              )}
+            </div>
+          )}
           <p className="text-xs text-muted-foreground">{t('Last checked {time}', { time: new Date(notice.lastChecked).toLocaleString() })}</p>
         </dl>
       )}

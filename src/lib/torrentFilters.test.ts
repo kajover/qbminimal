@@ -1,30 +1,47 @@
 import { describe, expect, it } from 'vitest'
-import { countFilterOptions, filterTorrents, parseTags, type TorrentFilters, getTrackerHost, groupTrackersByHost, matchesTracker, TRACKERLESS } from './torrentFilters'
+import { countFilterOptions, filterTorrents, parseTags, type TorrentFilters, getTrackerHost, groupTrackersByHost, matchesTracker, NO_FILTERS, toggleChoice, TRACKERLESS, UNCATEGORIZED, UNTAGGED } from './torrentFilters'
 import type { Torrent } from '@/types'
 
 const torrent = (over: Partial<Torrent>) => ({ name: 'Ubuntu', state: 'downloading', progress: 0.5, dlspeed: 0, upspeed: 0, category: '', tags: '', ...over }) as Torrent
-const none: TorrentFilters = { name: '', status: 'all', category: '', tag: '' }
-const names = (list: Torrent[], filters: Partial<TorrentFilters>) => filterTorrents(list, { ...none, ...filters }).map(t => t.name)
+const names = (list: Torrent[], filters: Partial<TorrentFilters>, hosts?: Map<string, Set<string>>) => filterTorrents(list, { ...NO_FILTERS, ...filters }, hosts).map(t => t.name)
 
 describe('filterTorrents', () => {
   const list = [
-    torrent({ name: 'Ubuntu ISO', state: 'stalledUP', progress: 1, category: 'linux', tags: 'iso, stable' }),
-    torrent({ name: 'Fedora', state: 'downloading', dlspeed: 10 }),
+    torrent({ hash: 'u', name: 'Ubuntu ISO', state: 'stalledUP', progress: 1, category: 'linux', tags: 'iso, stable' }),
+    torrent({ hash: 'f', name: 'Fedora', state: 'downloading', dlspeed: 10, category: 'linux' }),
     torrent({ name: 'Old', state: 'stoppedUP', progress: 1 }),
     torrent({ name: 'Broken', state: 'missingFiles' }),
   ]
 
   it('keeps everything without filters', () => expect(names(list, {})).toHaveLength(4))
   it('matches names regardless of case', () => expect(names(list, { name: ' ubuntu ' })).toEqual(['Ubuntu ISO']))
-  it('groups seeding states', () => expect(names(list, { status: 'seeding' })).toEqual(['Ubuntu ISO']))
-  it('finds stopped torrents', () => expect(names(list, { status: 'stopped' })).toEqual(['Old']))
-  it('treats any finished torrent as completed', () => expect(names(list, { status: 'completed' })).toEqual(['Ubuntu ISO', 'Old']))
-  it('finds active torrents by speed', () => expect(names(list, { status: 'active' })).toEqual(['Fedora']))
-  it('finds errored torrents', () => expect(names(list, { status: 'errored' })).toEqual(['Broken']))
-  it('filters by category', () => expect(names(list, { category: 'linux' })).toEqual(['Ubuntu ISO']))
-  it('matches whole tags only', () => {
-    expect(names(list, { tag: 'stable' })).toEqual(['Ubuntu ISO'])
-    expect(names(list, { tag: 'sta' })).toEqual([])
+  it('searches categories, tags and tracker hosts too', () => {
+    expect(names(list, { name: 'LINUX' })).toEqual(['Ubuntu ISO', 'Fedora'])
+    expect(names(list, { name: 'stab' })).toEqual(['Ubuntu ISO'])
+    expect(names(list, { name: 'example' }, new Map([['tracker.example.org', new Set(['f'])]]))).toEqual(['Fedora'])
+  })
+  it('groups seeding states', () => expect(names(list, { statuses: ['seeding'] })).toEqual(['Ubuntu ISO']))
+  it('finds stopped torrents', () => expect(names(list, { statuses: ['stopped'] })).toEqual(['Old']))
+  it('treats any finished torrent as completed', () => expect(names(list, { statuses: ['completed'] })).toEqual(['Ubuntu ISO', 'Old']))
+  it('finds active torrents by speed', () => expect(names(list, { statuses: ['active'] })).toEqual(['Fedora']))
+  it('finds errored torrents', () => expect(names(list, { statuses: ['errored'] })).toEqual(['Broken']))
+  it('shows torrents matching any of several statuses', () => expect(names(list, { statuses: ['errored', 'active'] })).toEqual(['Fedora', 'Broken']))
+  it('filters by category, and finds those without one', () => {
+    expect(names(list, { categories: ['linux'] })).toEqual(['Ubuntu ISO', 'Fedora'])
+    expect(names(list, { categories: [UNCATEGORIZED] })).toEqual(['Old', 'Broken'])
+  })
+  it('matches whole tags only, and finds untagged torrents', () => {
+    expect(names(list, { tags: ['stable'] })).toEqual(['Ubuntu ISO'])
+    expect(names(list, { tags: ['sta'] })).toEqual([])
+    expect(names(list, { tags: [UNTAGGED, 'iso'] })).toHaveLength(4)
+  })
+  it('needs every list with choices to match', () => {
+    expect(names(list, { categories: ['linux'], statuses: ['seeding'] })).toEqual(['Ubuntu ISO'])
+    expect(names(list, { trackers: [TRACKERLESS] }, new Map([['t.test', new Set(['u'])]]))).toEqual(['Fedora', 'Old', 'Broken'])
+  })
+  it('toggles a choice in and out', () => {
+    expect(toggleChoice(['a'], 'b')).toEqual(['a', 'b'])
+    expect(toggleChoice(['a', 'b'], 'a')).toEqual(['b'])
   })
 })
 
@@ -65,10 +82,10 @@ describe('countFilterOptions', () => {
       { hash: 'b', name: 'b', state: 'stoppedDL', progress: 0.5, dlspeed: 0, upspeed: 0, category: '', tags: 'iso' },
     ] as Torrent[]
     const counts = countFilterOptions(list, new Map([['tracker.example', new Set(['a'])]]))
-    expect(counts.status.all).toBe(2)
+    expect(counts.all).toBe(2)
     expect(counts.status.seeding).toBe(1)
     expect(counts.status.stopped).toBe(1)
-    expect(counts.category).toEqual({ Linux: 1 })
+    expect(counts.category).toEqual({ Linux: 1, [UNCATEGORIZED]: 1 })
     expect(counts.tag).toEqual({ iso: 2, stable: 1 })
     expect(counts.tracker).toEqual({ 'tracker.example': 1 })
     expect(counts.trackerless).toBe(1)

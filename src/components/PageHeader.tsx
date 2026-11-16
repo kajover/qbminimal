@@ -16,8 +16,9 @@ export function PageHeader({ title, middle, actions, className, ref }: { title: 
         {createPortal(
           // Tighter on phones, so the title keeps room beside the buttons.
           <div ref={ref} className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
-            {/* Just the title: the header has no room for a line below it. */}
-            <h2 className="min-w-0 shrink truncate text-lg font-semibold leading-tight">{title}</h2>
+            {/* Just the title: the header has no room for a line below it. On phones showing the speeds
+                there's no room for it at all, so only screen readers get it. */}
+            <h2 className="min-w-0 shrink truncate text-lg font-semibold leading-tight max-sm:[:root[data-header-speeds=on]_&]:sr-only">{title}</h2>
             <div className="flex min-w-0 flex-1 justify-center">{slot.whole && middle}</div>
             {/* As close together as the buttons above the search results. */}
             {actions && <div className="flex shrink-0 items-center gap-1">{actions}</div>}

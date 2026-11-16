@@ -1,7 +1,9 @@
 name: Release
 
 # Pushing a tag like v1.1.0 builds the release zip, checks it, and publishes it on GitHub with
-# its SHA-256 checksum. The tag has to match the version in package.json.
+# its SHA-256 checksum. The tag has to match the version in package.json. It also puts the unpacked
+# app on the `updates` branch and attaches a torrent of it, so the app can install the update
+# through qBittorrent itself (see scripts/make-update-torrent.mjs).
 on:
   push:
     tags: ['v*']
@@ -30,13 +32,56 @@ jobs:
       - run: npm test
       - run: npm run package
       - run: sha256sum qbminimal-release.zip > qbminimal-release.zip.sha256
+      # qBittorrent downloads the torrent's files from this branch over HTTPS (a web seed). Older
+      # versions stay, and a tag moved to a newer commit replaces its own folder.
+      - name: Put the unpacked app on the updates branch
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          rm -rf .pkg
+          mkdir .pkg
+          unzip -q qbminimal-release.zip -d .pkg
+          mv .pkg/qbminimal ".pkg/qbminimal-$version"
+          branch="$RUNNER_TEMP/updates"
+          if git ls-remote --exit-code --heads origin updates > /dev/null; then
+            git fetch --depth=1 origin updates
+            git worktree add --detach "$branch" FETCH_HEAD
+          else
+            git worktree add --detach "$branch"
+            git -C "$branch" checkout --orphan updates
+            git -C "$branch" rm -rf --quiet .
+          fi
+          # No line-ending changes, or the files wouldn't match the torrent's hashes.
+          echo '* -text' > "$branch/.gitattributes"
+          rm -rf "${branch:?}/$version"
+          mkdir "$branch/$version"
+          cp -R ".pkg/qbminimal-$version" "$branch/$version/"
+          git -C "$branch" config user.name "github-actions[bot]"
+          git -C "$branch" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$branch" add -A
+          git -C "$branch" diff --cached --quiet || git -C "$branch" commit -q -m "Files of qbminimal $version"
+          git -C "$branch" push origin HEAD:refs/heads/updates
+      - name: Build the update torrent
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          node scripts/make-update-torrent.mjs ".pkg/qbminimal-$version" "qbminimal-$version" "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/updates/$version/" qbminimal-update.torrent
+      # The web seed has to answer for the new files, or the update would fail on every install.
+      - name: Check the web seed serves the files
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          url="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/updates/$version/qbminimal-$version/LICENSE"
+          for attempt in 1 2 3 4 5; do
+            if curl -fsS "$url" | cmp -s - ".pkg/qbminimal-$version/LICENSE"; then exit 0; fi
+            sleep 10
+          done
+          echo "$url doesn't serve the packaged file" >&2
+          exit 1
       # A tag moved to a newer commit replaces the files of its existing release.
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" qbminimal-release.zip qbminimal-release.zip.sha256 --clobber
+            gh release upload "$GITHUB_REF_NAME" qbminimal-release.zip qbminimal-release.zip.sha256 qbminimal-update.torrent --clobber
           else
-            gh release create "$GITHUB_REF_NAME" qbminimal-release.zip qbminimal-release.zip.sha256 --title "qbminimal ${GITHUB_REF_NAME#v}" --generate-notes --verify-tag
+            gh release create "$GITHUB_REF_NAME" qbminimal-release.zip qbminimal-release.zip.sha256 qbminimal-update.torrent --title "qbminimal ${GITHUB_REF_NAME#v}" --generate-notes --verify-tag
           fi

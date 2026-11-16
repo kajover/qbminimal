@@ -57,7 +57,8 @@ function Speed({ icon: Icon, bytes, color, label }: { icon: ComponentType<{ clas
 // reach 8px from the screen's edges, which gives a card's line of facts room at 12px.
 export function TorrentCards({ torrents, selected, showCheckboxes, onToggle, openHash, rowProps, wrapList }: TorrentCardsProps) {
   return wrapList(
-    <ul className="grid items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3">
+    // One column that may shrink, so a card with its checkbox stays within a phone's width.
+    <ul className="grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3">
       {torrents.map(torrent => {
         const isSelected = selected.has(torrent.hash)
         return (

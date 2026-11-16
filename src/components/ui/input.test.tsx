@@ -82,3 +82,10 @@ describe('a field that needs an entry', () => {
     expect(screen.queryByRole('alert')).toBeNull()
   })
 })
+
+describe('a field with a clear button of its own', () => {
+  it('leaves out the built-in ×', () => {
+    render(<><Input aria-label="A" defaultValue="x" clearable={false} /><Textarea aria-label="B" defaultValue="y" clearable={false} /></>)
+    expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull()
+  })
+})

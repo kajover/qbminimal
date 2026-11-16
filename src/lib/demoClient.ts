@@ -38,6 +38,8 @@ interface DemoTorrent {
   up: number
   category: string
   tags: string
+  // For the pretend update download: when it began. It reaches 100% a few seconds later.
+  startedAt?: number
   tracker: string
   addedDaysAgo: number
   ratio: number
@@ -116,7 +118,7 @@ async function samplePreferences(): Promise<Record<string, unknown>> {
     if (def.type === 'custom' || (newer ? DROPPED_IN_5_3 : VERSION_5_3_PREFS).has(def.key)) continue
     prefs[def.key] = sample(def)
   }
-  return { ...prefs, save_path: '/downloads', locale: 'en', web_ui_username: 'demo', resolve_peer_countries: true }
+  return { ...prefs, save_path: '/downloads', alternative_webui_enabled: true, alternative_webui_path: '/opt/qbminimal', locale: 'en', web_ui_username: 'demo', resolve_peer_countries: true }
 }
 
 const FEEDS: { feed: RSSFeed; articles: RSSItem[] }[] = [
@@ -241,12 +243,24 @@ class DemoClient implements ApiClient {
 
   async addTorrents(params: Record<string, string>, files: File[]) {
     const names = [...(params.urls ?? '').split('\n').filter(Boolean).map(url => url.split('/').pop() || url), ...files.map(f => f.name.replace(/\.torrent$/, ''))]
-    for (const name of names) {
+    // The update torrent is named after its release, like qbminimal-1.2.3, and is a small download.
+    const update = (params.tags ?? '').split(',').includes('qbminimal-update')
+    const version = /\/releases\/download\/v?([\d.]+)\//.exec(params.urls ?? '')?.[1]
+    for (const name of update && version ? [`qbminimal-${version}`] : names) {
       if (!this.torrents.some(t => t.name === name)) {
-        this.torrents.push({ name, size: 900 * MiB, progress: 0, down: 1_800_000, up: 20_000, category: params.category ?? '', tags: params.tags ?? '', tracker: 'udp://tracker.opentrackr.org:1337/announce', addedDaysAgo: 0, ratio: 0, stopped: params.stopped === 'true' })
+        this.torrents.push({ name, size: update ? 2 * MiB : 900 * MiB, progress: 0, down: update ? 500_000 : 1_800_000, up: 20_000, category: params.category ?? '', tags: params.tags ?? '', tracker: 'udp://tracker.opentrackr.org:1337/announce', addedDaysAgo: 0, ratio: 0, stopped: params.stopped === 'true', startedAt: update ? Date.now() : undefined })
       }
     }
     return { success_count: Math.max(names.length, 1), failure_count: 0, pending_count: 0 }
+  }
+
+  // Torrents with the tag. The pretend update download finishes about 4 seconds after it was added.
+  async getTorrentsByTag(tag: string) {
+    const unfinished = this.torrents.filter(t => t.progress < 1)
+    return this.torrents.filter(t => t.tags.split(',').map(x => x.trim()).includes(tag)).map(t => {
+      if (t.startedAt) t.progress = Math.min(1, (Date.now() - t.startedAt) / 4000)
+      return toTorrent(t, 1, unfinished.indexOf(t) + 1)
+    })
   }
 
   async addTorrentUrl(url: string, options: { category?: string } = {}) {
@@ -391,9 +405,14 @@ class DemoClient implements ApiClient {
   async setCategory(hashes: string[], category: string) { this.each(hashes, t => { t.category = category }) }
   async getTags() { return [...new Set(this.torrents.flatMap(t => t.tags.split(',').map(tag => tag.trim()).filter(Boolean)))] }
   async createTags() {}
-  async deleteTags() {}
-  async addTags() {}
-  async removeTags() {}
+  async deleteTags(tags: string[]) { void this.removeTags(this.torrents.map(t => fakeHash(t.name)), tags) }
+  // Tags change on the torrents, so renaming one in the filters shows in the demo.
+  async addTags(hashes: string[], tags: string[]) {
+    this.each(hashes, t => { t.tags = [...new Set([...t.tags.split(',').map(tag => tag.trim()).filter(Boolean), ...tags])].join(', ') })
+  }
+  async removeTags(hashes: string[], tags: string[]) {
+    this.each(hashes, t => { t.tags = t.tags.split(',').map(tag => tag.trim()).filter(tag => tag && !tags.includes(tag)).join(', ') })
+  }
 
   async createTorrent(params: Record<string, string>) {
     const taskID = `demo-${this.creatorTasks.length + 1}`

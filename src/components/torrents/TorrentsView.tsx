@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
-import { ChevronLeft, ChevronRight, FolderCog, Pause, Play, Trash2, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pause, Play, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { NativeSelect } from '@/components/NativeSelect'
+import { SearchInput } from '@/components/SearchInput'
 import { PageBoundary } from '@/components/PageBoundary'
 import { PageHeader } from '@/components/PageHeader'
 import { useCategories, useDeleteTorrents, usePauseTorrents, useResumeTorrents, useSessionPausedWarning, useTags, useTorrents, useTrackerMap } from '@/hooks/useApi'
@@ -17,21 +19,19 @@ import { Tooltip } from '@/components/ui/tooltip'
 import { toast } from '@/hooks/use-toast'
 import { getColumn, loadColumnLayout, saveColumnLayout, TORRENT_FILTER_COLUMNS, type ColumnLayout } from '@/lib/torrentColumns'
 import { choiceOptions, NONE } from '@/lib/columnFilters'
-import { AddFilterButton, ColumnFilterChips, type FilterTarget } from '@/components/ColumnFilters'
+import { type FilterTarget } from '@/components/ColumnFilters'
 import type { Torrent } from '@/types'
 import { useBulkActions, type BulkPrompt } from './bulkActions'
 import { BulkPromptDialog } from './BulkPromptDialog'
 import { ActionBarDialog } from './ActionBarDialog'
 import { DeleteTorrentsDialog } from './DeleteTorrentsDialog'
-import { FilterViewChips } from './FilterViews'
 import { TorrentCards } from './TorrentCards'
-import { ListFilterChips, TorrentFilterPanel } from './TorrentFilterPanel'
+import { FilterSheet, FilterSidebar } from './TorrentFilterPanel'
 import { MoreMenu, TorrentContextMenu } from './TorrentMenus'
 import { ShortcutsDialog } from './ShortcutsDialog'
 import { TorrentTable } from './TorrentTable'
 // Loaded with the list rather than on first use, so the details and dialogs open at once.
 import { AddTorrentDialog } from './AddTorrentView'
-import { CategoriesTagsDialog } from './CategoriesTagsDialog'
 import { TorrentDetailsDialog, TorrentDetailsPanel } from './TorrentDetails'
 import { AddTorrentButton, TorrentToolbar } from './TorrentToolbar'
 import { t } from '@/i18n'
@@ -61,7 +61,8 @@ export function TorrentsView() {
 
   const selection = useSelection(list.rows.map(t => t.hash))
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [manageOpen, setManageOpen] = useState(false)
+  // The quick search by name above the list. Closing it clears its text.
+  const [searchOpen, setSearchOpen] = useState(false)
   const [detailsHash, setDetailsHash] = useState<string | null>(null)
   const [columns, setColumns] = useState<ColumnLayout>(loadColumnLayout)
   // A new id for each request starts the delete dialog fresh.
@@ -140,13 +141,13 @@ export function TorrentsView() {
     const n = matchingLength
     announce(n === 0 ? t('No torrents match these filters') : n === 1 ? t('1 torrent') : t('{count} torrents', { count: n }))
   })
-  const { name: filterName, status: filterStatus, category: filterCategory, tag: filterTag, tracker: filterTracker } = list.filters
+  const { name: filterName, statuses: filterStatuses, categories: filterCategories, tags: filterTags, trackers: filterTrackers } = list.filters
   const filtersMounted = useRef(false)
   useEffect(() => {
     if (!filtersMounted.current) { filtersMounted.current = true; return }
     const timer = setTimeout(announceMatches, 800)
     return () => clearTimeout(timer)
-  }, [filterName, filterStatus, filterCategory, filterTag, filterTracker])
+  }, [filterName, filterStatuses, filterCategories, filterTags, filterTrackers])
 
   const changeColumns = (layout: ColumnLayout) => {
     setColumns(layout)
@@ -249,14 +250,29 @@ export function TorrentsView() {
     </TorrentContextMenu>
   )
 
-  // Ctrl or Cmd + A selects every matching torrent, Delete asks to delete the selection, Escape
-  // closes the details and then clears the selection, / opens the search, and ? lists all of these.
+  // Ctrl or Cmd + A selects every matching torrent and with Shift none, + I swaps the selected and
+  // unselected ones, + S starts and + P stops the selection, and + O opens Add, as in qBittorrent.
+  // Delete asks to delete the selection, Escape closes the details and then clears the selection,
+  // / opens the search, and ? lists all of these.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (!isListShortcut(event)) return
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'a') {
+      const mod = event.metaKey || event.ctrlKey
+      const key = event.key.toLowerCase()
+      if (mod && key === 'a') {
         event.preventDefault()
-        selection.replace(list.matching.map(t => t.hash))
+        if (event.shiftKey) selection.clear()
+        else selection.replace(list.matching.map(t => t.hash))
+      } else if (mod && key === 'i') {
+        event.preventDefault()
+        selection.replace(list.matching.filter(t => !selection.selected.has(t.hash)).map(t => t.hash))
+      } else if (mod && (key === 's' || key === 'p') && !event.shiftKey && count > 0) {
+        event.preventDefault()
+        if (key === 's') start()
+        else stop()
+      } else if (mod && key === 'o') {
+        event.preventDefault()
+        setAddOpen(true)
       } else if ((event.key === 'Delete' || event.key === 'Backspace') && count > 0) {
         event.preventDefault()
         askToDelete(selectedTorrents)
@@ -265,8 +281,8 @@ export function TorrentsView() {
         else selection.clear()
       } else if (event.key === '/') {
         event.preventDefault()
-        if (filtersOpen) document.querySelector<HTMLElement>('#torrent-filters input')?.focus()
-        else setFiltersOpen(true)
+        if (searchOpen) document.getElementById('torrent-search')?.focus()
+        else setSearchOpen(true)
       } else if (event.key === '?') {
         event.preventDefault()
         setShortcutsOpen(true)
@@ -275,6 +291,11 @@ export function TorrentsView() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   })
+
+  const toggleSearch = () => {
+    if (searchOpen) list.setQuery('')
+    setSearchOpen(!searchOpen)
+  }
 
   // Phones: where a thumb reaches, just above the tab bar, or where the tab bar would be when it's
   // off; on tablets as wide as the tab bar. The buttons sit at the end, Delete last. No margin from
@@ -314,7 +335,7 @@ export function TorrentsView() {
       title={t('Torrents')}
       middle={selectionBar}
       actions={total > 0
-        ? <TorrentToolbar list={list} filtersOpen={filtersOpen} onToggleFilters={() => setFiltersOpen(open => !open)} columns={columns} onColumnsChange={changeColumns} onShowShortcuts={() => setShortcutsOpen(true)} onAdd={() => setAddOpen(true)} />
+        ? <TorrentToolbar list={list} filtersOpen={filtersOpen} onToggleFilters={() => setFiltersOpen(open => !open)} searchOpen={searchOpen} onToggleSearch={toggleSearch} columns={columns} onColumnsChange={changeColumns} onShowShortcuts={() => setShortcutsOpen(true)} onAdd={() => setAddOpen(true)} />
         : !isLoading && <AddTorrentButton onAdd={() => setAddOpen(true)} />}
     />
   )
@@ -352,100 +373,104 @@ export function TorrentsView() {
     )
   }
 
-  const hasPanelFilters = !!list.filters.name.trim() || list.filters.status !== 'all' || !!list.filters.category || !!list.filters.tag || !!list.filters.tracker
   const matchingSelected = list.matching.filter(t => selection.selected.has(t.hash)).length
+  const sidebar = (
+    <FilterSidebar
+      list={list}
+      torrents={torrents}
+      categories={categories ?? {}}
+      tags={tags ?? []}
+      views={views}
+      onViewsChange={setViews}
+      columnTargets={[...filterTargets.values()]}
+      onClose={() => setFiltersOpen(false)}
+    />
+  )
+
 
   return (
     <div className="space-y-4">
       {header}
 
-      <FilterViewChips list={list} views={views} onViewsChange={setViews} />
-
-      <ColumnFilterChips
-        targets={[...filterTargets.values()]}
-        filters={list.filters.columns ?? {}}
-        onChange={list.setColumnFilter}
-        // Added from the filter panel's funnel button, and in the table from the column titles too.
-        showAdd={false}
-        start={!filtersOpen && hasPanelFilters && <ListFilterChips list={list} />}
-      />
-
-      {filtersOpen && (
-        <TorrentFilterPanel
-          list={list}
-          categories={Object.keys(categories ?? {})}
-          tags={tags ?? []}
-          views={views}
-          onViewsChange={setViews}
-          actions={(
-            <>
-              <Button type="button" variant="outline" size="icon" className="size-8 shrink-0" aria-label={t('Categories and tags')} title={t('Categories and tags')} onClick={() => setManageOpen(true)}>
-                <FolderCog className="size-4" />
-              </Button>
-              <AddFilterButton targets={[...filterTargets.values()]} onChange={list.setColumnFilter} />
-              <Button type="button" variant="ghost" size="icon" className="ms-auto size-8 shrink-0 rounded-full bg-muted hover:bg-accent" aria-label={t('Close filters')} title={t('Close filters')} onClick={() => setFiltersOpen(false)}>
-                <X className="size-4" />
-              </Button>
-            </>
+      {/* The filters open on the list's end side: beside it on wide screens, over it on phones. */}
+      <div className={cn(filtersOpen && wide && 'flex items-start gap-4')}>
+        {!wide && <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}>{sidebar}</FilterSheet>}
+        <div className="min-w-0 flex-1 space-y-4">
+          {searchOpen && (
+            <SearchInput
+              id="torrent-search"
+              autoFocus
+              aria-label={t('Search')}
+              placeholder={t('Search')}
+              value={list.query}
+              onValueChange={list.setQuery}
+              onKeyDown={(e) => { if (e.key === 'Escape') toggleSearch() }}
+              className="md:max-w-sm"
+            />
           )}
-        />
-      )}
 
-      {list.matching.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-8 text-sm text-muted-foreground">
-          <span>{t('No torrents match these filters')}</span>
-          <Button variant="outline" size="sm" onClick={list.clearFilters}>{t('Clear filters')}</Button>
-        </div>
-      ) : list.showTable ? (
-        <TorrentTable
-          torrents={list.rows}
-          layout={columns}
-          onLayoutChange={changeColumns}
-          onResetSort={list.resetSort}
-          selected={selection.selected}
-          selectAllState={matchingSelected === 0 ? false : matchingSelected === list.matching.length ? true : 'indeterminate'}
-          onToggle={toggleBox}
-          onSelectAll={(checked) => (checked ? selection.replace(list.matching.map(t => t.hash)) : selection.clear())}
-          openHash={detailsTorrent ? detailsTorrent.hash : null}
-          sortField={list.sort.field}
-          sortDirection={list.sort.direction}
-          onSort={list.sortBy}
-          rowProps={rowProps}
-          wrapBody={withMenu}
-          columnFilters={list.filters.columns ?? {}}
-          filterTargets={filterTargets}
-          onColumnFilter={list.setColumnFilter}
-        />
-      ) : (
-        <TorrentCards
-          torrents={list.rows}
-          selected={selection.selected}
-          showCheckboxes={mouse || count > 0}
-          onToggle={toggleBox}
-          openHash={detailsTorrent ? detailsTorrent.hash : null}
-          rowProps={rowProps}
-          wrapList={withMenu}
-        />
-      )}
+        {list.matching.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-8 text-sm text-muted-foreground">
+            <span>{t('No torrents match these filters')}</span>
+            <Button variant="outline" size="sm" onClick={list.clearFilters}>{t('Clear filters')}</Button>
+          </div>
+        ) : list.showTable ? (
+          <TorrentTable
+            torrents={list.rows}
+            layout={columns}
+            onLayoutChange={changeColumns}
+            onResetSort={list.resetSort}
+            selected={selection.selected}
+            selectAllState={matchingSelected === 0 ? false : matchingSelected === list.matching.length ? true : 'indeterminate'}
+            onToggle={toggleBox}
+            onSelectAll={(checked) => (checked ? selection.replace(list.matching.map(t => t.hash)) : selection.clear())}
+            openHash={detailsTorrent ? detailsTorrent.hash : null}
+            sortField={list.sort.field}
+            sortDirection={list.sort.direction}
+            onSort={list.sortBy}
+            rowProps={rowProps}
+            wrapBody={withMenu}
+            columnFilters={list.filters.columns ?? {}}
+            filterTargets={filterTargets}
+            onColumnFilter={list.setColumnFilter}
+          />
+        ) : (
+          <TorrentCards
+            torrents={list.rows}
+            selected={selection.selected}
+            showCheckboxes={mouse || count > 0}
+            onToggle={toggleBox}
+            openHash={detailsTorrent ? detailsTorrent.hash : null}
+            rowProps={rowProps}
+            wrapList={withMenu}
+          />
+        )}
 
-      {list.matching.length > PAGE_SIZES[0] && (
-        <div className="flex flex-wrap items-center justify-between gap-2 px-2">
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
-            {t('Show')}
-            <NativeSelect className="h-8 text-foreground" value={list.pageSize} onChange={(e) => list.setPageSize(Number(e.target.value))}>
-              {PAGE_SIZES.map(size => <option key={size} value={size}>{size}</option>)}
-            </NativeSelect>
-            {t('per page')}
-          </label>
-          {list.pageCount > 1 && (
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" aria-label={t('Previous page')} disabled={list.page === 1} onClick={() => list.setPage(list.page - 1)}><ChevronLeft className="size-4 rtl:rotate-180" /></Button>
-              <span className="text-sm tabular-nums">{list.page} / {list.pageCount}</span>
-              <Button variant="outline" size="sm" aria-label={t('Next page')} disabled={list.page === list.pageCount} onClick={() => list.setPage(list.page + 1)}><ChevronRight className="size-4 rtl:rotate-180" /></Button>
-            </div>
-          )}
+        {list.matching.length > PAGE_SIZES[0] && (
+          <div className="flex flex-wrap items-center justify-between gap-2 px-2">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              {t('Show')}
+              <NativeSelect className="h-8 text-foreground" value={list.pageSize} onChange={(e) => list.setPageSize(Number(e.target.value))}>
+                {PAGE_SIZES.map(size => <option key={size} value={size}>{size}</option>)}
+              </NativeSelect>
+              {t('per page')}
+            </label>
+            {list.pageCount > 1 && (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" aria-label={t('Previous page')} disabled={list.page === 1} onClick={() => list.setPage(list.page - 1)}><ChevronLeft className="size-4 rtl:rotate-180" /></Button>
+                <span className="text-sm tabular-nums">{list.page} / {list.pageCount}</span>
+                <Button variant="outline" size="sm" aria-label={t('Next page')} disabled={list.page === list.pageCount} onClick={() => list.setPage(list.page + 1)}><ChevronRight className="size-4 rtl:rotate-180" /></Button>
+              </div>
+            )}
+          </div>
+        )}
         </div>
-      )}
+        {filtersOpen && wide && (
+          <aside aria-label={t('Filters')} className="sticky top-[calc(var(--header-height,3rem)+1rem)] max-h-[calc(100vh-var(--header-height,3rem)-2rem)] w-60 shrink-0 overflow-y-auto rounded-xl border bg-card p-3">
+            {sidebar}
+          </aside>
+        )}
+      </div>
 
       {/* Keeps the last cards clear of the selection bar on phones. */}
       {count > 0 && <div aria-hidden className="h-[calc(3.5rem+var(--table-scrollbar-space,0px))] md:hidden" />}
@@ -456,7 +481,6 @@ export function TorrentsView() {
       <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
 
       {addDialog}
-      {manageOpen && <CategoriesTagsDialog open onOpenChange={setManageOpen} />}
       {detailsTorrent && (
         <PageBoundary loading={null}>
           {wide

@@ -199,7 +199,7 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
       </div>
 
       {/* The funnel above adds a filter in either view; the table also filters from its titles. */}
-      <ColumnFilterChips targets={[...targets.values()]} filters={filters} onChange={setFilter} showAdd={false} />
+      <ColumnFilterChips targets={[...targets.values()]} filters={filters} onChange={setFilter} />
 
       {sorted.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">{t('No results match these filters')}</p>}
 
@@ -258,7 +258,7 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
       </div>
 
       {/* Laid out like the torrent cards: a grid on wide screens. */}
-      <ul className={cn('grid items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3', showTable && 'hidden')}>
+      <ul className={cn('grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3', showTable && 'hidden')}>
         {shown.map(result => (
           <li key={`${result.fileUrl}|${result.descrLink}`} className="flex items-start gap-2 rounded-xl border bg-card px-3 py-2.5">
             <button type="button" className="min-w-0 flex-1 text-start" onClick={() => result.fileUrl && onAdd(result)}>

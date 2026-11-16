@@ -348,9 +348,10 @@
 }
 
 /* Phones: the tab bar's height (set by Layout) plus its gap above the screen's edge or the home
-   indicator. Bars and panels kept above it, and the page's room at its end, use this. */
+   indicator. Bars and panels kept above it, and the page's room at its end, use this. The gap is
+   the smallest that works everywhere: 4px. */
 :root {
-  --nav-gap: 0.5rem;
+  --nav-gap: 4px;
   /* How far the tab bar, or the selection bar in its place, sits from the bottom of the page. */
   --bottom-edge: max(var(--nav-gap), env(safe-area-inset-bottom));
   --bottom-nav-height: calc(var(--nav-bar-height, 3.75rem) + var(--bottom-edge));
@@ -362,7 +363,6 @@
 @supports (-webkit-touch-callout: none) {
   @media (display-mode: browser) and (orientation: portrait) and (max-width: 32rem) {
     :root {
-      --nav-gap: 4px;
       /* Not lower: the window ends 16px above Safari's floating address bar, and Safari cuts off
          any fixed bar placed past that edge. */
       --bottom-edge: var(--nav-gap);

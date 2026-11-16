@@ -3,13 +3,12 @@ import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { DEFAULT_LIST_SETTINGS, loadListSettings, saveListSettings, type ListView, type SortDirection, type SortField } from '@/lib/listSettings'
 import { compareTorrents, TORRENT_FILTER_COLUMNS } from '@/lib/torrentColumns'
 import { activeCount, applyColumnFilters, loadColumnFilters, saveColumnFilters, withFilter, type ColumnFilter } from '@/lib/columnFilters'
-import { countFilterOptions, filterTorrents, groupTrackersByHost, type TorrentFilters } from '@/lib/torrentFilters'
+import { countFilterOptions, filterTorrents, searchTorrents, groupTrackersByHost, hasSidebarFilters, NO_FILTERS, toggleChoice, type FilterList, type TorrentFilters } from '@/lib/torrentFilters'
 import type { Torrent } from '@/types'
 
 // Matches --breakpoint-md in index.css.
 const WIDE_SCREEN = '(min-width: 1200px)'
 
-const NO_FILTERS: TorrentFilters = { name: '', status: 'all', category: '', tag: '', tracker: '', columns: {} }
 const COLUMN_FILTERS_TABLE = 'torrents'
 
 // Everything about how the torrent list is narrowed, ordered, split into pages, and shown.
@@ -17,6 +16,8 @@ const COLUMN_FILTERS_TABLE = 'torrents'
 // the other filters start cleared on each visit.
 export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, string[]> | undefined) {
   const [saved] = useState(loadListSettings)
+  // The quick search narrows the list for a moment, apart from the filters: views don't keep it.
+  const [query, setQuery] = useState('')
   const [filters, setFilters] = useState<TorrentFilters>(() => ({ ...NO_FILTERS, columns: loadColumnFilters(COLUMN_FILTERS_TABLE) }))
   const [sort, setSort] = useState<{ field: SortField; direction: SortDirection }>({ field: saved.sortField, direction: saved.sortDirection })
   const [view, setView] = useState<ListView>(saved.view)
@@ -35,9 +36,9 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
   const matching = useMemo(() => {
     const sign = sort.direction === 'asc' ? 1 : -1
     // Equal values fall back to the name, so rows don't trade places on every refresh.
-    return applyColumnFilters(filterTorrents(torrents, filters, hosts), TORRENT_FILTER_COLUMNS, filters.columns ?? {}).sort((a, b) =>
+    return applyColumnFilters(searchTorrents(filterTorrents(torrents, filters, hosts), query, hosts), TORRENT_FILTER_COLUMNS, filters.columns ?? {}).sort((a, b) =>
       sign * (compareTorrents(a, b, sort.field) || compareTorrents(a, b, 'name')))
-  }, [torrents, filters, hosts, sort])
+  }, [torrents, filters, query, hosts, sort])
 
   const pageCount = Math.max(1, Math.ceil(matching.length / pageSize))
   // The list can shrink under a later page, for example after deleting.
@@ -45,8 +46,18 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
 
   return {
     filters,
+    query,
+    setQuery: (text: string) => {
+      setQuery(text)
+      setRequestedPage(1)
+    },
     setFilter: <K extends keyof TorrentFilters>(key: K, value: TorrentFilters[K]) => {
       setFilters(current => ({ ...current, [key]: value }))
+      setRequestedPage(1)
+    },
+    // Adds a choice in the sidebar, or takes it out again.
+    toggleFilter: (key: FilterList, value: string) => {
+      setFilters(current => ({ ...current, [key]: toggleChoice(current[key] as string[], value) }))
       setRequestedPage(1)
     },
     setColumnFilter: (id: string, filter: ColumnFilter | null) => {
@@ -59,10 +70,14 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
       setRequestedPage(1)
     },
     clearFilters: () => {
+      setQuery('')
       setFilters(NO_FILTERS)
       setRequestedPage(1)
     },
-    filtered: !!filters.name.trim() || filters.status !== 'all' || !!filters.category || !!filters.tag || !!filters.tracker || activeCount(filters.columns) > 0,
+    filtered: hasSidebarFilters(filters) || activeCount(filters.columns) > 0,
+    // The quick search and the filters, each marked on its own button.
+    searched: !!query.trim(),
+    narrowed: hasSidebarFilters(filters) || activeCount(filters.columns) > 0,
     counts,
     trackerHosts: [...hosts.keys()].sort(),
     sort,
