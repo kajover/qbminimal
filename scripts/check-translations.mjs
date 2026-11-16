@@ -3,10 +3,22 @@
 // used. Run with: npm run i18n:check
 import fs from 'node:fs'
 import path from 'node:path'
-import ts from 'typescript'
+import { parseSync } from 'oxc-parser'
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', 'src')
 const used = new Set()
+
+// The text of every t('...') call: a plain string, or a template without ${} in it.
+function visit(node) {
+  if (!node || typeof node !== 'object') return
+  if (Array.isArray(node)) return node.forEach(visit)
+  if (node.type === 'CallExpression' && node.callee.type === 'Identifier' && node.callee.name === 't') {
+    const first = node.arguments[0]
+    if (first?.type === 'Literal' && typeof first.value === 'string') used.add(first.value)
+    else if (first?.type === 'TemplateLiteral' && first.expressions.length === 0) used.add(first.quasis[0].value.cooked)
+  }
+  for (const key in node) if (key !== 'parent') visit(node[key])
+}
 
 function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -14,12 +26,9 @@ function walk(dir) {
     if (entry.isDirectory()) {
       if (entry.name !== 'i18n' && entry.name !== 'test') walk(full)
     } else if (/\.tsx?$/.test(entry.name) && !entry.name.includes('.test.')) {
-      const source = ts.createSourceFile(full, fs.readFileSync(full, 'utf8'), ts.ScriptTarget.Latest, true, full.endsWith('x') ? ts.ScriptKind.TSX : ts.ScriptKind.TS)
-      const visit = (node) => {
-        if (ts.isCallExpression(node) && node.expression.getText(source) === 't' && node.arguments[0] && ts.isStringLiteralLike(node.arguments[0])) used.add(node.arguments[0].text)
-        ts.forEachChild(node, visit)
-      }
-      visit(source)
+      const { program, errors } = parseSync(full, fs.readFileSync(full, 'utf8'))
+      if (errors.length) throw new Error(`${full}: ${errors[0].message}`)
+      visit(program)
     }
   }
 }

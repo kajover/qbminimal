@@ -138,7 +138,7 @@ npm test
 npm run typecheck
 ```
 
-`npm run typecheck` uses TypeScript 7. The linter uses TypeScript 6.0 until typescript-eslint supports 7. Dependabot checks every week for newer packages and GitHub Actions and opens pull requests for them.
+`npm run typecheck` uses TypeScript 7, and `npm run lint` uses Oxlint, which reads TypeScript itself. Dependabot checks every week for newer packages and GitHub Actions and opens pull requests for them.
 
 ## Translations
 

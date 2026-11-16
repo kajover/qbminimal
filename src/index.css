@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
 /* The theme switcher puts .dark on <html>. */
 @custom-variant dark (&:is(.dark *));

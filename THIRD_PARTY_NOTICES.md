@@ -24,6 +24,6 @@ qbminimal is licensed under the GNU General Public License v3.0. It includes or 
 
 ## Used only to build and test
 
-Vite, TypeScript, ESLint, and Vitest, each under the MIT License, along with their dependencies.
+Vite, TypeScript, Oxlint, and Vitest, each under the MIT License, along with their dependencies.
 
 The full license text of each package is in its folder under `node_modules` after `npm install`.

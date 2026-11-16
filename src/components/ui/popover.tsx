@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils"
 // A small panel that opens from a button, styled like the menus.
 const Popover = PopoverPrimitive.Root
 const PopoverTrigger = PopoverPrimitive.Trigger
-const PopoverAnchor = PopoverPrimitive.Anchor
 
 function PopoverContent({ className, align = "start", sideOffset = 4, ...props }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
   return (
@@ -25,4 +24,4 @@ function PopoverContent({ className, align = "start", sideOffset = 4, ...props }
   )
 }
 
-export { Popover, PopoverTrigger, PopoverAnchor, PopoverContent }
+export { Popover, PopoverTrigger, PopoverContent }

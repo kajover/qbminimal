@@ -15,7 +15,8 @@ for (const [name, args] of CHECKS) {
   const started = Date.now()
   const run = spawnSync('npm', args, { encoding: 'utf8' })
   const seconds = ((Date.now() - started) / 1000).toFixed(1)
-  // Without colour codes, so the summary and errors read plainly.
+  // Without colour codes, so the summary and errors read plainly. They start with the escape character.
+  // oxlint-disable-next-line no-control-regex
   const output = `${run.stdout ?? ''}${run.stderr ?? ''}`.replace(/\x1b\[[0-9;]*m/g, '')
   // The translation check lists every catalog; one with keys missing fails it.
   const failed = run.status !== 0 || (name === 'translations' && /missing: /.test(output))

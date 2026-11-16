@@ -163,7 +163,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   const titleWidths = useMemo(() => Object.fromEntries(columns.map(def =>
     // The title's own width, plus its padding (16px), the arrow (14px and its gap), the filter button (20px and its gap), and a margin.
     [def.id, Math.ceil(textWidth(def.header ?? def.label, 12 * scale) + 16 + 18 + 22 + 4)])) as Partial<Record<ColumnId, number>>,
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- the ids stand for the columns
+  // oxlint-disable-next-line react/exhaustive-deps -- the ids stand for the columns
   [columnKey, scale])
   const minWidthOf = (id: ColumnId) => Math.max(getColumn(id).minWidth * scale, titleWidths[id] ?? 0)
   const widthOf = (id: ColumnId) => (resizing?.id === id ? resizing.width : Math.max(columnWidth(layout, id) * scale, minWidthOf(id)))
