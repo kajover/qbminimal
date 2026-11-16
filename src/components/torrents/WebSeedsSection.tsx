@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Check, Pencil, Plus, Trash2 } from 'lucide-react'
 import { ConfirmAction } from '@/components/ConfirmAction'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Input, Textarea } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useTorrentAction, useWebSeeds } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
@@ -97,7 +97,7 @@ export function WebSeedsSection({ hash }: { hash: string }) {
         )}
       <form onSubmit={add} className="space-y-1 pt-2">
         <Label htmlFor="new-web-seeds" className="text-xs text-muted-foreground">{t('Add web seeds, one URL per line')}</Label>
-        <textarea
+        <Textarea
           id="new-web-seeds"
           rows={2}
           value={newUrls}

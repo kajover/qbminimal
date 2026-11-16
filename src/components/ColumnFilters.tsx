@@ -220,7 +220,8 @@ export function AddFilterButton({ targets, onChange }: { targets: FilterTarget[]
           <Filter className="size-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent>
+      {/* Focus goes to the popup itself, not the column list: phones would open that list at once. */}
+      <PopoverContent tabIndex={-1} onOpenAutoFocus={(e) => { e.preventDefault(); (e.currentTarget as HTMLElement).focus() }}>
         <div className="grid gap-3">
           <NativeSelect aria-label={t('Column')} className="h-8" value={target.id} onChange={(e) => setTargetId(e.target.value)}>
             {targets.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}

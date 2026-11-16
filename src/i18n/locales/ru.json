@@ -241,7 +241,6 @@
   "Previous page": "Предыдущая страница",
   "Seeds": "Сиды",
   "Size": "Размер",
-  "Source": "Источник",
   "{count} results": "Результатов: {count}",
   "{from}-{to} of {total}": "{from}–{to} из {total}",
   "{seeds} seeds · {leeches} leeches": "Сиды: {seeds} · Личи: {leeches}",
@@ -869,7 +868,6 @@
   "Failed to resume": "Не удалось возобновить",
   "Failed to save settings": "Не удалось сохранить настройки",
   "Failed to unban peer": "Не удалось разблокировать пира",
-  "A search plugin failed, so results may be incomplete.": "Сбой поискового плагина, поэтому результаты могут быть неполными.",
   "Couldn't stop the search in qBittorrent": "Не удалось остановить поиск в qBittorrent",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Все поисковые плагины выключены. Включите хотя бы один в разделе Управление плагинами.",
   "No search plugins are installed. Add one under Manage plugins.": "Поисковые плагины не установлены. Добавьте плагин в разделе Управление плагинами.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "В этом файле нет правил",
   "This file isn't a qBittorrent rules file": "Это не файл правил qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Это не файл правил qBittorrent (не JSON)",
-  "See the Logs view for details.": "Подробности в разделе Журнал.",
   "Down limit": "Огр. загр.",
   "Down speed": "Загрузка",
   "ETA": "Осталось",
@@ -1327,5 +1324,6 @@
   "Run again": "Повторить поиск",
   "Couldn't delete every search": "Не удалось удалить все поиски",
   "Keep past searches": "Хранить прошлые поиски",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Прошлые поиски остаются в qBittorrent, их можно открыть или повторить. Если выключено, каждый новый поиск удаляет предыдущие."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Прошлые поиски остаются в qBittorrent, их можно открыть или повторить. Если выключено, каждый новый поиск удаляет предыдущие.",
+  "Fill in this field": "Заполните это поле"
 }

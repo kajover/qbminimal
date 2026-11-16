@@ -198,13 +198,14 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
         {/* The same side room as the content below, so the menu button lines up with the list's
             start and the last button with its end: on phones the cards and table reach 0.5rem
             past the page's 1rem margin. */}
-        <div className="flex h-14 items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(1rem,env(safe-area-inset-right))]">
+        <div className="flex h-12 items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(1rem,env(safe-area-inset-right))]">
           <div className="flex shrink-0 items-center gap-2">
             <PagesMenu page={page} onNavigate={onNavigate} />
             {/* Left out for room; screen readers still hear it. */}
             <h1 className="sr-only">{t('qBittorrent')}</h1>
           </div>
-          <div ref={setSlot} className="flex min-w-0 flex-1 items-center md:px-2" />
+          {/* Room before the title only, so the last button ends where the list does. */}
+          <div ref={setSlot} className="flex min-w-0 flex-1 items-center md:ps-2" />
           <GlobalSpeeds onOpen={() => onNavigate('statistics')} />
         </div>
         <ConnectionBanner />
@@ -213,7 +214,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
       <div>
         <div className="flex">
           {/* Above the torrent details panel (z-30), so the edge handle is never covered. */}
-          <div ref={sidebarBox} className={cn('sticky top-14 z-35 hidden h-[calc(100vh-3.5rem)] shrink-0 self-start', menuBar && 'md:flex')}>
+          <div ref={sidebarBox} className={cn('sticky top-(--header-height,3rem) z-35 hidden h-[calc(100vh-var(--header-height,3rem))] shrink-0 self-start', menuBar && 'md:flex')}>
             {sidebarShown && (
               <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto p-2 pb-4">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{MAIN_PAGES.map(navButton)}</nav>
@@ -260,7 +261,8 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
         ref={navRef}
         aria-label={t('Pages')}
         style={{ '--bar-bottom': 'var(--bottom-edge)' } as CSSProperties}
-        className={cn('glass glass-flat bottom-bar inset-x-[max(0.75rem,env(safe-area-inset-left))] z-30 rounded-full md:hidden', !menuBar && 'hidden')}
+        // Centred and no wider than a phone's on tablets, where the full width is far to reach across.
+        className={cn('glass glass-flat bottom-bar inset-x-[max(0.75rem,env(safe-area-inset-left))] z-30 mx-auto max-w-lg rounded-full md:hidden', !menuBar && 'hidden')}
       >
         <div className="flex justify-around px-1 py-1.5">
           {MAIN_PAGES.map(({ id, label, icon: Icon }) => (

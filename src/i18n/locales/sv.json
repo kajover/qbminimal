@@ -241,7 +241,6 @@
   "Previous page": "Föregående sida",
   "Seeds": "Seeds",
   "Size": "Storlek",
-  "Source": "Källa",
   "{count} results": "Resultat: {count}",
   "{from}-{to} of {total}": "{from}-{to} av {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} seeds · {leeches} leechare",
@@ -869,7 +868,6 @@
   "Failed to resume": "Det gick inte att återuppta",
   "Failed to save settings": "Det gick inte att spara inställningar",
   "Failed to unban peer": "Det gick inte att häva bannlysningen av jämliken",
-  "A search plugin failed, so results may be incomplete.": "Ett sökplugin misslyckades, så resultaten kan vara ofullständiga.",
   "Couldn't stop the search in qBittorrent": "Kunde inte stoppa sökningen i qBittorrent",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Alla sökplugin är avstängda. Slå på ett under Hantera plugin.",
   "No search plugins are installed. Add one under Manage plugins.": "Inga sökplugin är installerade. Lägg till ett under Hantera plugin.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Filen innehåller inga regler",
   "This file isn't a qBittorrent rules file": "Filen är ingen regelfil för qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Filen är ingen regelfil för qBittorrent (den är inte JSON)",
-  "See the Logs view for details.": "Se loggvyn för detaljer.",
   "Down limit": "Nedladdn.gräns",
   "Down speed": "Nedladdn.hastighet",
   "ETA": "Beräknad tid",
@@ -1327,5 +1324,6 @@
   "Run again": "Sök igen",
   "Couldn't delete every search": "Kunde inte ta bort alla sökningar",
   "Keep past searches": "Behåll tidigare sökningar",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Tidigare sökningar finns kvar i qBittorrent så att de kan öppnas eller köras igen. Av: varje ny sökning tar bort de föregående."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Tidigare sökningar finns kvar i qBittorrent så att de kan öppnas eller köras igen. Av: varje ny sökning tar bort de föregående.",
+  "Fill in this field": "Fyll i det här fältet"
 }

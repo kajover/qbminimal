@@ -241,7 +241,6 @@
   "Previous page": "Trang trước",
   "Seeds": "Seed",
   "Size": "Kích thước",
-  "Source": "Nguồn",
   "{count} results": "{count} kết quả",
   "{from}-{to} of {total}": "{from}-{to} / {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} seed · {leeches} leech",
@@ -869,7 +868,6 @@
   "Failed to resume": "Không thể tiếp tục",
   "Failed to save settings": "Không thể lưu cài đặt",
   "Failed to unban peer": "Không thể bỏ cấm peer",
-  "A search plugin failed, so results may be incomplete.": "Một plugin tìm kiếm đã lỗi, nên kết quả có thể chưa đầy đủ.",
   "Couldn't stop the search in qBittorrent": "Không thể dừng tìm kiếm trong qBittorrent",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Mọi plugin tìm kiếm đều đang tắt. Hãy bật một plugin trong Quản lý plugin.",
   "No search plugins are installed. Add one under Manage plugins.": "Chưa cài plugin tìm kiếm nào. Hãy thêm một plugin trong Quản lý plugin.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Tệp này không có quy tắc nào",
   "This file isn't a qBittorrent rules file": "Tệp này không phải tệp quy tắc của qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Tệp này không phải tệp quy tắc của qBittorrent (không phải JSON)",
-  "See the Logs view for details.": "Xem chế độ xem Nhật ký để biết chi tiết.",
   "Down limit": "Giới hạn tải xuống",
   "Down speed": "Tốc độ tải xuống",
   "ETA": "Thời gian còn lại",
@@ -1327,5 +1324,6 @@
   "Run again": "Tìm lại",
   "Couldn't delete every search": "Không thể xóa mọi tìm kiếm",
   "Keep past searches": "Giữ các tìm kiếm trước",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Các tìm kiếm trước được giữ trong qBittorrent để mở lại hoặc chạy lại. Khi tắt, mỗi tìm kiếm mới sẽ xóa các tìm kiếm trước đó."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Các tìm kiếm trước được giữ trong qBittorrent để mở lại hoặc chạy lại. Khi tắt, mỗi tìm kiếm mới sẽ xóa các tìm kiếm trước đó.",
+  "Fill in this field": "Hãy điền vào trường này"
 }

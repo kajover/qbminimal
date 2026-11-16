@@ -241,7 +241,6 @@
   "Previous page": "上一页",
   "Seeds": "做种数",
   "Size": "大小",
-  "Source": "来源",
   "{count} results": "{count} 个结果",
   "{from}-{to} of {total}": "{from}-{to}，共 {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} 做种 · {leeches} 下载",
@@ -869,7 +868,6 @@
   "Failed to resume": "恢复失败",
   "Failed to save settings": "无法保存设置",
   "Failed to unban peer": "无法解封用户",
-  "A search plugin failed, so results may be incomplete.": "某个搜索插件出错，结果可能不完整。",
   "Couldn't stop the search in qBittorrent": "无法停止 qBittorrent 中的搜索",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "所有搜索插件均已关闭。请在管理插件中开启一个。",
   "No search plugins are installed. Add one under Manage plugins.": "未安装搜索插件。请在管理插件中添加一个。",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "此文件中没有规则",
   "This file isn't a qBittorrent rules file": "此文件不是 qBittorrent 规则文件",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "此文件不是 qBittorrent 规则文件（不是 JSON）",
-  "See the Logs view for details.": "详情请查看日志。",
   "Down limit": "下载限制",
   "Down speed": "下载速度",
   "ETA": "剩余时间",
@@ -1327,5 +1324,6 @@
   "Run again": "重新搜索",
   "Couldn't delete every search": "无法删除所有搜索",
   "Keep past searches": "保留以往搜索",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "以往的搜索保留在 qBittorrent 中,可以重新打开或再次运行。关闭后,每次新搜索都会删除之前的搜索。"
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "以往的搜索保留在 qBittorrent 中,可以重新打开或再次运行。关闭后,每次新搜索都会删除之前的搜索。",
+  "Fill in this field": "请填写此字段"
 }

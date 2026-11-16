@@ -88,7 +88,7 @@ export function TorrentCards({ torrents, selected, showCheckboxes, onToggle, ope
                 <span className={cn('min-w-[6.6em] shrink-0', getStateColor(torrent.state, torrent.completion_on))} title={torrent.error || undefined}>{getStateLabel(torrent.state, torrent.completion_on)}</span>
                 <span className="text-muted-foreground tabular-nums">{Math.round(torrent.progress * 100)}%</span>
               </div>
-              <p className="text-sm font-medium wrap-anywhere">{torrent.name}</p>
+              <p className="text-sm wrap-anywhere">{torrent.name}</p>
               {/* One line of facts, each with an icon. Hovering or a screen reader gives the words. */}
               {/* Packed from the start with one even gap, 12px where there's room and down to 4px on
                   narrow phones, so the five facts (about 20rem) stay on one line. Every fact sits in a

@@ -57,7 +57,7 @@ export function SpeedChart({ hash }: { hash?: string } = {}) {
         <span className="sr-only">{t('Highest in this period: {speed}.', { speed: speed(peak) })}</span>
       </figcaption>
 
-      <div className="flex gap-2 text-[0.625rem] text-muted-foreground tabular-nums">
+      <div className="flex gap-2 text-xs text-muted-foreground tabular-nums">
         <div className="flex flex-col justify-between py-0.5 text-end" aria-hidden>
           <span>{speed(top)}</span>
           <span>{speed(top / 2)}</span>

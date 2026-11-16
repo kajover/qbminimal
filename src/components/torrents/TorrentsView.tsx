@@ -276,20 +276,21 @@ export function TorrentsView() {
     return () => window.removeEventListener('keydown', onKey)
   })
 
-  // Phones: where a thumb reaches, right above the tab bar, or where the tab bar would be when it's
-  // off. Wide screens: in the header, in the middle of the window, so the list below doesn't move
+  // Phones: where a thumb reaches, just above the tab bar, or where the tab bar would be when it's
+  // off; on tablets as wide as the tab bar. The buttons sit at the end, Delete last. No margin from
+  // the page's spacing, which would lift it off the tab bar. Wide screens: in the header, in the middle of the window, so the list below doesn't move
   // when a torrent is selected.
   const selectionBar = count > 0 && (
     <div
       role="toolbar"
       aria-label={t('Selected torrents')}
-      className="glass glass-flat-phone z-30 flex items-center gap-1 overflow-x-auto max-md:fixed max-md:inset-x-3 max-md:bottom-[calc(var(--bottom-nav-height,4rem)+var(--selection-bar-gap,0.5rem))] max-md:rounded-full max-md:p-1.5 max-md:px-2 md:absolute md:top-1/2 md:left-1/2 md:max-w-[calc(100vw-38rem)] md:-translate-1/2 md:rounded-xl md:p-0.5"
+      className="glass glass-flat-phone z-30 flex items-center gap-1 overflow-x-auto max-md:fixed max-md:inset-x-3 max-md:mx-auto max-md:my-0 max-md:max-w-lg max-md:bottom-[calc(var(--bottom-nav-height,4rem)+var(--selection-bar-gap,0.25rem))] max-md:rounded-full max-md:p-1.5 max-md:px-2 md:absolute md:top-1/2 md:left-1/2 md:max-w-[calc(100vw-38rem)] md:-translate-1/2 md:rounded-xl md:p-0.5"
     >
       <Button variant="ghost" size="icon" className="size-8 shrink-0 rounded-full" aria-label={t('Clear selection')} title={t('Clear selection (Esc)')} onClick={selection.clear}>
         <X className="size-4" />
       </Button>
       <span className="pe-1 text-sm whitespace-nowrap tabular-nums">{t('{selected}/{total} selected', { selected: count, total: list.matching.length })}</span>
-      <Button variant="ghost" size="sm" className="gap-1" title={t('Start')} onClick={start}><Play className="size-4" /><span className="max-sm:sr-only">{t('Start')}</span></Button>
+      <Button variant="ghost" size="sm" className="gap-1 max-md:ms-auto" title={t('Start')} onClick={start}><Play className="size-4" /><span className="max-sm:sr-only">{t('Start')}</span></Button>
       <Button variant="ghost" size="sm" className="gap-1" title={t('Stop')} onClick={stop}><Pause className="size-4" /><span className="max-sm:sr-only">{t('Stop')}</span></Button>
       {pinnedEntries.map(entry => {
         const Icon = entry.icon

@@ -241,7 +241,6 @@
   "Previous page": "Előző oldal",
   "Seeds": "Seedek",
   "Size": "Méret",
-  "Source": "Forrás",
   "{count} results": "{count} találat",
   "{from}-{to} of {total}": "{from}–{to} / {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} seed · {leeches} leech",
@@ -869,7 +868,6 @@
   "Failed to resume": "A folytatás sikertelen",
   "Failed to save settings": "A beállítások mentése sikertelen",
   "Failed to unban peer": "A tiltás feloldása sikertelen",
-  "A search plugin failed, so results may be incomplete.": "Egy keresőbővítmény meghibásodott, ezért az eredmények hiányosak lehetnek.",
   "Couldn't stop the search in qBittorrent": "A keresés nem állítható le a qBittorrentben",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Minden keresőbővítmény ki van kapcsolva. Kapcsolj be egyet a Bővítmények kezelése alatt.",
   "No search plugins are installed. Add one under Manage plugins.": "Nincs telepített keresőbővítmény. Adj hozzá egyet a Bővítmények kezelése alatt.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Ebben a fájlban nincsenek szabályok",
   "This file isn't a qBittorrent rules file": "Ez a fájl nem qBittorrent szabályfájl",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Ez a fájl nem qBittorrent szabályfájl (nem JSON)",
-  "See the Logs view for details.": "A részletekért nézd meg a Naplók nézetet.",
   "Down limit": "Letöltési korlát",
   "Down speed": "Letöltési sebesség",
   "ETA": "Hátralévő idő",
@@ -1327,5 +1324,6 @@
   "Run again": "Keresés újra",
   "Couldn't delete every search": "Nem sikerült minden keresést törölni",
   "Keep past searches": "Korábbi keresések megtartása",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "A korábbi keresések megmaradnak a qBittorrentben, így újra megnyithatók vagy futtathatók. Kikapcsolva minden új keresés törli az előzőeket."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "A korábbi keresések megmaradnak a qBittorrentben, így újra megnyithatók vagy futtathatók. Kikapcsolva minden új keresés törli az előzőeket.",
+  "Fill in this field": "Töltse ki ezt a mezőt"
 }

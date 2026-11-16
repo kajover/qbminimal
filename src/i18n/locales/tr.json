@@ -241,7 +241,6 @@
   "Previous page": "Önceki sayfa",
   "Seeds": "Gönderim",
   "Size": "Boyut",
-  "Source": "Kaynak",
   "{count} results": "{count} sonuç",
   "{from}-{to} of {total}": "{from}-{to} / {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} gönderim · {leeches} çekme",
@@ -869,7 +868,6 @@
   "Failed to resume": "Sürdürülemedi",
   "Failed to save settings": "Ayarlar kaydedilemedi",
   "Failed to unban peer": "Kişinin yasağı kaldırılamadı",
-  "A search plugin failed, so results may be incomplete.": "Bir arama eklentisi başarısız oldu; sonuçlar eksik olabilir.",
   "Couldn't stop the search in qBittorrent": "qBittorrent'teki arama durdurulamadı",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Tüm arama eklentileri kapalı. Eklentileri yönet bölümünden birini açın.",
   "No search plugins are installed. Add one under Manage plugins.": "Yüklü arama eklentisi yok. Eklentileri yönet bölümünden bir tane ekleyin.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Bu dosyada hiç kural yok",
   "This file isn't a qBittorrent rules file": "Bu dosya bir qBittorrent kural dosyası değil",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Bu dosya bir qBittorrent kural dosyası değil (JSON değil)",
-  "See the Logs view for details.": "Ayrıntılar için Günlük görünümüne bakın.",
   "Down limit": "İnd. sınırı",
   "Down speed": "İnd. hızı",
   "ETA": "TBS",
@@ -1327,5 +1324,6 @@
   "Run again": "Yeniden ara",
   "Couldn't delete every search": "Tüm aramalar silinemedi",
   "Keep past searches": "Geçmiş aramaları sakla",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Önceki aramalar qBittorrent'te kalır, böylece açılabilir veya yeniden çalıştırılabilir. Kapalıyken her yeni arama öncekileri siler."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Önceki aramalar qBittorrent'te kalır, böylece açılabilir veya yeniden çalıştırılabilir. Kapalıyken her yeni arama öncekileri siler.",
+  "Fill in this field": "Bu alanı doldurun"
 }

@@ -241,7 +241,6 @@
   "Previous page": "หน้าก่อนหน้า",
   "Seeds": "ซีด",
   "Size": "ขนาด",
-  "Source": "แหล่งที่มา",
   "{count} results": "{count} ผลลัพธ์",
   "{from}-{to} of {total}": "{from}-{to} จาก {total}",
   "{seeds} seeds · {leeches} leeches": "ซีด {seeds} · ลีช {leeches}",
@@ -869,7 +868,6 @@
   "Failed to resume": "ดำเนินการต่อไม่สำเร็จ",
   "Failed to save settings": "บันทึกการตั้งค่าไม่สำเร็จ",
   "Failed to unban peer": "เลิกแบนเพียร์ไม่สำเร็จ",
-  "A search plugin failed, so results may be incomplete.": "ปลั๊กอินค้นหาล้มเหลว ผลลัพธ์อาจไม่ครบ",
   "Couldn't stop the search in qBittorrent": "หยุดการค้นหาใน qBittorrent ไม่ได้",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "ปลั๊กอินค้นหาทุกตัวปิดอยู่ เปิดสักตัวได้ที่ จัดการปลั๊กอิน",
   "No search plugins are installed. Add one under Manage plugins.": "ไม่มีปลั๊กอินค้นหาที่ติดตั้ง เพิ่มได้ที่ จัดการปลั๊กอิน",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "ไฟล์นี้ไม่มีกฎ",
   "This file isn't a qBittorrent rules file": "ไฟล์นี้ไม่ใช่ไฟล์กฎของ qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "ไฟล์นี้ไม่ใช่ไฟล์กฎของ qBittorrent (ไม่ใช่ JSON)",
-  "See the Logs view for details.": "ดูรายละเอียดในมุมมองบันทึก",
   "Down limit": "ขีดจำกัดดาวน์",
   "Down speed": "ความเร็วดาวน์",
   "ETA": "ETA",
@@ -1327,5 +1324,6 @@
   "Run again": "ค้นหาอีกครั้ง",
   "Couldn't delete every search": "ลบการค้นหาบางรายการไม่ได้",
   "Keep past searches": "เก็บการค้นหาก่อนหน้า",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "การค้นหาก่อนหน้าจะอยู่ใน qBittorrent เพื่อเปิดหรือค้นหาซ้ำได้ เมื่อปิด การค้นหาใหม่แต่ละครั้งจะลบรายการก่อนหน้า"
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "การค้นหาก่อนหน้าจะอยู่ใน qBittorrent เพื่อเปิดหรือค้นหาซ้ำได้ เมื่อปิด การค้นหาใหม่แต่ละครั้งจะลบรายการก่อนหน้า",
+  "Fill in this field": "กรอกข้อมูลในช่องนี้"
 }

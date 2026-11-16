@@ -3,7 +3,7 @@ import { FolderOpen } from 'lucide-react'
 import { BannedPeers } from '@/components/BannedPeers'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { Input } from '@/components/ui/input'
+import { Input, Textarea } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { PrefDef } from '@/lib/preferences'
 import { ApiKeyField, CookiesEditor, InterfaceAddressField, NetworkInterfaceField, ScanDirsEditor, ShutdownButton, TestEmailButton, TrackerUrlList } from './CustomFields'
@@ -58,7 +58,7 @@ export function PreferenceField({ def, value, getValue, onChange, disabled, hasU
       break
     case 'textarea':
       control = (
-        <textarea id={id} rows={3} value={String(value ?? '')} disabled={disabled} onChange={(e) => onChange(e.target.value)} className="border-input dark:bg-input/30 w-full rounded-md border bg-transparent px-3 py-2 text-sm disabled:opacity-50" />
+        <Textarea id={id} rows={3} value={String(value ?? '')} disabled={disabled} onChange={(e) => onChange(e.target.value)} className="border-input dark:bg-input/30 w-full rounded-md border bg-transparent px-3 py-2 text-sm disabled:opacity-50" />
       )
       break
     case 'path':

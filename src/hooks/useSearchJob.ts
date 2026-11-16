@@ -2,7 +2,6 @@ import { useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
-import { getSearchEngineError } from '@/lib/searchErrors'
 import { forgetSearches, keepSearchesOn, readSavedSearches, rememberSearch } from '@/lib/searchPatterns'
 import { t } from '@/i18n'
 
@@ -15,29 +14,19 @@ interface Job {
   id: number
   running: boolean
   startedAt: number
-  // The newest log warning before the search, to spot the plugin errors it causes. null when
-  // the log couldn't be read, or when reopening an older search.
-  logMark: number | null
 }
 
-// Runs a qBittorrent search: starts it, polls its results every second until it finishes or
-// times out, and reports plugin errors qBittorrent only writes to its log.
+// Runs a qBittorrent search: starts it and polls its results every second until it finishes or
+// times out. Plugin errors aren't repeated here: qBittorrent writes them to its log.
 export function useSearchJob() {
   const queryClient = useQueryClient()
   const [job, setJob] = useState<Job | null>(null)
   const endedAt = useRef(0)
 
-  const finish = async (current: Job, found: number) => {
+  const finish = (current: Job) => {
     endedAt.current = Date.now()
     setJob({ ...current, running: false })
     void queryClient.invalidateQueries({ queryKey: ['search', 'status'] })
-    if (current.logMark === null) return
-    // qBittorrent logs one error per failed search, without naming the plugin.
-    const warnings = await qbitClient.getLogWarnings(current.logMark).catch(() => [])
-    const problem = warnings.map(entry => getSearchEngineError(entry.message)).find(Boolean)
-    if (!problem) return
-    if (found > 0) toast.warning(t('A search plugin failed, so results may be incomplete.'), { description: problem })
-    else toast.error(t('Search failed.'), { description: problem })
   }
 
   const results = useQuery({
@@ -47,14 +36,13 @@ export function useSearchJob() {
     queryFn: async () => {
       const current = job!
       const data = await qbitClient.getSearchResults(current.id)
-      const found = data.results?.length ?? 0
       if (current.running) {
         if (data.status === 'Stopped' || data.status === 'Completed') {
-          void finish(current, found)
+          finish(current)
         } else if (Date.now() - current.startedAt > TIME_LIMIT_MS) {
           await qbitClient.stopSearch(current.id).catch(() => undefined)
           toast.warning(t('The search ran for a minute, so it was stopped. These are the results so far.'))
-          void finish({ ...current, logMark: null }, found)
+          finish(current)
         }
       }
       return data.results ?? []
@@ -79,10 +67,9 @@ export function useSearchJob() {
       return false
     }
     try {
-      const warnings = await qbitClient.getLogWarnings().catch(() => null)
       const { id } = await qbitClient.startSearch(pattern, plugins, category)
       rememberSearch(id, { pattern, plugins, category })
-      setJob({ id, running: true, startedAt: Date.now(), logMark: warnings ? warnings.at(-1)?.id ?? -1 : null })
+      setJob({ id, running: true, startedAt: Date.now() })
       if (!keepSearchesOn()) void deleteOthers(id)
       void queryClient.invalidateQueries({ queryKey: ['search', 'status'] })
       return true
@@ -106,7 +93,7 @@ export function useSearchJob() {
   }
 
   // Shows the results of a search qBittorrent still holds.
-  const open = (id: number) => setJob({ id, running: false, startedAt: Date.now(), logMark: null })
+  const open = (id: number) => setJob({ id, running: false, startedAt: Date.now() })
   // Clears the results, for when their search was deleted.
   const close = () => setJob(null)
 

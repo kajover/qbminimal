@@ -461,7 +461,6 @@ class DemoClient implements ApiClient {
     return all.filter(entry => wanted[entry.type])
   }
 
-  async getLogWarnings() { return [] }
   async getPeerLog(): Promise<PeerLogEntry[]> { return this.banned.map((ip, id) => ({ id, timestamp: NOW, ip, blocked: true, reason: 'banned' })) }
 }
 

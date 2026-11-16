@@ -241,7 +241,6 @@
   "Previous page": "Poprzednia strona",
   "Seeds": "Seedy",
   "Size": "Rozmiar",
-  "Source": "Źródło",
   "{count} results": "Wyniki: {count}",
   "{from}-{to} of {total}": "{from}-{to} z {total}",
   "{seeds} seeds · {leeches} leeches": "Seedy: {seeds} · Leechery: {leeches}",
@@ -869,7 +868,6 @@
   "Failed to resume": "Nie udało się wznowić",
   "Failed to save settings": "Nie udało się zapisać ustawień",
   "Failed to unban peer": "Nie udało się odblokować peera",
-  "A search plugin failed, so results may be incomplete.": "Wtyczka wyszukiwania zgłosiła błąd, więc wyniki mogą być niekompletne.",
   "Couldn't stop the search in qBittorrent": "Nie udało się zatrzymać wyszukiwania w qBittorrent",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Wszystkie wtyczki wyszukiwania są wyłączone. Włącz jedną w sekcji Zarządzaj wtyczkami.",
   "No search plugins are installed. Add one under Manage plugins.": "Nie zainstalowano żadnych wtyczek wyszukiwania. Dodaj jedną w sekcji Zarządzaj wtyczkami.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Ten plik nie zawiera żadnych reguł",
   "This file isn't a qBittorrent rules file": "Ten plik nie jest plikiem reguł qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Ten plik nie jest plikiem reguł qBittorrent (to nie JSON)",
-  "See the Logs view for details.": "Szczegóły znajdziesz w widoku Logi.",
   "Down limit": "Limit pobierania",
   "Down speed": "Prędkość pobierania",
   "ETA": "ETA",
@@ -1327,5 +1324,6 @@
   "Run again": "Szukaj ponownie",
   "Couldn't delete every search": "Nie udało się usunąć wszystkich wyszukiwań",
   "Keep past searches": "Zachowuj poprzednie wyszukiwania",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Poprzednie wyszukiwania zostają w qBittorrent, aby można je było otworzyć lub powtórzyć. Wyłączone: każde nowe wyszukiwanie usuwa poprzednie."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Poprzednie wyszukiwania zostają w qBittorrent, aby można je było otworzyć lub powtórzyć. Wyłączone: każde nowe wyszukiwanie usuwa poprzednie.",
+  "Fill in this field": "Wypełnij to pole"
 }

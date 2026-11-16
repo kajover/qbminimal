@@ -241,7 +241,6 @@
   "Previous page": "पिछला पेज",
   "Seeds": "सीड",
   "Size": "आकार",
-  "Source": "स्रोत",
   "{count} results": "{count} नतीजे",
   "{from}-{to} of {total}": "{total} में से {from}–{to}",
   "{seeds} seeds · {leeches} leeches": "{seeds} सीड · {leeches} लीचर",
@@ -869,7 +868,6 @@
   "Failed to resume": "फिर से शुरू नहीं हो सका",
   "Failed to save settings": "सेटिंग्स सेव नहीं हो सकीं",
   "Failed to unban peer": "पीयर से बैन हटाया नहीं जा सका",
-  "A search plugin failed, so results may be incomplete.": "एक खोज प्लगइन विफल रहा, इसलिए नतीजे अधूरे हो सकते हैं।",
   "Couldn't stop the search in qBittorrent": "qBittorrent में खोज रोकी नहीं जा सकी",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "सभी खोज प्लगइन बंद हैं। प्लगइन प्रबंधित करें में किसी एक को चालू करें।",
   "No search plugins are installed. Add one under Manage plugins.": "कोई खोज प्लगइन इंस्टॉल नहीं है। प्लगइन प्रबंधित करें में एक जोड़ें।",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "इस फ़ाइल में कोई नियम नहीं है",
   "This file isn't a qBittorrent rules file": "यह qBittorrent की नियम फ़ाइल नहीं है",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "यह qBittorrent की नियम फ़ाइल नहीं है (यह JSON नहीं है)",
-  "See the Logs view for details.": "विवरण के लिए लॉग देखें।",
   "Down limit": "डाउनलोड सीमा",
   "Down speed": "डाउनलोड स्पीड",
   "ETA": "बचा हुआ समय",
@@ -1327,5 +1324,6 @@
   "Run again": "फिर से खोजें",
   "Couldn't delete every search": "सभी खोजें हटाई नहीं जा सकीं",
   "Keep past searches": "पिछली खोजें रखें",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "पिछली खोजें qBittorrent में रहती हैं, ताकि उन्हें खोला या फिर से चलाया जा सके। बंद होने पर हर नई खोज पिछली खोजें हटा देती है।"
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "पिछली खोजें qBittorrent में रहती हैं, ताकि उन्हें खोला या फिर से चलाया जा सके। बंद होने पर हर नई खोज पिछली खोजें हटा देती है।",
+  "Fill in this field": "यह फ़ील्ड भरें"
 }

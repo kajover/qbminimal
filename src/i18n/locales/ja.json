@@ -241,7 +241,6 @@
   "Previous page": "前のページ",
   "Seeds": "シード",
   "Size": "サイズ",
-  "Source": "ソース",
   "{count} results": "{count} 件の結果",
   "{from}-{to} of {total}": "{total} 件中 {from}–{to}",
   "{seeds} seeds · {leeches} leeches": "シード {seeds} · リーチャー {leeches}",
@@ -869,7 +868,6 @@
   "Failed to resume": "再開できませんでした",
   "Failed to save settings": "設定を保存できませんでした",
   "Failed to unban peer": "ピアの禁止を解除できませんでした",
-  "A search plugin failed, so results may be incomplete.": "検索プラグインが失敗したため、結果が不完全な可能性があります。",
   "Couldn't stop the search in qBittorrent": "qBittorrent の検索を停止できませんでした",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "すべての検索プラグインがオフです。プラグインを管理でオンにしてください。",
   "No search plugins are installed. Add one under Manage plugins.": "検索プラグインがインストールされていません。プラグインを管理で追加してください。",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "このファイルにはルールが含まれていません",
   "This file isn't a qBittorrent rules file": "このファイルは qBittorrent のルールファイルではありません",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "このファイルは qBittorrent のルールファイルではありません (JSON ではありません)",
-  "See the Logs view for details.": "詳細はログを確認してください。",
   "Down limit": "DL速度上限",
   "Down speed": "DL速度",
   "ETA": "予想残り時間",
@@ -1327,5 +1324,6 @@
   "Run again": "再検索",
   "Couldn't delete every search": "一部の検索を削除できませんでした",
   "Keep past searches": "過去の検索を保持",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "過去の検索は qBittorrent に残り、開き直したり再検索したりできます。オフにすると、新しい検索のたびに以前の検索が削除されます。"
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "過去の検索は qBittorrent に残り、開き直したり再検索したりできます。オフにすると、新しい検索のたびに以前の検索が削除されます。",
+  "Fill in this field": "この欄を入力してください"
 }

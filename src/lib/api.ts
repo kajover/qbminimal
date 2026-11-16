@@ -342,8 +342,6 @@ class QbitClient {
   // --- Logs ---
 
   getLogs = (levels: LogLevels, lastKnownId = -1) => this.get<LogEntry[]>('log/main', { ...levels, last_known_id: lastKnownId })
-  // Warnings only, after the given entry. Search uses them to spot plugin errors.
-  getLogWarnings = (lastKnownId = -1) => this.getLogs({ normal: false, info: false, warning: true, critical: false }, lastKnownId)
   getPeerLog = () => this.get<PeerLogEntry[]>('log/peers', { last_known_id: -1 })
 }
 

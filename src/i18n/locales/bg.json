@@ -241,7 +241,6 @@
   "Previous page": "Предишна страница",
   "Seeds": "Сийдове",
   "Size": "Размер",
-  "Source": "Източник",
   "{count} results": "Резултати: {count}",
   "{from}-{to} of {total}": "{from}-{to} от {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} сийдове · {leeches} лийчове",
@@ -869,7 +868,6 @@
   "Failed to resume": "Възобновяването не успя",
   "Failed to save settings": "Настройките не можаха да се запазят",
   "Failed to unban peer": "Пиърът не можа да се отблокира",
-  "A search plugin failed, so results may be incomplete.": "Добавка за търсене се провали, затова резултатите може да са непълни.",
   "Couldn't stop the search in qBittorrent": "Търсенето не можа да се спре в qBittorrent",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Всички добавки за търсене са изключени. Включете някоя в „Управление на добавките“.",
   "No search plugins are installed. Add one under Manage plugins.": "Няма инсталирани добавки за търсене. Добавете в „Управление на добавките“.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Този файл не съдържа правила",
   "This file isn't a qBittorrent rules file": "Този файл не е файл с правила на qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Този файл не е файл с правила на qBittorrent (не е JSON)",
-  "See the Logs view for details.": "Вижте дневниците за подробности.",
   "Down limit": "Ограничение на изтеглянето",
   "Down speed": "Скорост на изтегляне",
   "ETA": "Оставащо време",
@@ -1327,5 +1324,6 @@
   "Run again": "Търси отново",
   "Couldn't delete every search": "Не всички търсения можаха да бъдат изтрити",
   "Keep past searches": "Пазене на предишни търсения",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Предишните търсения остават в qBittorrent, за да се отварят или пускат отново. Когато е изключено, всяко ново търсене изтрива предишните."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Предишните търсения остават в qBittorrent, за да се отварят или пускат отново. Когато е изключено, всяко ново търсене изтрива предишните.",
+  "Fill in this field": "Попълнете това поле"
 }

@@ -8,7 +8,7 @@ import { PageHeader } from '@/components/PageHeader'
 import { FreeSpaceHint } from './FreeSpaceHint'
 import { Checkbox } from '@/components/ui/checkbox'
 import { TorrentFilePicker } from './TorrentFilePicker'
-import { Input } from '@/components/ui/input'
+import { Input, Textarea } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useCategories, useFindTorrent, useTags, useWebApiVersion } from '@/hooks/useApi'
 import { supportsFeature } from '@/lib/apiVersion'
@@ -320,7 +320,7 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
           <form onSubmit={submit} className="space-y-4">
             <Field label={t('Magnet or torrent links, one per line')} htmlFor="add-links">
               <div className="relative">
-                <textarea
+                <Textarea
                   id="add-links"
                   rows={3}
                   value={links}

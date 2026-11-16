@@ -241,7 +241,6 @@
   "Previous page": "Předchozí stránka",
   "Seeds": "Seedy",
   "Size": "Velikost",
-  "Source": "Zdroj",
   "{count} results": "Výsledky: {count}",
   "{from}-{to} of {total}": "{from}-{to} z {total}",
   "{seeds} seeds · {leeches} leeches": "Seedy: {seeds} · leecheři: {leeches}",
@@ -869,7 +868,6 @@
   "Failed to resume": "Obnovení se nezdařilo",
   "Failed to save settings": "Uložení nastavení se nezdařilo",
   "Failed to unban peer": "Odblokování peera se nezdařilo",
-  "A search plugin failed, so results may be incomplete.": "Vyhledávací plugin selhal, výsledky proto mohou být neúplné.",
   "Couldn't stop the search in qBittorrent": "Hledání se v qBittorrentu nepodařilo zastavit",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Všechny vyhledávací pluginy jsou vypnuté. Jeden zapněte v části Spravovat pluginy.",
   "No search plugins are installed. Add one under Manage plugins.": "Nejsou nainstalovány žádné vyhledávací pluginy. Jeden přidejte v části Spravovat pluginy.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Tento soubor neobsahuje žádná pravidla",
   "This file isn't a qBittorrent rules file": "Tento soubor není soubor pravidel qBittorrentu",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Tento soubor není soubor pravidel qBittorrentu (není ve formátu JSON)",
-  "See the Logs view for details.": "Podrobnosti najdete v zobrazení Protokoly.",
   "Down limit": "Limit stahování",
   "Down speed": "Rychlost stahování",
   "ETA": "ETA",
@@ -1327,5 +1324,6 @@
   "Run again": "Hledat znovu",
   "Couldn't delete every search": "Nepodařilo se smazat všechna hledání",
   "Keep past searches": "Uchovávat předchozí hledání",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Předchozí hledání zůstávají v qBittorrentu, aby šla otevřít nebo spustit znovu. Když je vypnuto, každé nové hledání smaže ta předchozí."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Předchozí hledání zůstávají v qBittorrentu, aby šla otevřít nebo spustit znovu. Když je vypnuto, každé nové hledání smaže ta předchozí.",
+  "Fill in this field": "Vyplňte toto pole"
 }

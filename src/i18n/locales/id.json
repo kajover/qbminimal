@@ -241,7 +241,6 @@
   "Previous page": "Halaman sebelumnya",
   "Seeds": "Seed",
   "Size": "Ukuran",
-  "Source": "Sumber",
   "{count} results": "{count} hasil",
   "{from}-{to} of {total}": "{from}-{to} dari {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} seed · {leeches} leech",
@@ -869,7 +868,6 @@
   "Failed to resume": "Gagal melanjutkan",
   "Failed to save settings": "Gagal menyimpan pengaturan",
   "Failed to unban peer": "Gagal mencabut larangan peer",
-  "A search plugin failed, so results may be incomplete.": "Plugin pencarian gagal, jadi hasil mungkin tidak lengkap.",
   "Couldn't stop the search in qBittorrent": "Tidak dapat menghentikan pencarian di qBittorrent",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Semua plugin pencarian dinonaktifkan. Aktifkan satu di Kelola plugin.",
   "No search plugins are installed. Add one under Manage plugins.": "Tidak ada plugin pencarian terpasang. Tambahkan satu di Kelola plugin.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Berkas ini tidak berisi aturan",
   "This file isn't a qBittorrent rules file": "Berkas ini bukan berkas aturan qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Berkas ini bukan berkas aturan qBittorrent (bukan JSON)",
-  "See the Logs view for details.": "Lihat tampilan Log untuk detailnya.",
   "Down limit": "Batas unduh",
   "Down speed": "Kecepatan unduh",
   "ETA": "ETA",
@@ -1327,5 +1324,6 @@
   "Run again": "Cari lagi",
   "Couldn't delete every search": "Tidak semua pencarian bisa dihapus",
   "Keep past searches": "Simpan pencarian sebelumnya",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Pencarian sebelumnya tetap di qBittorrent agar bisa dibuka atau dijalankan lagi. Jika mati, setiap pencarian baru menghapus yang sebelumnya."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Pencarian sebelumnya tetap di qBittorrent agar bisa dibuka atau dijalankan lagi. Jika mati, setiap pencarian baru menghapus yang sebelumnya.",
+  "Fill in this field": "Isi kolom ini"
 }

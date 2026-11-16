@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Check, Pencil, Plus, Trash2 } from 'lucide-react'
 import { ConfirmAction } from '@/components/ConfirmAction'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Input, Textarea } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useTorrentAction, useTorrentTrackers } from '@/hooks/useApi'
 import { DetailsHeading } from './DetailsHeading'
@@ -152,7 +152,7 @@ export function TrackersTab({ hash }: { hash: string }) {
 
       <form onSubmit={add} className="space-y-1 border-t px-2 pt-3">
         <Label htmlFor="new-trackers" className="text-xs text-muted-foreground">{t('Add trackers, one URL per line')}</Label>
-        <textarea
+        <Textarea
           id="new-trackers"
           rows={2}
           value={newUrls}

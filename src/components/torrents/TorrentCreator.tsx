@@ -6,7 +6,7 @@ import { FolderPicker } from '@/components/settings/FolderPicker'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
+import { Input, Textarea } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/hooks/use-toast'
 import { getCreatedTorrentUrl, qbitClient } from '@/lib/api'
@@ -124,10 +124,10 @@ export function TorrentCreator() {
           </div>
 
           <Field label={t('Trackers, one per line (a blank line starts a new tier)')} htmlFor="creator-trackers">
-            <textarea id="creator-trackers" rows={3} value={form.trackers} onChange={(e) => set('trackers', e.target.value)} className={textareaClass} />
+            <Textarea id="creator-trackers" rows={3} value={form.trackers} onChange={(e) => set('trackers', e.target.value)} className={textareaClass} />
           </Field>
           <Field label={t('Web seeds, one per line')} htmlFor="creator-seeds">
-            <textarea id="creator-seeds" rows={2} value={form.urlSeeds} onChange={(e) => set('urlSeeds', e.target.value)} className={textareaClass} />
+            <Textarea id="creator-seeds" rows={2} value={form.urlSeeds} onChange={(e) => set('urlSeeds', e.target.value)} className={textareaClass} />
           </Field>
           <Field label={t('Comment')} htmlFor="creator-comment">
             <Input id="creator-comment" value={form.comment} onChange={(e) => set('comment', e.target.value)} className="h-9" />

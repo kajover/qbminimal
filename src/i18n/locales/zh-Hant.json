@@ -241,7 +241,6 @@
   "Previous page": "上一頁",
   "Seeds": "做種者",
   "Size": "大小",
-  "Source": "來源",
   "{count} results": "{count} 筆結果",
   "{from}-{to} of {total}": "{from}–{to}，共 {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} 做種者 · {leeches} 下載者",
@@ -869,7 +868,6 @@
   "Failed to resume": "無法繼續",
   "Failed to save settings": "無法儲存設定",
   "Failed to unban peer": "無法解除封鎖對等端",
-  "A search plugin failed, so results may be incomplete.": "有搜尋附加元件發生錯誤，結果可能不完整。",
   "Couldn't stop the search in qBittorrent": "無法在 qBittorrent 中停止搜尋",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "所有搜尋附加元件皆已關閉。請在「管理附加元件」中開啟。",
   "No search plugins are installed. Add one under Manage plugins.": "未安裝搜尋附加元件。請在「管理附加元件」中新增。",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "此檔案中沒有規則",
   "This file isn't a qBittorrent rules file": "此檔案不是 qBittorrent 規則檔",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "此檔案不是 qBittorrent 規則檔（不是 JSON）",
-  "See the Logs view for details.": "詳細資訊請見「記錄」。",
   "Down limit": "下載限制",
   "Down speed": "下載速率",
   "ETA": "剩餘時間",
@@ -1327,5 +1324,6 @@
   "Run again": "重新搜尋",
   "Couldn't delete every search": "無法刪除所有搜尋",
   "Keep past searches": "保留過往搜尋",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "過往的搜尋會保留在 qBittorrent 中,可重新開啟或再次執行。關閉後,每次新搜尋都會刪除先前的搜尋。"
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "過往的搜尋會保留在 qBittorrent 中,可重新開啟或再次執行。關閉後,每次新搜尋都會刪除先前的搜尋。",
+  "Fill in this field": "請填寫此欄位"
 }

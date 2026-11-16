@@ -241,7 +241,6 @@
   "Previous page": "Vorherige Seite",
   "Seeds": "Seeds",
   "Size": "Größe",
-  "Source": "Quelle",
   "{count} results": "{count} Ergebnisse",
   "{from}-{to} of {total}": "{from}–{to} von {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} Seeds · {leeches} Leecher",
@@ -869,7 +868,6 @@
   "Failed to resume": "Fortsetzen fehlgeschlagen",
   "Failed to save settings": "Einstellungen konnten nicht gespeichert werden",
   "Failed to unban peer": "Peer konnte nicht entsperrt werden",
-  "A search plugin failed, so results may be incomplete.": "Ein Such-Plugin ist fehlgeschlagen, die Ergebnisse sind eventuell unvollständig.",
   "Couldn't stop the search in qBittorrent": "Die Suche in qBittorrent konnte nicht gestoppt werden",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Alle Such-Plugins sind aus. Schalte eines unter Plugins verwalten ein.",
   "No search plugins are installed. Add one under Manage plugins.": "Keine Such-Plugins installiert. Füge eines unter Plugins verwalten hinzu.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Diese Datei enthält keine Regeln",
   "This file isn't a qBittorrent rules file": "Diese Datei ist keine Regeldatei von qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Diese Datei ist keine Regeldatei von qBittorrent (kein JSON)",
-  "See the Logs view for details.": "Details stehen im Protokoll.",
   "Down limit": "DL-Limit",
   "Down speed": "DL-Rate",
   "ETA": "Restzeit",
@@ -1327,5 +1324,6 @@
   "Run again": "Erneut suchen",
   "Couldn't delete every search": "Nicht alle Suchen konnten gelöscht werden",
   "Keep past searches": "Frühere Suchen behalten",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Frühere Suchen bleiben in qBittorrent, damit sie geöffnet oder erneut ausgeführt werden können. Wenn aus, löscht jede neue Suche die vorherigen."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Frühere Suchen bleiben in qBittorrent, damit sie geöffnet oder erneut ausgeführt werden können. Wenn aus, löscht jede neue Suche die vorherigen.",
+  "Fill in this field": "Bitte dieses Feld ausfüllen"
 }

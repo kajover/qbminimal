@@ -65,8 +65,9 @@ function AppSection() {
   const [now] = useState(() => Math.floor(Date.now() / 1000))
 
   const about: [string, string | undefined][] = [
-    ['qbminimal', `v${__APP_VERSION__}`],
-    ['qBittorrent', qbittorrentVersion],
+    // Plain numbers, like the other versions here.
+    ['qbminimal', __APP_VERSION__],
+    ['qBittorrent', qbittorrentVersion?.replace(/^v/, '')],
     ['Web API', webApiVersion],
     [t('Running for'), process?.launch_time ? formatDuration(now - process.launch_time) : undefined],
     [t('Platform'), build ? t('{platform}, {bitness}-bit', { platform: build.platform, bitness: build.bitness }) : undefined],

@@ -241,7 +241,6 @@
   "Previous page": "আগের পৃষ্ঠা",
   "Seeds": "সিড",
   "Size": "আকার",
-  "Source": "উৎস",
   "{count} results": "{count}টি ফলাফল",
   "{from}-{to} of {total}": "{total}টির মধ্যে {from}-{to}",
   "{seeds} seeds · {leeches} leeches": "{seeds} সিড · {leeches} লিচ",
@@ -869,7 +868,6 @@
   "Failed to resume": "আবার চালু করা যায়নি",
   "Failed to save settings": "সেটিংস সংরক্ষণ করা যায়নি",
   "Failed to unban peer": "পিয়ারের নিষেধাজ্ঞা তোলা যায়নি",
-  "A search plugin failed, so results may be incomplete.": "একটি অনুসন্ধান প্লাগইন ব্যর্থ হয়েছে, তাই ফলাফল অসম্পূর্ণ হতে পারে।",
   "Couldn't stop the search in qBittorrent": "qBittorrent-এ অনুসন্ধান থামানো যায়নি",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "সব অনুসন্ধান প্লাগইন বন্ধ আছে। প্লাগইন পরিচালনা করুন-এ গিয়ে একটি চালু করুন।",
   "No search plugins are installed. Add one under Manage plugins.": "কোনো অনুসন্ধান প্লাগইন ইনস্টল করা নেই। প্লাগইন পরিচালনা করুন-এ গিয়ে একটি যোগ করুন।",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "এই ফাইলে কোনো নিয়ম নেই",
   "This file isn't a qBittorrent rules file": "এটি qBittorrent-এর নিয়মের ফাইল নয়",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "এটি qBittorrent-এর নিয়মের ফাইল নয় (এটি JSON নয়)",
-  "See the Logs view for details.": "বিস্তারিত জানতে লগ দেখুন।",
   "Down limit": "ডাউন সীমা",
   "Down speed": "ডাউন গতি",
   "ETA": "বাকি সময়",
@@ -1327,5 +1324,6 @@
   "Run again": "আবার খুঁজুন",
   "Couldn't delete every search": "সব অনুসন্ধান মোছা যায়নি",
   "Keep past searches": "আগের অনুসন্ধান রাখুন",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "আগের অনুসন্ধানগুলি qBittorrent-এ থাকে, যাতে খোলা বা আবার চালানো যায়। বন্ধ থাকলে প্রতিটি নতুন অনুসন্ধান আগেরগুলি মুছে দেয়।"
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "আগের অনুসন্ধানগুলি qBittorrent-এ থাকে, যাতে খোলা বা আবার চালানো যায়। বন্ধ থাকলে প্রতিটি নতুন অনুসন্ধান আগেরগুলি মুছে দেয়।",
+  "Fill in this field": "এই ঘরটি পূরণ করুন"
 }

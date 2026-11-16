@@ -241,7 +241,6 @@
   "Previous page": "이전 페이지",
   "Seeds": "시드",
   "Size": "크기",
-  "Source": "출처",
   "{count} results": "결과 {count}개",
   "{from}-{to} of {total}": "{total}개 중 {from}-{to}",
   "{seeds} seeds · {leeches} leeches": "시드 {seeds} · 얌체 {leeches}",
@@ -869,7 +868,6 @@
   "Failed to resume": "재개하지 못했습니다",
   "Failed to save settings": "설정을 저장하지 못했습니다",
   "Failed to unban peer": "피어 차단을 해제하지 못했습니다",
-  "A search plugin failed, so results may be incomplete.": "검색 플러그인 하나가 실패하여 결과가 불완전할 수 있습니다.",
   "Couldn't stop the search in qBittorrent": "qBittorrent에서 검색을 정지하지 못했습니다",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "모든 검색 플러그인이 꺼져 있습니다. 플러그인 관리에서 하나를 켜세요.",
   "No search plugins are installed. Add one under Manage plugins.": "설치된 검색 플러그인이 없습니다. 플러그인 관리에서 추가하세요.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "이 파일에는 규칙이 없습니다",
   "This file isn't a qBittorrent rules file": "이 파일은 qBittorrent 규칙 파일이 아닙니다",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "이 파일은 qBittorrent 규칙 파일이 아닙니다 (JSON이 아님)",
-  "See the Logs view for details.": "자세한 내용은 로그를 확인하세요.",
   "Down limit": "다운 제한",
   "Down speed": "다운 속도",
   "ETA": "남은 시간",
@@ -1327,5 +1324,6 @@
   "Run again": "다시 검색",
   "Couldn't delete every search": "일부 검색을 삭제하지 못했습니다",
   "Keep past searches": "이전 검색 유지",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "이전 검색이 qBittorrent에 남아 다시 열거나 실행할 수 있습니다. 끄면 새 검색을 할 때마다 이전 검색이 삭제됩니다."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "이전 검색이 qBittorrent에 남아 다시 열거나 실행할 수 있습니다. 끄면 새 검색을 할 때마다 이전 검색이 삭제됩니다.",
+  "Fill in this field": "이 입력란을 채우세요"
 }

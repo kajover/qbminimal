@@ -241,7 +241,6 @@
   "Previous page": "העמוד הקודם",
   "Seeds": "זורעים",
   "Size": "גודל",
-  "Source": "מקור",
   "{count} results": "תוצאות: {count}",
   "{from}-{to} of {total}": "{from}-{to} מתוך {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} זורעים · {leeches} מורידים",
@@ -869,7 +868,6 @@
   "Failed to resume": "ההמשך נכשל",
   "Failed to save settings": "שמירת ההגדרות נכשלה",
   "Failed to unban peer": "ביטול הרחקת העמית נכשל",
-  "A search plugin failed, so results may be incomplete.": "תוסף חיפוש נכשל, ולכן התוצאות עשויות להיות חלקיות.",
   "Couldn't stop the search in qBittorrent": "לא ניתן לעצור את החיפוש ב-qBittorrent",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "כל תוספי החיפוש כבויים. יש להפעיל אחד תחת ניהול תוספים.",
   "No search plugins are installed. Add one under Manage plugins.": "לא מותקנים תוספי חיפוש. יש להוסיף אחד תחת ניהול תוספים.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "אין כללים בקובץ זה",
   "This file isn't a qBittorrent rules file": "קובץ זה אינו קובץ כללים של qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "קובץ זה אינו קובץ כללים של qBittorrent (הוא אינו JSON)",
-  "See the Logs view for details.": "פרטים נוספים בתצוגת היומנים.",
   "Down limit": "מגבלת הורדה",
   "Down speed": "מהירות הורדה",
   "ETA": "זמן משוער",
@@ -1327,5 +1324,6 @@
   "Run again": "חיפוש חוזר",
   "Couldn't delete every search": "לא ניתן היה למחוק את כל החיפושים",
   "Keep past searches": "שמירת חיפושים קודמים",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "חיפושים קודמים נשארים ב-qBittorrent כדי לפתוח או להריץ אותם שוב. כשהאפשרות כבויה, כל חיפוש חדש מוחק את הקודמים."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "חיפושים קודמים נשארים ב-qBittorrent כדי לפתוח או להריץ אותם שוב. כשהאפשרות כבויה, כל חיפוש חדש מוחק את הקודמים.",
+  "Fill in this field": "יש למלא שדה זה"
 }

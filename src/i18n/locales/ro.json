@@ -241,7 +241,6 @@
   "Previous page": "Pagina anterioară",
   "Seeds": "Seederi",
   "Size": "Dimensiune",
-  "Source": "Sursă",
   "{count} results": "Rezultate: {count}",
   "{from}-{to} of {total}": "{from}–{to} din {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} seederi · {leeches} leecheri",
@@ -869,7 +868,6 @@
   "Failed to resume": "Reluarea a eșuat",
   "Failed to save settings": "Setările nu au putut fi salvate",
   "Failed to unban peer": "Interdicția partenerului nu a putut fi ridicată",
-  "A search plugin failed, so results may be incomplete.": "Un plugin de căutare a eșuat, deci rezultatele pot fi incomplete.",
   "Couldn't stop the search in qBittorrent": "Căutarea nu a putut fi oprită în qBittorrent",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Toate pluginurile de căutare sunt dezactivate. Activează unul în Gestionează pluginurile.",
   "No search plugins are installed. Add one under Manage plugins.": "Niciun plugin de căutare nu este instalat. Adaugă unul în Gestionează pluginurile.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Acest fișier nu conține reguli",
   "This file isn't a qBittorrent rules file": "Acest fișier nu este un fișier de reguli qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Acest fișier nu este un fișier de reguli qBittorrent (nu este JSON)",
-  "See the Logs view for details.": "Vezi vizualizarea Jurnal pentru detalii.",
   "Down limit": "Limită DL",
   "Down speed": "Viteză DL",
   "ETA": "Timp rămas",
@@ -1327,5 +1324,6 @@
   "Run again": "Caută din nou",
   "Couldn't delete every search": "Nu s-au putut șterge toate căutările",
   "Keep past searches": "Păstrează căutările anterioare",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Căutările anterioare rămân în qBittorrent, ca să poată fi deschise sau rulate din nou. Dezactivat, fiecare căutare nouă le șterge pe cele dinainte."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Căutările anterioare rămân în qBittorrent, ca să poată fi deschise sau rulate din nou. Dezactivat, fiecare căutare nouă le șterge pe cele dinainte.",
+  "Fill in this field": "Completați acest câmp"
 }

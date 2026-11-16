@@ -241,7 +241,6 @@
   "Previous page": "Προηγούμενη σελίδα",
   "Seeds": "Seeds",
   "Size": "Μέγεθος",
-  "Source": "Πηγή",
   "{count} results": "{count} αποτελέσματα",
   "{from}-{to} of {total}": "{from}-{to} από {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} seeds · {leeches} leechers",
@@ -869,7 +868,6 @@
   "Failed to resume": "Αποτυχία συνέχισης",
   "Failed to save settings": "Αποτυχία αποθήκευσης ρυθμίσεων",
   "Failed to unban peer": "Αποτυχία άρσης αποκλεισμού διασυνδέτη",
-  "A search plugin failed, so results may be incomplete.": "Ένα πρόσθετο αναζήτησης απέτυχε, οπότε τα αποτελέσματα μπορεί να είναι ελλιπή.",
   "Couldn't stop the search in qBittorrent": "Αδυναμία διακοπής της αναζήτησης στο qBittorrent",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Όλα τα πρόσθετα αναζήτησης είναι ανενεργά. Ενεργοποιήστε ένα στη Διαχείριση προσθέτων.",
   "No search plugins are installed. Add one under Manage plugins.": "Δεν υπάρχουν εγκατεστημένα πρόσθετα αναζήτησης. Προσθέστε ένα στη Διαχείριση προσθέτων.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Αυτό το αρχείο δεν περιέχει κανόνες",
   "This file isn't a qBittorrent rules file": "Αυτό το αρχείο δεν είναι αρχείο κανόνων του qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Αυτό το αρχείο δεν είναι αρχείο κανόνων του qBittorrent (δεν είναι JSON)",
-  "See the Logs view for details.": "Δείτε την προβολή Καταγραφές για λεπτομέρειες.",
   "Down limit": "Όριο λήψης",
   "Down speed": "Ταχύτητα λήψης",
   "ETA": "ETA",
@@ -1327,5 +1324,6 @@
   "Run again": "Αναζήτηση ξανά",
   "Couldn't delete every search": "Δεν ήταν δυνατή η διαγραφή όλων των αναζητήσεων",
   "Keep past searches": "Διατήρηση προηγούμενων αναζητήσεων",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Οι προηγούμενες αναζητήσεις μένουν στο qBittorrent για να ανοίγουν ή να εκτελούνται ξανά. Όταν είναι ανενεργό, κάθε νέα αναζήτηση διαγράφει τις προηγούμενες."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Οι προηγούμενες αναζητήσεις μένουν στο qBittorrent για να ανοίγουν ή να εκτελούνται ξανά. Όταν είναι ανενεργό, κάθε νέα αναζήτηση διαγράφει τις προηγούμενες.",
+  "Fill in this field": "Συμπληρώστε αυτό το πεδίο"
 }

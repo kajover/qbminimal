@@ -241,7 +241,6 @@
   "Previous page": "الصفحة السابقة",
   "Seeds": "البذور",
   "Size": "الحجم",
-  "Source": "المصدر",
   "{count} results": "{count} نتيجة",
   "{from}-{to} of {total}": "{from}-{to} من {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} بذور · {leeches} منزّلون",
@@ -869,7 +868,6 @@
   "Failed to resume": "فشل الاستئناف",
   "Failed to save settings": "فشل حفظ الإعدادات",
   "Failed to unban peer": "فشل رفع الحظر عن القرين",
-  "A search plugin failed, so results may be incomplete.": "فشل أحد ملحقات البحث، لذا قد تكون النتائج ناقصة.",
   "Couldn't stop the search in qBittorrent": "تعذر إيقاف البحث في qBittorrent",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "كل ملحقات البحث متوقفة. فعّل واحدًا من إدارة الملحقات.",
   "No search plugins are installed. Add one under Manage plugins.": "لا توجد ملحقات بحث مثبتة. أضف واحدًا من إدارة الملحقات.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "لا يحتوي هذا الملف على أي قواعد",
   "This file isn't a qBittorrent rules file": "هذا الملف ليس ملف قواعد qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "هذا الملف ليس ملف قواعد qBittorrent (ليس JSON)",
-  "See the Logs view for details.": "راجع السجل لمعرفة التفاصيل.",
   "Down limit": "حد التنزيل",
   "Down speed": "سرعة التنزيل",
   "ETA": "الوقت المتبقي",
@@ -1327,5 +1324,6 @@
   "Run again": "إعادة البحث",
   "Couldn't delete every search": "تعذّر حذف كل عمليات البحث",
   "Keep past searches": "الاحتفاظ بعمليات البحث السابقة",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "تبقى عمليات البحث السابقة في qBittorrent لفتحها أو إعادتها. عند الإيقاف، يحذف كل بحث جديد ما قبله."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "تبقى عمليات البحث السابقة في qBittorrent لفتحها أو إعادتها. عند الإيقاف، يحذف كل بحث جديد ما قبله.",
+  "Fill in this field": "املأ هذا الحقل"
 }

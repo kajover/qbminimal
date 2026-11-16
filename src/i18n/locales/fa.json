@@ -241,7 +241,6 @@
   "Previous page": "صفحه قبل",
   "Seeds": "سیدها",
   "Size": "اندازه",
-  "Source": "منبع",
   "{count} results": "{count} نتیجه",
   "{from}-{to} of {total}": "{from}-{to} از {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} سید · {leeches} لیچ",
@@ -869,7 +868,6 @@
   "Failed to resume": "از سرگیری ناموفق بود",
   "Failed to save settings": "ذخیره تنظیم‌ها ناموفق بود",
   "Failed to unban peer": "رفع انسداد همتا ناموفق بود",
-  "A search plugin failed, so results may be incomplete.": "یک افزونه جستجو ناموفق بود، پس ممکن است نتایج ناقص باشند.",
   "Couldn't stop the search in qBittorrent": "توقف جستجو در qBittorrent ممکن نبود",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "همه افزونه‌های جستجو خاموش‌اند. یکی را در «مدیریت افزونه‌ها» روشن کنید.",
   "No search plugins are installed. Add one under Manage plugins.": "هیچ افزونه جستجویی نصب نشده است. یکی را در «مدیریت افزونه‌ها» اضافه کنید.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "این فایل هیچ قانونی ندارد",
   "This file isn't a qBittorrent rules file": "این فایل، فایل قوانین qBittorrent نیست",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "این فایل، فایل قوانین qBittorrent نیست (JSON نیست)",
-  "See the Logs view for details.": "برای جزئیات، نمای گزارش‌ها را ببینید.",
   "Down limit": "محدودیت دانلود",
   "Down speed": "سرعت دانلود",
   "ETA": "زمان باقی‌مانده",
@@ -1327,5 +1324,6 @@
   "Run again": "جستجوی دوباره",
   "Couldn't delete every search": "حذف همه جستجوها ممکن نشد",
   "Keep past searches": "نگه داشتن جستجوهای قبلی",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "جستجوهای قبلی در qBittorrent می‌مانند تا دوباره باز یا اجرا شوند. اگر خاموش باشد، هر جستجوی تازه جستجوهای قبلی را حذف می‌کند."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "جستجوهای قبلی در qBittorrent می‌مانند تا دوباره باز یا اجرا شوند. اگر خاموش باشد، هر جستجوی تازه جستجوهای قبلی را حذف می‌کند.",
+  "Fill in this field": "این فیلد را پر کنید"
 }

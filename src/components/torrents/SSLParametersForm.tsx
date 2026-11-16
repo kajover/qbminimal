@@ -6,6 +6,7 @@ import { useTorrentAction } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import { t } from '@/i18n'
+import { Textarea } from '@/components/ui/input'
 
 const areaClass = 'border-input dark:bg-input/30 w-full rounded-md border bg-transparent px-2 py-1 font-mono text-xs'
 
@@ -51,7 +52,7 @@ export function SSLParametersForm({ hash }: { hash: string }) {
           {([['ssl-cert', 'Certificate', 'certificate'], ['ssl-key', 'Private key', 'privateKey'], ['ssl-dh', 'Diffie-Hellman parameters', 'dhParams']] as const).map(([id, label, key]) => (
             <div key={id} className="space-y-1">
               <Label htmlFor={id} className="text-xs text-muted-foreground">{t(label)}</Label>
-              <textarea id={id} rows={3} value={values[key]} onChange={(e) => setValues({ ...values, [key]: e.target.value })} className={areaClass} />
+              <Textarea id={id} rows={3} value={values[key]} onChange={(e) => setValues({ ...values, [key]: e.target.value })} className={areaClass} />
             </div>
           ))}
           <div className="flex gap-2">

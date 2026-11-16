@@ -15,6 +15,7 @@ import type { TorrentPeer } from '@/types'
 import { DetailsHeading } from './DetailsHeading'
 import { PeerFlag } from './PeerFlag'
 import { t } from '@/i18n'
+import { Textarea } from '@/components/ui/input'
 
 type SortField = 'ip' | 'client' | 'progress' | 'dl_speed' | 'up_speed' | 'downloaded' | 'uploaded' | 'relevance'
 
@@ -277,7 +278,7 @@ export function PeersTab({ hash }: { hash: string }) {
               <DialogTitle>{t('Add peers')}</DialogTitle>
               <DialogDescription>{t('Add peers, as IP:port')}</DialogDescription>
             </DialogHeader>
-            <textarea
+            <Textarea
               aria-label={t('Add peers, as IP:port')}
               value={newPeers}
               onChange={(e) => setNewPeers(e.target.value)}

@@ -241,7 +241,6 @@
   "Previous page": "Vorige pagina",
   "Seeds": "Seeds",
   "Size": "Grootte",
-  "Source": "Bron",
   "{count} results": "{count} resultaten",
   "{from}-{to} of {total}": "{from}-{to} van {total}",
   "{seeds} seeds · {leeches} leeches": "{seeds} seeds · {leeches} leechers",
@@ -869,7 +868,6 @@
   "Failed to resume": "Hervatten mislukt",
   "Failed to save settings": "Kan instellingen niet opslaan",
   "Failed to unban peer": "Kan ban op peer niet opheffen",
-  "A search plugin failed, so results may be incomplete.": "Een zoekplugin is mislukt, dus de resultaten zijn mogelijk onvolledig.",
   "Couldn't stop the search in qBittorrent": "Kan het zoeken in qBittorrent niet stoppen",
   "Every search plugin is turned off. Turn one on under Manage plugins.": "Alle zoekplugins staan uit. Zet er een aan onder Plugins beheren.",
   "No search plugins are installed. Add one under Manage plugins.": "Er zijn geen zoekplugins geïnstalleerd. Voeg er een toe onder Plugins beheren.",
@@ -1186,7 +1184,6 @@
   "This file has no rules in it": "Dit bestand bevat geen regels",
   "This file isn't a qBittorrent rules file": "Dit is geen regelbestand van qBittorrent",
   "This file isn't a qBittorrent rules file (it isn't JSON)": "Dit is geen regelbestand van qBittorrent (geen JSON)",
-  "See the Logs view for details.": "Zie het Logboek voor details.",
   "Down limit": "DL-limiet",
   "Down speed": "DL-snelheid",
   "ETA": "ETA",
@@ -1327,5 +1324,6 @@
   "Run again": "Opnieuw zoeken",
   "Couldn't delete every search": "Kon niet alle zoekopdrachten verwijderen",
   "Keep past searches": "Eerdere zoekopdrachten bewaren",
-  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Eerdere zoekopdrachten blijven in qBittorrent, zodat je ze kunt openen of opnieuw uitvoeren. Uit: elke nieuwe zoekopdracht verwijdert de vorige."
+  "Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.": "Eerdere zoekopdrachten blijven in qBittorrent, zodat je ze kunt openen of opnieuw uitvoeren. Uit: elke nieuwe zoekopdracht verwijdert de vorige.",
+  "Fill in this field": "Vul dit veld in"
 }
