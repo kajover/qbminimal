@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { ChevronLeft, ChevronRight, LogOut, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -6,7 +6,7 @@ import { HeaderSlot } from '@/components/HeaderSlot'
 import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { DropOverlay } from '@/components/DropOverlay'
 import { GlobalSpeeds } from '@/components/GlobalSpeeds'
-import { EXTRA_PAGES, MAIN_PAGES, type PageId } from '@/components/navigation'
+import { EXTRA_PAGES, MAIN_PAGES, MENU_PAGES, type PageId } from '@/components/navigation'
 import { StatusDots } from '@/components/StatusDots'
 import { usePageNotes } from '@/hooks/useStatusNotes'
 import { useSession } from '@/hooks/useSession'
@@ -159,6 +159,34 @@ function useSidebar() {
   return { shown, width, measured, box, show, startDrag, resetWidth }
 }
 
+// The statistics open over the page from the speeds in the header, loaded when first asked for.
+const StatisticsDialog = lazy(() => import('@/components/torrents/TorrentStats').then(m => ({ default: m.StatisticsDialog })))
+
+// G and then a page's number, 1 to 7 in the menu's order, goes to that page. Not while typing or
+// with a window or menu open.
+function usePageKeys(onNavigate: (page: PageId) => void) {
+  const navigate = useRef(onNavigate)
+  useEffect(() => { navigate.current = onNavigate })
+  useEffect(() => {
+    let armed = 0
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement
+      if (event.metaKey || event.ctrlKey || event.altKey || target.closest('input, textarea, select, [contenteditable="true"]') || document.querySelector('[role="dialog"], [role="menu"]')) return
+      const key = event.key.toLowerCase()
+      if (armed && Date.now() - armed < 1500 && /^[1-9]$/.test(key)) {
+        const next = MENU_PAGES[Number(key) - 1]
+        armed = 0
+        if (next) {
+          event.preventDefault()
+          navigate.current(next.id)
+        }
+      } else armed = key === 'g' && !event.shiftKey ? Date.now() : 0
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+}
+
 export function Layout({ page, onNavigate, children }: LayoutProps) {
   const { signOut } = useSession()
   const { shown: sidebarShown, width: sidebarWidth, measured: sidebarMeasured, box: sidebarBox, show: showSidebar, startDrag, resetWidth } = useSidebar()
@@ -169,6 +197,8 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
     if (!__DEMO__) checkForUpdatesIfDue()
   }, [])
   const wide = useMediaQuery('(min-width: 1200px)')
+  const [statsOpen, setStatsOpen] = useState(false)
+  usePageKeys(onNavigate)
   // Where each page's title row goes; on phones without the selection bar.
   const [slot, setSlot] = useState<HTMLDivElement | null>(null)
 
@@ -206,7 +236,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
           </div>
           {/* Room before the title only, so the last button ends where the list does. */}
           <div ref={setSlot} className="flex min-w-0 flex-1 items-center md:ps-2" />
-          <GlobalSpeeds onOpen={() => onNavigate('statistics')} />
+          <GlobalSpeeds onOpen={() => setStatsOpen(true)} />
         </div>
         <ConnectionBanner />
       </header>
@@ -255,6 +285,7 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
       </div>
 
       <DropOverlay />
+      {statsOpen && <Suspense fallback={null}><StatisticsDialog open onOpenChange={setStatsOpen} /></Suspense>}
 
       {/* Phones: a floating glass capsule, clear of the screen's edges and the home indicator. */}
       <nav

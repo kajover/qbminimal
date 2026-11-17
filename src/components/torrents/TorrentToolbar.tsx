@@ -1,5 +1,4 @@
 import { ArrowUpDown, Columns3, LayoutList, ListFilter, Plus, RotateCcw, Search, Table2 } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { SearchInput } from '@/components/SearchInput'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { Button } from '@/components/ui/button'
@@ -16,7 +15,7 @@ interface TorrentToolbarProps {
   list: TorrentList
   filtersOpen: boolean
   onToggleFilters: () => void
-  // The search bar over the list on phones, opened from its button.
+  // The search field under the header on phones, opened from its button.
   searchOpen: boolean
   onSearchOpenChange: (open: boolean) => void
   columns: ColumnLayout
@@ -33,12 +32,11 @@ export function AddTorrentButton({ onAdd }: { onAdd: () => void }) {
   )
 }
 
-// The quick search: a bar in the header on wide screens. On phones a button first in the row opens
-// the bar over the list, right under it; the search stays while the bar is closed, marked by a dot.
-// Esc empties it. Typing searches after a short pause, Enter at once. Wildcards like *.mkv work.
-function QuickSearch({ list, open, onOpenChange }: { list: TorrentList; open: boolean; onOpenChange: (open: boolean) => void }) {
-  const wide = useMediaQuery('(min-width: 1200px)')
-  const field = (
+// The quick search field: in the header on wide screens, and on phones in the page under it,
+// opened from a button first in the row. The search stays while the field is closed, marked by a
+// dot. Esc empties it. Typing searches after a short pause, Enter at once. Wildcards like *.mkv work.
+export function QuickSearchField({ list, wide, onClose }: { list: TorrentList; wide: boolean; onClose?: () => void }) {
+  return (
     <SearchInput
       id="torrent-search"
       autoFocus={!wide}
@@ -49,23 +47,22 @@ function QuickSearch({ list, open, onOpenChange }: { list: TorrentList; open: bo
       onValueChange={(text) => (text ? list.setDraft(text) : list.setQuery(''))}
       onKeyDown={(e) => {
         if (e.key === 'Enter') list.searchNow()
-        if (e.key === 'Escape') { list.setQuery(''); if (!wide) onOpenChange(false) }
+        if (e.key === 'Escape') { list.setQuery(''); onClose?.() }
       }}
       className={wide ? 'w-56' : undefined}
       inputClassName="h-8"
     />
   )
-  if (wide) return field
+}
+
+function QuickSearch({ list, open, onOpenChange }: { list: TorrentList; open: boolean; onOpenChange: (open: boolean) => void }) {
+  const wide = useMediaQuery('(min-width: 1200px)')
+  if (wide) return <QuickSearchField list={list} wide />
   return (
-    <Popover open={open} onOpenChange={onOpenChange}>
-      <PopoverTrigger asChild>
-        <Button variant={open ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={t('Search')} title={t('Search')}>
-          <Search className="size-4" />
-          {list.searched && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent align="start" className="w-[min(22rem,calc(100vw-1rem))] p-2">{field}</PopoverContent>
-    </Popover>
+    <Button variant={open ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={t('Search')} title={t('Search')} aria-expanded={open} aria-controls="torrent-search" onClick={() => onOpenChange(!open)}>
+      <Search className="size-4" />
+      {list.searched && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
+    </Button>
   )
 }
 

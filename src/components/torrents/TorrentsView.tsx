@@ -11,7 +11,7 @@ import { useRowPress, type RowProps } from '@/hooks/useRowPress'
 import { useSelection } from '@/hooks/useSelection'
 import { useTorrentList } from '@/hooks/useTorrentList'
 import { PAGE_SIZES } from '@/lib/listSettings'
-import { SIDEBAR_COLUMNS } from '@/lib/torrentFilters'
+import { chosenCount, SIDEBAR_COLUMNS } from '@/lib/torrentFilters'
 import { loadFilterViews, type FilterView } from '@/lib/filterViews'
 import { announce } from '@/lib/announce'
 import { loadBarActions, saveBarActions } from '@/lib/actionBar'
@@ -33,7 +33,7 @@ import { TorrentTable } from './TorrentTable'
 // Loaded with the list rather than on first use, so the details and dialogs open at once.
 import { AddTorrentDialog } from './AddTorrentView'
 import { TorrentDetailsDialog, TorrentDetailsPanel } from './TorrentDetails'
-import { AddTorrentButton, TorrentToolbar } from './TorrentToolbar'
+import { AddTorrentButton, QuickSearchField, TorrentToolbar } from './TorrentToolbar'
 import { t } from '@/i18n'
 
 
@@ -254,7 +254,8 @@ export function TorrentsView() {
   // Ctrl or Cmd + A selects every matching torrent and with Shift none, + I swaps the selected and
   // unselected ones, + S starts and + P stops the selection, and + O opens Add, as in qBittorrent.
   // Delete asks to delete the selection, Escape closes the details and then clears the selection,
-  // / opens the search, and ? lists all of these.
+  // / or S opens the search, F the filters, N adds torrents, V switches between table and cards, and ?
+  // lists all of these.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (!isListShortcut(event)) return
@@ -280,7 +281,8 @@ export function TorrentsView() {
       } else if (event.key === 'Escape') {
         if (detailsHash) closeDetails()
         else selection.clear()
-      } else if (event.key === '/') {
+      // S as well as /, which needs Shift on many keyboards, such as German ones.
+      } else if (event.key === '/' || (key === 's' && !mod && !event.altKey && !event.shiftKey)) {
         event.preventDefault()
         const field = document.getElementById('torrent-search')
         if (field) field.focus()
@@ -288,6 +290,11 @@ export function TorrentsView() {
       } else if (event.key === '?') {
         event.preventDefault()
         setShortcutsOpen(true)
+      } else if (!mod && !event.altKey && !event.shiftKey && (key === 'f' || key === 'n' || key === 'v')) {
+        event.preventDefault()
+        if (key === 'f') setFiltersOpen(open => !open)
+        else if (key === 'n') setAddOpen(true)
+        else list.showAsTable(!list.showTable)
       }
     }
     window.addEventListener('keydown', onKey)
@@ -394,6 +401,7 @@ export function TorrentsView() {
       <div className={cn(filtersOpen && wide && 'flex items-start gap-4')}>
         {!wide && <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}>{sidebar}</FilterSheet>}
         <div className="min-w-0 flex-1 space-y-4">
+          {searchOpen && !wide && <QuickSearchField list={list} wide={false} onClose={() => setSearchOpen(false)} />}
 
         {list.matching.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-8 text-sm text-muted-foreground">
@@ -420,7 +428,7 @@ export function TorrentsView() {
             filterTargets={filterTargets}
             sidebarFilter={{
               has: (id) => id in SIDEBAR_COLUMNS,
-              active: (id) => (list.filters[SIDEBAR_COLUMNS[id]] as string[]).length > 0,
+              active: (id) => chosenCount(list.filters, SIDEBAR_COLUMNS[id]) > 0,
               choices: (id) => <FilterChoices list={list} listKey={SIDEBAR_COLUMNS[id]} categories={categories ?? {}} tags={tags ?? []} />,
             }}
             onColumnFilter={list.setColumnFilter}
@@ -457,7 +465,7 @@ export function TorrentsView() {
         )}
         </div>
         {filtersOpen && wide && (
-          <aside aria-label={t('Filters')} className="sticky top-[calc(var(--header-height,3rem)+1rem)] max-h-[calc(100vh-var(--header-height,3rem)-2rem)] w-60 shrink-0 overflow-y-auto rounded-xl border bg-card p-3">
+          <aside aria-label={t('Filters')} className="sticky top-[calc(var(--header-height,3rem)+1rem)] max-h-[calc(100vh-var(--header-height,3rem)-2rem)] w-72 shrink-0 overflow-y-auto rounded-xl border bg-card p-3">
             {sidebar}
           </aside>
         )}

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { parseFilterViews, sameFilters, upsertView, type FilterView } from './filterViews'
 
-const movies: FilterView = { name: 'Movies', filters: { name: '', statuses: ['downloading'], categories: ['Movies', 'Films'], tags: [], trackers: [], columns: { size: { type: 'range', min: 1024 } } } }
+const movies: FilterView = { name: 'Movies', filters: { name: '', statuses: ['downloading'], categories: ['Movies', 'Films'], tags: [], trackers: [], excluded: {}, columns: { size: { type: 'range', min: 1024 } } } }
 
 describe('filter views', () => {
   it('reads saved views and drops broken ones', () => {
     const raw = JSON.stringify([movies, { name: '' }, 'junk', { name: 'Odd', filters: { status: 'nonsense', category: 3 } }])
-    expect(parseFilterViews(raw)).toEqual([movies, { name: 'Odd', filters: { name: '', statuses: [], categories: [], tags: [], trackers: [], columns: {} } }])
+    expect(parseFilterViews(raw)).toEqual([movies, { name: 'Odd', filters: { name: '', statuses: [], categories: [], tags: [], trackers: [], excluded: {}, columns: {} } }])
     expect(parseFilterViews('not json')).toEqual([])
     expect(parseFilterViews(null)).toEqual([])
   })
@@ -14,8 +14,8 @@ describe('filter views', () => {
   it('turns views saved with one choice each into lists', () => {
     const old = JSON.stringify([{ name: 'Old', filters: { name: 'x', status: 'seeding', category: 'Linux', tag: '', tracker: 'a.test' } }, { name: 'All', filters: { status: 'all' } }])
     expect(parseFilterViews(old)).toEqual([
-      { name: 'Old', filters: { name: 'x', statuses: ['seeding'], categories: ['Linux'], tags: [], trackers: ['a.test'], columns: {} } },
-      { name: 'All', filters: { name: '', statuses: [], categories: [], tags: [], trackers: [], columns: {} } },
+      { name: 'Old', filters: { name: 'x', statuses: ['seeding'], categories: ['Linux'], tags: [], trackers: ['a.test'], excluded: {}, columns: {} } },
+      { name: 'All', filters: { name: '', statuses: [], categories: [], tags: [], trackers: [], excluded: {}, columns: {} } },
     ])
   })
 

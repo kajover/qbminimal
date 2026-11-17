@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Loader2, Plus, Puzzle, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -31,8 +31,23 @@ export function SearchView() {
   const [pluginChoice, setPluginChoice] = useState('enabled')
   const [category, setCategory] = useState('all')
   const [pluginsOpen, setPluginsOpen] = useState(false)
+  const [toolbarSlot, setToolbarSlot] = useState<HTMLDivElement | null>(null)
   const [adding, setAdding] = useState<SearchResult | null>(null)
   const [addBusy, setAddBusy] = useState(false)
+
+  // S or / goes to the search field, as on the torrent list. Not while typing or in a window.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement
+      if (event.metaKey || event.ctrlKey || event.altKey || target.closest?.('input, textarea, select, [contenteditable="true"]') || document.querySelector('[role="dialog"], [role="menu"]')) return
+      if (event.key === '/' || event.key.toLowerCase() === 's') {
+        event.preventDefault()
+        document.getElementById('search-pattern')?.focus()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const enabled = (plugins ?? []).filter(plugin => plugin.enabled)
   // A chosen plugin that's been turned off or removed since falls back to all of them.
@@ -70,39 +85,39 @@ export function SearchView() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title={t('Search')} />
+      {/* The results put their filter, columns and view buttons here, as the torrent list does,
+          shown before a search too so the view can be picked first. */}
+      <PageHeader title={t('Search')} actions={<div ref={setToolbarSlot} className="flex items-center gap-1" />} />
       <Card>
         <CardContent className="space-y-3">
-          <form onSubmit={submit} className="space-y-2">
-            <div className="flex gap-2">
-              <SearchInput aria-label={t('Search for')} placeholder={t('Search for...')} value={pattern} onValueChange={setPattern} required className="min-w-0 flex-1" />
-              {/* While searching, the spinner turns into a stop button under the pointer. */}
-              <Button type="submit" className="group" aria-label={search.running ? t('Stop search') : t('Search')} title={search.running ? t('Stop search') : t('Search')}>
-                {search.running ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin group-hover:hidden group-focus-visible:hidden" />
-                    <X className="hidden size-4 group-hover:block group-focus-visible:block" />
-                  </>
-                ) : <Search className="size-4" />}
-              </Button>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <NativeSelect aria-label={t('Search plugin')} value={plugin} onChange={(e) => setPluginChoice(e.target.value)}>
-                <option value="enabled">{t('All enabled plugins')}</option>
-                {enabled.map(p => <option key={p.name} value={p.name}>{p.fullName || p.name}</option>)}
-              </NativeSelect>
-              <NativeSelect aria-label={t('Search category')} value={category} onChange={(e) => setCategory(e.target.value)}>
-                {CATEGORIES.map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}
-              </NativeSelect>
-            </div>
-            <Button type="button" variant="ghost" size="sm" onClick={() => setPluginsOpen(true)}><Puzzle />{t('Manage plugins')}</Button>
+          {/* One row on wide screens. On phones the field and button come first, then the rest. */}
+          <form onSubmit={submit} className="flex flex-wrap items-center gap-2">
+            <SearchInput id="search-pattern" aria-label={t('Search for')} placeholder={t('Search for...')} value={pattern} onValueChange={setPattern} required className="min-w-0 flex-1 basis-48" />
+            {/* While searching, the spinner turns into a stop button under the pointer. */}
+            <Button type="submit" className="group max-sm:order-2" aria-label={search.running ? t('Stop search') : t('Search')} title={search.running ? t('Stop search') : t('Search')}>
+              {search.running ? (
+                <>
+                  <Loader2 className="size-4 animate-spin group-hover:hidden group-focus-visible:hidden" />
+                  <X className="hidden size-4 group-hover:block group-focus-visible:block" />
+                </>
+              ) : <Search className="size-4" />}
+            </Button>
+            <NativeSelect aria-label={t('Search plugin')} value={plugin} onChange={(e) => setPluginChoice(e.target.value)} className="max-w-48 truncate max-sm:order-3">
+              <option value="enabled">{t('All enabled plugins')}</option>
+              {enabled.map(p => <option key={p.name} value={p.name}>{p.fullName || p.name}</option>)}
+            </NativeSelect>
+            <NativeSelect aria-label={t('Search category')} value={category} onChange={(e) => setCategory(e.target.value)} className="max-w-48 truncate max-sm:order-3">
+              {CATEGORIES.map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}
+            </NativeSelect>
+            <Button type="button" variant="outline" size="icon" className="max-sm:order-3" aria-label={t('Manage plugins')} title={t('Manage plugins')} onClick={() => setPluginsOpen(true)}><Puzzle className="size-4" /></Button>
           </form>
           <SearchHistory activeId={search.jobId} busy={search.running} onOpen={(id) => { if (!search.running) search.open(id) }} onRun={runAgain} onCleared={search.close} />
         </CardContent>
       </Card>
 
-      {search.results.length > 0 ? <SearchResults results={search.results} onAdd={setAdding} />
-        : search.searched && !search.running && <p className="py-8 text-center text-sm text-muted-foreground">{t('Nothing found')}</p>}
+      {/* Keyed by search, so each starts on its first page without the last one's filters. */}
+      <SearchResults key={search.jobId ?? 'none'} results={search.results} onAdd={setAdding} toolbarSlot={toolbarSlot} />
+      {search.results.length === 0 && search.searched && !search.running && <p className="py-8 text-center text-sm text-muted-foreground">{t('Nothing found')}</p>}
 
       <SearchPluginsDialog open={pluginsOpen} onOpenChange={setPluginsOpen} />
 

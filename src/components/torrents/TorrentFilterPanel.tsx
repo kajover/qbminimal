@@ -1,10 +1,11 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
-import { Activity, Bookmark, Filter, RefreshCw, Check, ChevronRight, CircleCheck, CircleOff, Download, Folder, FolderX, Globe, MoreHorizontal, Pause, Pencil, Plus, RotateCcw, Tag, Tags, TriangleAlert, Trash2, Upload, X, type LucideIcon } from 'lucide-react'
+import { useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from 'react'
+import { Activity, ArrowDownToLine, ArrowUpFromLine, Bookmark, Filter, RefreshCw, Check, ChevronRight, CircleAlert, CircleCheck, CircleDashed, CircleOff, Columns3, Download, Eye, EyeOff, Folder, FolderInput, FolderX, Globe, Hourglass, ListChecks, Minus, MoreHorizontal, Pause, Pencil, Play, Plus, RotateCcw, ServerCrash, ServerOff, Tag, Tags, TriangleAlert, Trash2, Upload, X, type LucideIcon } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { SearchInput } from '@/components/SearchInput'
 import { Label } from '@/components/ui/label'
 import { AddFilterButton, ColumnFilterChips, type FilterTarget } from '@/components/ColumnFilters'
 import { activeCount } from '@/lib/columnFilters'
@@ -13,7 +14,7 @@ import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import { readStored, writeStored } from '@/lib/storage'
 import { renameCategory, renameTag } from '@/lib/renameLabels'
-import { parseTags, STATUS_FILTERS, toggleChoice, TRACKERLESS, UNCATEGORIZED, UNTAGGED, type FilterList, type StatusFilter } from '@/lib/torrentFilters'
+import { choiceState, chosenCount, parseTags, searchMatcher, STATUS_FILTERS, toggleChoice, TRACKERLESS, UNCATEGORIZED, UNTAGGED, withChoice, type ChoiceState, type FilterList, type StatusFilter } from '@/lib/torrentFilters'
 import { cn } from '@/lib/utils'
 import type { TorrentList } from '@/hooks/useTorrentList'
 import { saveFilterViews, sameFilters, upsertView, type FilterView } from '@/lib/filterViews'
@@ -26,7 +27,9 @@ const choiceLabel = (value: string) =>
   value === UNCATEGORIZED ? t('Uncategorized') : value === UNTAGGED ? t('Untagged') : value === TRACKERLESS ? t('No tracker') : value
 
 const STATUS_ICONS: Record<StatusFilter, LucideIcon> = {
-  downloading: Download, seeding: Upload, completed: CircleCheck, stopped: Pause, active: Activity, errored: TriangleAlert,
+  downloading: Download, seeding: Upload, completed: CircleCheck, running: Play, stopped: Pause, active: Activity, inactive: CircleDashed,
+  stalled: Hourglass, stalledUploading: ArrowUpFromLine, stalledDownloading: ArrowDownToLine, checking: ListChecks, moving: FolderInput,
+  errored: TriangleAlert, trackerError: ServerCrash, trackerDown: ServerOff, trackerWarning: CircleAlert,
 }
 
 interface Choice { value: string; label: string; icon: LucideIcon; count: number }
@@ -46,8 +49,15 @@ function choicesFor(key: FilterList, list: TorrentList, categories: Record<strin
 }
 
 function ChoiceItem({ list, listKey, choice, menu }: { list: TorrentList; listKey: FilterList; choice: Choice; menu?: ReactNode }) {
-  const checked = (list.filters[listKey] as string[]).includes(choice.value)
-  return <FilterItem icon={choice.icon} label={choice.label} muted={choice.value.startsWith('\u0000')} count={choice.count} checked={checked} onToggle={() => list.toggleFilter(listKey, choice.value)} menu={menu} />
+  const state = choiceState(list.filters, listKey, choice.value)
+  return (
+    <FilterItem
+      icon={choice.icon} label={choice.label} muted={choice.value.startsWith('\u0000')} count={choice.count} checked={state === 'in'} excluded={state === 'out'}
+      onToggle={(e) => (e.ctrlKey || e.metaKey ? list.excludeFilter(listKey, choice.value) : list.toggleFilter(listKey, choice.value))}
+      onExclude={() => list.excludeFilter(listKey, choice.value)}
+      menu={menu}
+    />
+  )
 }
 
 // One list's tick boxes on their own, for the popup of a table column the sidebar covers. Ticking
@@ -60,34 +70,79 @@ export function FilterChoices({ list, listKey, categories, tags }: { list: Torre
   )
 }
 
-// Sections folded away stay folded on this device.
-const FOLDED_KEY = 'qbminimal.filterSections'
+// Sections folded away stay folded on this device. Trackers start folded, as there can be many.
+const FOLDED_KEY = 'qbminimal.sidebarFolded'
+const OLD_FOLDED_KEY = 'qbminimal.filterSections'
 const loadFolded = (): string[] => {
   try {
-    const parsed: unknown = JSON.parse(readStored(FOLDED_KEY) ?? '[]')
-    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : []
+    const stored = readStored(FOLDED_KEY)
+    const parsed: unknown = JSON.parse(stored ?? readStored(OLD_FOLDED_KEY) ?? '[]')
+    const ids = Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : []
+    return stored === null && !ids.includes('trackers') ? [...ids, 'trackers'] : ids
   } catch {
-    return []
+    return ['trackers']
   }
 }
 
+// Statuses no torrent has are left out unless asked for, as there are many.
+const EMPTY_STATUSES_KEY = 'qbminimal.showEmptyStatuses'
+
+const LONG_PRESS_MS = 500
+
 // One choice: a tick box, its name and how many torrents it has, and for categories and tags a menu
 // to change or delete it. The menu shows on hover with a mouse, and always on touch screens.
-function FilterItem({ label, icon: Icon, count, checked, onToggle, muted, menu, single }: {
-  label: string; icon: LucideIcon; count?: number; checked: boolean; onToggle: () => void; muted?: boolean; menu?: ReactNode
+function FilterItem({ label, icon: Icon, count, checked, excluded, onToggle, onExclude, muted, menu, single }: {
+  label: string; icon: LucideIcon; count?: number; checked: boolean; onToggle: (event: MouseEvent) => void; muted?: boolean; menu?: ReactNode
+  // Hidden: the torrents it matches are left out. Set with Ctrl or Cmd and a click, or a long press.
+  excluded?: boolean
+  onExclude?: () => void
   // A saved view is one choice at a time: no tick box, just marked while it's in force.
   single?: boolean
 }) {
+  // A finger held on the choice excludes it; the click that ends the hold does nothing more.
+  const hold = useRef<{ timer: number; x: number; y: number } | null>(null)
+  const held = useRef(false)
+  const cancel = () => {
+    if (hold.current) window.clearTimeout(hold.current.timer)
+    hold.current = null
+  }
   return (
     <li className={cn('group flex items-center rounded-md hover:bg-accent/60', single && checked && 'bg-secondary')}>
-      <button type="button" role={single ? undefined : 'checkbox'} aria-checked={single ? undefined : checked} aria-pressed={single ? checked : undefined} onClick={onToggle} className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1 text-start text-sm outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
+      <button
+        type="button" role={single ? undefined : 'checkbox'} aria-checked={single ? undefined : checked} aria-pressed={single ? checked : undefined}
+        title={onExclude ? t('Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.') : undefined}
+        onClick={(e) => {
+          if (held.current) { held.current = false; return }
+          onToggle(e)
+        }}
+        onPointerDown={(e) => {
+          cancel()
+          held.current = false
+          if (!onExclude || e.pointerType === 'mouse') return
+          const timer = window.setTimeout(() => {
+            hold.current = null
+            held.current = true
+            navigator.vibrate?.(10)
+            onExclude()
+          }, LONG_PRESS_MS)
+          hold.current = { timer, x: e.clientX, y: e.clientY }
+        }}
+        onPointerMove={(e) => { if (hold.current && Math.hypot(e.clientX - hold.current.x, e.clientY - hold.current.y) > 10) cancel() }}
+        onPointerUp={cancel}
+        onPointerCancel={cancel}
+        // The phone's own menu for a held button would cover the list.
+        onContextMenu={(e) => { if (onExclude && held.current) e.preventDefault() }}
+        className="flex min-w-0 flex-1 touch-manipulation items-center gap-2 rounded-md px-2 py-1 text-start text-sm outline-hidden select-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
         {!single && (
-          <span aria-hidden className={cn('flex size-4 shrink-0 items-center justify-center rounded-[4px] border', checked && 'border-primary bg-primary text-primary-foreground')}>
+          <span aria-hidden className={cn('flex size-4 shrink-0 items-center justify-center rounded-[4px] border', checked && 'border-primary bg-primary text-primary-foreground', excluded && 'border-destructive bg-destructive text-white')}>
             {checked && <Check className="size-3" />}
+            {excluded && <Minus className="size-3" />}
           </span>
         )}
         <Icon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
-        <span className={cn('min-w-0 flex-1 truncate', muted && 'text-muted-foreground')} title={label}>{label}</span>
+        <span className={cn('min-w-0 flex-1 truncate', muted && 'text-muted-foreground', excluded && 'text-muted-foreground line-through')} title={label}>{label}</span>
+        {excluded && <span className="sr-only">{t('Hidden')}</span>}
         {count !== undefined && <span className="text-xs text-muted-foreground tabular-nums">{count}</span>}
       </button>
       {menu}
@@ -108,8 +163,14 @@ function ItemMenu({ name, children }: { name: string; children: ReactNode }) {
   )
 }
 
-function Section({ id, title, icon: Icon, chosen, folded, onFold, onAdd, addLabel, children }: {
-  id: string; title: string; icon: LucideIcon; chosen: number; folded: boolean; onFold: (id: string) => void; onAdd?: () => void; addLabel?: string; children: ReactNode
+function Section({ id, title, icon: Icon, chosen, folded, onFold, onAdd, addLabel, action, search, onSearch, children }: {
+  id: string; title: string; icon: LucideIcon; chosen: number; folded: boolean; onFold: (id: string) => void; onAdd?: () => void; addLabel?: string
+  // Another button in the title row, such as saving a view.
+  action?: ReactNode
+  // A field that narrows the section's choices by name.
+  search?: string
+  onSearch?: (text: string) => void
+  children: ReactNode
 }) {
   return (
     <section className="space-y-1">
@@ -120,12 +181,16 @@ function Section({ id, title, icon: Icon, chosen, folded, onFold, onAdd, addLabe
           <span className="truncate">{title}</span>
           {chosen > 0 && <span className="rounded-full bg-primary px-1.5 text-[0.7rem] leading-4 text-primary-foreground normal-case">{chosen}</span>}
         </button>
+        {action}
         {onAdd && (
           <Button type="button" variant="ghost" size="icon" className="size-7" aria-label={addLabel} title={addLabel} onClick={onAdd}>
             <Plus className="size-4" />
           </Button>
         )}
       </div>
+      {!folded && onSearch && (
+        <SearchInput aria-label={t('Search {section}', { section: title })} placeholder={t('Search {section}', { section: title })} value={search ?? ''} onValueChange={onSearch} inputClassName="h-7 text-sm" />
+      )}
       {!folded && <ul className="space-y-px">{children}</ul>}
     </section>
   )
@@ -139,6 +204,7 @@ type Prompt =
   | { kind: 'editTag'; name: string }
   | { kind: 'deleteTag'; name: string }
   | { kind: 'renameView'; name: string }
+  | { kind: 'deleteView'; name: string }
 
 interface PromptDialogProps {
   prompt: Prompt | null
@@ -150,10 +216,11 @@ interface PromptDialogProps {
   onDeleted: (list: FilterList, value: string) => void
   onRenamed: (list: FilterList, from: string, to: string) => void
   onRenameView: (from: string, to: string) => void
+  onDeleteView: (name: string) => void
 }
 
 // Creating, editing, renaming and deleting categories, tags and views, one small dialog at a time.
-function PromptDialog({ prompt, onClose, torrents, taken, onDeleted, onRenamed, onRenameView }: PromptDialogProps) {
+function PromptDialog({ prompt, onClose, torrents, taken, onDeleted, onRenamed, onRenameView, onDeleteView }: PromptDialogProps) {
   const action = useTorrentAction()
   const [name, setName] = useState(prompt && 'name' in prompt ? prompt.name : '')
   const [path, setPath] = useState(prompt?.kind === 'editCategory' ? prompt.savePath : '')
@@ -189,6 +256,9 @@ function PromptDialog({ prompt, onClose, torrents, taken, onDeleted, onRenamed, 
       if (clash(taken.views, prompt.name)) return void toast.error(t('There is already a view called {name}', { name: wanted }))
       onRenameView(prompt.name, wanted)
       onClose()
+    } else if (prompt.kind === 'deleteView') {
+      onDeleteView(prompt.name)
+      onClose()
     } else if (prompt.kind === 'deleteCategory') {
       void run(() => qbitClient.removeCategories([prompt.name]), t('Failed to delete category'), t('Category deleted'), () => onDeleted('categories', prompt.name))
     } else {
@@ -196,11 +266,12 @@ function PromptDialog({ prompt, onClose, torrents, taken, onDeleted, onRenamed, 
     }
   }
 
-  const deleting = prompt?.kind === 'deleteCategory' || prompt?.kind === 'deleteTag'
+  const deleting = prompt?.kind === 'deleteCategory' || prompt?.kind === 'deleteTag' || prompt?.kind === 'deleteView'
   const creating = prompt?.kind === 'newCategory' || prompt?.kind === 'newTags'
   const title = !prompt ? '' : prompt.kind === 'newCategory' ? t('New category') : prompt.kind === 'editCategory' ? t('Edit category')
     : prompt.kind === 'newTags' ? t('New tags') : prompt.kind === 'editTag' ? t('Rename tag') : prompt.kind === 'renameView' ? t('Rename view')
     : prompt.kind === 'deleteCategory' ? t('Delete the {name} category?', { name: prompt.name })
+    : prompt.kind === 'deleteView' ? t('Delete the {name} view?', { name: prompt.name })
     : t('Delete the {tag} tag?', { tag: prompt.name })
   const nameLabel = prompt?.kind === 'newCategory' ? t('New category name') : prompt?.kind === 'newTags' ? t('New tags, separated by commas') : t('Name')
   return (
@@ -212,6 +283,7 @@ function PromptDialog({ prompt, onClose, torrents, taken, onDeleted, onRenamed, 
             <DialogDescription className={cn(!deleting && prompt?.kind !== 'editTag' && 'sr-only')}>
               {prompt?.kind === 'deleteCategory' ? t('Torrents in it will have no category. Their files stay where they are.')
                 : prompt?.kind === 'deleteTag' ? t('It will be removed from every torrent.')
+                : prompt?.kind === 'deleteView' ? t('Only the saved filters go. Torrents stay as they are.')
                 : prompt?.kind === 'editTag' ? t('Every torrent with this tag gets the new name.')
                 : title}
             </DialogDescription>
@@ -253,32 +325,47 @@ interface FilterSidebarProps {
 }
 
 // Saved views, then status, categories, tags and trackers, each with tick boxes for any number of
-// choices and a count of the torrents each would show. Views, categories and tags can be added,
+// choices and a count of the torrents each would show. A choice can also be excluded, hiding what it matches. Views, categories and tags can be added,
 // renamed, changed and deleted right here.
 export function FilterSidebar({ list, torrents, categories, tags, views, onViewsChange, columnTargets, onClose }: FilterSidebarProps) {
   const { filters } = list
   const [folded, setFolded] = useState(loadFolded)
   const [prompt, setPrompt] = useState<Prompt | null>(null)
+  // What each section's own search field holds, by section.
+  const [searches, setSearches] = useState<Record<string, string>>({})
+  const [showEmpty, setShowEmpty] = useState(() => readStored(EMPTY_STATUSES_KEY) === 'true')
   const fold = (id: string) => setFolded(current => {
     const next = toggleChoice(current, id)
-    writeStored(FOLDED_KEY, next.length ? JSON.stringify(next) : null)
+    writeStored(FOLDED_KEY, JSON.stringify(next))
     return next
   })
-  const chosen = (key: FilterList, value: string) => (filters[key] as string[]).includes(value)
-  const items = (key: FilterList, menu?: (name: string) => ReactNode) =>
-    choicesFor(key, list, categories, tags).map(choice => <ChoiceItem key={choice.value} list={list} listKey={key} choice={choice} menu={menu && !choice.value.startsWith('\u0000') ? menu(choice.value) : undefined} />)
+  const searchProps = (id: string) => ({ search: searches[id] ?? '', onSearch: (text: string) => setSearches(current => ({ ...current, [id]: text })) })
+  // The choices whose name matches the section's search, with wildcards like the quick search.
+  const matching = <T extends { label: string }>(id: string, choices: T[]) => {
+    const matches = searchMatcher(searches[id] ?? '')
+    return matches ? choices.filter(choice => matches(choice.label)) : choices
+  }
+  const items = (key: FilterList, id: string, menu?: (name: string) => ReactNode) => {
+    let choices = choicesFor(key, list, categories, tags)
+    // A picked or excluded status stays in sight, so it can be let go.
+    if (key === 'statuses' && !showEmpty) choices = choices.filter(choice => choice.count > 0 || choiceState(filters, key, choice.value))
+    const shown = matching(id, choices)
+    if (!shown.length) return <li className="px-2 py-1 text-sm text-muted-foreground">{t('Nothing matches')}</li>
+    return shown.map(choice => <ChoiceItem key={choice.value} list={list} listKey={key} choice={choice} menu={menu && !choice.value.startsWith('\u0000') ? menu(choice.value) : undefined} />)
+  }
   // A deleted category or tag can't stay chosen, or it would hide every torrent.
-  const forget = (key: FilterList, value: string) => { if (chosen(key, value)) list.toggleFilter(key, value) }
+  const forget = (key: FilterList, value: string) => { if (choiceState(filters, key, value)) list.applyFilters(withChoice(filters, key, value, null)) }
   // The quick search narrows the views by name too.
   const query = list.query.trim().toLowerCase()
-  const shownViews = query ? views.filter(view => view.name.toLowerCase().includes(query)) : views
+  const shownViews = matching('views', (query ? views.filter(view => view.name.toLowerCase().includes(query)) : views).map(view => ({ ...view, label: view.name })))
   const changeViews = (next: FilterView[]) => {
     saveFilterViews(next)
     onViewsChange(next)
   }
-  // A renamed category or tag stays chosen under its new name.
+  // A renamed category or tag stays picked, or excluded, under its new name.
   const renamed = (key: FilterList, from: string, to: string) => {
-    if (chosen(key, from)) list.applyFilters({ ...filters, [key]: (filters[key] as string[]).map(value => (value === from ? to : value)) })
+    const state: ChoiceState = choiceState(filters, key, from)
+    if (state) list.applyFilters(withChoice(withChoice(filters, key, from, null), key, to, state))
   }
   const renameView = (from: string, to: string) => changeViews(views.map(view => (view.name === from ? { ...view, name: to } : view)))
   const updateView = (name: string) => {
@@ -288,29 +375,37 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
   const removeView = (name: string) => changeViews(views.filter(view => view.name !== name))
   const categoryNames = Object.keys(categories).sort((a, b) => a.localeCompare(b))
   const tagNames = [...tags].sort((a, b) => a.localeCompare(b))
+  const toggleEmpty = () => {
+    writeStored(EMPTY_STATUSES_KEY, showEmpty ? null : 'true')
+    setShowEmpty(!showEmpty)
+  }
 
   return (
     <div id="torrent-filters" className="space-y-3">
       <div className="flex items-center gap-1">
         <h3 className="min-w-0 flex-1 truncate text-sm font-medium">{t('Filters')}</h3>
+        {/* Adds a filter on any table column. */}
+        <AddFilterButton targets={columnTargets} onChange={list.setColumnFilter} />
         <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0 rounded-full bg-muted hover:bg-accent" aria-label={t('Close filters')} title={t('Close filters')} onClick={onClose}>
           <X className="size-4" />
         </Button>
       </div>
-      {/* Reset and the column filter funnel first, then saving the filters as a view. */}
-      <div className="flex items-center gap-1">
-        {/* Clears every filter, the column filters included. */}
-        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full px-2.5" disabled={!list.filtered} onClick={list.clearFilters}>
+      {/* Each reset clears its own kind of filter. */}
+      <div className="flex flex-wrap items-center gap-1">
+        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 rounded-full px-1.5 has-[>svg]:px-1.5" disabled={!list.sidebarFiltered} title={t('Clear the choices below')} onClick={list.clearSidebarFilters}>
           <RotateCcw className="size-4" />
           {t('Reset filters')}
         </Button>
-        <span className="ms-auto"><AddFilterButton targets={columnTargets} onChange={list.setColumnFilter} /></span>
+        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 rounded-full px-1.5 has-[>svg]:px-1.5" disabled={!list.columnFiltered} title={t('Clear the column filters')} onClick={list.clearColumnFilters}>
+          <Columns3 className="size-4" />
+          {t('Reset columns')}
+        </Button>
       </div>
-      <SaveViewButton list={list} views={views} onViewsChange={onViewsChange} />
 
-      {shownViews.length > 0 && (
-        <Section id="views" title={t('Views')} icon={Bookmark} chosen={0} folded={folded.includes('views')} onFold={fold}>
-          {shownViews.map(view => {
+      <Section id="views" title={t('Views')} icon={Bookmark} chosen={0} folded={folded.includes('views')} onFold={fold} action={<SaveViewButton list={list} views={views} onViewsChange={onViewsChange} />} {...(views.length > 0 ? searchProps('views') : {})}>
+        {views.length === 0 ? <li className="px-2 py-1 text-sm text-muted-foreground">{t('No saved views yet. Pick some filters, then save them here.')}</li>
+          : shownViews.length === 0 ? <li className="px-2 py-1 text-sm text-muted-foreground">{t('Nothing matches')}</li>
+          : shownViews.map(view => {
             const active = sameFilters(view.filters, filters)
             return (
               <FilterItem
@@ -325,14 +420,13 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
                   <ItemMenu name={view.name}>
                     <DropdownMenuItem onClick={() => setPrompt({ kind: 'renameView', name: view.name })}><Pencil />{t('Rename')}</DropdownMenuItem>
                     <DropdownMenuItem disabled={active} onClick={() => updateView(view.name)}><RefreshCw />{t('Save the current filters in it')}</DropdownMenuItem>
-                    <DropdownMenuItem variant="destructive" onClick={() => removeView(view.name)}><Trash2 />{t('Remove this view')}</DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onClick={() => setPrompt({ kind: 'deleteView', name: view.name })}><Trash2 />{t('Remove this view')}</DropdownMenuItem>
                   </ItemMenu>
                 )}
               />
             )
           })}
-        </Section>
-      )}
+      </Section>
 
       {/* Filters set from the table's column titles or the funnel above, each opening its editor. */}
       {activeCount(filters.columns) > 0 && (
@@ -341,12 +435,19 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
         </Section>
       )}
 
-      <Section id="status" title={t('Status')} icon={Activity} chosen={filters.statuses.length} folded={folded.includes('status')} onFold={fold}>
-        {items('statuses')}
+      <Section
+        id="status" title={t('Status')} icon={Activity} chosen={chosenCount(filters, 'statuses')} folded={folded.includes('status')} onFold={fold} {...searchProps('status')}
+        action={(
+          <Button type="button" variant="ghost" size="icon" className="size-7" aria-pressed={showEmpty} aria-label={showEmpty ? t('Hide empty statuses') : t('Show empty statuses')} title={showEmpty ? t('Hide empty statuses') : t('Show empty statuses')} onClick={toggleEmpty}>
+            {showEmpty ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          </Button>
+        )}
+      >
+        {items('statuses', 'status')}
       </Section>
 
-      <Section id="categories" title={t('Categories')} icon={Folder} chosen={filters.categories.length} folded={folded.includes('categories')} onFold={fold} onAdd={() => setPrompt({ kind: 'newCategory' })} addLabel={t('New category')}>
-        {items('categories', name => (
+      <Section id="categories" title={t('Categories')} icon={Folder} chosen={chosenCount(filters, 'categories')} folded={folded.includes('categories')} onFold={fold} onAdd={() => setPrompt({ kind: 'newCategory' })} addLabel={t('New category')} {...searchProps('categories')}>
+        {items('categories', 'categories', name => (
           <ItemMenu name={name}>
             <DropdownMenuItem onClick={() => setPrompt({ kind: 'editCategory', name, savePath: categories[name]?.savePath ?? '' })}><Pencil />{t('Edit category')}</DropdownMenuItem>
             <DropdownMenuItem variant="destructive" onClick={() => setPrompt({ kind: 'deleteCategory', name })}><Trash2 />{t('Delete')}</DropdownMenuItem>
@@ -354,8 +455,8 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
         ))}
       </Section>
 
-      <Section id="tags" title={t('Tags')} icon={Tags} chosen={filters.tags.length} folded={folded.includes('tags')} onFold={fold} onAdd={() => setPrompt({ kind: 'newTags' })} addLabel={t('New tags')}>
-        {items('tags', name => (
+      <Section id="tags" title={t('Tags')} icon={Tags} chosen={chosenCount(filters, 'tags')} folded={folded.includes('tags')} onFold={fold} onAdd={() => setPrompt({ kind: 'newTags' })} addLabel={t('New tags')} {...searchProps('tags')}>
+        {items('tags', 'tags', name => (
           <ItemMenu name={name}>
             <DropdownMenuItem onClick={() => setPrompt({ kind: 'editTag', name })}><Pencil />{t('Rename')}</DropdownMenuItem>
             <DropdownMenuItem variant="destructive" onClick={() => setPrompt({ kind: 'deleteTag', name })}><Trash2 />{t('Delete')}</DropdownMenuItem>
@@ -363,8 +464,8 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
         ))}
       </Section>
 
-      <Section id="trackers" title={t('Trackers')} icon={Globe} chosen={filters.trackers.length} folded={folded.includes('trackers')} onFold={fold}>
-        {items('trackers')}
+      <Section id="trackers" title={t('Trackers')} icon={Globe} chosen={chosenCount(filters, 'trackers')} folded={folded.includes('trackers')} onFold={fold} {...searchProps('trackers')}>
+        {items('trackers', 'trackers')}
       </Section>
 
       {/* Keyed so each prompt starts with empty fields, or the category's own save path. */}
@@ -377,6 +478,7 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
         onDeleted={forget}
         onRenamed={renamed}
         onRenameView={renameView}
+        onDeleteView={removeView}
       />
     </div>
   )

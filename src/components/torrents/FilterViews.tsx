@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Bookmark, Save } from 'lucide-react'
+import { BookmarkPlus, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -13,7 +13,7 @@ interface FilterViewsProps {
   onViewsChange: (views: FilterView[]) => void
 }
 
-// Saves the current filters under a name, from the filter panel.
+// Saves the current filters under a name, from the Views title in the filter sidebar.
 export function SaveViewButton({ list, views, onViewsChange }: FilterViewsProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
@@ -30,8 +30,8 @@ export function SaveViewButton({ list, views, onViewsChange }: FilterViewsProps)
 
   return (
     <>
-      <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full px-2.5 has-[>svg]:pe-1.5" disabled={!list.filtered} title={list.filtered ? t('Save these filters as a view') : t('Choose some filters first')} onClick={() => { setName(''); setOpen(true) }}>
-        <Bookmark className="size-4" />{t('Save as view')}
+      <Button type="button" variant="ghost" size="icon" className="size-7" disabled={!list.filtered} aria-label={t('Save as view')} title={list.filtered ? t('Save these filters as a view') : t('Choose some filters first')} onClick={() => { setName(''); setOpen(true) }}>
+        <BookmarkPlus className="size-4" />
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent aria-describedby={undefined}>

@@ -21,6 +21,8 @@ export function UpdateCheck() {
   // The percent downloaded while an update installs, null otherwise.
   const [installing, setInstalling] = useState<number | null>(null)
   const stop = useRef<AbortController | null>(null)
+  // Set once qBittorrent serves the new version; the page reloads when asked, not by itself.
+  const [installed, setInstalled] = useState(false)
 
   const torrentUrl = notice.latest?.qbminimalTorrent
   const latestVersion = notice.latest?.qbminimal
@@ -37,9 +39,15 @@ export function UpdateCheck() {
         client: qbitClient, torrentUrl, version: latestVersion, currentPath: oldPath,
         onProgress: setInstalling, signal: control.signal, currentVersion: __APP_VERSION__,
       })
-      toast.success(oldRemoved ? t('Update installed and the previous version removed. Reloading...')
-        : t('Update installed. The previous version stays in {folder} and can be deleted. Reloading...', { folder: oldPath }))
-      setTimeout(pageActions.reload, 1000)
+      setInstalling(null)
+      setInstalled(true)
+      // Stays until it's answered, so nothing typed elsewhere is lost to a reload.
+      toast.success(oldRemoved ? t('Update installed and the previous version removed.')
+        : t('Update installed. The previous version stays in {folder} and can be deleted.', { folder: oldPath }), {
+        description: t('Reload the page to use it.'),
+        duration: Infinity,
+        action: { label: t('Reload'), onClick: pageActions.reload },
+      })
     } catch (error) {
       const messages: Record<UpdateFailure, string> = {
         add: t('Couldn\'t add the update to qBittorrent'),
@@ -71,10 +79,32 @@ export function UpdateCheck() {
     <div className="mt-4 space-y-3 border-t pt-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">{t('Checks GitHub for new releases by itself every 12 hours.')}</p>
-        <Button variant="outline" size="sm" disabled={checking} onClick={() => void check()}>
-          <RefreshCw className={checking ? 'animate-spin' : undefined} />
-          {checking ? t('Checking for updates...') : t('Check for updates')}
-        </Button>
+        {/* Installing sits beside checking, once there's something to install. */}
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {installed ? (
+            <Button size="sm" onClick={pageActions.reload}><RefreshCw />{t('Reload')}</Button>
+          ) : installing !== null ? (
+            <>
+              <span role="status" className="text-sm">{t('Downloading update... {percent}%', { percent: installing })}</span>
+              <Button variant="outline" size="sm" onClick={() => stop.current?.abort()}>{t('Cancel')}</Button>
+            </>
+          ) : installable && (
+            <ConfirmAction
+              safe
+              label={t('Install update')}
+              title={t('Install version {version}?', { version: latestVersion })}
+              message={t('qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.')}
+              confirmLabel={t('Install')}
+              buttonLabel={t('Install update')}
+              buttonIcon={Download}
+              onConfirm={() => void install()}
+            />
+          )}
+          <Button variant="outline" size="sm" disabled={checking || installing !== null} onClick={() => void check()}>
+            <RefreshCw className={checking ? 'animate-spin' : undefined} />
+            {checking ? t('Checking for updates...') : t('Check for updates')}
+          </Button>
+        </div>
       </div>
       {notice.latest && (
         <dl className="space-y-1 text-sm" aria-live="polite">
@@ -95,27 +125,6 @@ export function UpdateCheck() {
               </dd>
             </div>
           ))}
-          {installable && (
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-              {installing === null ? (
-                <ConfirmAction
-                  safe
-                  label={t('Install update')}
-                  title={t('Install version {version}?', { version: latestVersion })}
-                  message={t('qBittorrent downloads the new version from GitHub into a new folder next to the current one, then switches to it. The old folder stays and can be deleted.')}
-                  confirmLabel={t('Install')}
-                  buttonLabel={t('Install update')}
-                  buttonIcon={Download}
-                  onConfirm={() => void install()}
-                />
-              ) : (
-                <>
-                  <span role="status">{t('Downloading update... {percent}%', { percent: installing })}</span>
-                  <Button variant="outline" size="sm" onClick={() => stop.current?.abort()}>{t('Cancel')}</Button>
-                </>
-              )}
-            </div>
-          )}
           <p className="text-xs text-muted-foreground">{t('Last checked {time}', { time: new Date(notice.lastChecked).toLocaleString() })}</p>
         </dl>
       )}

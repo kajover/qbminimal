@@ -17,3 +17,6 @@ const PAGES: { id: PageId; label: string; icon: LucideIcon }[] = [
 const EXTRA: PageId[] = ['logs', 'statistics']
 export const MAIN_PAGES = PAGES.filter(page => !EXTRA.includes(page.id))
 export const EXTRA_PAGES = PAGES.filter(page => EXTRA.includes(page.id))
+
+// Every page in the order the menu lists them, for the G and number keys.
+export const MENU_PAGES = [...MAIN_PAGES, ...EXTRA_PAGES]

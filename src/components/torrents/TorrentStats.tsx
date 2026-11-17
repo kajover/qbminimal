@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/PageHeader'
 import { Card, CardContent } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useApiFeature, usePreferences, useTorrents, useTransferInfo } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
@@ -98,6 +99,33 @@ function AlternativeLimitsButton({ on }: { on: boolean }) {
 
 // qBittorrent's connection status and statistics, as a page like Logs.
 export function StatisticsView() {
+  return (
+    <div className="space-y-4">
+      <PageHeader title={t('Statistics')} />
+      <Card>
+        <CardContent className="space-y-4">
+          <Statistics />
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+// The same, over the page, from the speeds in the header.
+export function StatisticsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent aria-describedby={undefined} className="max-h-[90dvh] space-y-4 overflow-y-auto sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle>{t('Statistics')}</DialogTitle>
+        </DialogHeader>
+        <Statistics />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function Statistics() {
   const { data: state } = useTransferInfo()
   const { data: torrents } = useTorrents()
   const canPauseSession = useApiFeature('sessionPause') && typeof state?.session_state === 'boolean'
@@ -154,11 +182,7 @@ export function StatisticsView() {
     .filter(group => group.rows.length > 0)
 
   return (
-    <div className="space-y-4">
-      <PageHeader title={t('Statistics')} />
-      <Card>
-        <CardContent className="space-y-4">
-
+    <>
         {!state ? (
           <p className="py-6 text-center text-sm text-muted-foreground">{t('Loading statistics...')}</p>
         ) : (
@@ -218,8 +242,6 @@ export function StatisticsView() {
             )}
           </>
         )}
-        </CardContent>
-      </Card>
-    </div>
+    </>
   )
 }

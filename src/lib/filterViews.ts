@@ -1,5 +1,5 @@
 import { readStored, writeStored } from './storage'
-import { STATUS_FILTERS, type StatusFilter, type TorrentFilters } from './torrentFilters'
+import { FILTER_LISTS, STATUS_FILTERS, type FilterList, type StatusFilter, type TorrentFilters } from './torrentFilters'
 import { parseColumnFilters, sameColumnFilters } from './columnFilters'
 
 // Named sets of filters, like "Downloading in Movies", one tap away above the torrent list.
@@ -16,6 +16,15 @@ const isStatus = (value: unknown): value is StatusFilter => STATUS_FILTERS.some(
 const texts = (list: unknown, single: unknown): string[] =>
   Array.isArray(list) ? [...new Set(list.filter((item): item is string => typeof item === 'string'))]
     : typeof single === 'string' && single && single !== 'all' ? [single] : []
+
+function parseExcluded(raw: unknown): Partial<Record<FilterList, string[]>> {
+  if (!raw || typeof raw !== 'object') return {}
+  const lists = raw as Record<string, unknown>
+  return Object.fromEntries(FILTER_LISTS.map(list => {
+    const values = texts(lists[list], undefined)
+    return [list, list === 'statuses' ? values.filter(isStatus) : values]
+  }).filter(([, values]) => values.length > 0))
+}
 
 // Anything unreadable is left out rather than breaking the list.
 export function parseFilterViews(raw: string | null): FilterView[] {
@@ -38,6 +47,7 @@ export function parseFilterViews(raw: string | null): FilterView[] {
         categories: texts(filters.categories, filters.category),
         tags: texts(filters.tags, filters.tag),
         trackers: texts(filters.trackers, filters.tracker),
+        excluded: parseExcluded(filters.excluded),
         columns: parseColumnFilters(filters.columns),
       },
     }]
@@ -52,7 +62,8 @@ const sameSet = (a: readonly string[], b: readonly string[]) => a.length === b.l
 
 export function sameFilters(a: TorrentFilters, b: TorrentFilters) {
   return a.name.trim() === b.name.trim() && sameSet(a.statuses, b.statuses) && sameSet(a.categories, b.categories) &&
-    sameSet(a.tags, b.tags) && sameSet(a.trackers, b.trackers) && sameColumnFilters(a.columns, b.columns)
+    sameSet(a.tags, b.tags) && sameSet(a.trackers, b.trackers) && sameColumnFilters(a.columns, b.columns) &&
+    FILTER_LISTS.every(list => sameSet(a.excluded?.[list] ?? [], b.excluded?.[list] ?? []))
 }
 
 // A view with the same name is replaced, so saving again updates it.

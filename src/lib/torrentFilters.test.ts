@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { countFilterOptions, filterTorrents, parseTags, searchMatcher, type TorrentFilters, getTrackerHost, groupTrackersByHost, matchesTracker, NO_FILTERS, toggleChoice, TRACKERLESS, UNCATEGORIZED, UNTAGGED } from './torrentFilters'
+import { choiceState, countFilterOptions, cycleChoice, excludeChoice, filterTorrents, parseTags, searchMatcher, type TorrentFilters, getTrackerHost, groupTrackersByHost, matchesTracker, NO_FILTERS, toggleChoice, TRACKERLESS, UNCATEGORIZED, UNTAGGED } from './torrentFilters'
 import type { Torrent } from '@/types'
 
 const torrent = (over: Partial<Torrent>) => ({ name: 'Ubuntu', state: 'downloading', progress: 0.5, dlspeed: 0, upspeed: 0, category: '', tags: '', ...over }) as Torrent
@@ -42,6 +42,33 @@ describe('filterTorrents', () => {
   it('toggles a choice in and out', () => {
     expect(toggleChoice(['a'], 'b')).toEqual(['a', 'b'])
     expect(toggleChoice(['a', 'b'], 'a')).toEqual(['b'])
+  })
+})
+
+describe('excluded choices', () => {
+  const list = [
+    torrent({ name: 'Ubuntu', category: 'linux', tags: 'iso' }),
+    torrent({ name: 'Movie', category: 'films', state: 'stalledDL' }),
+    torrent({ name: 'Checked', state: 'checkingUP', has_tracker_error: true }),
+  ]
+  it('hides torrents matching an excluded choice', () => {
+    expect(names(list, { excluded: { categories: ['linux'] } })).toEqual(['Movie', 'Checked'])
+    expect(names(list, { excluded: { tags: ['iso'], statuses: ['stalled'] } })).toEqual(['Checked'])
+  })
+  it('combines with picked choices', () => expect(names(list, { statuses: ['downloading', 'stalledDownloading'], excluded: { categories: ['linux'] } })).toEqual(['Movie']))
+  it('knows checking and tracker problems', () => {
+    expect(names(list, { statuses: ['checking'] })).toEqual(['Checked'])
+    expect(names(list, { statuses: ['trackerError'] })).toEqual(['Checked'])
+  })
+  it('cycles a click between picked and neither, and a held click to excluded', () => {
+    let filters = cycleChoice(NO_FILTERS, 'tags', 'iso')
+    expect(choiceState(filters, 'tags', 'iso')).toBe('in')
+    filters = excludeChoice(filters, 'tags', 'iso')
+    expect(choiceState(filters, 'tags', 'iso')).toBe('out')
+    expect(filters.tags).toEqual([])
+    filters = cycleChoice(filters, 'tags', 'iso')
+    expect(choiceState(filters, 'tags', 'iso')).toBeNull()
+    expect(choiceState(cycleChoice(cycleChoice(NO_FILTERS, 'tags', 'iso'), 'tags', 'iso'), 'tags', 'iso')).toBeNull()
   })
 })
 

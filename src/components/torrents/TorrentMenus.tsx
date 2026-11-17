@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import type { Torrent } from '@/types'
 import type { MenuEntry, MenuGroup } from './bulkActions'
 import { t } from '@/i18n'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 
 // Icons for the groups that open as submenus of the right-click menu.
 const GROUP_ICONS: Record<string, LucideIcon> = { Options: Settings2, Copy }
@@ -60,6 +61,8 @@ const ContextItem: MenuItem = ContextMenuItem
 
 // The More button of the selection bar: every other action, in sections, the quick ones as icons.
 export function MoreMenu({ torrents, groups, onCustomize }: { torrents: Torrent[]; groups: MenuGroup[]; onCustomize?: () => void }) {
+  // On phones the menu rises from the selection bar, with a gap so the two don't run together.
+  const wide = useMediaQuery('(min-width: 1200px)')
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -69,7 +72,7 @@ export function MoreMenu({ torrents, groups, onCustomize }: { torrents: Torrent[
         </Button>
       </DropdownMenuTrigger>
       {/* As wide as its longest item, so none is cut off, but never wider than the screen. */}
-      <DropdownMenuContent align="end" className="max-h-[70vh] w-max min-w-60 max-w-[calc(100vw-1rem)] overflow-y-auto">
+      <DropdownMenuContent align="end" sideOffset={wide ? 4 : 18} className="max-h-[70vh] w-max min-w-60 max-w-[calc(100vw-1rem)] overflow-y-auto">
         <DropdownMenuLabel className="max-w-72 truncate">{countLabel(torrents)}</DropdownMenuLabel>
         {groups.map(group => (
           <Fragment key={group.name}>

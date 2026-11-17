@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { ArrowDown, ArrowUp, ArrowUpDown, Columns3, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, LayoutList, Table2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { AddFilterButton, ColumnFilterButton, ColumnFilterChips, type FilterTarget } from '@/components/ColumnFilters'
-import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, DEFAULT_SEARCH_WIDTHS, loadSearchHidden, loadSearchView, saveSearchView, loadSearchSort, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchSort, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey } from '@/lib/searchSettings'
+import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loadSearchHidden, loadSearchView, saveSearchView, loadSearchSort, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchSort, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey, type SearchWidths } from '@/lib/searchSettings'
 import { applyColumnFilters, choiceOptions, withFilter, type ColumnFilter, type ColumnFilters, type FilterColumn } from '@/lib/columnFilters'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { formatBytes, formatDateTime } from '@/lib/format'
@@ -26,8 +27,60 @@ const COLUMNS: { key: SortKey; label: string; numeric?: boolean; className?: str
 
 const PER_PAGE = 20
 const ACTIONS_WIDTH = 96
-// The name keeps at least this share of the table, so it stays the widest column.
-const NAME_SHARE = 0.4
+// The name never fits into less than this, so narrow screens scroll the table instead.
+const MIN_NAME_WIDTH = 240
+// Cell padding, and in the titles also the sort arrow and filter button beside the label.
+const CELL_PADDING = 20
+const TITLE_EXTRAS = 64
+
+// How wide a text is in the given font, measured on a canvas, or null where that isn't possible.
+let canvas: CanvasRenderingContext2D | null | undefined
+function textWidth(text: string, font: string): number | null {
+  if (canvas === undefined) {
+    try {
+      canvas = document.createElement('canvas').getContext('2d')
+    } catch {
+      canvas = null
+    }
+  }
+  if (!canvas) return null
+  canvas.font = font
+  return canvas.measureText(text).width
+}
+
+// Each column but the name as wide as its widest value among all the results, or its title, so
+// widths don't change from page to page.
+function fittedWidths(results: SearchResult[]): SearchWidths {
+  const family = typeof document === 'undefined' ? 'sans-serif' : getComputedStyle(document.body).fontFamily || 'sans-serif'
+  const widths: SearchWidths = {}
+  for (const column of COLUMNS) {
+    if (column.key === 'fileName') continue
+    const title = textWidth(column.label, `500 14px ${family}`)
+    if (title === null) return {}
+    let widest = title + TITLE_EXTRAS
+    for (const result of results) {
+      widest = Math.max(widest, (textWidth(String(column.cell(result)), `400 14px ${family}`) ?? 0) + CELL_PADDING)
+    }
+    widths[column.key] = Math.max(MIN_SEARCH_WIDTH, Math.ceil(widest))
+  }
+  return widths
+}
+
+// The width that shows every given cell's content whole: each is copied, unclipped, into a hidden
+// box beside the table, which keeps the table's fonts.
+function naturalWidth(cells: Element[], host: HTMLElement): number {
+  const probe = document.createElement('div')
+  probe.style.cssText = 'position:absolute;top:0;left:0;visibility:hidden;pointer-events:none;width:max-content;white-space:nowrap'
+  host.appendChild(probe)
+  let widest = 0
+  for (const cell of cells) {
+    probe.className = cell.className
+    probe.innerHTML = cell.innerHTML
+    widest = Math.max(widest, probe.getBoundingClientRect().width)
+  }
+  probe.remove()
+  return Math.ceil(widest)
+}
 
 // Each column can be filtered like the torrent table's: a text match, a range, or a choice of sites.
 const FILTER_COLUMNS: FilterColumn<SearchResult>[] = [
@@ -40,7 +93,12 @@ const FILTER_COLUMNS: FilterColumn<SearchResult>[] = [
 ]
 
 // Found torrents, sortable, 20 a page: a table on wide screens and a list on phones.
-export function SearchResults({ results, onAdd }: { results: SearchResult[]; onAdd: (result: SearchResult) => void }) {
+export function SearchResults({ results, onAdd, toolbarSlot }: {
+  results: SearchResult[]
+  onAdd: (result: SearchResult) => void
+  // Where the filter, columns or sort, and view buttons go: the page header's button row.
+  toolbarSlot?: HTMLElement | null
+}) {
   const [sort, setSortState] = useState<SearchSort>(loadSearchSort)
   const setSort = (next: SearchSort) => { setSortState(next); saveSearchSort(next) }
   const [page, setPage] = useState(1)
@@ -64,38 +122,74 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
     saveSearchView(saved)
   }
 
-  // Narrow tables shrink the other columns rather than the name.
-  const tableBox = useRef<HTMLDivElement>(null)
+  // Like the torrent table: a column is resized from its right edge, and the table scrolls sideways
+  // when the columns are wider than the screen. Until then each fits its content and the name takes
+  // the rest; once the name is resized, a filler column takes any room left over.
+  const fitted = useMemo(() => fittedWidths(results), [results])
   const [tableWidth, setTableWidth] = useState(0)
+  const [resizing, setResizing] = useState<{ key: SortKey; width: number } | null>(null)
+  // sign is -1 right to left, where a column's resizing edge is on its left.
+  const resizeStart = useRef<{ x: number; width: number; sign: number } | null>(null)
+  const frame = useRef<HTMLDivElement>(null)
+  const head = useRef<HTMLDivElement>(null)
+  const scroller = useRef<HTMLDivElement>(null)
+  // The table is only there once results arrive, so it's watched from then on.
+  const hasResults = results.length > 0
   useEffect(() => {
-    const box = tableBox.current
+    const box = frame.current
     if (!box || typeof ResizeObserver === 'undefined') return
     const observer = new ResizeObserver(() => setTableWidth(box.clientWidth))
     observer.observe(box)
     return () => observer.disconnect()
-  }, [])
-  const fixed = visible.filter(c => c.key !== 'fileName').reduce((sum, c) => sum + widths[c.key as ResizableKey], 0)
-  // Narrow screens scroll the table sideways instead, with room for the name.
-  const scale = wide && tableWidth > 0 && fixed > 0 ? Math.min(1, Math.max(0, tableWidth * (1 - NAME_SHARE) - ACTIONS_WIDTH) / fixed) : 1
-  const shownWidth = (key: ResizableKey) => Math.max(48, Math.round(widths[key] * scale))
-  const resizing = useRef<{ key: ResizableKey; x: number; width: number; sign: number } | null>(null)
-  const startResize = (e: PointerEvent<HTMLSpanElement>, key: ResizableKey) => {
+  }, [hasResults])
+  const columnWidth = (key: SortKey) => (resizing?.key === key ? resizing.width : widths[key] ?? fitted[key] ?? FALLBACK_SEARCH_WIDTHS[key])
+  const others = visible.reduce((sum, c) => sum + (c.key === 'fileName' ? 0 : columnWidth(c.key)), 0)
+  const widthOf = (key: SortKey) => (key === 'fileName' && resizing?.key !== key && widths.fileName === undefined && tableWidth > 0
+    ? Math.max(MIN_NAME_WIDTH, tableWidth - others - ACTIONS_WIDTH)
+    : columnWidth(key))
+  const total = ACTIONS_WIDTH + visible.reduce((sum, c) => sum + widthOf(c.key), 0)
+  const startResize = (e: PointerEvent<HTMLSpanElement>, key: SortKey) => {
     e.preventDefault()
     e.currentTarget.setPointerCapture(e.pointerId)
-    resizing.current = { key, x: e.clientX, width: widths[key], sign: getComputedStyle(e.currentTarget).direction === 'rtl' ? -1 : 1 }
+    resizeStart.current = { x: e.clientX, width: widthOf(key), sign: getComputedStyle(e.currentTarget).direction === 'rtl' ? -1 : 1 }
+    setResizing({ key, width: widthOf(key) })
   }
-  // A column is resized from its left edge, so dragging left widens it and narrows the name.
-  const moveResize = (e: PointerEvent<HTMLSpanElement>) => {
-    const drag = resizing.current
-    if (!drag) return
-    setWidths(current => ({ ...current, [drag.key]: Math.max(MIN_SEARCH_WIDTH, Math.round(drag.width - (e.clientX - drag.x) * drag.sign)) }))
+  const moveResize = (e: PointerEvent<HTMLSpanElement>, key: SortKey) => {
+    if (!resizeStart.current || resizing?.key !== key) return
+    setResizing({ key, width: Math.max(MIN_SEARCH_WIDTH, Math.round(resizeStart.current.width + (e.clientX - resizeStart.current.x) * resizeStart.current.sign)) })
   }
+  const saveWidth = (key: SortKey, width: number) => setWidths(current => {
+    const next = { ...current, [key]: Math.max(MIN_SEARCH_WIDTH, Math.round(width)) }
+    saveSearchWidths(next)
+    return next
+  })
   const endResize = () => {
-    if (!resizing.current) return
-    resizing.current = null
-    setWidths(current => { saveSearchWidths(current); return current })
+    if (resizing) saveWidth(resizing.key, resizing.width)
+    resizeStart.current = null
+    setResizing(null)
   }
-  const resetWidth = (key: ResizableKey) => setWidths(current => { const next = { ...current, [key]: DEFAULT_SEARCH_WIDTHS[key] }; saveSearchWidths(next); return next })
+  // Double-clicking the edge fits the column to its widest value on this page, and to its header.
+  const fitWidth = (key: SortKey) => {
+    const host = frame.current
+    const index = visible.findIndex(c => c.key === key)
+    if (!host || index === -1) return
+    const cells = [...host.querySelectorAll('tbody tr')].map(row => row.children[index]).filter(Boolean)
+    const header = host.querySelectorAll('thead th')[index]
+    // Room for the sort arrow and the filter button, so the header isn't cut later.
+    const headerWidth = header ? naturalWidth([header], host) + 18 : 0
+    saveWidth(key, Math.max(naturalWidth(cells, host), headerWidth) + 1)
+  }
+  // The titles sit in a table of their own, so they stay in view below the header while the rows
+  // scroll sideways along with them.
+  const syncScroll = () => { if (head.current && scroller.current) head.current.scrollLeft = scroller.current.scrollLeft }
+  const colgroup = (
+    <colgroup>
+      {visible.map(c => <col key={c.key} style={{ width: widthOf(c.key) }} />)}
+      <col style={{ width: ACTIONS_WIDTH }} />
+      {/* Takes any room left over, so the columns keep their widths. */}
+      <col />
+    </colgroup>
+  )
   const setFilter = (id: string, filter: ColumnFilter | null) => {
     setFilters(current => withFilter(current, id, filter))
     setPage(1)
@@ -143,13 +237,10 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
     </span>
   )
 
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-sm text-muted-foreground">{sorted.length === results.length ? t('{count} results', { count: results.length }) : t('{length} of {total} results', { length: sorted.length, total: results.length })}</span>
-        <div className="flex items-center gap-1">
-        <AddFilterButton targets={[...targets.values()]} onChange={setFilter} />
-        {/* Table: filter, columns, view. Cards: filter, sort, view. */}
+  // In the page's header, like the torrent list's buttons.
+  const toolbar = (
+    <>
+        {/* As on the torrent list: columns or sort, then the view, then the filter funnel last. */}
         {showTable && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -164,7 +255,7 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
               </DropdownMenuCheckboxItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => { setHidden(DEFAULT_SEARCH_HIDDEN); setWidths(DEFAULT_SEARCH_WIDTHS); saveSearchWidths(DEFAULT_SEARCH_WIDTHS) }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => { setHidden(DEFAULT_SEARCH_HIDDEN); setWidths({}); saveSearchWidths({}) }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         )}
@@ -195,66 +286,86 @@ export function SearchResults({ results, onAdd }: { results: SearchResult[]; onA
         <Button variant="outline" size="icon" className="size-8" aria-label={showTable ? t('Card view') : t('Table view')} title={showTable ? t('Card view') : t('Table view')} onClick={switchView}>
           {showTable ? <LayoutList className="size-4" /> : <Table2 className="size-4" />}
         </Button>
-        </div>
+        <AddFilterButton targets={[...targets.values()]} onChange={setFilter} />
+    </>
+  )
+
+  const placedToolbar = toolbarSlot ? createPortal(toolbar, toolbarSlot) : <div className="flex justify-end gap-1">{toolbar}</div>
+  // Before a search, only the buttons.
+  if (results.length === 0) return placedToolbar
+
+  return (
+    <div className="space-y-2">
+      {placedToolbar}
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground">{sorted.length === results.length ? t('{count} results', { count: results.length }) : t('{length} of {total} results', { length: sorted.length, total: results.length })}</span>
       </div>
 
-      {/* The funnel above adds a filter in either view; the table also filters from its titles. */}
+      {/* The funnel in the header adds a filter in either view; the table also filters from its titles. */}
       <ColumnFilterChips targets={[...targets.values()]} filters={filters} onChange={setFilter} />
 
       {sorted.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">{t('No results match these filters')}</p>}
 
-      {/* Wide screens clip rather than scroll sideways, so the column titles can stay in view below the header. */}
-      <div ref={tableBox} className={cn('rounded-xl border bg-card', wide ? 'overflow-x-clip' : 'overflow-x-auto', (!showTable || sorted.length === 0) && 'hidden')}>
-        <table className="w-full table-fixed text-sm tabular-nums" style={wide ? undefined : { minWidth: fixed + ACTIONS_WIDTH + 200 }}>
-          <colgroup>
-            <col />
-            {visible.filter(c => c.key !== 'fileName').map(c => <col key={c.key} style={{ width: shownWidth(c.key as ResizableKey) }} />)}
-            <col className="w-24" />
-          </colgroup>
-          <thead className="sticky top-(--header-height,3rem) z-10 bg-card shadow-[inset_0_-1px_0_var(--border)]">
-            <tr>
-              {visible.map(c => (
-                <th key={c.key} className="group/th relative h-10 px-2 font-medium text-muted-foreground" aria-sort={sort.key === c.key ? (sort.desc ? 'descending' : 'ascending') : undefined}>
-                  <div className="flex items-center gap-0.5">
-                    <button type="button" onClick={() => sortBy(c.key)} className={cn('flex min-w-0 flex-1 items-center gap-1 hover:text-foreground', sort.key === c.key && 'text-foreground')}>
-                      {c.label}
-                      {sort.key === c.key && (sort.desc ? <ArrowDown className="size-3.5" /> : <ArrowUp className="size-3.5" />)}
-                    </button>
-                    <ColumnFilterButton target={targets.get(c.key)!} filter={filters[c.key]} onChange={(filter) => setFilter(c.key, filter)} />
-                  </div>
-                  {/* The edge between two titles resizes the column after it; the name takes what's left. */}
-                  {c.key !== 'fileName' && (
+      <div ref={frame} className={cn('rounded-xl border bg-card max-sm:-mx-2', (!showTable || sorted.length === 0) && 'hidden')}>
+        <div
+          ref={head}
+          onWheel={(e) => { const dx = e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX; if (dx && scroller.current) scroller.current.scrollLeft += dx }}
+          className="sticky top-(--header-height,3.5rem) z-20 overflow-hidden rounded-t-xl border-b bg-card"
+        >
+          <table className="table-fixed text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
+            {colgroup}
+            <thead>
+              <tr>
+                {visible.map(c => (
+                  <th key={c.key} className="group/th relative h-10 select-none px-2 text-start align-middle font-medium text-muted-foreground" aria-sort={sort.key === c.key ? (sort.desc ? 'descending' : 'ascending') : undefined}>
+                    <div className="flex min-w-0 items-center gap-0.5">
+                      <button type="button" onClick={() => sortBy(c.key)} className={cn('flex min-w-0 flex-1 items-center gap-1 hover:text-foreground', sort.key === c.key && 'text-foreground')}>
+                        <span className="truncate">{c.label}</span>
+                        {sort.key === c.key && (sort.desc ? <ArrowDown className="size-3.5 shrink-0" /> : <ArrowUp className="size-3.5 shrink-0" />)}
+                      </button>
+                      <ColumnFilterButton target={targets.get(c.key)!} filter={filters[c.key]} onChange={(filter) => setFilter(c.key, filter)} />
+                    </div>
                     <span
                       role="separator"
                       aria-orientation="vertical"
                       aria-label={t('Resize {label}', { label: c.label })}
-                      title={t('Drag to resize. Double-click to reset.')}
-                      onPointerDown={(e) => startResize(e, c.key as ResizableKey)}
-                      onPointerMove={moveResize}
+                      title={t('Drag to resize. Double-click to fit the content.')}
+                      onPointerDown={(e) => startResize(e, c.key)}
+                      onPointerMove={(e) => moveResize(e, c.key)}
                       onPointerUp={endResize}
                       onPointerCancel={endResize}
-                      onDoubleClick={() => resetWidth(c.key as ResizableKey)}
-                      className="group absolute start-0 top-0 flex h-full w-2 -translate-x-1/2 cursor-col-resize touch-none justify-center rtl:translate-x-1/2"
+                      onDoubleClick={() => fitWidth(c.key)}
+                      className="group absolute end-0 top-0 flex h-full w-2 cursor-col-resize touch-none justify-end"
                     >
-                      <span className="h-full w-px bg-border group-hover:bg-primary/60" />
+                      <span className={cn('h-full w-px', resizing?.key === c.key ? 'bg-primary' : 'bg-border group-hover:bg-primary/60')} />
                     </span>
-                  )}
-                </th>
-              ))}
-              <th className="w-24"><span className="sr-only">{t('Actions')}</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            {shown.map(result => (
-              <tr key={`${result.fileUrl}|${result.descrLink}`} className="cursor-pointer border-b last:border-0 hover:bg-muted/50" onClick={() => result.fileUrl && onAdd(result)}>
-                {visible.map(c => (
-                  <td key={c.key} className={cn('px-2 py-1.5', c.className)} title={c.key === 'fileName' ? result.fileName : undefined}>{c.cell(result)}</td>
+                  </th>
                 ))}
-                <td className="px-1 py-0.5">{links(result, true)}</td>
+                <th><span className="sr-only">{t('Actions')}</span></th>
+                <th aria-hidden />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+          </table>
+        </div>
+        <div ref={scroller} onScroll={syncScroll} className="overflow-x-auto overscroll-x-none rounded-b-xl">
+          <table className="table-fixed text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
+            {colgroup}
+            <tbody>
+              {shown.map(result => (
+                <tr key={`${result.fileUrl}|${result.descrLink}`} className="cursor-pointer border-b last:border-0 hover:bg-muted/50" onClick={() => result.fileUrl && onAdd(result)}>
+                  {visible.map(c => (
+                    <td key={c.key} className={cn('truncate px-2 py-1.5 whitespace-nowrap', c.className)} title={c.key === 'fileName' ? result.fileName : undefined}>
+                      {/* Numbers, sizes and dates read left to right, also in a right-to-left language. */}
+                      {c.numeric ? <span dir="ltr">{c.cell(result)}</span> : c.cell(result)}
+                    </td>
+                  ))}
+                  <td className="px-1 py-0.5">{links(result, true)}</td>
+                  <td aria-hidden />
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Laid out like the torrent cards: a grid on wide screens. */}

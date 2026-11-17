@@ -63,24 +63,43 @@ describe('search', () => {
     renderView()
     await search()
     await screen.findAllByText('ubuntu-desktop.iso')
-    const titles = within(screen.getByRole('table')).getAllByRole('columnheader').map(th => th.textContent?.trim())
+    const titles = within(screen.getAllByRole('table')[0]).getAllByRole('columnheader').map(th => th.textContent?.trim())
     expect(titles).toEqual(['Name', 'Size', 'Seeds', 'Leeches', 'Plugin', 'Actions'])
+  })
+
+  it('keeps the form in one row with the plugins button', async () => {
+    renderView()
+    const form = field().closest('form')!
+    for (const name of ['Search', 'Manage plugins']) expect(within(form).getByRole('button', { name })).toBeInTheDocument()
+    for (const name of ['Search plugin', 'Search category']) expect(within(form).getByRole('combobox', { name })).toBeInTheDocument()
+  })
+
+  it('gives every column, the name too, a resize handle, and saves a fitted width', async () => {
+    renderView()
+    await search()
+    await screen.findAllByText('ubuntu-desktop.iso')
+    const labels = screen.getAllByRole('separator').map(handle => handle.getAttribute('aria-label'))
+    expect(labels).toEqual(['Resize Name', 'Resize Size', 'Resize Seeds', 'Resize Leeches', 'Resize Plugin'])
+    expect(screen.getByRole('separator', { name: 'Resize Name' })).toHaveAttribute('title', 'Drag to resize. Double-click to fit the content.')
+
+    await userEvent.dblClick(screen.getByRole('separator', { name: 'Resize Name' }))
+    expect(JSON.parse(localStorage.getItem('qbminimal.searchWidths')!)).toHaveProperty('fileName')
   })
 
   it('switches between the table and cards, with the buttons for each', async () => {
     renderView()
     await search()
     await screen.findAllByText('ubuntu-desktop.iso')
-    expect(toolbar()).toEqual(['Column filter', 'Columns', 'Card view'])
+    expect(toolbar()).toEqual(['Columns', 'Card view', 'Column filter'])
 
     await userEvent.click(screen.getByRole('button', { name: 'Card view' }))
-    expect(toolbar()).toEqual(['Column filter', 'Sort: Seeds', 'Table view'])
-    expect(screen.getByRole('table').closest('.hidden')).not.toBeNull()
+    expect(toolbar()).toEqual(['Sort: Seeds', 'Table view', 'Column filter'])
+    expect(screen.getAllByRole('table')[0].closest('.hidden')).not.toBeNull()
     // Wide screens show the table by default, so cards are the choice kept.
     expect(localStorage.getItem('qbminimal.searchView')).toBe('cards')
 
     await userEvent.click(screen.getByRole('button', { name: 'Table view' }))
-    expect(toolbar()).toEqual(['Column filter', 'Columns', 'Card view'])
+    expect(toolbar()).toEqual(['Columns', 'Card view', 'Column filter'])
     expect(localStorage.getItem('qbminimal.searchView')).toBeNull()
   })
 

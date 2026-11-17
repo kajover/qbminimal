@@ -25,6 +25,10 @@ export interface Torrent {
   state: string
   // Web API 2.17.0 and newer: why the torrent is in the error state.
   error?: string
+  // qBittorrent 5.1 and newer, from sync/maindata: problems its trackers report.
+  has_tracker_error?: boolean
+  has_tracker_warning?: boolean
+  has_other_announce_error?: boolean
   progress: number
   size: number
   total_size: number

@@ -46,7 +46,7 @@ describe('install update', () => {
     pageActions.reload = vi.fn()
   })
 
-  it('asks first, then downloads, switches the Web UI and reloads', async () => {
+  it('asks first, then downloads, switches the Web UI, and reloads only when asked', async () => {
     renderIt()
     await userEvent.click(await screen.findByRole('button', { name: 'Install update' }))
     expect(api.addTorrents).not.toHaveBeenCalled()
@@ -56,7 +56,10 @@ describe('install update', () => {
     expect(api.addTorrents).toHaveBeenCalledWith(expect.objectContaining({ savepath: '/opt' }), [])
     expect((api.addTorrents.mock.calls as unknown as [Record<string, string>][])[0][0]).not.toHaveProperty('tags')
     await waitFor(() => expect(api.deleteTorrents).toHaveBeenCalledWith(['abc'], false))
-    await waitFor(() => expect(pageActions.reload).toHaveBeenCalled(), { timeout: 3000 })
+    const reload = await screen.findByRole('button', { name: 'Reload' }, { timeout: 3000 })
+    expect(pageActions.reload).not.toHaveBeenCalled()
+    await userEvent.click(reload)
+    expect(pageActions.reload).toHaveBeenCalled()
   })
 
   it('offers no install without an alternative Web UI', async () => {

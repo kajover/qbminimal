@@ -3,7 +3,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { DEFAULT_LIST_SETTINGS, loadListSettings, saveListSettings, type ListView, type SortDirection, type SortField } from '@/lib/listSettings'
 import { compareTorrents, TORRENT_FILTER_COLUMNS } from '@/lib/torrentColumns'
 import { activeCount, applyColumnFilters, loadColumnFilters, saveColumnFilters, withFilter, type ColumnFilter } from '@/lib/columnFilters'
-import { countFilterOptions, filterTorrents, searchTorrents, withoutSidebarColumns, groupTrackersByHost, hasSidebarFilters, NO_FILTERS, toggleChoice, type FilterList, type TorrentFilters } from '@/lib/torrentFilters'
+import { countFilterOptions, cycleChoice, excludeChoice, filterTorrents, searchTorrents, withoutSidebarColumns, groupTrackersByHost, hasSidebarFilters, NO_FILTERS, type FilterList, type TorrentFilters } from '@/lib/torrentFilters'
 import type { Torrent } from '@/types'
 
 // Matches --breakpoint-md in index.css.
@@ -76,9 +76,14 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
       setFilters(current => ({ ...current, [key]: value }))
       setRequestedPage(1)
     },
-    // Adds a choice in the sidebar, or takes it out again.
+    // Picks a choice in the sidebar, or lets it go again.
     toggleFilter: (key: FilterList, value: string) => {
-      setFilters(current => ({ ...current, [key]: toggleChoice(current[key] as string[], value) }))
+      setFilters(current => cycleChoice(current, key, value))
+      setRequestedPage(1)
+    },
+    // Hides the torrents a choice matches, or stops hiding them.
+    excludeFilter: (key: FilterList, value: string) => {
+      setFilters(current => excludeChoice(current, key, value))
       setRequestedPage(1)
     },
     setColumnFilter: (id: string, filter: ColumnFilter | null) => {
@@ -96,6 +101,17 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
       setFilters(NO_FILTERS)
       setRequestedPage(1)
     },
+    // The sidebar's choices only, keeping the column filters.
+    clearSidebarFilters: () => {
+      setFilters(current => ({ ...NO_FILTERS, columns: current.columns }))
+      setRequestedPage(1)
+    },
+    clearColumnFilters: () => {
+      setFilters(current => ({ ...current, columns: {} }))
+      setRequestedPage(1)
+    },
+    sidebarFiltered: hasSidebarFilters(filters),
+    columnFiltered: activeCount(filters.columns) > 0,
     filtered: hasSidebarFilters(filters) || activeCount(filters.columns) > 0,
     // The quick search and the filters, each marked on its own button.
     searched: !!query.trim(),

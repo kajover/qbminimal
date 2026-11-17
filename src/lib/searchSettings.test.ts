@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_SEARCH_SORT, DEFAULT_SEARCH_WIDTHS, DEFAULT_SEARCH_HIDDEN, MIN_SEARCH_WIDTH, parseSearchHidden, parseSearchSort, parseSearchWidths } from './searchSettings'
+import { DEFAULT_SEARCH_SORT, DEFAULT_SEARCH_HIDDEN, MIN_SEARCH_WIDTH, parseSearchHidden, parseSearchSort, parseSearchWidths } from './searchSettings'
 
 describe('parseSearchSort', () => {
   it('reads a saved sort', () => {
@@ -15,13 +15,14 @@ describe('parseSearchSort', () => {
 })
 
 describe('parseSearchWidths', () => {
-  it('keeps saved widths and fills in the rest', () => {
-    expect(parseSearchWidths(JSON.stringify({ fileSize: 150.4 }))).toEqual({ ...DEFAULT_SEARCH_WIDTHS, fileSize: 150 })
+  it('keeps only the widths set by hand, so the rest fit their content', () => {
+    expect(parseSearchWidths(JSON.stringify({ fileSize: 150.4 }))).toEqual({ fileSize: 150 })
+    expect(parseSearchWidths(JSON.stringify({ fileName: 600 }))).toEqual({ fileName: 600 })
   })
 
   it('drops widths below the minimum and anything unreadable', () => {
-    expect(parseSearchWidths(JSON.stringify({ nbSeeders: MIN_SEARCH_WIDTH - 1, siteUrl: 'wide', fileName: 400 }))).toEqual(DEFAULT_SEARCH_WIDTHS)
-    expect(parseSearchWidths('[1,2]')).toEqual(DEFAULT_SEARCH_WIDTHS)
+    expect(parseSearchWidths(JSON.stringify({ nbSeeders: MIN_SEARCH_WIDTH - 1, siteUrl: 'wide', fileName: MIN_SEARCH_WIDTH - 1 }))).toEqual({})
+    expect(parseSearchWidths('[1,2]')).toEqual({})
   })
 })
 

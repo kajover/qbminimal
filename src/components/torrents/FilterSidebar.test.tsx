@@ -193,4 +193,44 @@ describe('the filter sidebar', () => {
     expect(within(sidebar).getByRole('checkbox', { name: /Errored/ })).toHaveAttribute('aria-checked', 'true')
     expect(within(sidebar).queryByRole('group', { name: 'Column filters' })).toBeNull()
   })
+
+  it('hides what a choice matches with Ctrl and a click, and lets it go with another click', async () => {
+    const sidebar = await openSidebar()
+    const linux = within(sidebar).getByRole('checkbox', { name: /Linux/ })
+    const user = userEvent.setup()
+    await user.keyboard('{Control>}')
+    await user.click(linux)
+    await user.keyboard('{/Control}')
+    expect(shown()).toEqual(['bravo', 'charlie'])
+    expect(linux).toHaveAttribute('aria-checked', 'false')
+    await userEvent.click(linux)
+    expect(shown()).toEqual(['alpha', 'bravo', 'charlie'])
+  })
+
+  it('narrows a section with its own search', async () => {
+    const sidebar = await openSidebar()
+    await userEvent.type(within(sidebar).getByRole('searchbox', { name: 'Search Categories' }), 'vid')
+    expect(within(sidebar).queryByRole('checkbox', { name: /Linux/ })).toBeNull()
+    expect(within(sidebar).getByRole('checkbox', { name: /Video/ })).toBeInTheDocument()
+  })
+
+  it('shows empty statuses only when asked, and folds trackers at first', async () => {
+    const sidebar = await openSidebar()
+    expect(within(sidebar).queryByRole('checkbox', { name: /Errored/ })).toBeNull()
+    await userEvent.click(within(sidebar).getByRole('button', { name: 'Show empty statuses' }))
+    expect(within(sidebar).getByRole('checkbox', { name: /Errored/ })).toBeInTheDocument()
+    expect(within(sidebar).getByRole('button', { name: /Trackers/ })).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('asks before deleting a view, and says when there are none', async () => {
+    localStorage.setItem('qbminimal.filterViews', JSON.stringify([{ name: 'Mine', filters: { categories: ['Linux'] } }]))
+    const sidebar = await openSidebar()
+    await userEvent.click(within(sidebar).getByRole('button', { name: 'More actions for Mine' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Remove this view' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(sidebar).getByText('Mine')).toBeInTheDocument()
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Delete' }))
+    expect(within(sidebar).queryByRole('button', { name: 'Mine' })).toBeNull()
+    expect(within(sidebar).getByText(/No saved views yet/)).toBeInTheDocument()
+  })
 })

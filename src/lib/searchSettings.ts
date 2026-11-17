@@ -9,13 +9,18 @@ export interface SearchSort { key: SearchSortKey; desc: boolean }
 // Most seeds first, as those download best.
 export const DEFAULT_SEARCH_SORT: SearchSort = { key: 'nbSeeders', desc: true }
 
-// The columns after the name, which takes the room left over.
+// The columns that can be hidden: every one but the name.
 export type ResizableSearchColumn = Exclude<SearchSortKey, 'fileName'>
-export const DEFAULT_SEARCH_WIDTHS: Record<ResizableSearchColumn, number> = { fileSize: 110, nbSeeders: 96, nbLeechers: 104, engineName: 130, pubDate: 160 }
+// Columns fit their content and the name takes the room left, until one is resized by hand: only
+// those widths are kept. These stand in until the content is measured.
+export type SearchWidths = Partial<Record<SearchSortKey, number>>
+export const FALLBACK_SEARCH_WIDTHS: Record<SearchSortKey, number> = { fileName: 480, fileSize: 110, nbSeeders: 112, nbLeechers: 112, engineName: 130, pubDate: 160 }
 export const MIN_SEARCH_WIDTH = 72
 
 const SORT_KEY = 'qbminimal.searchSort'
-const WIDTHS_KEY = 'qbminimal.searchColumns'
+// The old key held a width for every column, which would keep them from fitting.
+const WIDTHS_KEY = 'qbminimal.searchWidths'
+const OLD_WIDTHS_KEY = 'qbminimal.searchColumns'
 const HIDDEN_KEY = 'qbminimal.searchHiddenColumns'
 const VIEW_KEY = 'qbminimal.searchView'
 
@@ -35,12 +40,12 @@ export function parseSearchSort(raw: string | null): SearchSort {
     : DEFAULT_SEARCH_SORT
 }
 
-export function parseSearchWidths(raw: string | null): Record<ResizableSearchColumn, number> {
+export function parseSearchWidths(raw: string | null): SearchWidths {
   const saved = readJson(raw)
-  return Object.fromEntries(Object.entries(DEFAULT_SEARCH_WIDTHS).map(([key, width]) => {
+  return Object.fromEntries(SEARCH_SORT_KEYS.flatMap(key => {
     const value = saved[key]
-    return [key, typeof value === 'number' && Number.isFinite(value) && value >= MIN_SEARCH_WIDTH ? Math.round(value) : width]
-  })) as Record<ResizableSearchColumn, number>
+    return typeof value === 'number' && Number.isFinite(value) && value >= MIN_SEARCH_WIDTH ? [[key, Math.round(value)]] : []
+  }))
 }
 
 export const loadSearchSort = () => parseSearchSort(readStored(SORT_KEY))
@@ -49,7 +54,10 @@ export const saveSearchSort = (sort: SearchSort) =>
   writeStored(SORT_KEY, sort.key === DEFAULT_SEARCH_SORT.key && sort.desc === DEFAULT_SEARCH_SORT.desc ? null : JSON.stringify(sort))
 
 export const loadSearchWidths = () => parseSearchWidths(readStored(WIDTHS_KEY))
-export const saveSearchWidths = (widths: Record<ResizableSearchColumn, number>) => writeStored(WIDTHS_KEY, JSON.stringify(widths))
+export const saveSearchWidths = (widths: SearchWidths) => {
+  writeStored(OLD_WIDTHS_KEY, null)
+  writeStored(WIDTHS_KEY, Object.keys(widths).length ? JSON.stringify(widths) : null)
+}
 
 // Every column but the name can be hidden. The date starts hidden, as few plugins send it.
 export const DEFAULT_SEARCH_HIDDEN: ResizableSearchColumn[] = ['pubDate']
