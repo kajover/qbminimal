@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>qBittorrent</title>
+    <!-- Built with a hash in the name, so a new icon shows at once, even though qBittorrent tells
+         browsers to keep images for a week. -->
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon-BsgGjm5W.svg" />
+    <link rel="icon" type="image/png" href="./assets/favicon-DwQx5Llf.png" />
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon-WEi7P1R1.png" />
+    <link rel="manifest" href="manifest.json" />
+    <!-- Added to a phone's home screen, it opens like an app. The status bar is opaque black, with the
+         page below it: since iOS 26 a see-through one (black-translucent) lays the app out a status
+         bar short, leaving a band at the bottom, and blurs the top of the page. iOS reads this only
+         when the app is added to the Home Screen. -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="qBittorrent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <!-- iPhone Safari would otherwise turn numbers such as peer addresses into phone links in its
+         own link color, which can be hard to read on the page. -->
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfdfd" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17181c" />
+    <!-- The title font is needed straight away, so it isn't shown in a stand-in font first. -->
+    <link rel="preload" href="./assets/Silkscreen-Regular-Baa5h4vI.ttf" as="font" type="font/ttf" crossorigin />
+    <script type="module" crossorigin src="./assets/index-Cf6bSkd3.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Os9gboWP.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
