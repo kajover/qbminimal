@@ -1,0 +1,1 @@
+import{ut as e}from"./PageHeader-CGV-o7BJ.js";import{t}from"./index-C6A-5Eza.js";var n=t();function r({className:t,onCheckedChange:r,...i}){return(0,n.jsx)(`input`,{type:`checkbox`,role:`switch`,switch:``,className:e(`switch`,t),onChange:e=>r?.(e.target.checked),...i})}export{r as t};
