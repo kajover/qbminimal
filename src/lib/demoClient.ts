@@ -26,6 +26,14 @@ import type { ShareLimits } from './shareLimits'
 const DEMO_WEB_API: string = import.meta.env.VITE_DEMO_WEB_API || '2.11.2'
 const DEMO_SESSION_KEY = 'qbminimal.demoSession'
 const NOW = Math.floor(Date.now() / 1000)
+
+// Everyday log lines, enough that the Logs page scrolls.
+const DEMO_LOG_LINES = [
+  'UPnP / NAT-PMP support: ON', 'Peer ID: "-qB5230-"', 'Anonymous mode: OFF', 'Encryption support: ON',
+  'Detected external IP. IP: "203.0.113.7"', 'Peer exchange (PeX) support: ON', 'Local Peer Discovery support: ON',
+  'Distributed Hash Table (DHT) support: ON', 'Tracker is not reachable, retrying later', 'Added new torrent.',
+  'Torrent download finished.', 'Successfully moved torrent.', 'Restored torrent.', 'Removed torrent.',
+].flatMap((line, i, list) => [line, list[(i + 5) % list.length], list[(i + 9) % list.length]])
 const GiB = 1024 ** 3
 const MiB = 1024 ** 2
 
@@ -484,12 +492,24 @@ class DemoClient implements ApiClient {
       { id: 0, timestamp: NOW - 26 * 3600, type: 1, message: 'qBittorrent v5.2.3 started' },
       { id: 1, timestamp: NOW - 26 * 3600 + 2, type: 2, message: 'Successfully listening on IP. IP: "0.0.0.0". Port: "TCP/51413"' },
       { id: 2, timestamp: NOW - 600, type: 4, message: 'Tracker is not reachable, retrying later' },
+      ...DEMO_LOG_LINES.map((message, i) => ({ id: 3 + i, timestamp: NOW - 500 + i * 8, type: i % 9 === 4 ? 4 : 2, message })),
     ]
+    // A new entry every 20 seconds, so the log moves as a real one does.
+    const since = Math.floor((Date.now() / 1000 - NOW) / 20)
+    for (let i = 1; i <= since; i++) all.push({ id: 2 + DEMO_LOG_LINES.length + i, timestamp: NOW + i * 20, type: 2, message: DEMO_LOG_LINES[i % DEMO_LOG_LINES.length] })
     const wanted = { 1: levels.normal, 2: levels.info, 4: levels.warning, 8: levels.critical } as Record<number, boolean>
     return all.filter(entry => wanted[entry.type])
   }
 
-  async getPeerLog(): Promise<PeerLogEntry[]> { return this.banned.map((ip, id) => ({ id, timestamp: NOW, ip, blocked: true, reason: 'banned' })) }
+  async getPeerLog(): Promise<PeerLogEntry[]> {
+    // A few addresses the IP filter turned away, then any banned here.
+    const blocked: PeerLogEntry[] = [
+      { id: 0, timestamp: NOW - 420, ip: '198.51.100.23', blocked: true, reason: 'IP filter' },
+      { id: 1, timestamp: NOW - 260, ip: '203.0.113.88', blocked: true, reason: 'IP filter' },
+      { id: 2, timestamp: NOW - 90, ip: '192.0.2.140', blocked: false, reason: 'Too many failed hash checks' },
+    ]
+    return [...blocked, ...this.banned.map((ip, i) => ({ id: blocked.length + i, timestamp: NOW, ip, blocked: false, reason: 'Banned manually' }))]
+  }
 }
 
 export const demoClient = /* @__PURE__ */ new DemoClient()

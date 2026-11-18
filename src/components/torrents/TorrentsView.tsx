@@ -469,7 +469,7 @@ export function TorrentsView() {
         )}
         </div>
         {filtersOpen && wide && (
-          <aside aria-label={t('Filters')} className="sticky top-[calc(var(--header-height,3rem)+1rem)] max-h-[calc(100vh-var(--header-height,3rem)-2rem)] w-72 shrink-0 overflow-y-auto rounded-xl border bg-card p-3">
+          <aside aria-label={t('Filters')} className="sticky top-4 max-h-[calc(100dvh-var(--header-height,3rem)-2rem)] w-72 shrink-0 overflow-y-auto rounded-xl border bg-card p-3">
             {sidebar}
           </aside>
         )}

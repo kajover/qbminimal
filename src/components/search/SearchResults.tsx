@@ -269,7 +269,7 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
         <div
           ref={head}
           onWheel={(e) => { const dx = e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX; if (dx && scroller.current) scroller.current.scrollLeft += dx }}
-          className="sticky top-(--header-height,3.5rem) z-20 overflow-hidden rounded-t-xl border-b bg-card"
+          className="sticky top-(--sticky-top) z-20 overflow-hidden rounded-t-xl border-b bg-card"
         >
           <table className="table-fixed text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
             {colgroup}

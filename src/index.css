@@ -3,6 +3,17 @@
 
 /* The theme switcher puts .dark on <html>. */
 @custom-variant dark (&:is(.dark *));
+/* The page's frame: the header on top, and only the area below it scrolling. On wide screens, and
+   at any width where scrollbars take room (main.tsx marks the page), so the header always spans
+   the window and its scrollbar starts below it. Phones keep scrolling the window (see Layout). */
+@custom-variant frame {
+  @media (min-width: 1200px) {
+    @slot;
+  }
+  &:where(:root[data-scrollbars='room'] *) {
+    @slot;
+  }
+}
 
 /* qbminimal's palette: neutral greys with a warm red for destructive actions. Components read
    these through the --color-* names below. */
@@ -369,9 +380,18 @@
     }
   }
 }
+/* Where bars that stay in view while the page scrolls stick: under the header where the window
+   scrolls, and at the top of the area below the header in the frame, which scrolls on its own. */
+:root {
+  --sticky-top: var(--header-height, 3rem);
+}
+:root[data-scrollbars='room'] {
+  --sticky-top: 0px;
+}
 @media (min-width: 1200px) { /* --breakpoint-md */
   :root {
     --bottom-nav-height: 0px;
+    --sticky-top: 0px;
   }
 }
 /* Phones without the tab bar (Settings > Menu bar off): the selection bar and the table's

@@ -189,7 +189,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
       <div
         ref={head}
         onWheel={(e) => wheelOnHead(e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX)}
-        className="sticky top-(--header-height,3.5rem) z-20 overflow-hidden rounded-t-xl border-b bg-card"
+        className="sticky top-(--sticky-top) z-20 overflow-hidden rounded-t-xl border-b bg-card"
       >
       <table className={cn('table-fixed text-sm tabular-nums', LINKED_SCROLL && 'table-head-linked')} style={tableWidth}>
         {colgroup}

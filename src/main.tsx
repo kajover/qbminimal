@@ -17,6 +17,15 @@ if (magnet) {
 // Safari 17.4 and newer have a native iOS switch; elsewhere index.css draws one.
 if ('switch' in HTMLInputElement.prototype) document.documentElement.classList.add('native-switch')
 
+// Scrollbars that take room (a mouse, or "always show scrollbars"), unlike the overlay ones on
+// phones and trackpads. With them the page scrolls below the header at every width, so the header
+// spans the window (see the frame variant in index.css).
+const probe = document.createElement('div')
+probe.style.cssText = 'position:absolute;top:-200px;width:100px;height:100px;overflow:scroll'
+document.body.append(probe)
+if (probe.offsetWidth > probe.clientWidth) document.documentElement.dataset.scrollbars = 'room'
+probe.remove()
+
 // iPhone and iPad: Safari zooms the page in when a field under 16px gets focus, and the zoom stays
 // afterwards. A maximum scale stops that, so fields keep the app's 14px; iOS still lets people
 // pinch to zoom. Other systems would block pinch zoom with it, so it is set on iOS only.

@@ -15,6 +15,7 @@ import { useDisplayOption } from '@/lib/displayOptions'
 import { checkForUpdatesIfDue } from '@/lib/updateNotice'
 import { readStored, writeStored } from '@/lib/storage'
 import { cn } from '@/lib/utils'
+import { PAGE_SCROLL_ID, pageScroller } from '@/lib/pageScroll'
 import { t } from '@/i18n'
 
 interface LayoutProps {
@@ -87,6 +88,54 @@ function useBarSizes() {
     }
   }, [])
   return { header, nav }
+}
+
+// The frame scrolls the area below the header, which the keys only reach while focus is in it.
+// So with focus on nothing, or on the header or sidebar, the arrows, Page Up and Down, Home, End
+// and Space scroll it all the same. Space on a button still presses it.
+function usePageScrollKeys() {
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return
+      const area = document.getElementById(PAGE_SCROLL_ID)
+      const target = event.target as HTMLElement
+      if (!area || pageScroller() !== area || area.contains(target) || document.querySelector('[role="dialog"], [role="menu"]')) return
+      if (target.closest('input, textarea, select, [contenteditable="true"], [role="tablist"], [role="radiogroup"], [role="slider"], [role="listbox"]')) return
+      const onNothing = target === document.body
+      const page = area.clientHeight * 0.875
+      const by: Record<string, number> = { ArrowDown: 40, ArrowUp: -40, PageDown: page, PageUp: -page }
+      if (onNothing && event.key === ' ') by[' '] = event.shiftKey ? -page : page
+      if (event.key === 'Home' || event.key === 'End') {
+        event.preventDefault()
+        area.scrollTo({ top: event.key === 'Home' ? 0 : area.scrollHeight, behavior: 'smooth' })
+      } else if (event.key in by) {
+        event.preventDefault()
+        area.scrollBy({ top: by[event.key], behavior: event.key.startsWith('Arrow') ? 'instant' : 'smooth' })
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+}
+
+// The width the page's scrollbar takes, as --page-scrollbar, so panels fixed to the window's end
+// stop beside it rather than over it. Overlay scrollbars take none.
+function useScrollbarWidth() {
+  useEffect(() => {
+    const area = document.getElementById(PAGE_SCROLL_ID)
+    if (typeof ResizeObserver === 'undefined' || !area) return
+    const root = document.documentElement.style
+    const observer = new ResizeObserver(() => {
+      const style = getComputedStyle(area)
+      const width = area.offsetWidth - area.clientWidth - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth)
+      root.setProperty('--page-scrollbar', `${pageScroller() === area ? Math.max(0, width) : 0}px`)
+    })
+    observer.observe(area)
+    return () => {
+      observer.disconnect()
+      root.removeProperty('--page-scrollbar')
+    }
+  }, [])
 }
 
 const SIDEBAR_KEY = 'qbminimal.sidebar'
@@ -197,14 +246,18 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
     if (!__DEMO__) checkForUpdatesIfDue()
   }, [])
   const wide = useMediaQuery('(min-width: 1200px)')
+  // The pages' sidebar, open beside the content.
+  const sidebarOpen = menuBar && wide && sidebarShown
   const [statsOpen, setStatsOpen] = useState(false)
   usePageKeys(onNavigate)
+  usePageScrollKeys()
+  useScrollbarWidth()
   // Where each page's title row goes; on phones without the selection bar.
   const [slot, setSlot] = useState<HTMLDivElement | null>(null)
 
   // A newly opened page starts at its top.
   useEffect(() => {
-    window.scrollTo(0, 0)
+    pageScroller().scrollTo(0, 0)
   }, [page])
 
   const notes = usePageNotes()
@@ -223,12 +276,17 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
     // window lets iPhone Safari show the page on behind its address bar; a fixed frame stops at it
     // and leaves a blank strip. Nothing may make the page wider than the screen: iPhone Safari would
     // then widen the whole layout, open it zoomed in, and push the tab bar out of sight.
-    <div style={{ '--sidebar-width': `${sidebarMeasured}px` } as CSSProperties} className="min-h-screen bg-background max-md:overflow-x-clip">
-      <header ref={headerRef} className="glass-bar sticky top-0 z-40 border-b pt-[env(safe-area-inset-top)]">
+    // In the frame (from the md width, or wherever scrollbars take room) the window holds still:
+    // the header spans it on top and only the area below scrolls, so its scrollbar starts under the
+    // header and never changes the header's width.
+    <div style={{ '--sidebar-width': `${sidebarMeasured}px` } as CSSProperties} className="min-h-screen bg-background max-md:overflow-x-clip frame:flex frame:h-dvh frame:min-h-0 frame:flex-col frame:overflow-hidden">
+      <header ref={headerRef} className="glass-bar sticky top-0 z-40 border-b pt-[env(safe-area-inset-top)] frame:shrink-0">
         {/* The same side room as the content below, so the menu button lines up with the list's
             start and the last button with its end: on phones the cards and table reach 0.5rem
-            past the page's 1rem margin. */}
-        <div className="flex h-12 items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(1rem,env(safe-area-inset-right))]">
+            past the page's 1rem margin. In the frame both ends also leave the room the page's
+            scrollbar takes below (none for overlay scrollbars): at its end to line up with the
+            content, and at the start the same again, so both sides are even. */}
+        <div className="flex h-12 items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(1rem,env(safe-area-inset-right))] frame:pl-[calc(max(1rem,env(safe-area-inset-left))+var(--page-scrollbar,0px))] frame:pr-[calc(max(1rem,env(safe-area-inset-right))+var(--page-scrollbar,0px))]">
           <div className="flex shrink-0 items-center gap-2">
             <PagesMenu page={page} onNavigate={onNavigate} />
             {/* Left out for room; screen readers still hear it. */}
@@ -241,12 +299,13 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
         <ConnectionBanner />
       </header>
 
-      <div>
-        <div className="flex">
+      <div className="frame:min-h-0 frame:flex-1">
+        <div className="flex frame:h-full">
           {/* Above the torrent details panel (z-30), so the edge handle is never covered. */}
-          <div ref={sidebarBox} className={cn('sticky top-(--header-height,3rem) z-35 hidden h-[calc(100vh-var(--header-height,3rem))] shrink-0 self-start', menuBar && 'md:flex')}>
+          <div ref={sidebarBox} className={cn('relative z-35 hidden h-full shrink-0', menuBar && 'md:flex')}>
+            {/* The header's room at the start, so the pages line up under the menu button. */}
             {sidebarShown && (
-              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto p-2 pb-4">
+              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto pt-2 pe-2 pb-4 ps-[calc(1rem+var(--page-scrollbar,0px))]">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{MAIN_PAGES.map(navButton)}</nav>
                 <div className="mt-2 flex flex-col gap-1 border-t pt-2">
                   {EXTRA_PAGES.map(navButton)}
@@ -259,8 +318,9 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
               </aside>
             )}
             {/* The sidebar's edge: drag it to resize, or past a point to hide; the button in its middle hides and shows it.
+                With the sidebar hidden it takes no room, so the content starts where the menu button does.
                 Its background is solid in both themes, so the edge line doesn't show through it. */}
-            <div className="group relative w-px bg-border">
+            <div className={cn('group relative w-px bg-border', !sidebarShown && '-me-px')}>
               <div aria-hidden className="absolute inset-y-0 -inset-x-1.5 z-10 cursor-col-resize" onPointerDown={startDrag} onDoubleClick={resetWidth} />
               <Button
                 variant="outline"
@@ -275,7 +335,10 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
               </Button>
             </div>
           </div>
-          <main className="min-w-0 flex-1 pt-4 pb-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] max-md:pb-[calc(var(--bottom-nav-height,5rem)+1rem)]">
+          {/* Room for a scrollbar is kept, so pages that scroll and pages that don't are as wide.
+              Without the sidebar, the start has as much room again, like the header. The
+              scrollbar is on the left right to left. */}
+          <main id={PAGE_SCROLL_ID} className={cn('min-w-0 flex-1 frame:h-full frame:overflow-y-auto frame:[scrollbar-gutter:stable] pt-4 pb-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] max-md:pb-[calc(var(--bottom-nav-height,5rem)+1rem)]', !sidebarOpen && 'frame:ltr:pl-[calc(max(1rem,env(safe-area-inset-left))+var(--page-scrollbar,0px))] frame:rtl:pr-[calc(max(1rem,env(safe-area-inset-right))+var(--page-scrollbar,0px))]')}>
             {/* The torrent list and search results take the whole width; the other pages are easier to read narrower. */}
             <div className={cn(page !== 'torrents' && page !== 'search' && 'mx-auto w-full max-w-4xl')}>
               <HeaderSlot value={slot ? { element: slot, whole: wide } : null}>{children}</HeaderSlot>

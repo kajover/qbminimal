@@ -176,7 +176,7 @@ export function SearchView() {
           {search.results.length === 0 && search.searched && !search.running && <p className="py-8 text-center text-sm text-muted-foreground">{t('Nothing found')}</p>}
         </div>
         {sidebarOpen && wide && (
-          <aside aria-label={t('Search options')} className="sticky top-[calc(var(--header-height,3rem)+1rem)] max-h-[calc(100vh-var(--header-height,3rem)-2rem)] w-72 shrink-0 overflow-y-auto rounded-xl border bg-card p-3">
+          <aside aria-label={t('Search options')} className="sticky top-4 max-h-[calc(100dvh-var(--header-height,3rem)-2rem)] w-72 shrink-0 overflow-y-auto rounded-xl border bg-card p-3">
             {sidebar}
           </aside>
         )}
