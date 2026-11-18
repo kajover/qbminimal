@@ -1,0 +1,1 @@
+import{ut as e}from"./PageHeader-DCRFphIK.js";import{t}from"./index-D0fAfOGD.js";var n=t();function r({className:t,onCheckedChange:r,...i}){return(0,n.jsx)(`input`,{type:`checkbox`,role:`switch`,switch:``,className:e(`switch`,t),onChange:e=>r?.(e.target.checked),...i})}export{r as t};
