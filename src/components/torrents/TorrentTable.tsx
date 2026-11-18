@@ -1,17 +1,18 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent, type PointerEvent, type ReactElement, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react'
 import { textScale } from '@/lib/textSize'
 import { ArrowDown, ArrowUp, RotateCcw } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { columnWidth, DEFAULT_COLUMN_LAYOUT, getColumn, toggleColumn, moveColumn, resizeColumn, shiftColumn, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
+import { columnWidth, DEFAULT_COLUMN_LAYOUT, getColumn, toggleColumn, moveColumn, resizeColumn, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
 import { DOWN_SPEED_COLOR, formatEta, getStateBadge, getStateLabel, ratioColor, UP_SPEED_COLOR, peerPair as pair } from '@/lib/torrentState'
 import type { SortDirection } from '@/lib/listSettings'
 import type { RowProps } from '@/hooks/useRowPress'
 import type { Torrent } from '@/types'
 import { useTransferInfo } from '@/hooks/useApi'
 import { BottomScrollbar } from './BottomScrollbar'
+import { fittedWidth, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
 import { ColumnFilterButton, SidebarFilterButton, type FilterTarget } from '@/components/ColumnFilters'
 import type { ColumnFilter, ColumnFilters } from '@/lib/columnFilters'
 import { t } from '@/i18n'
@@ -115,31 +116,6 @@ interface TorrentTableProps {
   onColumnFilter: (id: ColumnId, filter: ColumnFilter | null) => void
 }
 
-// How wide a column title is in the table's medium-weight header font.
-let measure: CanvasRenderingContext2D | null = null
-function textWidth(text: string, px: number): number {
-  measure ??= document.createElement('canvas').getContext('2d')
-  if (!measure) return text.length * px * 0.6
-  measure.font = `500 ${px}px ${getComputedStyle(document.body).fontFamily}`
-  return measure.measureText(text).width
-}
-
-// The width that shows every given cell's content whole: each is copied, unclipped, into a hidden
-// box beside the table, which keeps the table's fonts.
-function naturalWidth(cells: Element[], host: HTMLElement): number {
-  const probe = document.createElement('div')
-  probe.style.cssText = 'position:absolute;top:0;left:0;visibility:hidden;pointer-events:none;width:max-content;white-space:nowrap'
-  host.appendChild(probe)
-  let widest = 0
-  for (const cell of cells) {
-    probe.className = cell.className
-    probe.innerHTML = cell.innerHTML
-    widest = Math.max(widest, probe.getBoundingClientRect().width)
-  }
-  probe.remove()
-  return Math.ceil(widest)
-}
-
 // A table whose columns can be dragged to a new place, resized from their right edge, sorted by
 // clicking, and shown or hidden from the Columns menu. Alt + arrow keys on a header move it too.
 // Clicking a row selects it and opens its details; Ctrl or Cmd adds to the selection, Shift a range.
@@ -147,11 +123,6 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   const { data: serverState } = useTransferInfo()
   // qBittorrent hides its # column while queueing is off, when every torrent would show *.
   const columns = visibleColumns(layout).filter(def => def.id !== 'priority' || serverState?.queueing !== false)
-  const [resizing, setResizing] = useState<{ id: ColumnId; width: number } | null>(null)
-  // sign is -1 right to left, where a column's resizing edge is on its left.
-  const resizeStart = useRef<{ x: number; width: number; sign: number } | null>(null)
-  const [dragging, setDragging] = useState<ColumnId | null>(null)
-  const [dropTarget, setDropTarget] = useState<ColumnId | null>(null)
   const scroller = useRef<HTMLDivElement>(null)
   const head = useRef<HTMLDivElement>(null)
   const frame = useRef<HTMLDivElement>(null)
@@ -168,68 +139,20 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   // oxlint-disable-next-line react/exhaustive-deps -- the ids stand for the columns
   [columnKey, scale])
   const minWidthOf = (id: ColumnId) => Math.max(getColumn(id).minWidth * scale, titleWidths[id] ?? 0)
-  const widthOf = (id: ColumnId) => (resizing?.id === id ? resizing.width : Math.max(columnWidth(layout, id) * scale, minWidthOf(id)))
-  const total = SELECT_WIDTH * scale + columns.reduce((sum, def) => sum + widthOf(def.id), 0)
-
-  const startResize = (e: PointerEvent<HTMLSpanElement>, id: ColumnId) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.currentTarget.setPointerCapture(e.pointerId)
-    resizeStart.current = { x: e.clientX, width: widthOf(id), sign: getComputedStyle(e.currentTarget).direction === 'rtl' ? -1 : 1 }
-    setResizing({ id, width: widthOf(id) })
-  }
-  const moveResize = (e: PointerEvent<HTMLSpanElement>, id: ColumnId) => {
-    if (!resizeStart.current || resizing?.id !== id) return
-    setResizing({ id, width: Math.max(minWidthOf(id), resizeStart.current.width + (e.clientX - resizeStart.current.x) * resizeStart.current.sign) })
-  }
-  const endResize = () => {
-    if (resizing) onLayoutChange(resizeColumn(layout, resizing.id, resizing.width / scale))
-    resizeStart.current = null
-    setResizing(null)
-  }
-  // Double-clicking the edge fits the column to its widest value on this page, and to its header.
-  const fitWidth = (id: ColumnId) => {
-    const host = frame.current
-    const index = columns.findIndex(def => def.id === id)
-    if (!host || index === -1) return
+  const resize = useColumnResize<ColumnId>({
+    widthOf: id => Math.max(columnWidth(layout, id) * scale, minWidthOf(id)),
+    minWidthOf,
+    onResize: (id, width) => onLayoutChange(resizeColumn(layout, id, width / scale)),
+    // Double-clicking the edge fits the column to its widest value on this page, and to its title.
     // The first cell of each row is the checkbox.
-    const cells = [...host.querySelectorAll('tbody tr')].map(row => row.children[index + 1]).filter(Boolean)
-    const header = host.querySelectorAll('thead th')[index + 1]
-    // Room for the sort arrow, so sorting by the column later doesn't cut its header.
-    const headerWidth = header ? naturalWidth([header], host) + 18 : 0
-    onLayoutChange(resizeColumn(layout, id, (Math.max(naturalWidth(cells, host), headerWidth) + 1) / scale))
-  }
-
-  const onDragStart = (e: DragEvent<HTMLTableCellElement>, id: ColumnId) => {
-    if (resizeStart.current) {
-      e.preventDefault()
-      return
-    }
-    e.dataTransfer.effectAllowed = 'move'
-    e.dataTransfer.setData('text/plain', id)
-    setDragging(id)
-  }
-  const onDragOver = (e: DragEvent<HTMLTableCellElement>, id: ColumnId) => {
-    if (!dragging) return
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-    if (dropTarget !== id) setDropTarget(id)
-  }
-  const onDrop = (e: DragEvent<HTMLTableCellElement>, id: ColumnId) => {
-    e.preventDefault()
-    if (dragging) onLayoutChange(moveColumn(layout, dragging, id))
-    setDragging(null)
-    setDropTarget(null)
-  }
-  const onHeaderKey = (e: KeyboardEvent<HTMLButtonElement>, id: ColumnId) => {
-    if (!e.altKey || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return
-    e.preventDefault()
-    // The arrow points where the column goes on screen, which is backwards right to left.
-    const towardsStart = (e.key === 'ArrowLeft') !== (getComputedStyle(e.currentTarget).direction === 'rtl')
-    onLayoutChange(shiftColumn(layout, id, towardsStart ? -1 : 1))
-  }
-
-  const dragIndex = dragging ? columns.findIndex(def => def.id === dragging) : -1
+    onFit: id => {
+      const width = fittedWidth(frame.current, columns.findIndex(def => def.id === id) + 1)
+      if (width) onLayoutChange(resizeColumn(layout, id, width / scale))
+    },
+  })
+  const widthOf = resize.width
+  const drag = useColumnDrag<ColumnId>({ keys: columns.map(def => def.id), onMove: (id, target) => onLayoutChange(moveColumn(layout, id, target)), busy: resize.busy })
+  const total = SELECT_WIDTH * scale + columns.reduce((sum, def) => sum + widthOf(def.id), 0)
 
   // The titles are a table of their own, kept in view below the header while the rows scroll
   // under them (a sticky row can't be inside the rows' sideways scroller), and scrolled sideways
@@ -277,35 +200,27 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
             <th className={cn('sticky start-0 z-10 h-10 bg-card px-2 text-start', LINKED_SCROLL && 'table-head-pinned')}>
               <Checkbox aria-label={t('Select all')} checked={selectAllState} onCheckedChange={(checked) => onSelectAll(checked === true)} />
             </th>
-            {columns.map((def, index) => {
+            {columns.map(def => {
               const sorted = sortField === def.id
-              // The drop marker shows on the side the column will land.
-              const marker = dropTarget === def.id && dragging && dragging !== def.id ? (index < dragIndex ? 'before' : 'after') : null
+              const { className: dragClass, ...dragProps } = drag.titleProps(def.id)
               const target = filterTargets.get(def.id)
               const filterButton = target ? <ColumnFilterButton target={target} filter={columnFilters[def.id]} onChange={(filter) => onColumnFilter(def.id, filter)} />
                 : sidebarFilter?.has(def.id) && <SidebarFilterButton label={t('Filter {label}', { label: def.label })} active={sidebarFilter.active(def.id)}>{sidebarFilter.choices(def.id)}</SidebarFilterButton>
               return (
                 <th
                   key={def.id}
-                  draggable
-                  onDragStart={(e) => onDragStart(e, def.id)}
-                  onDragOver={(e) => onDragOver(e, def.id)}
-                  onDragLeave={() => setDropTarget(target => (target === def.id ? null : target))}
-                  onDrop={(e) => onDrop(e, def.id)}
-                  onDragEnd={() => { setDragging(null); setDropTarget(null) }}
+                  {...dragProps}
                   aria-sort={sorted ? (sortDirection === 'asc' ? 'ascending' : 'descending') : undefined}
                   className={cn(
                     'group/th relative h-10 select-none px-2 text-start align-middle font-medium text-muted-foreground',
-                    dragging === def.id && 'opacity-50',
-                    marker === 'before' && 'shadow-[inset_2px_0_0_var(--color-primary)]',
-                    marker === 'after' && 'shadow-[inset_-2px_0_0_var(--color-primary)]',
+                    dragClass,
                   )}
                 >
                   <div className="flex min-w-0 items-center gap-0.5">
                     <button
                       type="button"
                       onClick={() => onSort(def.id)}
-                      onKeyDown={(e) => onHeaderKey(e, def.id)}
+                      onKeyDown={(e) => drag.onTitleKey(e, def.id)}
                       title={t('Sort by {label}. Drag to move, or press Alt and an arrow key.', { label: def.label })}
                       aria-label={def.header ? def.label : undefined}
                       className={cn('flex min-w-0 flex-1 cursor-grab items-center gap-1 hover:text-foreground active:cursor-grabbing', sorted && 'text-foreground')}
@@ -315,20 +230,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
                     </button>
                     {filterButton}
                   </div>
-                  <span
-                    role="separator"
-                    aria-orientation="vertical"
-                    aria-label={t('Resize {label}', { label: def.label })}
-                    title={t('Drag to resize. Double-click to fit the content.')}
-                    onPointerDown={(e) => startResize(e, def.id)}
-                    onPointerMove={(e) => moveResize(e, def.id)}
-                    onPointerUp={endResize}
-                    onPointerCancel={endResize}
-                    onDoubleClick={() => fitWidth(def.id)}
-                    className="group absolute end-0 top-0 flex h-full w-2 cursor-col-resize touch-none justify-end"
-                  >
-                    <span className={cn('h-full w-px', resizing?.id === def.id ? 'bg-primary' : 'bg-border group-hover:bg-primary/60')} />
-                  </span>
+                  {resize.handle(def.id, def.label)}
                 </th>
               )
             })}

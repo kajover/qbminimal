@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Lists text passed to t('...') that a translation doesn't cover yet, and translations no longer
 // used. Run with: npm run i18n:check
+// With --allow-missing, untranslated texts are listed but don't fail it, for work between releases.
 import fs from 'node:fs'
 import path from 'node:path'
 import { parseSync } from 'oxc-parser'
@@ -35,6 +36,7 @@ function walk(dir) {
 walk(root)
 
 let problems = 0
+const allowMissing = process.argv.includes('--allow-missing')
 const localesDir = path.join(root, 'i18n', 'locales')
 for (const file of fs.readdirSync(localesDir).filter(name => name.endsWith('.json')).sort()) {
   let catalog
@@ -52,7 +54,7 @@ for (const file of fs.readdirSync(localesDir).filter(name => name.endsWith('.jso
   console.log(`${file}: ${Object.keys(catalog).length} translations, ${missing.length} missing`)
   for (const key of missing) console.log(`  missing: ${key}`)
   for (const [key] of broken) console.log(`  placeholders differ: ${key}`)
-  problems += missing.length + broken.length
+  problems += (allowMissing ? 0 : missing.length) + broken.length
 }
 // Text shown through a variable, like column names, isn't found here and is listed in the catalogs by hand.
 process.exitCode = problems ? 1 : 0

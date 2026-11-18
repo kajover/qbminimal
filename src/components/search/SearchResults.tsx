@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowDown, ArrowUp, ArrowUpDown, Columns3, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, LayoutList, Table2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ColumnFilterButton, type FilterTarget } from '@/components/ColumnFilters'
+import { fittedWidth, moveInOrder, useColumnDrag, useColumnResize } from '@/components/TableColumns'
 import { searchFilterTargets } from '@/lib/searchFilters'
-import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loadSearchHidden, loadSearchView, saveSearchView, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey, type SearchWidths } from '@/lib/searchSettings'
+import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loadSearchHidden, loadSearchOrder, loadSearchView, saveSearchOrder, SEARCH_SORT_KEYS, saveSearchView, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey, type SearchWidths } from '@/lib/searchSettings'
 import { applyColumnFilters, type ColumnFilter, type ColumnFilters } from '@/lib/columnFilters'
 import { published, SEARCH_FILTER_COLUMNS } from '@/lib/searchFilters'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
@@ -66,21 +67,6 @@ function fittedWidths(results: SearchResult[]): SearchWidths {
   return widths
 }
 
-// The width that shows every given cell's content whole: each is copied, unclipped, into a hidden
-// box beside the table, which keeps the table's fonts.
-function naturalWidth(cells: Element[], host: HTMLElement): number {
-  const probe = document.createElement('div')
-  probe.style.cssText = 'position:absolute;top:0;left:0;visibility:hidden;pointer-events:none;width:max-content;white-space:nowrap'
-  host.appendChild(probe)
-  let widest = 0
-  for (const cell of cells) {
-    probe.className = cell.className
-    probe.innerHTML = cell.innerHTML
-    widest = Math.max(widest, probe.getBoundingClientRect().width)
-  }
-  probe.remove()
-  return Math.ceil(widest)
-}
 
 // Found torrents, sortable, 20 a page: a table on wide screens and a list on phones.
 
@@ -100,7 +86,10 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
   const [hidden, setHiddenState] = useState(loadSearchHidden)
   const setHidden = (next: ResizableKey[]) => { setHiddenState(next); saveSearchHidden(next) }
   const toggleColumn = (key: ResizableKey) => setHidden(hidden.includes(key) ? hidden.filter(k => k !== key) : [...hidden, key])
-  const visible = COLUMNS.filter(c => c.key === 'fileName' || !hidden.includes(c.key))
+  // Columns in the order they were dragged to.
+  const [order, setOrderState] = useState(loadSearchOrder)
+  const setOrder = (next: SortKey[]) => { setOrderState(next); saveSearchOrder(next) }
+  const visible = order.map(key => COLUMNS.find(c => c.key === key)!).filter(c => c.key === 'fileName' || !hidden.includes(c.key))
   const shows = (key: ResizableKey) => !hidden.includes(key)
 
   // Like the torrent list: the table on wide screens and cards on phones, unless one is picked.
@@ -120,9 +109,6 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
   // the rest; once the name is resized, a filler column takes any room left over.
   const fitted = useMemo(() => fittedWidths(results), [results])
   const [tableWidth, setTableWidth] = useState(0)
-  const [resizing, setResizing] = useState<{ key: SortKey; width: number } | null>(null)
-  // sign is -1 right to left, where a column's resizing edge is on its left.
-  const resizeStart = useRef<{ x: number; width: number; sign: number } | null>(null)
   const frame = useRef<HTMLDivElement>(null)
   const head = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
@@ -135,43 +121,28 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
     observer.observe(box)
     return () => observer.disconnect()
   }, [hasResults])
-  const columnWidth = (key: SortKey) => (resizing?.key === key ? resizing.width : widths[key] ?? fitted[key] ?? FALLBACK_SEARCH_WIDTHS[key])
-  const others = visible.reduce((sum, c) => sum + (c.key === 'fileName' ? 0 : columnWidth(c.key)), 0)
-  const widthOf = (key: SortKey) => (key === 'fileName' && resizing?.key !== key && widths.fileName === undefined && tableWidth > 0
-    ? Math.max(MIN_NAME_WIDTH, tableWidth - others - ACTIONS_WIDTH)
-    : columnWidth(key))
-  const total = ACTIONS_WIDTH + visible.reduce((sum, c) => sum + widthOf(c.key), 0)
-  const startResize = (e: PointerEvent<HTMLSpanElement>, key: SortKey) => {
-    e.preventDefault()
-    e.currentTarget.setPointerCapture(e.pointerId)
-    resizeStart.current = { x: e.clientX, width: widthOf(key), sign: getComputedStyle(e.currentTarget).direction === 'rtl' ? -1 : 1 }
-    setResizing({ key, width: widthOf(key) })
-  }
-  const moveResize = (e: PointerEvent<HTMLSpanElement>, key: SortKey) => {
-    if (!resizeStart.current || resizing?.key !== key) return
-    setResizing({ key, width: Math.max(MIN_SEARCH_WIDTH, Math.round(resizeStart.current.width + (e.clientX - resizeStart.current.x) * resizeStart.current.sign)) })
-  }
   const saveWidth = (key: SortKey, width: number) => setWidths(current => {
     const next = { ...current, [key]: Math.max(MIN_SEARCH_WIDTH, Math.round(width)) }
     saveSearchWidths(next)
     return next
   })
-  const endResize = () => {
-    if (resizing) saveWidth(resizing.key, resizing.width)
-    resizeStart.current = null
-    setResizing(null)
-  }
-  // Double-clicking the edge fits the column to its widest value on this page, and to its header.
-  const fitWidth = (key: SortKey) => {
-    const host = frame.current
-    const index = visible.findIndex(c => c.key === key)
-    if (!host || index === -1) return
-    const cells = [...host.querySelectorAll('tbody tr')].map(row => row.children[index]).filter(Boolean)
-    const header = host.querySelectorAll('thead th')[index]
-    // Room for the sort arrow and the filter button, so the header isn't cut later.
-    const headerWidth = header ? naturalWidth([header], host) + 18 : 0
-    saveWidth(key, Math.max(naturalWidth(cells, host), headerWidth) + 1)
-  }
+  const resize = useColumnResize<SortKey>({
+    widthOf: (key): number => (key === 'fileName' && widths.fileName === undefined && tableWidth > 0
+      ? Math.max(MIN_NAME_WIDTH, tableWidth - others() - ACTIONS_WIDTH)
+      : widths[key] ?? fitted[key] ?? FALLBACK_SEARCH_WIDTHS[key]),
+    minWidthOf: () => MIN_SEARCH_WIDTH,
+    onResize: saveWidth,
+    // Double-clicking the edge fits the column to its widest value on this page, and to its title.
+    onFit: key => {
+      const width = fittedWidth(frame.current, visible.findIndex(c => c.key === key))
+      if (width) saveWidth(key, width)
+    },
+  })
+  const widthOf: (key: SortKey) => number = resize.width
+  // The other columns' widths, which the name's share of the table leaves room for.
+  const others = (): number => visible.reduce((sum, c) => sum + (c.key === 'fileName' ? 0 : widthOf(c.key)), 0)
+  const total = ACTIONS_WIDTH + visible.reduce((sum, c) => sum + widthOf(c.key), 0)
+  const drag = useColumnDrag<SortKey>({ keys: visible.map(c => c.key), onMove: (key, target) => setOrder(moveInOrder(order, key, target)), busy: resize.busy })
   // The titles sit in a table of their own, so they stay in view below the header while the rows
   // scroll sideways along with them.
   const syncScroll = () => { if (head.current && scroller.current) head.current.scrollLeft = scroller.current.scrollLeft }
@@ -245,7 +216,7 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
               </DropdownMenuCheckboxItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => { setHidden(DEFAULT_SEARCH_HIDDEN); setWidths({}); saveSearchWidths({}) }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => { setHidden(DEFAULT_SEARCH_HIDDEN); setWidths({}); saveSearchWidths({}); setOrder([...SEARCH_SORT_KEYS]) }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         )}
@@ -304,31 +275,25 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
             {colgroup}
             <thead>
               <tr>
-                {visible.map(c => (
-                  <th key={c.key} className="group/th relative h-10 select-none px-2 text-start align-middle font-medium text-muted-foreground" aria-sort={sort.key === c.key ? (sort.desc ? 'descending' : 'ascending') : undefined}>
-                    <div className="flex min-w-0 items-center gap-0.5">
-                      <button type="button" onClick={() => sortBy(c.key)} className={cn('flex min-w-0 flex-1 items-center gap-1 hover:text-foreground', sort.key === c.key && 'text-foreground')}>
-                        <span className="truncate">{c.label}</span>
-                        {sort.key === c.key && (sort.desc ? <ArrowDown className="size-3.5 shrink-0" /> : <ArrowUp className="size-3.5 shrink-0" />)}
-                      </button>
-                      <ColumnFilterButton target={targets.get(c.key)!} filter={filters[c.key]} onChange={(filter) => setFilter(c.key, filter)} />
-                    </div>
-                    <span
-                      role="separator"
-                      aria-orientation="vertical"
-                      aria-label={t('Resize {label}', { label: c.label })}
-                      title={t('Drag to resize. Double-click to fit the content.')}
-                      onPointerDown={(e) => startResize(e, c.key)}
-                      onPointerMove={(e) => moveResize(e, c.key)}
-                      onPointerUp={endResize}
-                      onPointerCancel={endResize}
-                      onDoubleClick={() => fitWidth(c.key)}
-                      className="group absolute end-0 top-0 flex h-full w-2 cursor-col-resize touch-none justify-end"
-                    >
-                      <span className={cn('h-full w-px', resizing?.key === c.key ? 'bg-primary' : 'bg-border group-hover:bg-primary/60')} />
-                    </span>
-                  </th>
-                ))}
+                {visible.map(c => {
+                  const { className: dragClass, ...dragProps } = drag.titleProps(c.key)
+                  return (
+                    <th key={c.key} {...dragProps} className={cn('group/th relative h-10 select-none px-2 text-start align-middle font-medium text-muted-foreground', dragClass)} aria-sort={sort.key === c.key ? (sort.desc ? 'descending' : 'ascending') : undefined}>
+                      <div className="flex min-w-0 items-center gap-0.5">
+                        <button
+                          type="button" onClick={() => sortBy(c.key)} onKeyDown={(e) => drag.onTitleKey(e, c.key)}
+                          title={t('Sort by {label}. Drag to move, or press Alt and an arrow key.', { label: c.label })}
+                          className={cn('flex min-w-0 flex-1 cursor-grab items-center gap-1 hover:text-foreground active:cursor-grabbing', sort.key === c.key && 'text-foreground')}
+                        >
+                          <span className="truncate">{c.label}</span>
+                          {sort.key === c.key && (sort.desc ? <ArrowDown className="size-3.5 shrink-0" /> : <ArrowUp className="size-3.5 shrink-0" />)}
+                        </button>
+                        <ColumnFilterButton target={targets.get(c.key)!} filter={filters[c.key]} onChange={(filter) => setFilter(c.key, filter)} />
+                      </div>
+                      {resize.handle(c.key, c.label)}
+                    </th>
+                  )
+                })}
                 <th><span className="sr-only">{t('Actions')}</span></th>
                 <th aria-hidden />
               </tr>

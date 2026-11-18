@@ -21,6 +21,21 @@ export const MIN_SEARCH_WIDTH = 72
 const WIDTHS_KEY = 'qbminimal.searchWidths'
 const OLD_WIDTHS_KEY = 'qbminimal.searchColumns'
 const HIDDEN_KEY = 'qbminimal.searchHiddenColumns'
+const ORDER_KEY = 'qbminimal.searchColumnOrder'
+
+// The columns' order, as dragged. Anything unreadable, or missing a column, goes back to the default.
+export function parseSearchOrder(raw: string | null): SearchSortKey[] {
+  try {
+    const parsed: unknown = raw ? JSON.parse(raw) : null
+    if (Array.isArray(parsed) && parsed.length === SEARCH_SORT_KEYS.length && SEARCH_SORT_KEYS.every(key => parsed.includes(key))) return parsed as SearchSortKey[]
+  } catch {
+    // The default below.
+  }
+  return [...SEARCH_SORT_KEYS]
+}
+export const loadSearchOrder = () => parseSearchOrder(readStored(ORDER_KEY))
+export const saveSearchOrder = (order: SearchSortKey[]) =>
+  writeStored(ORDER_KEY, order.every((key, i) => key === SEARCH_SORT_KEYS[i]) ? null : JSON.stringify(order))
 const VIEW_KEY = 'qbminimal.searchView'
 
 const readJson = (raw: string | null): Record<string, unknown> => {

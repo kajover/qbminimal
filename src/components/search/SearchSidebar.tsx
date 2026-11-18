@@ -7,13 +7,13 @@ import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ConfirmAction } from '@/components/ConfirmAction'
 import { AddFilterButton, ColumnFilterChips, type FilterTarget } from '@/components/ColumnFilters'
-import { FilterItem, Section } from '@/components/torrents/TorrentFilterPanel'
+import { FilterItem, NothingMatches, Section } from '@/components/FilterSidebarParts'
+import { useSidebarSections } from '@/hooks/useSidebarSections'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import { activeCount, type ColumnFilter, type ColumnFilters } from '@/lib/columnFilters'
 import { forgetSearches, keepSearchesOn, parseSearchesShown, readSavedSearches, searchesShown, setKeepSearches, setSearchesShown, type SavedSearch } from '@/lib/searchPatterns'
-import { readStored, writeStored } from '@/lib/storage'
-import { searchMatcher, toggleChoice } from '@/lib/torrentFilters'
+import { toggleChoice } from '@/lib/torrentFilters'
 import { t } from '@/i18n'
 
 // qBittorrent's own search categories.
@@ -24,14 +24,6 @@ const SEARCH_CATEGORIES: [value: string, label: string, icon: LucideIcon][] = [
 
 // Sections folded away stay folded on this device.
 const FOLDED_KEY = 'qbminimal.searchSidebarFolded'
-const loadFolded = (): string[] => {
-  try {
-    const parsed: unknown = JSON.parse(readStored(FOLDED_KEY) ?? '[]')
-    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : []
-  } catch {
-    return []
-  }
-}
 
 interface SearchSidebarProps {
   // The search shown, and whether it's still running.
@@ -66,20 +58,8 @@ export function SearchSidebar(props: SearchSidebarProps) {
   // The latest searches listed at first, and how many more "Show more" has revealed.
   const [perPage, setPerPage] = useState(searchesShown)
   const [extra, setExtra] = useState(0)
-  const [folded, setFolded] = useState(loadFolded)
-  // What each section's own search field holds, by section.
-  const [texts, setTexts] = useState<Record<string, string>>({})
-  const fold = (id: string) => setFolded(current => {
-    const next = toggleChoice(current, id)
-    writeStored(FOLDED_KEY, next.length ? JSON.stringify(next) : null)
-    return next
-  })
-  const searchProps = (id: string) => ({ search: texts[id] ?? '', onSearch: (text: string) => setTexts(current => ({ ...current, [id]: text })) })
-  const matching = <T,>(id: string, items: T[], label: (item: T) => string) => {
-    const matches = searchMatcher(texts[id] ?? '')
-    return matches ? items.filter(item => matches(label(item))) : items
-  }
-  const nothing = <li className="px-2 py-1 text-sm text-muted-foreground">{t('Nothing matches')}</li>
+  const { folded, fold, searchProps, matching } = useSidebarSections(FOLDED_KEY)
+  const nothing = <NothingMatches />
 
   const saved = readSavedSearches()
   const name = (id: number) => saved[id]?.pattern ?? t('Search {id}', { id })

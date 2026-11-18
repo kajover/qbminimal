@@ -3,9 +3,10 @@ import type { ColumnFilters } from './columnFilters'
 import { t } from '@/i18n'
 
 export type StatusFilter = 'downloading' | 'seeding' | 'completed' | 'running' | 'stopped' | 'active' | 'inactive' | 'stalled' |
-  'stalledUploading' | 'stalledDownloading' | 'checking' | 'moving' | 'errored' | 'trackerError' | 'trackerDown' | 'trackerWarning'
+  'stalledUploading' | 'stalledDownloading' | 'checking' | 'moving' | 'errored' | 'trackerError' | 'unregistered' | 'trackerDown' | 'trackerWarning'
 
-// qBittorrent's own statuses, then the tracker problems it reports from version 5.1 on.
+// qBittorrent's own statuses, then the tracker problems it reports from version 5.1 on, with what
+// the trackers' messages say about them (see lib/trackerIssues).
 export const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: 'downloading', label: t('Downloading') },
   { value: 'seeding', label: t('Seeding') },
@@ -21,6 +22,7 @@ export const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: 'moving', label: t('Moving') },
   { value: 'errored', label: t('Errored') },
   { value: 'trackerError', label: t('Tracker error') },
+  { value: 'unregistered', label: t('Unregistered') },
   { value: 'trackerDown', label: t('Tracker down') },
   { value: 'trackerWarning', label: t('Tracker warning') },
 ]
@@ -164,8 +166,10 @@ function matchesStatus(torrent: Torrent, status: StatusFilter): boolean {
     case 'trackerError':
       return !!torrent.has_tracker_error
     // Problems reaching the tracker at all, like a timeout.
+    case 'unregistered':
+      return torrent.tracker_issue === 'unregistered'
     case 'trackerDown':
-      return !!torrent.has_other_announce_error
+      return !!torrent.has_other_announce_error || torrent.tracker_issue === 'down'
     case 'trackerWarning':
       return !!torrent.has_tracker_warning
   }

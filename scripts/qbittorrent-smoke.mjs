@@ -3,6 +3,11 @@
 // alternative Web UI, and that the Web API calls the app depends on answer with the fields it reads.
 // Usage: node scripts/qbittorrent-smoke.mjs http://127.0.0.1:8080 [username] [password]
 // Without a username, qBittorrent must let local requests in without signing in.
+// With QBT_DOWNLOADS (a folder as qBittorrent sees it) and QBT_DOWNLOADS_HOST (the same folder
+// here), it also installs the latest release the way the app's update does, and removes it again
+// the way the update removes the previous version, checking the folder goes too.
+import fs from 'node:fs'
+import path from 'node:path'
 
 const [base = 'http://127.0.0.1:8080', username, password] = process.argv.slice(2)
 const api = `${base}/api/v2`
@@ -70,6 +75,12 @@ for (let attempt = 0; attempt < 10; attempt++) {
 }
 const torrent = main.body?.torrents?.[hash]
 check(!!torrent, 'sync/maindata lists the added torrent')
+// qBittorrent 5.1 and newer say which torrents have tracker problems, for the sidebar's statuses.
+const [major, minor] = String(version.body).replace(/^v/, '').split('.').map(Number)
+if (major > 5 || (major === 5 && minor >= 1)) {
+  const missingTracker = hasKeys(torrent, ['has_tracker_error', 'has_tracker_warning', 'has_other_announce_error'])
+  check(missingTracker.length === 0, `tracker problem fields${missingTracker.length ? `: missing ${missingTracker.join(', ')}` : ''}`)
+}
 const torrentFields = ['name', 'state', 'progress', 'size', 'dlspeed', 'upspeed', 'eta', 'ratio', 'priority', 'num_seeds', 'num_complete', 'num_leechs', 'num_incomplete', 'added_on', 'category', 'tags', 'save_path', 'dl_limit', 'up_limit']
 const missingTorrent = hasKeys(torrent, torrentFields)
 check(missingTorrent.length === 0, `torrent fields${missingTorrent.length ? `: missing ${missingTorrent.join(', ')}` : ''}`)
@@ -95,6 +106,63 @@ await request('torrents/delete', { method: 'POST', form: { hashes: hash, deleteF
 await sleep(500)
 const after = await request('torrents/info')
 check(Array.isArray(after.body) && !after.body.some(item => item.hash === hash), 'torrents/delete removes it')
+
+// --- The Logs page and its export ---
+const log = await request('log/main?normal=true&info=true&warning=true&critical=true&last_known_id=-1')
+check(log.status === 200 && Array.isArray(log.body) && log.body.length > 0 && hasKeys(log.body[0], ['id', 'message', 'timestamp', 'type']).length === 0, 'log/main lists entries with id, message, timestamp and type')
+const peerLog = await request('log/peers?last_known_id=-1')
+check(peerLog.status === 200 && Array.isArray(peerLog.body), 'log/peers answers with a list')
+
+// --- The Search page ---
+const plugins = await request('search/plugins')
+check(plugins.status === 200 && Array.isArray(plugins.body), 'search/plugins answers with a list')
+const searches = await request('search/status')
+check(searches.status === 200 && Array.isArray(searches.body), 'search/status answers with a list')
+
+// --- Installing an update, and removing the previous version with its folder ---
+const downloads = process.env.QBT_DOWNLOADS
+const downloadsHere = process.env.QBT_DOWNLOADS_HOST
+if (downloads && downloadsHere) {
+  // The latest release's tag, from where GitHub's "latest" link leads.
+  const latest = await fetch('https://github.com/kajover/qbminimal/releases/latest', { redirect: 'manual' })
+  const releaseVersion = (latest.headers.get('location') ?? '').match(/\/tag\/v([\d.]+)$/)?.[1]
+  check(!!releaseVersion, `finds the latest release (${releaseVersion})`)
+  if (releaseVersion) {
+    const name = `qbminimal-${releaseVersion}`
+    const urls = `https://github.com/kajover/qbminimal/releases/download/v${releaseVersion}/qbminimal-update.torrent`
+    const findUpdate = async () => (await request('torrents/info')).body?.find?.(item => item.name === name && item.save_path.replace(/\/+$/, '') === downloads.replace(/\/+$/, ''))
+    // As the update adds it: into a folder of its own, beside the current one.
+    await request('torrents/add', { method: 'POST', form: { urls, savepath: downloads, autoTMM: 'false', contentLayout: 'Original' } })
+    let update
+    for (let attempt = 0; attempt < 120; attempt++) {
+      update = await findUpdate()
+      if (update?.progress === 1) break
+      await sleep(1000)
+    }
+    check(update?.progress === 1, `qBittorrent downloads ${name} from GitHub (${Math.round((update?.progress ?? 0) * 100)}%)`)
+    const folder = path.join(downloadsHere, name)
+    check(fs.existsSync(path.join(folder, 'LICENSE')), `the files are in ${name}`)
+    if (update) await request('torrents/delete', { method: 'POST', form: { hashes: update.hash, deleteFiles: 'false' } })
+    await sleep(1000)
+    check(fs.existsSync(path.join(folder, 'LICENSE')), 'removing the torrent keeps the files')
+
+    // As the next update removes it: added again over its folder, unchecked, and deleted with its files.
+    await request('torrents/add', { method: 'POST', form: { urls, savepath: downloads, autoTMM: 'false', contentLayout: 'Original', paused: 'true', stopped: 'true', skip_checking: 'true' } })
+    let again
+    for (let attempt = 0; attempt < 30 && !again; attempt++) {
+      again = await findUpdate()
+      if (!again) await sleep(1000)
+    }
+    check(!!again, 'the release is added again over its folder')
+    if (again) await request('torrents/delete', { method: 'POST', form: { hashes: again.hash, deleteFiles: 'true' } })
+    let gone = false
+    for (let attempt = 0; attempt < 20 && !gone; attempt++) {
+      gone = !fs.existsSync(folder)
+      if (!gone) await sleep(500)
+    }
+    check(gone, `deleting it with its files removes the ${name} folder`)
+  }
+}
 
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed')
 process.exit(failures ? 1 : 0)

@@ -39,7 +39,7 @@ jobs:
       - name: Start qBittorrent with qbminimal
         run: |
           profile="$RUNNER_TEMP/qbt"
-          mkdir -p "$profile/qBittorrent/config"
+          mkdir -p "$profile/qBittorrent/config" "$profile/downloads"
           # Local requests need no sign-in, and the Web UI is qbminimal from release/public.
           cat > "$profile/qBittorrent/config/qBittorrent.conf" <<'CONF'
           [LegalNotice]
@@ -60,6 +60,10 @@ jobs:
             sleep 2
           done
       - name: Check qbminimal against qBittorrent
+        # The update test downloads into the profile's downloads folder, seen here as well.
+        env:
+          QBT_DOWNLOADS: /config/downloads
+          QBT_DOWNLOADS_HOST: ${{ runner.temp }}/qbt/downloads
         run: |
           # If the container still asks for a password, it prints a temporary one for admin.
           password="$(docker logs qbt 2>&1 | sed -n 's/.*temporary password is provided for this session: //p' | tail -1)"

@@ -29,6 +29,8 @@ export interface Torrent {
   has_tracker_error?: boolean
   has_tracker_warning?: boolean
   has_other_announce_error?: boolean
+  // Set by qbminimal from the trackers' messages, for torrents with a tracker problem.
+  tracker_issue?: 'unregistered' | 'down'
   progress: number
   size: number
   total_size: number

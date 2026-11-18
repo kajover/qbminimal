@@ -26,7 +26,9 @@ import { BulkPromptDialog } from './BulkPromptDialog'
 import { ActionBarDialog } from './ActionBarDialog'
 import { DeleteTorrentsDialog } from './DeleteTorrentsDialog'
 import { TorrentCards } from './TorrentCards'
-import { FilterChoices, FilterSheet, FilterSidebar } from './TorrentFilterPanel'
+import { FilterChoices, FilterSidebar } from './TorrentFilterPanel'
+import { FilterSheet } from '@/components/FilterSidebarParts'
+import { useMarkedTorrents } from '@/hooks/useTrackerIssues'
 import { MoreMenu, TorrentContextMenu } from './TorrentMenus'
 import { ShortcutsDialog } from './ShortcutsDialog'
 import { TorrentTable } from './TorrentTable'
@@ -51,7 +53,9 @@ export function TorrentsView() {
   const { data: trackerMap } = useTrackerMap()
   const { data: categories } = useCategories()
   const { data: tags } = useTags()
-  const list = useTorrentList(torrents, trackerMap)
+  // Marked with what their trackers say, for the Unregistered and Tracker down statuses.
+  const marked = useMarkedTorrents(torrents)
+  const list = useTorrentList(marked, trackerMap)
   const pause = usePauseTorrents()
   const resume = useResumeTorrents()
   const warnIfPaused = useSessionPausedWarning()

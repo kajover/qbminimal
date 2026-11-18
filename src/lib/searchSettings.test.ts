@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_SEARCH_HIDDEN, MIN_SEARCH_WIDTH, parseSearchHidden, parseSearchWidths } from './searchSettings'
+import { DEFAULT_SEARCH_HIDDEN, MIN_SEARCH_WIDTH, parseSearchHidden, parseSearchOrder, parseSearchWidths } from './searchSettings'
 
 describe('parseSearchWidths', () => {
   it('keeps only the widths set by hand, so the rest fit their content', () => {
@@ -26,5 +26,17 @@ describe('parseSearchHidden', () => {
     expect(parseSearchHidden(null)).toEqual(DEFAULT_SEARCH_HIDDEN)
     expect(parseSearchHidden('{"a":1}')).toEqual(DEFAULT_SEARCH_HIDDEN)
     expect(parseSearchHidden('not json')).toEqual(DEFAULT_SEARCH_HIDDEN)
+  })
+})
+
+describe('parseSearchOrder', () => {
+  it('keeps a dragged order with every column', () => {
+    const order = ['fileSize', 'fileName', 'nbSeeders', 'nbLeechers', 'engineName', 'pubDate']
+    expect(parseSearchOrder(JSON.stringify(order))).toEqual(order)
+  })
+  it('goes back to the default for anything missing a column or unreadable', () => {
+    expect(parseSearchOrder(JSON.stringify(['fileName']))[0]).toBe('fileName')
+    expect(parseSearchOrder(JSON.stringify(['fileName']))).toHaveLength(6)
+    expect(parseSearchOrder('nope')).toHaveLength(6)
   })
 })

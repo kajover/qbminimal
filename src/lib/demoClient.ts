@@ -47,14 +47,14 @@ interface DemoTorrent {
   ratio: number
   stopped?: boolean
   // A problem its tracker reports, to show the sidebar's tracker statuses.
-  trackerIssue?: 'error' | 'warning' | 'down'
+  trackerIssue?: 'error' | 'unregistered' | 'warning' | 'down'
 }
 
 const SEED: DemoTorrent[] = [
   { name: 'debian-13.1.0-amd64-netinst.iso', size: 754 * MiB, progress: 1, down: 0, up: 412_000, category: 'Linux', tags: 'iso, stable', tracker: 'http://bttracker.debian.org:6969/announce', addedDaysAgo: 12, ratio: 3.41 },
   { name: 'Fedora-Workstation-Live-43.iso', size: 2.3 * GiB, progress: 0.62, down: 2_400_000, up: 180_000, category: 'Linux', tags: 'iso', tracker: 'http://torrent.fedoraproject.org:6969/announce', addedDaysAgo: 0.2, ratio: 0.18 },
   { name: 'Sintel.2010.1080p.mkv', size: 1.1 * GiB, progress: 0.27, down: 1_150_000, up: 64_000, category: 'Movies', tags: 'open-movie', tracker: 'udp://tracker.opentrackr.org:1337/announce', addedDaysAgo: 1, ratio: 0.05, trackerIssue: 'warning' },
-  { name: 'ubuntu-25.10-desktop-amd64.iso', size: 5.7 * GiB, progress: 1, down: 0, up: 0, category: 'Linux', tags: 'iso', tracker: 'https://torrent.ubuntu.com/announce', addedDaysAgo: 30, ratio: 1.12, stopped: true },
+  { name: 'ubuntu-25.10-desktop-amd64.iso', size: 5.7 * GiB, progress: 1, down: 0, up: 0, category: 'Linux', tags: 'iso', tracker: 'https://torrent.ubuntu.com/announce', addedDaysAgo: 30, ratio: 1.12, stopped: true, trackerIssue: 'unregistered' },
   { name: 'archlinux-2026.11.01-x86_64.iso', size: 1.4 * GiB, progress: 1, down: 0, up: 890_000, category: 'Linux', tags: '', tracker: 'udp://tracker.archlinux.org:6969/announce', addedDaysAgo: 5, ratio: 7.9, trackerIssue: 'down' },
   { name: 'Big Buck Bunny (2008) [4K]', size: 680 * MiB, progress: 0, down: 0, up: 0, category: 'Movies', tags: 'open-movie', tracker: 'udp://tracker.opentrackr.org:1337/announce', addedDaysAgo: 0.01, ratio: 0, stopped: true },
 ]
@@ -103,7 +103,7 @@ function toTorrent(t: DemoTorrent, jitter: number, queuePosition: number): Torre
     num_seeds: running ? 12 : 0, num_complete: 140, num_leechs: running ? 3 : 0, num_incomplete: 22, connections_count: running ? 15 : 0, connections_limit: 100,
     dl_limit: 0, up_limit: 0, ratio_limit: -2, seeding_time_limit: -2, inactive_seeding_time_limit: -2, share_limit_action: 'Default', share_limits_mode: 'Default',
     added_on: added, completion_on: done ? added + 3600 : 0, last_activity: running ? NOW : added, time_active: Math.round(t.addedDaysAgo * 86400), seeding_time: done ? Math.round(t.addedDaysAgo * 80000) : 0, reannounce: 1200,
-    has_tracker_error: t.trackerIssue === 'error', has_tracker_warning: t.trackerIssue === 'warning', has_other_announce_error: t.trackerIssue === 'down',
+    has_tracker_error: t.trackerIssue === 'error' || t.trackerIssue === 'unregistered', has_tracker_warning: t.trackerIssue === 'warning', has_other_announce_error: t.trackerIssue === 'down',
     save_path: t.savePath ?? `/downloads/${t.category.toLowerCase()}`, download_path: '', content_path: `${t.savePath ?? `/downloads/${t.category.toLowerCase()}`}/${t.name}`,
   }
 }
@@ -359,10 +359,14 @@ class DemoClient implements ApiClient {
   async setSSLParameters() {}
 
   async getTorrentTrackers(hash: string): Promise<TorrentTracker[]> {
-    const url = this.find(hash)?.tracker ?? ''
+    const torrent = this.find(hash)
+    const url = torrent?.tracker ?? ''
+    // The message a tracker with a problem would send.
+    const messages: Record<string, string> = { unregistered: 'Unregistered torrent', error: 'Tracker error', down: 'Connection timed out', warning: 'Slow down' }
+    const msg = messages[torrent?.trackerIssue ?? ''] ?? ''
     return [
       { url: '** [DHT] **', status: 2, tier: '', num_peers: 40, num_seeds: 30, num_leeches: 10, num_downloaded: 0, msg: '' },
-      { url, status: 2, tier: 0, num_peers: 160, num_seeds: 140, num_leeches: 20, num_downloaded: 900, msg: '' },
+      { url, status: torrent?.trackerIssue && torrent.trackerIssue !== 'warning' ? 4 : 2, tier: 0, num_peers: 160, num_seeds: 140, num_leeches: 20, num_downloaded: 900, msg },
     ]
   }
 
