@@ -57,6 +57,8 @@ describe('search', () => {
     api.state.nextId = 1
     api.state.searches = []
     for (const mock of [api.startSearch, api.stopSearch, api.deleteSearch]) mock.mockClear()
+    // The sidebar starts closed; most tests here use it.
+    localStorage.setItem('qbminimal.searchSidebar', 'open')
   })
 
   it('shows name, size, seeds, leeches and plugin, with Published hidden and no Source', async () => {
@@ -146,7 +148,8 @@ describe('search', () => {
     expect(screen.queryByRole('button', { name: 'Delete every search' })).toBeNull()
   })
 
-  it('keeps earlier searches and lists them, as it does by default', async () => {
+  it('keeps earlier searches and lists them when turned on', async () => {
+    localStorage.setItem('qbminimal.keepSearches', 'on')
     api.state.searches = [{ id: 7, status: 'Stopped', total: 3 }]
     api.state.nextId = 8
     renderView()
@@ -157,6 +160,7 @@ describe('search', () => {
   })
 
   it('opens another saved search while one runs, and stops the running one from its own button', async () => {
+    localStorage.setItem('qbminimal.keepSearches', 'on')
     api.state.searches = [{ id: 3, status: 'Running', total: 2 }, { id: 4, status: 'Stopped', total: 2 }]
     renderView()
     const sidebar = screen.getByRole('complementary', { name: 'Search options' })
@@ -167,6 +171,7 @@ describe('search', () => {
   })
 
   it('lists the latest ten searches, and more on request', async () => {
+    localStorage.setItem('qbminimal.keepSearches', 'on')
     api.state.searches = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, status: 'Stopped', total: 1 }))
     renderView()
     const sidebar = screen.getByRole('complementary', { name: 'Search options' })
@@ -177,6 +182,21 @@ describe('search', () => {
     await userEvent.click(within(sidebar).getByRole('button', { name: /Show more/ }))
     expect(within(sidebar).getByTitle('Search 1')).toBeInTheDocument()
     expect(within(sidebar).queryByRole('button', { name: /Show more/ })).toBeNull()
+  })
+
+  it('starts with the sidebar closed, and deletes past searches when keeping them is turned off', async () => {
+    localStorage.removeItem('qbminimal.searchSidebar')
+    localStorage.setItem('qbminimal.keepSearches', 'on')
+    api.state.searches = [{ id: 3, status: 'Stopped', total: 2 }, { id: 4, status: 'Stopped', total: 2 }]
+    renderView()
+    expect(screen.queryByRole('complementary', { name: 'Search options' })).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: 'Search options' }))
+    const sidebar = screen.getByRole('complementary', { name: 'Search options' })
+    await within(sidebar).findByTitle('Search 4')
+    await userEvent.click(within(sidebar).getByRole('button', { name: 'Saved search settings' }))
+    await userEvent.click(await screen.findByRole('switch', { name: 'Keep past searches' }))
+    await waitFor(() => expect(api.deleteSearch).toHaveBeenCalledTimes(2))
+    expect(localStorage.getItem('qbminimal.keepSearches')).toBeNull()
   })
 
   it('asks for text instead of starting an empty search', async () => {

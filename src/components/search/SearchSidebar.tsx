@@ -76,12 +76,13 @@ export function SearchSidebar(props: SearchSidebarProps) {
   const runAgain = async (id: number, search: SavedSearch) => {
     if (await onRun(search)) await remove(id)
   }
-  const clear = async () => {
-    const ids = searches.map(search => search.id)
+  // Deletes every search, or every one but the search shown, when past searches stop being kept.
+  const clear = async (keepShown = false) => {
+    const ids = searches.map(search => search.id).filter(id => !keepShown || id !== activeId)
     const outcomes = await Promise.allSettled(ids.map(id => qbitClient.deleteSearch(id)))
     forgetSearches(ids.filter((_, i) => outcomes[i].status === 'fulfilled'))
     void queryClient.invalidateQueries({ queryKey: ['search', 'status'] })
-    onCleared()
+    if (!keepShown) onCleared()
     if (outcomes.some(outcome => outcome.status === 'rejected')) toast.error(t('Couldn\'t delete every search'))
   }
   const matchingSearches = matching('saved', [...searches].reverse(), search => name(search.id))
@@ -134,7 +135,7 @@ export function SearchSidebar(props: SearchSidebarProps) {
               <PopoverContent align="end" className="w-72 space-y-2">
                 <div className="flex items-center justify-between gap-2 text-sm">
                   <label htmlFor="keep-searches">{t('Keep past searches')}</label>
-                  <Switch id="keep-searches" checked={keep} onCheckedChange={(on) => { setKeepSearches(on); setKeep(on) }} />
+                  <Switch id="keep-searches" checked={keep} onCheckedChange={(on) => { setKeepSearches(on); setKeep(on); if (!on) void clear(true) }} />
                 </div>
                 <p className="text-xs text-muted-foreground">{t('Earlier searches stay in qBittorrent, so they can be opened or run again. When off, each new search deletes the ones before it.')}</p>
                 <div className="flex items-center justify-between gap-2 border-t pt-2 text-sm">
@@ -187,7 +188,7 @@ export function SearchSidebar(props: SearchSidebarProps) {
                       </Button>
                     )}
                     <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0" aria-label={t('Delete search {value}', { value: label })} title={t('Delete')} onClick={() => void remove(search.id)}>
-                      <X className="size-4" />
+                      <Trash2 className="size-4" />
                     </Button>
                   </>
                 )}

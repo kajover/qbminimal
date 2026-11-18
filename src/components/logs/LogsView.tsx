@@ -22,6 +22,10 @@ const LEVELS = [
 
 type Levels = Record<(typeof LEVELS)[number]['key'], boolean>
 
+// Every level is loaded, so each one's count shows even while it's hidden; the tick boxes only
+// choose what's listed.
+const ALL_LEVELS: Levels = { normal: true, info: true, warning: true, critical: true }
+
 // Newest first, and only this many, so a long session stays quick to show.
 const MAX_ROWS = 500
 
@@ -72,31 +76,36 @@ export function LogsView() {
   const [tab, setTab] = useState<'main' | 'peers'>('main')
   const [levels, setLevels] = useState<Levels>({ normal: true, info: true, warning: true, critical: true })
   const [search, setSearch] = useState('')
-  const main = useLogs(levels)
+  const main = useLogs(ALL_LEVELS)
   const peers = usePeerLog(tab === 'peers')
 
   const mainRows = useMemo<Row[]>(() => {
     const needle = search.trim().toLowerCase()
+    const shownTypes = new Set<number>(LEVELS.filter(level => levels[level.key]).map(level => level.type))
     return [...(main.data ?? [])]
-      .filter(log => !needle || log.message.toLowerCase().includes(needle))
+      .filter(log => shownTypes.has(log.type) && (!needle || log.message.toLowerCase().includes(needle)))
       .reverse()
       .slice(0, MAX_ROWS)
       .map(log => {
         const level = LEVELS.find(l => l.type === log.type) ?? LEVELS[0]
         return { id: log.id, timestamp: log.timestamp, label: level.label, level: level.key, badge: level.badge, message: log.message }
       })
-  }, [main.data, search])
+  }, [main.data, search, levels])
 
-  const peerRows = useMemo<Row[]>(() => [...(peers.data ?? [])].reverse().slice(0, MAX_ROWS).map(entry => ({
+  // Searched by address and reason, like the general log by message.
+  const peerRows = useMemo<Row[]>(() => [...(peers.data ?? [])].filter(entry => {
+    const needle = search.trim().toLowerCase()
+    return !needle || `${entry.ip} ${entry.reason ?? ''}`.toLowerCase().includes(needle)
+  }).reverse().slice(0, MAX_ROWS).map(entry => ({
     id: entry.id,
     timestamp: entry.timestamp,
     label: entry.blocked ? t('blocked') : t('banned'),
     level: entry.blocked ? 'blocked' : 'banned',
     badge: entry.blocked ? 'bg-red-500/15 text-red-700 dark:text-red-400' : 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
     message: entry.reason ? `${entry.ip}: ${entry.reason}` : entry.ip,
-  })), [peers.data])
+  })), [peers.data, search])
 
-  // Counts of the entries loaded, before the search. A level that is switched off isn't loaded.
+  // Counts of every level's entries, before the search and whether or not the level is shown.
   const counts = useMemo(() => {
     const result: Record<number, number> = {}
     for (const log of main.data ?? []) result[log.type] = (result[log.type] ?? 0) + 1
@@ -139,7 +148,7 @@ export function LogsView() {
                     <Checkbox id={`log-${level.key}`} checked={levels[level.key]} onCheckedChange={(checked) => setLevels(prev => ({ ...prev, [level.key]: !!checked }))} />
                     <Label htmlFor={`log-${level.key}`} className="text-xs font-normal">
                       {level.label}
-                      {levels[level.key] && <span className="ms-1 tabular-nums text-muted-foreground">{counts[level.type] ?? 0}</span>}
+                      <span className="ms-1 tabular-nums text-muted-foreground">{counts[level.type] ?? 0}</span>
                     </Label>
                   </div>
                 ))}
@@ -150,10 +159,11 @@ export function LogsView() {
                 : mainRows.length === 0 ? <Note>{t('No matching entries')}</Note>
                 : <LogRows rows={mainRows} />}
             </TabsContent>
-            <TabsContent value="peers">
+            <TabsContent value="peers" className="space-y-3">
+              <SearchInput aria-label={t('Search')} placeholder={t('Search')} value={search} onValueChange={setSearch} />
               {peers.isLoading ? <Note>{t('Loading peer log...')}</Note>
                 : peers.isError && !peers.data ? <Note>{t('Couldn\'t load the peer log')}</Note>
-                : peerRows.length === 0 ? <Note>{t('No blocked or banned peers yet')}</Note>
+                : peerRows.length === 0 ? <Note>{search.trim() && peers.data?.length ? t('No matching entries') : t('No blocked or banned peers yet')}</Note>
                 : <LogRows rows={peerRows} />}
             </TabsContent>
           </Tabs>

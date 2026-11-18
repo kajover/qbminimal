@@ -23,7 +23,7 @@ import { SearchResults } from './SearchResults'
 import { SearchSidebar } from './SearchSidebar'
 import { t } from '@/i18n'
 
-// Whether the sidebar was closed on a wide screen, kept on this device.
+// Whether the sidebar was left open on a wide screen, kept on this device.
 const SIDEBAR_KEY = 'qbminimal.searchSidebar'
 
 export function SearchView() {
@@ -38,15 +38,16 @@ export function SearchView() {
   const [filtersFor, setFiltersFor] = useState<{ job: number | null; filters: ColumnFilters }>({ job: null, filters: {} })
   const filters = filtersFor.job === search.jobId ? filtersFor.filters : {}
   const setFilter = (id: string, filter: ColumnFilter | null) => setFiltersFor({ job: search.jobId, filters: withFilter(filters, id, filter) })
-  // The sidebar stays open on wide screens unless closed there, and opens over the page on phones.
+  // The sidebar starts closed. On wide screens it stays open once opened there; on phones it opens
+  // over the page each time.
   const wide = useMediaQuery('(min-width: 1200px)')
   const [sidebarPref, setSidebarPref] = useState(() => readStored(SIDEBAR_KEY))
   const [sheetOpen, setSheetOpen] = useState(false)
-  const sidebarOpen = wide ? sidebarPref !== 'closed' : sheetOpen
+  const sidebarOpen = wide ? sidebarPref === 'open' : sheetOpen
   const setSidebarOpen = (open: boolean) => {
     if (!wide) return setSheetOpen(open)
-    setSidebarPref(open ? null : 'closed')
-    writeStored(SIDEBAR_KEY, open ? null : 'closed')
+    setSidebarPref(open ? 'open' : null)
+    writeStored(SIDEBAR_KEY, open ? 'open' : null)
   }
   // For the F key, which is set up once.
   const toggleSidebar = useRef(() => {})
@@ -158,7 +159,7 @@ export function SearchView() {
         <div className="min-w-0 flex-1 space-y-4">
           {/* A short field: the plugins and category are in the sidebar. */}
           <form onSubmit={submit} className="flex max-w-xl items-center gap-2">
-            <SearchInput id="search-pattern" aria-label={t('Search for')} placeholder={t('Search for...')} value={pattern} onValueChange={setPattern} required className="min-w-0 flex-1" />
+            <SearchInput id="search-pattern" aria-label={t('Search for')} placeholder={t('Search')} value={pattern} onValueChange={setPattern} required className="min-w-0 flex-1" />
             {/* While searching, the spinner turns into a stop button under the pointer. */}
             <Button type="submit" className="group" aria-label={search.running ? t('Stop search') : t('Search')} title={search.running ? t('Stop search') : t('Search')}>
               {search.running ? (
