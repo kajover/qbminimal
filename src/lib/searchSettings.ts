@@ -6,7 +6,7 @@ import { readStored, writeStored } from './storage'
 export type SearchSortKey = 'fileName' | 'fileSize' | 'nbSeeders' | 'nbLeechers' | 'engineName' | 'pubDate'
 export const SEARCH_SORT_KEYS: SearchSortKey[] = ['fileName', 'fileSize', 'nbSeeders', 'nbLeechers', 'engineName', 'pubDate']
 export interface SearchSort { key: SearchSortKey; desc: boolean }
-// Most seeds first, as those download best.
+// Each search starts with the most seeds first, as those download best.
 export const DEFAULT_SEARCH_SORT: SearchSort = { key: 'nbSeeders', desc: true }
 
 // The columns that can be hidden: every one but the name.
@@ -17,7 +17,6 @@ export type SearchWidths = Partial<Record<SearchSortKey, number>>
 export const FALLBACK_SEARCH_WIDTHS: Record<SearchSortKey, number> = { fileName: 480, fileSize: 110, nbSeeders: 112, nbLeechers: 112, engineName: 130, pubDate: 160 }
 export const MIN_SEARCH_WIDTH = 72
 
-const SORT_KEY = 'qbminimal.searchSort'
 // The old key held a width for every column, which would keep them from fitting.
 const WIDTHS_KEY = 'qbminimal.searchWidths'
 const OLD_WIDTHS_KEY = 'qbminimal.searchColumns'
@@ -33,13 +32,6 @@ const readJson = (raw: string | null): Record<string, unknown> => {
   }
 }
 
-export function parseSearchSort(raw: string | null): SearchSort {
-  const saved = readJson(raw)
-  return SEARCH_SORT_KEYS.includes(saved.key as SearchSortKey) && typeof saved.desc === 'boolean'
-    ? { key: saved.key as SearchSortKey, desc: saved.desc }
-    : DEFAULT_SEARCH_SORT
-}
-
 export function parseSearchWidths(raw: string | null): SearchWidths {
   const saved = readJson(raw)
   return Object.fromEntries(SEARCH_SORT_KEYS.flatMap(key => {
@@ -47,11 +39,6 @@ export function parseSearchWidths(raw: string | null): SearchWidths {
     return typeof value === 'number' && Number.isFinite(value) && value >= MIN_SEARCH_WIDTH ? [[key, Math.round(value)]] : []
   }))
 }
-
-export const loadSearchSort = () => parseSearchSort(readStored(SORT_KEY))
-// The default isn't stored, so a later change of default reaches everyone who kept it.
-export const saveSearchSort = (sort: SearchSort) =>
-  writeStored(SORT_KEY, sort.key === DEFAULT_SEARCH_SORT.key && sort.desc === DEFAULT_SEARCH_SORT.desc ? null : JSON.stringify(sort))
 
 export const loadSearchWidths = () => parseSearchWidths(readStored(WIDTHS_KEY))
 export const saveSearchWidths = (widths: SearchWidths) => {

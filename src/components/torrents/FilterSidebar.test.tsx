@@ -167,10 +167,13 @@ describe('the filter sidebar', () => {
     localStorage.setItem('qbminimal.columnFilters.torrents', JSON.stringify({ name: { type: 'text', op: 'contains', value: 'al' } }))
     const sidebar = await openSidebar()
     expect(shown()).toEqual(['alpha'])
+    // The funnel shows a dot while a column filter is on.
+    expect(within(sidebar).getByRole('button', { name: 'Column filter (filters on)' })).toBeInTheDocument()
     const group = within(sidebar).getByRole('group', { name: 'Column filters' })
     await userEvent.click(within(group).getByRole('button', { name: /Remove filter/ }))
     expect(shown()).toEqual(['alpha', 'bravo', 'charlie'])
     expect(within(sidebar).queryByRole('group', { name: 'Column filters' })).toBeNull()
+    expect(within(sidebar).getByRole('button', { name: 'Column filter' })).toBeInTheDocument()
   })
 
   it('filters a column the sidebar covers with the sidebar\'s own tick boxes', async () => {

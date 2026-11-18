@@ -3,17 +3,17 @@ import { createPortal } from 'react-dom'
 import { ArrowDown, ArrowUp, ArrowUpDown, Columns3, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, LayoutList, Table2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { AddFilterButton, ColumnFilterButton, ColumnFilterChips, type FilterTarget } from '@/components/ColumnFilters'
-import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loadSearchHidden, loadSearchView, saveSearchView, loadSearchSort, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchSort, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey, type SearchWidths } from '@/lib/searchSettings'
-import { applyColumnFilters, choiceOptions, withFilter, type ColumnFilter, type ColumnFilters, type FilterColumn } from '@/lib/columnFilters'
+import { ColumnFilterButton, type FilterTarget } from '@/components/ColumnFilters'
+import { searchFilterTargets } from '@/lib/searchFilters'
+import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loadSearchHidden, loadSearchView, saveSearchView, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey, type SearchWidths } from '@/lib/searchSettings'
+import { applyColumnFilters, type ColumnFilter, type ColumnFilters } from '@/lib/columnFilters'
+import { published, SEARCH_FILTER_COLUMNS } from '@/lib/searchFilters'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { formatBytes, formatDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { SearchResult } from '@/types'
 import { t } from '@/i18n'
 
-// Older qBittorrent leaves out the plugin and date, and plugins send -1 for a date they don't know.
-const published = (r: SearchResult) => (r.pubDate && r.pubDate > 0 ? r.pubDate : 0)
 
 // qBittorrent's search plugins only report these, so columns like a tracker's freeleech or group can't be shown.
 const COLUMNS: { key: SortKey; label: string; numeric?: boolean; className?: string; cell: (r: SearchResult) => ReactNode }[] = [
@@ -82,27 +82,20 @@ function naturalWidth(cells: Element[], host: HTMLElement): number {
   return Math.ceil(widest)
 }
 
-// Each column can be filtered like the torrent table's: a text match, a range, or a choice of sites.
-const FILTER_COLUMNS: FilterColumn<SearchResult>[] = [
-  { id: 'fileName', label: t('Name'), kind: 'text', value: r => r.fileName },
-  { id: 'fileSize', label: t('Size'), kind: 'size', value: r => (r.fileSize >= 0 ? r.fileSize : NaN) },
-  { id: 'nbSeeders', label: t('Seeds'), kind: 'number', value: r => r.nbSeeders },
-  { id: 'nbLeechers', label: t('Leeches'), kind: 'number', value: r => r.nbLeechers },
-  { id: 'engineName', label: t('Plugin'), kind: 'set', value: r => r.engineName ?? '' },
-  { id: 'pubDate', label: t('Published'), kind: 'date', value: r => published(r) || NaN },
-]
-
 // Found torrents, sortable, 20 a page: a table on wide screens and a list on phones.
-export function SearchResults({ results, onAdd, toolbarSlot }: {
+
+export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterChange }: {
   results: SearchResult[]
   onAdd: (result: SearchResult) => void
+  // The column filters, kept by the page so the sidebar can show and change them.
+  filters: ColumnFilters
+  onFilterChange: (id: string, filter: ColumnFilter | null) => void
   // Where the filter, columns or sort, and view buttons go: the page header's button row.
   toolbarSlot?: HTMLElement | null
 }) {
-  const [sort, setSortState] = useState<SearchSort>(loadSearchSort)
-  const setSort = (next: SearchSort) => { setSortState(next); saveSearchSort(next) }
+  // Each search starts with the most seeds first; a sort picked here lasts for this search.
+  const [sort, setSort] = useState<SearchSort>(DEFAULT_SEARCH_SORT)
   const [page, setPage] = useState(1)
-  const [filters, setFilters] = useState<ColumnFilters>({})
   const [widths, setWidths] = useState(loadSearchWidths)
   const [hidden, setHiddenState] = useState(loadSearchHidden)
   const setHidden = (next: ResizableKey[]) => { setHiddenState(next); saveSearchHidden(next) }
@@ -191,17 +184,14 @@ export function SearchResults({ results, onAdd, toolbarSlot }: {
     </colgroup>
   )
   const setFilter = (id: string, filter: ColumnFilter | null) => {
-    setFilters(current => withFilter(current, id, filter))
+    onFilterChange(id, filter)
     setPage(1)
   }
-  const targets = useMemo(() => new Map(FILTER_COLUMNS.map((column): [string, FilterTarget] => [column.id, {
-    ...column,
-    options: column.kind === 'set' ? () => choiceOptions(results, column) : undefined,
-  }])), [results])
+  const targets = useMemo(() => new Map(searchFilterTargets(results).map((target): [string, FilterTarget] => [target.id, target])), [results])
 
   const sorted = useMemo(() => {
     const value = (r: SearchResult) => (sort.key === 'pubDate' ? published(r) : r[sort.key] ?? '')
-    return applyColumnFilters(results, FILTER_COLUMNS, filters).sort((a, b) => {
+    return applyColumnFilters(results, SEARCH_FILTER_COLUMNS, filters).sort((a, b) => {
       const x = value(a)
       const y = value(b)
       const order = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), undefined, { sensitivity: 'base', numeric: true })
@@ -240,7 +230,7 @@ export function SearchResults({ results, onAdd, toolbarSlot }: {
   // In the page's header, like the torrent list's buttons.
   const toolbar = (
     <>
-        {/* As on the torrent list: columns or sort, then the view, then the filter funnel last. */}
+        {/* As on the torrent list: columns or sort, then the view. The sidebar button follows. */}
         {showTable && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -286,7 +276,6 @@ export function SearchResults({ results, onAdd, toolbarSlot }: {
         <Button variant="outline" size="icon" className="size-8" aria-label={showTable ? t('Card view') : t('Table view')} title={showTable ? t('Card view') : t('Table view')} onClick={switchView}>
           {showTable ? <LayoutList className="size-4" /> : <Table2 className="size-4" />}
         </Button>
-        <AddFilterButton targets={[...targets.values()]} onChange={setFilter} />
     </>
   )
 
@@ -301,8 +290,7 @@ export function SearchResults({ results, onAdd, toolbarSlot }: {
         <span className="text-sm text-muted-foreground">{sorted.length === results.length ? t('{count} results', { count: results.length }) : t('{length} of {total} results', { length: sorted.length, total: results.length })}</span>
       </div>
 
-      {/* The funnel in the header adds a filter in either view; the table also filters from its titles. */}
-      <ColumnFilterChips targets={[...targets.values()]} filters={filters} onChange={setFilter} />
+      {/* Filters are added and listed in the sidebar; the table also filters from its titles. */}
 
       {sorted.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">{t('No results match these filters')}</p>}
 

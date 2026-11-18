@@ -91,7 +91,7 @@ const LONG_PRESS_MS = 500
 
 // One choice: a tick box, its name and how many torrents it has, and for categories and tags a menu
 // to change or delete it. The menu shows on hover with a mouse, and always on touch screens.
-function FilterItem({ label, icon: Icon, count, checked, excluded, onToggle, onExclude, muted, menu, single }: {
+export function FilterItem({ label, icon: Icon, count, checked, excluded, onToggle, onExclude, muted, menu, single }: {
   label: string; icon: LucideIcon; count?: number; checked: boolean; onToggle: (event: MouseEvent) => void; muted?: boolean; menu?: ReactNode
   // Hidden: the torrents it matches are left out. Set with Ctrl or Cmd and a click, or a long press.
   excluded?: boolean
@@ -150,7 +150,7 @@ function FilterItem({ label, icon: Icon, count, checked, excluded, onToggle, onE
   )
 }
 
-function ItemMenu({ name, children }: { name: string; children: ReactNode }) {
+export function ItemMenu({ name, children }: { name: string; children: ReactNode }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -163,7 +163,7 @@ function ItemMenu({ name, children }: { name: string; children: ReactNode }) {
   )
 }
 
-function Section({ id, title, icon: Icon, chosen, folded, onFold, onAdd, addLabel, action, search, onSearch, children }: {
+export function Section({ id, title, icon: Icon, chosen, folded, onFold, onAdd, addLabel, action, search, onSearch, children }: {
   id: string; title: string; icon: LucideIcon; chosen: number; folded: boolean; onFold: (id: string) => void; onAdd?: () => void; addLabel?: string
   // Another button in the title row, such as saving a view.
   action?: ReactNode
@@ -385,7 +385,7 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
       <div className="flex items-center gap-1">
         <h3 className="min-w-0 flex-1 truncate text-sm font-medium">{t('Filters')}</h3>
         {/* Adds a filter on any table column. */}
-        <AddFilterButton targets={columnTargets} onChange={list.setColumnFilter} />
+        <AddFilterButton targets={columnTargets} onChange={list.setColumnFilter} active={list.columnFiltered} />
         <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0 rounded-full bg-muted hover:bg-accent" aria-label={t('Close filters')} title={t('Close filters')} onClick={onClose}>
           <X className="size-4" />
         </Button>

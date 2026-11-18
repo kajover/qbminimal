@@ -120,14 +120,15 @@ describe('removing the previous version', () => {
   // qBittorrent with the update torrent finished, and the old release's torrent once it's added.
   function cleanupClient(old = '1.6.9') {
     let cleanupAdded = false
+    let cleanupPath = ''
     return {
       addTorrents: vi.fn(async (params: Record<string, string>) => {
-        if (params.contentLayout === 'NoSubfolder') cleanupAdded = true
+        if (params.skip_checking === 'true') { cleanupAdded = true; cleanupPath = params.savepath }
         return { success_count: 1, failure_count: 0, pending_count: 0 }
       }),
       getTorrentsInfo: vi.fn(async () => [
         { hash: 'new', name: 'qbminimal-1.2.3', state: 'stalledUP', progress: 1, save_path: '/opt' },
-        ...(cleanupAdded ? [{ hash: 'old', name: `qbminimal-${old}`, state: 'stoppedDL', progress: 0, save_path: '/opt/qbminimal' }] : []),
+        ...(cleanupAdded ? [{ hash: 'old', name: `qbminimal-${old}`, state: 'stoppedDL', progress: 0, save_path: cleanupPath }] : []),
       ]),
       setPreferences: vi.fn(async () => undefined),
       deleteTorrents: vi.fn(async () => undefined),
@@ -151,6 +152,13 @@ describe('removing the previous version', () => {
     }), [])
     // No tag, which would show in the filters.
     expect(client.addTorrents.mock.calls[0][0]).not.toHaveProperty('tags')
+    expect(client.deleteTorrents).toHaveBeenCalledWith(['old'], true)
+  })
+
+  it('adds a folder an update made as the torrent\'s own folder, so the folder goes too', async () => {
+    const client = cleanupClient()
+    expect(await removeOldVersion(client, '1.6.9', '/opt/qbminimal-1.6.9/', 1)).toBe(true)
+    expect(client.addTorrents).toHaveBeenCalledWith(expect.objectContaining({ savepath: '/opt', contentLayout: 'Original', skip_checking: 'true' }), [])
     expect(client.deleteTorrents).toHaveBeenCalledWith(['old'], true)
   })
 

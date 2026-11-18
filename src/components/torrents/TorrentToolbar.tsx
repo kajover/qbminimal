@@ -1,4 +1,4 @@
-import { ArrowUpDown, Columns3, LayoutList, ListFilter, Plus, RotateCcw, Search, Table2 } from 'lucide-react'
+import { ArrowUpDown, Columns3, LayoutList, PanelRight, Plus, RotateCcw, Search, Table2 } from 'lucide-react'
 import { SearchInput } from '@/components/SearchInput'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { Button } from '@/components/ui/button'
@@ -124,7 +124,7 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen,
       {/* Last, at the edge where the filter sidebar opens. */}
       <Button variant={filtersOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={list.narrowed ? t('Search and filter (filters on)') : t('Search and filter')} title={list.narrowed ? t('Search and filter (filters on)') : t('Search and filter')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
         {/* Opens the filter sidebar. */}
-        <ListFilter className="size-4" />
+        <PanelRight className="size-4" />
         {/* A dot while any filter hides torrents, as the chips above the list may be out of view. */}
         {list.narrowed && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
       </Button>

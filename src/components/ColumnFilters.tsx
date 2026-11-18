@@ -213,7 +213,12 @@ function FilterChip({ target, filter, onChange }: { target: FilterTarget; filter
 }
 
 // A funnel button that adds a column filter without the table: pick a column, then set it.
-export function AddFilterButton({ targets, onChange }: { targets: FilterTarget[]; onChange: (id: string, filter: ColumnFilter | null) => void }) {
+export function AddFilterButton({ targets, onChange, active }: {
+  targets: FilterTarget[]
+  onChange: (id: string, filter: ColumnFilter | null) => void
+  // Whether a column filter is on, shown as a dot like the filter button's.
+  active?: boolean
+}) {
   const [open, setOpen] = useState(false)
   const [targetId, setTargetId] = useState(targets[0]?.id ?? '')
   const target = targets.find(c => c.id === targetId) ?? targets[0]
@@ -221,8 +226,9 @@ export function AddFilterButton({ targets, onChange }: { targets: FilterTarget[]
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button type="button" variant="outline" size="icon" className="size-8 shrink-0" aria-label={t('Column filter')} title={t('Column filter')}>
+        <Button type="button" variant="outline" size="icon" className="relative size-8 shrink-0" aria-label={active ? t('Column filter (filters on)') : t('Column filter')} title={active ? t('Column filter (filters on)') : t('Column filter')}>
           <Filter className="size-4" />
+          {active && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
         </Button>
       </PopoverTrigger>
       {/* Focus goes to the popup itself, not the column list: phones would open that list at once. */}

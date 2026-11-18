@@ -22,6 +22,8 @@ export function useSearchJob() {
   const queryClient = useQueryClient()
   const [job, setJob] = useState<Job | null>(null)
   const endedAt = useRef(0)
+  // When each search began, so one opened again while running keeps its time limit.
+  const startedAt = useRef(new Map<number, number>())
 
   const finish = (current: Job) => {
     endedAt.current = Date.now()
@@ -69,6 +71,7 @@ export function useSearchJob() {
     try {
       const { id } = await qbitClient.startSearch(pattern, plugins, category)
       rememberSearch(id, { pattern, plugins, category })
+      startedAt.current.set(id, Date.now())
       setJob({ id, running: true, startedAt: Date.now() })
       if (!keepSearchesOn()) void deleteOthers(id)
       void queryClient.invalidateQueries({ queryKey: ['search', 'status'] })
@@ -92,8 +95,9 @@ export function useSearchJob() {
     }
   }
 
-  // Shows the results of a search qBittorrent still holds.
-  const open = (id: number) => setJob({ id, running: false, startedAt: Date.now() })
+  // Shows the results of a search qBittorrent still holds. One still running is followed again until
+  // it ends; another search left running carries on in qBittorrent meanwhile.
+  const open = (id: number, running = false) => setJob({ id, running, startedAt: startedAt.current.get(id) ?? Date.now() })
   // Clears the results, for when their search was deleted.
   const close = () => setJob(null)
 

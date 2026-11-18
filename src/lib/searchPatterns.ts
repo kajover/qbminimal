@@ -39,8 +39,18 @@ export function forgetSearches(ids: number[]) {
   writeStored(PATTERNS_KEY, Object.keys(saved).length ? JSON.stringify(saved) : null)
 }
 
-// Whether earlier searches stay in qBittorrent for reopening. Off by default, so each new search
-// replaces the ones before it and they don't pile up.
+// Whether earlier searches stay in qBittorrent for reopening. On by default; when off, each new
+// search replaces the ones before it.
 const KEEP_KEY = 'qbminimal.keepSearches'
-export const keepSearchesOn = () => readStored(KEEP_KEY) === 'on'
-export const setKeepSearches = (on: boolean) => writeStored(KEEP_KEY, on ? 'on' : null)
+export const keepSearchesOn = () => readStored(KEEP_KEY) !== 'off'
+export const setKeepSearches = (on: boolean) => writeStored(KEEP_KEY, on ? null : 'off')
+
+// How many of the latest searches the sidebar lists before a "Show more" button.
+const SHOWN_KEY = 'qbminimal.searchesShown'
+export const DEFAULT_SEARCHES_SHOWN = 10
+export function parseSearchesShown(raw: string | null): number {
+  const value = Number(raw)
+  return raw && Number.isInteger(value) && value >= 1 && value <= 500 ? value : DEFAULT_SEARCHES_SHOWN
+}
+export const searchesShown = () => parseSearchesShown(readStored(SHOWN_KEY))
+export const setSearchesShown = (count: number) => writeStored(SHOWN_KEY, count === DEFAULT_SEARCHES_SHOWN ? null : String(count))

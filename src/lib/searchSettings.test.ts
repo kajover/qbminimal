@@ -1,18 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_SEARCH_SORT, DEFAULT_SEARCH_HIDDEN, MIN_SEARCH_WIDTH, parseSearchHidden, parseSearchSort, parseSearchWidths } from './searchSettings'
-
-describe('parseSearchSort', () => {
-  it('reads a saved sort', () => {
-    expect(parseSearchSort(JSON.stringify({ key: 'fileSize', desc: false }))).toEqual({ key: 'fileSize', desc: false })
-  })
-
-  it('falls back to most seeds first', () => {
-    expect(parseSearchSort(null)).toEqual(DEFAULT_SEARCH_SORT)
-    expect(parseSearchSort('not json')).toEqual(DEFAULT_SEARCH_SORT)
-    expect(parseSearchSort(JSON.stringify({ key: 'colour', desc: true }))).toEqual(DEFAULT_SEARCH_SORT)
-    expect(parseSearchSort(JSON.stringify({ key: 'fileName' }))).toEqual(DEFAULT_SEARCH_SORT)
-  })
-})
+import { DEFAULT_SEARCH_HIDDEN, MIN_SEARCH_WIDTH, parseSearchHidden, parseSearchWidths } from './searchSettings'
 
 describe('parseSearchWidths', () => {
   it('keeps only the widths set by hand, so the rest fit their content', () => {

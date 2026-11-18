@@ -18,17 +18,26 @@ export const STALL_MS = 60_000
 // Works for `/` and `\` paths, with or without a trailing slash, and for Windows drives.
 export function updateTarget(currentPath: string, version: string): { savePath: string; name: string; webUiPath: string } | null {
   const trimmed = currentPath.trim().replace(/[\\/]+$/, '')
-  const at = Math.max(trimmed.lastIndexOf('/'), trimmed.lastIndexOf('\\'))
-  if (!trimmed || at < 0) return null
-  const separator = trimmed[at]
-  let savePath = trimmed.slice(0, at)
-  // "/qbminimal" has the root as its parent, and "C:\qbminimal" the drive.
-  if (!savePath || /^[A-Za-z]:$/.test(savePath)) savePath += separator
+  const split = splitFolder(trimmed)
+  if (!split) return null
+  const { parent: savePath, separator } = split
   const name = `qbminimal-${version}`
   const webUiPath = savePath.endsWith(separator) ? savePath + name : `${savePath}${separator}${name}`
   // Never the folder in use: cancelling deletes the download's files, which would then be the app's own.
   if (webUiPath === trimmed) return null
   return { savePath, name, webUiPath }
+}
+
+// A folder's parent and its own name. "/qbminimal" has the root as its parent, and "C:\qbminimal"
+// the drive.
+function splitFolder(path: string): { parent: string; name: string; separator: string } | null {
+  const trimmed = path.trim().replace(/[\\/]+$/, '')
+  const at = Math.max(trimmed.lastIndexOf('/'), trimmed.lastIndexOf('\\'))
+  if (!trimmed || at < 0) return null
+  const separator = trimmed[at]
+  let parent = trimmed.slice(0, at)
+  if (!parent || /^[A-Za-z]:$/.test(parent)) parent += separator
+  return { parent, name: trimmed.slice(at + 1), separator }
 }
 
 // Whether the update can be installed from here: qBittorrent has to use an alternative Web UI at
@@ -78,21 +87,26 @@ export function releaseTorrentUrl(version: string): string | null {
   return `https://github.com/kajover/qbminimal/releases/download/v${parsed.join('.')}/${UPDATE_TORRENT_ASSET}`
 }
 
-// Removes the previous version's files from its folder: its own release torrent is added over the
-// folder, stopped and unchecked, and deleted with its files. Only the files that release had go;
-// anything else in the folder stays. Says whether it worked.
+// Removes the previous version: its own release torrent is added over its folder, stopped and
+// unchecked, and deleted with its files. Only the files that release had go. A folder an update
+// made is named like the torrent's own folder, so it's added as that folder, and qBittorrent
+// removes the folder too once it's empty, as for any torrent. A folder named otherwise, as one
+// copied by hand, gets the files only and stays, empty. Says whether it worked.
 export async function removeOldVersion(client: UpdateClient, version: string, folder: string, pollMs = 1000): Promise<boolean> {
   const url = releaseTorrentUrl(version)
-  if (!url || !folder.trim()) return false
+  const split = splitFolder(folder)
+  if (!url || !split) return false
+  const whole = split.name === `qbminimal-${version}`
+  const savePath = whole ? split.parent : folder.trim().replace(/[\\/]+$/, '')
   try {
     await client.addTorrents({
-      urls: url, savepath: folder, autoTMM: 'false', contentLayout: 'NoSubfolder',
+      urls: url, savepath: savePath, autoTMM: 'false', contentLayout: whole ? 'Original' : 'NoSubfolder',
       paused: 'true', stopped: 'true', skip_checking: 'true',
     }, [])
     // qBittorrent downloads the .torrent first, which takes a moment.
     for (let tries = 0; tries < 30; tries++) {
       // Only this release's torrent in exactly that folder, so no other torrent's files are touched.
-      const found = (await client.getTorrentsInfo()).find(torrent => torrent.name === `qbminimal-${version}` && sameFolder(torrent.save_path, folder))
+      const found = (await client.getTorrentsInfo()).find(torrent => torrent.name === `qbminimal-${version}` && sameFolder(torrent.save_path, savePath))
       if (found) {
         await client.deleteTorrents([found.hash], true)
         return true
