@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useTheme, type Theme } from '@/lib/theme'
-import { Check, ExternalLink, Monitor, Moon, Sun, Undo2 } from 'lucide-react'
+import { ALargeSmall, Captions, Check, ExternalLink, Gauge, Info, Languages, Monitor, Moon, Palette, PanelLeft, Sun, Undo2, VenetianMask, type LucideIcon } from 'lucide-react'
+import { Tooltip } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import { setIncognito, useIncognito } from '@/lib/incognito'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -39,17 +41,47 @@ const textSizeLabels: Record<TextSize, string> = {
 const SECTIONS = [{ id: 'app', title: t('App') }, ...PREFERENCE_SECTIONS.map(({ id, title }) => ({ id, title }))]
 
 // An on/off choice from lib/displayOptions, which applies it to the page at once.
-function OptionSwitch({ option, label, className }: { option: DisplayOption; label: string; className?: string }) {
+// An option's name with its icon in front, as each of the App options shows it.
+function IconLabel({ htmlFor, icon: Icon, children }: { htmlFor?: string; icon: LucideIcon; children: ReactNode }) {
+  return (
+    <Label htmlFor={htmlFor} className="flex items-center gap-2">
+      <Icon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+      {children}
+    </Label>
+  )
+}
+
+function OptionSwitch({ option, label, icon, className }: { option: DisplayOption; label: string; icon: LucideIcon; className?: string }) {
   const on = useDisplayOption(option)
   const id = `option-${option}`
   return (
     <div className={cn('mt-3 flex items-center justify-between gap-2', className)}>
-      <Label htmlFor={id}>{label}</Label>
+      <IconLabel htmlFor={id} icon={icon}>{label}</IconLabel>
       <Switch
         id={id}
         checked={on}
         onCheckedChange={(checked) => setDisplayOption(option, checked)}
       />
+    </div>
+  )
+}
+
+// Incognito mode: made-up Linux names in place of the torrents' and their files', in this browser
+// only, for screenshots or a screen others can see.
+function IncognitoSwitch() {
+  const on = useIncognito()
+  return (
+    <div className="mt-3 flex items-center justify-between gap-2">
+      <span className="flex items-center gap-1">
+        <IconLabel htmlFor="option-incognito" icon={VenetianMask}>{t('Incognito mode')}</IconLabel>
+        {/* What it does, under the pointer or on focus. */}
+        <Tooltip label={t('Hides the real torrent and file names in this browser.')}>
+          <Button type="button" variant="ghost" size="icon" className="size-6 text-muted-foreground" aria-label={t('What incognito mode does')}>
+            <Info className="size-3.5" />
+          </Button>
+        </Tooltip>
+      </span>
+      <Switch id="option-incognito" checked={on} onCheckedChange={setIncognito} />
     </div>
   )
 }
@@ -87,7 +119,7 @@ function AppSection() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <Label>{t('Theme')}</Label>
+            <IconLabel icon={Palette}>{t('Theme')}</IconLabel>
             <div className="flex flex-wrap gap-1" role="group" aria-label={t('Theme')}>
               {themeOptions.map(({ value, label, icon: Icon }) => (
                 <Button key={value} variant={theme === value ? 'secondary' : 'outline'} size="sm" aria-pressed={theme === value} onClick={() => setTheme(value)} className="gap-2">
@@ -98,7 +130,7 @@ function AppSection() {
             </div>
           </div>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-            <Label htmlFor="language">{t('Language')}</Label>
+            <IconLabel htmlFor="language" icon={Languages}>{t('Language')}</IconLabel>
             {/* Changing it reloads the page, so every text is redrawn in the new language. */}
             <NativeSelect id="language" value={chosenLanguage()} onChange={(e) => setLanguage(e.target.value as LanguageChoice)}>
               <option value="auto">{t('Same as the browser')}</option>
@@ -106,7 +138,7 @@ function AppSection() {
             </NativeSelect>
           </div>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-            <Label htmlFor="text-size">{t('Text size')}</Label>
+            <IconLabel htmlFor="text-size" icon={ALargeSmall}>{t('Text size')}</IconLabel>
             <NativeSelect
               id="text-size"
               value={textSize}
@@ -119,10 +151,11 @@ function AppSection() {
               {TEXT_SIZES.map(({ value }) => <option key={value} value={value}>{textSizeLabels[value]}</option>)}
             </NativeSelect>
           </div>
-          <OptionSwitch option="headerSpeeds" label={t('Speeds in the header')} />
-          <OptionSwitch option="menuBar" label={t('Menu bar')} />
+          <IncognitoSwitch />
+          <OptionSwitch option="headerSpeeds" icon={Gauge} label={t('Speeds in the header')} />
+          <OptionSwitch option="menuBar" icon={PanelLeft} label={t('Menu bar')} />
           {/* The tab bar is only on phones, and only with the menu bar, so the choice is too. */}
-          <OptionSwitch option="tabLabels" label={t('Tab bar labels')} className={cn('md:hidden', !menuBar && 'hidden')} />
+          <OptionSwitch option="tabLabels" icon={Captions} label={t('Tab bar labels')} className={cn('md:hidden', !menuBar && 'hidden')} />
         </CardContent>
       </Card>
 

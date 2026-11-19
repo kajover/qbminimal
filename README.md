@@ -11,6 +11,8 @@ A minimal, phone-friendly Web UI for [qBittorrent](https://www.qbittorrent.org/)
 
 Built with React 19, TypeScript 7, Vite 8, and Tailwind CSS 4.
 
+**[Try the live demo](https://kajover.github.io/qbminimal/?signedin)**: it runs in your browser on sample torrents, with no qBittorrent behind it, so nothing you do there changes anything.
+
 ## Screenshots
 
 On a desktop, as a table with a torrent's details below it, and as cards. Without the menu bar, the pages are in the menu button at the top left:
@@ -36,20 +38,28 @@ On a phone, as cards and as a table, without and with the tab bar:
   <img src="docs/screenshots/mobile-table-menubar.png" alt="The torrent table on a phone with the tab bar" width="200">
 </p>
 
+In dark mode, on a desktop and on a phone:
+
+<p>
+  <img src="docs/screenshots/desktop-table-dark.png" alt="The torrent table in dark mode on a desktop, with the selected torrent's details below it" width="66%">
+  <img src="docs/screenshots/mobile-cards-dark.png" alt="The torrent cards in dark mode on a phone" width="200">
+</p>
+
 ## Features
 
-- **Torrent list** as a table or as cards. In the table you can show, hide (also by right-clicking a header), drag, and resize columns, sort by any of them, and filter each one: a range of sizes, speeds, dates or ratios, text a name or path contains, or a set of states. The column titles stay in view while you scroll. The layout is remembered on each device.
-- **Filter sidebar** beside the list (sliding in on phones): tick any number of statuses, categories, tags and trackers, each with how many torrents it matches, including those without a category, tag or tracker. Ctrl or ⌘ and a click, or a long press, excludes a choice instead. Statuses include stalled, checking, moving and, from qBittorrent 5.1 on, tracker errors, warnings, trackers that can't be reached, and torrents a tracker no longer knows (unregistered, read from the tracker's message); empty ones are hidden until you ask for them. Each section has its own search. Categories, tags and saved **views** can be created, renamed, edited and deleted right there, and the column filters in force are listed too. While any filter is on, the filter button shows a dot.
+- **Torrent list** as a table or as cards, each torrent with an icon for its status. In the table you can show, hide and reorder columns (from the Columns button or by right-clicking a header, dragging a column's handle), drag titles, and resize columns, sort by any of them, and filter each one: a range of sizes, speeds, dates or ratios, text a name or path contains, or a set of states. The column titles stay in view while you scroll. The layout is remembered on each device.
+- **Filter sidebar** beside the list (sliding in on phones): tick any number of statuses, categories, tags and trackers, each with how many torrents it matches, including those without a category, tag or tracker. Ctrl or ⌘ and a click, or a long press, excludes a choice instead. Statuses include stalled, checking, moving and, from qBittorrent 5.1 on, tracker errors, warnings, trackers that can't be reached, and torrents a tracker no longer knows (unregistered, read from the tracker's message); empty ones are hidden until you ask for them. Each section has its own search. Categories, tags and saved **views** can be created, renamed, edited and deleted right there, and the column filters in force are listed too. **Clear filters** at the top clears everything, or with its arrow only the sidebar or only the column filters; a section's count clears just that section. While any filter is on, the filter button shows a dot.
 - **Quick search** in the header (a button that opens it on phones): it looks in names, categories, tags and trackers, word by word across dots, underscores and brackets, or with wildcards such as `*.mkv` or `*S[0-9][0-9]E[0-9][0-9]*`. It searches after a short pause or on Enter, and isn't saved with a view.
-- **Torrent details**: pieces, a speed graph, transfer facts with copy buttons for the name, hash, magnet link and paths, files (choose what to download and each file's priority, rename, and save finished files with qBittorrent 5.3), trackers, peers with country flags, and every per-torrent setting: limits, location, queue, category, tags, and more.
-- **Selecting and actions**: click a torrent to open its details in a panel below the list, Ctrl or Cmd-click and Shift-click to select several, and right-click for every action, the everyday ones as a row of icons that name themselves on hover. Choose which actions sit in the selection bar from its More menu, separately for wide screens and phones. On phones, tap a torrent for its details and hold one to start selecting.
-- **Bulk actions** for several torrents at once, from the selection bar or the right-click menu, including on/off options such as sequential download, and a typed-in queue position.
+- **Torrent details**: pieces, a speed graph, transfer facts with copy buttons for the name, hash, magnet link and paths, files (search, sort, open or close every folder, choose what to download and each file's priority, rename, copy a path, and save finished files with qBittorrent 5.3), trackers with their status, tier and counts, peers with country flags (both searchable and sortable), and every action and per-torrent setting: start, stop, force start, recheck, options with a check mark while on, limits, location, queue, category, tags, comment, and delete.
+- **Selecting and actions**: click a torrent to open its details in a panel below the list, Ctrl or Cmd-click and Shift-click to select several, and right-click for every action. The More button in the selection bar holds the same menu. Choose which actions sit in the selection bar from its More menu, separately for wide screens and phones. On phones, tap a torrent for its details and hold one to start selecting.
+- **Bulk actions** for several torrents at once, from the selection bar or the right-click menu, including on/off options such as sequential download, a typed-in queue position, a comment, exporting their .torrent files, and picking a category (or creating a new one) or tags from a searchable list.
 - **Add torrents** with the + button above the list or on the Add page, from links or .torrent files with all of qBittorrent's options. For a single magnet link or .torrent, see its files first and choose which to download. Drop .torrent files anywhere on the page, or let the browser open magnet links here. What you've entered stays while you visit other pages, until you add it or clear it with the ×. **Create torrents** from files on the server.
 - **RSS** feeds and folders, articles, and download rules, including import and export.
-- **Search** with qBittorrent's search plugins, sorted by most seeds, with results you can sort, filter and resize by column. A sidebar holds saved searches (to reopen, run again or stop), the plugins and category to search with, the column filters, and plugin management.
-- **Logs** in a table with coloured levels, a search, and an export to a text file, and a **Statistics** page with a live speed graph, the speed limits in force, connection status, storage, and the switches to pause all transfers and for the alternative speed limits. Open them from the menu, where they sit together below the pages, or from the sidebar; the speeds in the header open them over the current page. Dots on the menu button and beside Torrents and Statistics show what's out of the ordinary from every page: torrents with errors, paused transfers, a connection problem, or the alternative limits. A notice says when qBittorrent can't be reached.
+- **Search** with qBittorrent's search plugins, sorted by most seeds, with results you can sort, filter and resize by column. A sidebar holds saved searches (to reopen, run again or stop), how many results each plugin found (click one to show only its results), the category to search in, the column filters, and plugin management. The search shown stays when you visit other pages.
+- **Logs** in one list with coloured levels, a search, entries that open on their own, and an export to a text file, and a **Statistics** page with a live speed graph, the speed limits in force with a switch for the alternative ones, connection status, the external IPv4 and IPv6 addresses, storage, the session's and all-time totals, and an overview of your torrents. Open them from the menu, where they sit together below the pages, or from the sidebar; the speeds in the header open them over the current page. Dots on the menu button and beside Torrents and Statistics show what's out of the ordinary from every page: torrents with errors, paused transfers, a connection problem, or the alternative limits. A notice says when qBittorrent can't be reached.
+- **Incognito mode** under **Settings > App** shows made-up Linux names in place of the real torrent and file names in this browser, for screenshots. Nothing changes in qBittorrent.
 - **Notifications** when a torrent finishes, if you turn them on. Messages appear above the bars at the bottom of a phone, and in the bottom corner on wide screens.
-- **Keyboard shortcuts** for the torrent list and for moving between pages (G and a number), listed in **Settings > App** and shown with `?`.
+- **Keyboard shortcuts** for the torrent list and for moving between pages (G and a number), listed in **Settings > App** and shown with `?`. Enter accepts a dialog, and Ctrl or ⌘ and Enter does it from a text box.
 - **30 languages**, listed [below](#languages).
 - **Accessibility options**, described [below](#accessibility).
 - **Settings**: every qBittorrent preference, shown only when your qBittorrent version has it.
@@ -141,6 +151,16 @@ npm run typecheck
 ```
 
 `npm run typecheck` uses TypeScript 7, and `npm run lint` uses Oxlint, which reads TypeScript itself. Dependabot checks every week for newer packages and GitHub Actions and opens pull requests for them.
+
+### Demo mode
+
+To try the app without a qBittorrent, run it on sample torrents in your browser:
+
+```bash
+npm run demo
+```
+
+Then open `http://localhost:5173/?signedin`. Everything works on the sample data, kept in memory until you reload. The demo acts as the newest qBittorrent; set `VITE_DEMO_WEB_API` to an older Web API version, such as `2.11.2` for qBittorrent 5.0, to see what the app does there. The same demo is built by the Demo workflow on every change to `main` and published as the [live demo](https://kajover.github.io/qbminimal/?signedin).
 
 ## Translations
 

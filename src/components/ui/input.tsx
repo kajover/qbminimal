@@ -120,7 +120,8 @@ function Input({ className, wrapperClassName, clearable: allowClear = true, icon
         // Room for the ×, kept over any padding the field sets, and no second × from the browser.
         withClear && "pe-8",
         icon && "ps-8",
-        kind === "search" && "[&::-webkit-search-cancel-button]:appearance-none"
+        // iPhone Safari draws its own, taller search field; this keeps the height set here.
+        kind === "search" && "appearance-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
       )}
       {...props}
       {...fieldProps}
@@ -146,7 +147,8 @@ function Textarea({ className, wrapperClassName, clearable: allowClear = true, r
     <div className={cn("relative w-full min-w-0", wrapperClassName)}>
       <textarea
         data-slot="textarea"
-        className={cn(className, allowClear && "pe-8")}
+        // Styled like the one-line fields, so every caller gets the same frame.
+        className={cn(FIELD_CLASSES, "block px-3 py-2 text-sm", className, allowClear && "pe-8")}
         {...props}
         {...fieldProps}
         aria-invalid={invalid ? true : props["aria-invalid"]}

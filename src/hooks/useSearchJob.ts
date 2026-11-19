@@ -7,8 +7,9 @@ import { t } from '@/i18n'
 
 // Searches longer than this are stopped, keeping what they found.
 const TIME_LIMIT_MS = 60_000
-// A click this soon after a search ends was meant to stop it, not to search again.
-const STOP_GRACE_MS = 800
+// A click this soon after a search ends was meant to stop it, not to search again: as long as a
+// double click, so a new search can start right after stopping one.
+const STOP_GRACE_MS = 400
 
 interface Job {
   id: number
@@ -16,14 +17,24 @@ interface Job {
   startedAt: number
 }
 
+// The search shown, with its text and category, kept while the app is open so it's still there
+// after going to another page and back. When each search began, so one opened again while running
+// keeps its time limit.
+let shown: { job: Job; pattern: string; category: string } | null = null
+const startTimes = new Map<number, number>()
+// For tests, which each start without a search shown.
+export const forgetShownSearch = () => { shown = null }
+
 // Runs a qBittorrent search: starts it and polls its results every second until it finishes or
 // times out. Plugin errors aren't repeated here: qBittorrent writes them to its log.
 export function useSearchJob() {
   const queryClient = useQueryClient()
-  const [job, setJob] = useState<Job | null>(null)
+  const [job, setJobState] = useState<Job | null>(() => shown?.job ?? null)
+  const setJob = (next: Job | null, text?: { pattern: string; category: string }) => {
+    shown = next ? { job: next, pattern: text?.pattern ?? shown?.pattern ?? '', category: text?.category ?? shown?.category ?? 'all' } : null
+    setJobState(next)
+  }
   const endedAt = useRef(0)
-  // When each search began, so one opened again while running keeps its time limit.
-  const startedAt = useRef(new Map<number, number>())
 
   const finish = (current: Job) => {
     endedAt.current = Date.now()
@@ -71,8 +82,8 @@ export function useSearchJob() {
     try {
       const { id } = await qbitClient.startSearch(pattern, plugins, category)
       rememberSearch(id, { pattern, plugins, category })
-      startedAt.current.set(id, Date.now())
-      setJob({ id, running: true, startedAt: Date.now() })
+      startTimes.set(id, Date.now())
+      setJob({ id, running: true, startedAt: Date.now() }, { pattern, category })
       if (!keepSearchesOn()) void deleteOthers(id)
       void queryClient.invalidateQueries({ queryKey: ['search', 'status'] })
       return true
@@ -82,6 +93,8 @@ export function useSearchJob() {
     }
   }
 
+  // Stopping shows at once on the button, so there's no notification, and a new search can start
+  // right away.
   const cancel = async () => {
     if (!job?.running) return
     endedAt.current = Date.now()
@@ -89,7 +102,6 @@ export function useSearchJob() {
     try {
       await qbitClient.stopSearch(job.id)
       void queryClient.invalidateQueries({ queryKey: ['search', 'status'] })
-      toast.info(t('Search stopped'))
     } catch {
       toast.error(t('Couldn\'t stop the search in qBittorrent'))
     }
@@ -97,12 +109,18 @@ export function useSearchJob() {
 
   // Shows the results of a search qBittorrent still holds. One still running is followed again until
   // it ends; another search left running carries on in qBittorrent meanwhile.
-  const open = (id: number, running = false) => setJob({ id, running, startedAt: startedAt.current.get(id) ?? Date.now() })
-  // Clears the results, for when their search was deleted.
+  const open = (id: number, running = false) => {
+    const saved = readSavedSearches()[id]
+    setJob({ id, running, startedAt: startTimes.get(id) ?? Date.now() }, saved && { pattern: saved.pattern, category: saved.category })
+  }
+  // Clears the results, for when their search was deleted or the Clear button was used.
   const close = () => setJob(null)
 
   return {
     jobId: job?.id ?? null,
+    // The text and category of the search shown when the page opened, for its form.
+    pattern: shown?.pattern ?? '',
+    category: shown?.category ?? 'all',
     running: !!job?.running,
     searched: !!job,
     results: results.data ?? [],

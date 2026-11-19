@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AppWindow, BookOpen, ChevronDown, Film, Filter, Gamepad2, History, Image as ImageIcon, LayoutGrid, Loader2, Music, Puzzle, RefreshCw, RotateCcw, Search, Settings, Shapes, Sparkles, Trash2, Tv, X, type LucideIcon } from 'lucide-react'
+import { AppWindow, BookOpen, ChevronDown, Film, Filter, Gamepad2, History, Image as ImageIcon, LayoutGrid, Loader2, Music, Puzzle, RefreshCw, Search, Settings, Shapes, Sparkles, Trash2, Tv, X, type LucideIcon } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -7,10 +7,10 @@ import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ConfirmAction } from '@/components/ConfirmAction'
 import { AddFilterButton, ColumnFilterChips, type FilterTarget } from '@/components/ColumnFilters'
-import { FilterItem, NothingMatches, Section } from '@/components/FilterSidebarParts'
+import { FilterItem, NothingMatches, Section, SidebarHeader } from '@/components/FilterSidebarParts'
 import { useSidebarSections } from '@/hooks/useSidebarSections'
 import { toast } from '@/hooks/use-toast'
-import { qbitClient } from '@/lib/api'
+import { qbitClient, type SearchPlugin } from '@/lib/api'
 import { activeCount, type ColumnFilter, type ColumnFilters } from '@/lib/columnFilters'
 import { forgetSearches, keepSearchesOn, parseSearchesShown, readSavedSearches, searchesShown, setKeepSearches, setSearchesShown, type SavedSearch } from '@/lib/searchPatterns'
 import { toggleChoice } from '@/lib/torrentFilters'
@@ -35,23 +35,22 @@ interface SearchSidebarProps {
   onRun: (search: SavedSearch) => Promise<boolean>
   onStop: (id: number) => void
   onCleared: () => void
-  plugins: { name: string; fullName?: string }[]
-  // Plugins ticked; none means every enabled one.
-  chosenPlugins: string[]
-  onPluginsChange: (names: string[]) => void
+  // The enabled plugins; each search asks them all.
+  plugins: SearchPlugin[]
+  // How many of the shown results each plugin found, by the name results carry.
+  pluginCounts: ReadonlyMap<string, number>
   category: string
   onCategoryChange: (category: string) => void
   onManagePlugins: () => void
   targets: FilterTarget[]
   filters: ColumnFilters
   onFilterChange: (id: string, filter: ColumnFilter | null) => void
-  onClose: () => void
 }
 
 // Earlier searches, the plugins and category to search with, and the column filters, laid out like
 // the torrent list's filter sidebar.
 export function SearchSidebar(props: SearchSidebarProps) {
-  const { activeId, running, onOpen, onRun, onStop, onCleared, plugins, chosenPlugins, onPluginsChange, category, onCategoryChange, onManagePlugins, targets, filters, onFilterChange, onClose } = props
+  const { activeId, running, onOpen, onRun, onStop, onCleared, plugins, pluginCounts, category, onCategoryChange, onManagePlugins, targets, filters, onFilterChange } = props
   const queryClient = useQueryClient()
   const { data: searches = [] } = useQuery({ queryKey: ['search', 'status'], queryFn: () => qbitClient.getSearchStatus(), refetchInterval: 5000 })
   const [keep, setKeep] = useState(keepSearchesOn)
@@ -89,31 +88,38 @@ export function SearchSidebar(props: SearchSidebarProps) {
   const shownSearches = matchingSearches.slice(0, perPage + extra)
   const hiddenSearches = matchingSearches.length - shownSearches.length
 
-  const shownPlugins = matching('plugins', plugins, plugin => plugin.fullName || plugin.name)
-  const shownCategories = matching('categories', SEARCH_CATEGORIES, ([, label]) => t(label))
-  const narrowed = chosenPlugins.length > 0 || category !== 'all'
+  // Clicking a plugin shows only its results: it's the Plugin column's filter. Results from a
+  // plugin turned off since still get a row.
+  const pluginFilter = filters.engineName?.type === 'set' ? filters.engineName.values : []
+  const pluginRows = [
+    ...plugins.map(plugin => ({ name: plugin.name, label: plugin.fullName || plugin.name })),
+    ...[...pluginCounts.keys()].filter(name => !plugins.some(plugin => plugin.name === name || plugin.fullName === name)).map(name => ({ name, label: name })),
+  ]
+  const countOf = (row: { name: string; label: string }) => pluginCounts.get(row.name) ?? pluginCounts.get(row.label) ?? 0
+  const valueOf = (row: { name: string; label: string }) => (pluginCounts.has(row.label) && !pluginCounts.has(row.name) ? row.label : row.name)
+  const togglePlugin = (value: string) => {
+    const values = toggleChoice(pluginFilter, value)
+    onFilterChange('engineName', values.length ? { type: 'set', values } : null)
+  }
+  const shownPlugins = matching('plugins', pluginRows, row => row.label)
+  // Only the categories some enabled plugin can search in; the rest would find the same as All.
+  const supported = new Set(plugins.flatMap(plugin => (plugin.supportedCategories ?? []).map(category => category.id)))
+  const categories = SEARCH_CATEGORIES.filter(([value]) => value === 'all' || value === category || supported.has(value))
+  const shownCategories = matching('categories', categories, ([, label]) => t(label))
+  const sidebarFiltered = category !== 'all' || pluginFilter.length > 0
+  const columnFiltered = Object.keys(filters).some(id => id !== 'engineName' && filters[id] && activeCount({ [id]: filters[id] }) > 0)
 
   return (
     <div id="search-sidebar" className="space-y-3">
-      <div className="flex items-center gap-1">
-        <h3 className="min-w-0 flex-1 truncate text-sm font-medium">{t('Search options')}</h3>
-        {/* Adds a filter on any column of the results. */}
-        <AddFilterButton targets={targets} onChange={onFilterChange} active={activeCount(filters) > 0} />
-        <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0 rounded-full bg-muted hover:bg-accent" aria-label={t('Close')} title={t('Close')} onClick={onClose}>
-          <X className="size-4" />
-        </Button>
-      </div>
-      {/* Each reset clears its own kind of filter. */}
-      <div className="flex flex-wrap items-center gap-1">
-        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 rounded-full px-1.5 has-[>svg]:px-1.5" disabled={!narrowed} title={t('Clear the choices below')} onClick={() => { onPluginsChange([]); onCategoryChange('all') }}>
-          <RotateCcw className="size-4" />
-          {t('Reset filters')}
-        </Button>
-        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 rounded-full px-1.5 has-[>svg]:px-1.5" disabled={activeCount(filters) === 0} title={t('Clear the column filters')} onClick={() => targets.forEach(target => filters[target.id] && onFilterChange(target.id, null))}>
-          <Filter className="size-4" />
-          {t('Reset columns')}
-        </Button>
-      </div>
+      {/* The funnel adds a filter on any column of the results. */}
+      <SidebarHeader
+        title={t('Search options')}
+        filterButton={<AddFilterButton targets={targets} onChange={onFilterChange} active={activeCount(filters) > 0} />}
+        sidebarFiltered={sidebarFiltered}
+        columnFiltered={columnFiltered}
+        onClearSidebar={() => { onCategoryChange('all'); onFilterChange('engineName', null) }}
+        onClearColumns={() => targets.forEach(target => target.id !== 'engineName' && filters[target.id] && onFilterChange(target.id, null))}
+      />
 
       <Section
         id="saved" title={t('Saved searches')} icon={History} chosen={0} folded={folded.includes('saved')} onFold={fold}
@@ -208,32 +214,34 @@ export function SearchSidebar(props: SearchSidebarProps) {
 
       {/* Filters set from the table's titles or the funnel above, each opening its editor. */}
       {activeCount(filters) > 0 && (
-        <Section id="columns" title={t('Column filters')} icon={Filter} chosen={activeCount(filters)} folded={folded.includes('columns')} onFold={fold}>
+        <Section id="columns" title={t('Column filters')} icon={Filter} chosen={activeCount(filters)} onClear={() => targets.forEach(target => filters[target.id] && onFilterChange(target.id, null))} folded={folded.includes('columns')} onFold={fold}>
           <li><ColumnFilterChips targets={targets} filters={filters} onChange={onFilterChange} className="gap-1.5" /></li>
         </Section>
       )}
 
       <Section
-        id="plugins" title={t('Plugins')} icon={Puzzle} chosen={chosenPlugins.length} folded={folded.includes('plugins')} onFold={fold} {...searchProps('plugins')}
+        id="plugins" title={t('Plugins')} icon={Puzzle} chosen={pluginFilter.length} onClear={() => onFilterChange('engineName', null)} folded={folded.includes('plugins')} onFold={fold} {...searchProps('plugins')}
         action={(
           <Button type="button" variant="ghost" size="icon" className="size-7" aria-label={t('Manage plugins')} title={t('Manage plugins')} onClick={onManagePlugins}>
             <Settings className="size-4" />
           </Button>
         )}
       >
-        {/* Nothing ticked searches with every enabled plugin. */}
-        <FilterItem icon={LayoutGrid} label={t('All enabled plugins')} muted checked={chosenPlugins.length === 0} onToggle={() => onPluginsChange([])} />
-        {shownPlugins.length === 0 && plugins.length > 0 ? nothing : shownPlugins.map(plugin => (
-          <FilterItem key={plugin.name} icon={Puzzle} label={plugin.fullName || plugin.name} checked={chosenPlugins.includes(plugin.name)} onToggle={() => onPluginsChange(toggleChoice(chosenPlugins, plugin.name))} />
-        ))}
+        {/* Every enabled plugin searches; turning them on and off is under Manage plugins. */}
+        {pluginRows.length === 0 ? <li className="px-2 py-1 text-sm text-muted-foreground">{t('No plugins enabled.')}</li>
+          : shownPlugins.length === 0 ? nothing
+          : shownPlugins.map(row => (
+            <FilterItem key={row.name} icon={Puzzle} label={row.label} count={countOf(row)} muted={countOf(row) === 0} checked={pluginFilter.includes(valueOf(row))} onToggle={() => togglePlugin(valueOf(row))} />
+          ))}
       </Section>
 
-      {/* qBittorrent searches one category at a time. */}
-      <Section id="categories" title={t('Categories')} icon={Shapes} chosen={category === 'all' ? 0 : 1} folded={folded.includes('categories')} onFold={fold} {...searchProps('categories')}>
+      {/* qBittorrent searches one category at a time, so picking one searches again. Results don't
+          say their category, so it can't narrow results already found. */}
+      {categories.length > 1 && <Section id="categories" title={t('Categories')} icon={Shapes} chosen={category === 'all' ? 0 : 1} onClear={() => onCategoryChange('all')} folded={folded.includes('categories')} onFold={fold} {...searchProps('categories')}>
         {shownCategories.length === 0 ? nothing : shownCategories.map(([value, label, icon]) => (
           <FilterItem key={value} icon={icon} label={t(label)} muted={value === 'all'} checked={category === value} onToggle={() => onCategoryChange(category === value ? 'all' : value)} />
         ))}
-      </Section>
+      </Section>}
     </div>
   )
 }

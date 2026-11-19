@@ -19,6 +19,8 @@ describe('isApiAtLeast', () => {
 describe('supportsFeature', () => {
   it('knows which features qBittorrent 5.2.3 lacks', () => {
     expect(supportsFeature('2.15.1', 'fileDownload')).toBe(false)
+    expect(supportsFeature('2.11.4', 'setComment')).toBe(false)
+    expect(supportsFeature('2.12.1', 'setComment')).toBe(true)
     expect(supportsFeature('2.15.1', 'sessionPause')).toBe(false)
     expect(supportsFeature('2.17.0', 'sessionPause')).toBe(true)
   })

@@ -40,10 +40,46 @@ function DialogOverlay({
   )
 }
 
+// Enter accepts a dialog: in a form field it submits the form as usual, and elsewhere it presses
+// the footer's last filled button, which is the one that accepts. A dialog with only outlined
+// buttons, such as a log entry's, has nothing to accept. Ctrl or ⌘ and Enter does the same
+// from a text box, where Enter alone starts a new line.
+function acceptOnEnter(event: React.KeyboardEvent<HTMLDivElement>) {
+  if (event.key !== 'Enter' || event.defaultPrevented || event.nativeEvent.isComposing || event.altKey || event.shiftKey) return
+  const target = event.target as HTMLElement
+  const typing = target.closest('textarea, [contenteditable="true"]')
+  const mod = event.ctrlKey || event.metaKey
+  if (typing ? !mod : mod) return
+  if (!typing && target.closest('button, a, select, input, [role="menuitem"], [role="option"], [role="combobox"], [role="checkbox"], [role="switch"], [role="tab"]')) return
+  const form = target.closest('form')
+  if (typing && form) {
+    event.preventDefault()
+    form.requestSubmit()
+    return
+  }
+  const buttons = event.currentTarget.querySelectorAll<HTMLButtonElement>('[data-slot="dialog-footer"] button:is([data-variant="default"], [data-variant="destructive"]):not([disabled])')
+  const accept = buttons[buttons.length - 1]
+  if (!accept) return
+  event.preventDefault()
+  accept.click()
+}
+
+// A dialog with a field to type in starts there. Others start on the dialog itself, so no button
+// looks picked and shows its tooltip, and Enter accepts.
+function focusOnOpen(event: Event) {
+  const content = event.currentTarget as HTMLElement
+  if (content.contains(document.activeElement)) return event.preventDefault()
+  if (content.querySelector('input:not([type="checkbox"]):not([type="radio"]):not([disabled]), textarea:not([disabled])')) return
+  event.preventDefault()
+  content.focus()
+}
+
 function DialogContent({
   className,
   children,
   showCloseButton = true,
+  onKeyDown,
+  onOpenAutoFocus,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
@@ -57,6 +93,8 @@ function DialogContent({
           "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-100 outline-hidden sm:max-w-lg",
           className
         )}
+        onKeyDown={(event) => { onKeyDown?.(event); acceptOnEnter(event) }}
+        onOpenAutoFocus={(event) => { onOpenAutoFocus?.(event); if (!event.defaultPrevented) focusOnOpen(event) }}
         {...props}
       >
         {children}

@@ -1,17 +1,18 @@
-import { useState, type ReactNode } from 'react'
-import { Activity, Database, Gauge, Globe, HardDrive, History, Network, Pause, Play, Turtle, type LucideIcon } from 'lucide-react'
+import { useMemo, useState, type ReactNode } from 'react'
+import { Activity, Database, Gauge, Globe, HardDrive, History, Network, Rabbit, Turtle, Layers, type LucideIcon } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/PageHeader'
 import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { useApiFeature, usePreferences, useTorrents, useTransferInfo } from '@/hooks/useApi'
+import { usePreferences, useTorrents, useTransferInfo } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import { formatDuration } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { formatBytes } from '@/lib/format'
 import { SpeedChart } from './SpeedChart'
+import { torrentOverview } from '@/lib/torrentOverview'
 import { CONNECTION_LABELS } from '@/lib/statusNotes'
 import { t } from '@/i18n'
 
@@ -28,32 +29,6 @@ function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: s
         <p className="truncate text-sm tabular-nums" title={value}>{value}</p>
       </div>
     </div>
-  )
-}
-
-// qBittorrent 5.3 can pause every transfer at once and later resume exactly what was running.
-function SessionPauseButton({ paused }: { paused: boolean }) {
-  const queryClient = useQueryClient()
-  const [pending, setPending] = useState(false)
-
-  const toggle = async () => {
-    setPending(true)
-    try {
-      await (paused ? qbitClient.resumeSession() : qbitClient.pauseSession())
-      await queryClient.invalidateQueries({ queryKey: ['torrents'] })
-      toast.success(paused ? t('Transfers resumed') : t('All transfers paused'), { description: paused ? undefined : t('Each torrent keeps its own state, so resuming brings back what was running.') })
-    } catch (e) {
-      toast.error(paused ? t('Couldn\'t resume transfers') : t('Couldn\'t pause transfers'), { description: e instanceof Error ? e.message : undefined })
-    } finally {
-      setPending(false)
-    }
-  }
-
-  return (
-    <Button type="button" size="sm" variant={paused ? 'default' : 'outline'} disabled={pending} onClick={toggle} className="w-full gap-2">
-      {paused ? <Play className="size-4" /> : <Pause className="size-4" />}
-      {paused ? t('Resume all transfers') : t('Pause all transfers')}
-    </Button>
   )
 }
 
@@ -80,19 +55,21 @@ function AlternativeLimitsButton({ on }: { on: boolean }) {
     }
   }
 
+  // Beside the limits it swaps, as tall as they are.
+  const label = on ? t('Alternative speed limits on') : t('Alternative speed limits off')
   return (
     <Button
       type="button"
-      size="sm"
       variant="outline"
       aria-pressed={on}
-      title={rates}
+      aria-label={t('Alternative speed limits')}
+      title={rates ? `${label}: ${rates}` : label}
       disabled={pending}
       onClick={toggle}
-      className={cn('mt-2 w-full gap-2', on && 'border-amber-500/40 bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 dark:text-amber-400')}
+      className={cn('h-full min-h-11 px-4', on && 'border-amber-500/40 bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 dark:text-amber-400')}
     >
-      <Turtle className="size-4" />
-      {t('Alternative speed limits')}
+      {/* A rabbit at full speed, a turtle while the slower limits apply. */}
+      {on ? <Turtle className="size-5" /> : <Rabbit className="size-5" />}
     </Button>
   )
 }
@@ -128,19 +105,16 @@ export function StatisticsDialog({ open, onOpenChange }: { open: boolean; onOpen
 function Statistics() {
   const { data: state } = useTransferInfo()
   const { data: torrents } = useTorrents()
-  const canPauseSession = useApiFeature('sessionPause') && typeof state?.session_state === 'boolean'
   const sessionPaused = state?.session_state === true
   const connection = CONNECTION_LABELS[state?.connection_status ?? '']
-  const externalAddress = [state?.last_external_address_v4, state?.last_external_address_v6].filter(Boolean).join(', ')
 
+  const overview = useMemo(() => (torrents ? torrentOverview(torrents, state?.dl_info_speed ?? 0) : null), [torrents, state?.dl_info_speed])
   const allGroups: { title: string; icon: LucideIcon; rows: [string, string][] }[] = state ? [
     {
       title: t('Storage'),
       icon: HardDrive,
       rows: [
         [t('Free space'), size(state.free_space_on_disk)],
-        // Summed here, as qBittorrent doesn't report it.
-        [t('Total size of torrents'), torrents ? formatBytes(torrents.reduce((sum, torrent) => sum + (torrent.size ?? 0), 0)) : '-'],
       ],
     },
     {
@@ -175,6 +149,30 @@ function Statistics() {
         [t('Total queued size'), size(state.total_queued_size)],
       ],
     },
+    // Across every torrent, from the list already loaded, after what qBittorrent reports.
+    ...(overview ? [
+      {
+        title: t('Torrents'),
+        icon: Layers,
+        rows: [
+          [t('All torrents'), count(overview.total)],
+          [t('Total size of torrents'), formatBytes(overview.size)],
+          [t('Downloading'), count(overview.downloading)],
+          [t('Seeding'), count(overview.seeding)],
+          [t('Stalled'), count(overview.stalled)],
+          [t('Stopped'), count(overview.stopped)],
+          [t('Errored'), count(overview.errored)],
+          [t('Private'), count(overview.private)],
+          [t('Trackers'), count(overview.trackers)],
+          [t('Left to download'), formatBytes(overview.remaining)],
+          // At the current download speed.
+          [t('Time left at this speed'), overview.eta === null ? '∞' : formatDuration(overview.eta)],
+          [t('Downloaded by these torrents'), formatBytes(overview.downloaded)],
+          [t('Uploaded by these torrents'), formatBytes(overview.uploaded)],
+          [t('Their ratio'), overview.ratio === null ? '∞' : overview.ratio.toFixed(2)],
+        ] as [string, string][],
+      },
+    ] : []),
   ] : []
   // Rows this qBittorrent doesn't report are left out, and so is a group left empty.
   const groups = allGroups
@@ -197,14 +195,14 @@ function Statistics() {
                   {connection && <p className="text-xs text-muted-foreground">{connection.description}</p>}
                 </div>
               </div>
-              {canPauseSession && <SessionPauseButton paused={sessionPaused} />}
             </div>
 
             <section>
               <h3 className="mb-1 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><Gauge className="size-3.5" />{t('Speed')}</h3>
               <SpeedChart />
               {/* The limits in force, which are the alternative ones while those are on. */}
-              <dl className={cn('mt-2 grid grid-cols-2 gap-2 text-sm', state.use_alt_speed_limits && 'text-amber-700 dark:text-amber-400')}>
+              <div className="mt-2 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2">
+              <dl className={cn('col-span-2 grid grid-cols-2 gap-2 text-sm', state.use_alt_speed_limits && 'text-amber-700 dark:text-amber-400')}>
                 <div className="rounded-md bg-muted/60 px-3 py-1.5">
                   <dt className="text-xs text-muted-foreground">{t('Download limit')}</dt>
                   <dd className="tabular-nums">↓ {limit(state.dl_rate_limit)}</dd>
@@ -215,22 +213,25 @@ function Statistics() {
                 </div>
               </dl>
               <AlternativeLimitsButton on={state.use_alt_speed_limits === true} />
+              </div>
             </section>
 
-            {/* One row: the node count needs little room, the addresses the rest. */}
-            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
+            {/* The node count needs little room, each address the rest; IPv4 and IPv6 apart. */}
+            <div className="flex flex-wrap gap-2 *:min-w-0">
               <Fact icon={<Network className="size-4" />} label={t('DHT nodes')} value={count(state.dht_nodes)} />
-              {externalAddress && <Fact icon={<Globe className="size-4" />} label={t('External address')} value={externalAddress} />}
+              {state.last_external_address_v4 && <div className="flex-1 basis-40"><Fact icon={<Globe className="size-4" />} label={t('External address (IPv4)')} value={state.last_external_address_v4} /></div>}
+              {state.last_external_address_v6 && <div className="flex-1 basis-56"><Fact icon={<Globe className="size-4" />} label={t('External address (IPv6)')} value={state.last_external_address_v6} /></div>}
             </div>
 
             {groups.map(group => (
               <section key={group.title}>
                 <h3 className="mb-1 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><group.icon className="size-3.5" />{group.title}</h3>
                 <dl className="divide-y text-sm">
-                  {group.rows.map(([label, value]) => (
-                    <div key={label} className="flex justify-between gap-4 py-1.5">
-                      <dt className="text-muted-foreground">{label}</dt>
-                      <dd className="text-end tabular-nums">{value}</dd>
+                  {group.rows.map(([label, value], index) => (
+                    <div key={index} className="flex justify-between gap-4 py-1.5">
+                      {/* A torrent's or tracker's name can be long, so it's cut short; the value never is. */}
+                      <dt className="min-w-0 truncate text-muted-foreground" title={label}>{label}</dt>
+                      <dd className="shrink-0 text-end tabular-nums">{value}</dd>
                     </div>
                   ))}
                 </dl>

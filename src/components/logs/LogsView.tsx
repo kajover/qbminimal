@@ -4,7 +4,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { PageHeader } from '@/components/PageHeader'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
 import { SearchInput } from '@/components/SearchInput'
@@ -127,17 +128,19 @@ function useNewEntries(scroller: RefObject<HTMLElement | null>, latest: (number 
   return remember
 }
 
-// The sentence, then its details quieter, as key=value. On phones a long entry stops after four
-// lines; it opens in full.
+// The sentence on one line, then its details on the next, quieter but the same size, as key=value.
+// On phones a long entry stops after four lines; it opens in full.
 function Message({ row }: { row: LogRow }) {
   return (
     <span className="min-w-0 basis-full [overflow-wrap:anywhere] max-md:line-clamp-4 md:basis-0 md:flex-1">
-      {row.summary && <span className="me-2">{row.summary}</span>}
-      {row.fields.map((field, index) => (
-        <span key={index} className="me-2 text-muted-foreground">
-          {field.key}<span className="opacity-60">=</span><span className="font-mono text-xs">{field.value}</span>
+      {row.summary && <span className="block">{row.summary}</span>}
+      {row.fields.length > 0 && (
+        <span className="block text-muted-foreground">
+          {row.fields.map((field, index) => (
+            <span key={index} className="me-2">{field.key}<span className="opacity-60">=</span>{field.value}</span>
+          ))}
         </span>
-      ))}
+      )}
     </span>
   )
 }
@@ -313,6 +316,7 @@ export function LogsView() {
     return result
   }, [main.data])
 
+  const [exporting, setExporting] = useState(false)
   const exportLogs = () => {
     const text = buildLogText(rows.map(row => ({ timestamp: row.timestamp, level: row.level, message: row.message })))
     const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }))
@@ -340,18 +344,17 @@ export function LogsView() {
                   <Settings />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-52">
                 {/* Stays open when switched, so the change can be seen. The switch only shows the
                     state: the whole row is the control. */}
                 <DropdownMenuItem role="menuitemcheckbox" aria-checked={autoScroll} className="justify-between" onSelect={(e) => { e.preventDefault(); changeAutoScroll(!autoScroll) }}>
                   {t('Auto Scroll')}
                   <Switch aria-hidden tabIndex={-1} readOnly checked={autoScroll} className="pointer-events-none" />
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem disabled={rows.length === 0} onSelect={() => setExporting(true)}><Download />{t('Export logs')}</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="outline" size="icon" className="shrink-0" title={t('Export logs')} aria-label={t('Export logs')} disabled={rows.length === 0} onClick={exportLogs}>
-              <Download />
-            </Button>
           </div>
           <LogWindow
             rows={rows}
@@ -365,6 +368,19 @@ export function LogsView() {
           />
         </CardContent>
       </Card>
+      {/* Asks first, as the file is the entries shown; Enter exports. */}
+      <Dialog open={exporting} onOpenChange={setExporting}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('Export logs?')}</DialogTitle>
+            <DialogDescription>{t('Saves the {count} entries shown, with the search and filters applied, as {file}.', { count: rows.length, file: logFileName('main') })}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setExporting(false)}>{t('Cancel')}</Button>
+            <Button onClick={() => { setExporting(false); exportLogs() }}><Download />{t('Export')}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {open && <LogEntryDialog row={open} onClose={() => setOpen(null)} onHide={(key) => changeHidden([...new Set([...hidden, key])])} />}
     </div>
   )

@@ -1,4 +1,4 @@
-import { lazy, startTransition, useEffect, useState, type ComponentType } from 'react'
+import { lazy, startTransition, useEffect, useLayoutEffect, useState, type ComponentType } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 import { HoverLabels } from '@/components/HoverLabels'
@@ -13,6 +13,7 @@ import { useSession } from '@/hooks/useSession'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { hasIncoming, onIncoming } from '@/lib/incoming'
 import { registerServiceWorker } from '@/lib/notify'
+import { pageScroller } from '@/lib/pageScroll'
 import { t } from '@/i18n'
 
 // The torrent list and the Add page (whose form the list's + button opens too) ship in the main
@@ -47,6 +48,9 @@ function Screens() {
   // A magnet link the page was opened for starts on the Add page.
   const [page, setPage] = useState<PageId>(() => (hasIncoming() ? 'add' : 'torrents'))
   const [selected, setSelected] = useState(page)
+  // A newly shown page starts at its top. Done as it's put on screen, before it's drawn: doing it
+  // when the tab lights up would first jump the old page to its top, which flashes.
+  useLayoutEffect(() => { pageScroller().scrollTo(0, 0) }, [page])
   // So do torrents dropped on the page or handed over later.
   useEffect(() => onIncoming(() => { setSelected('add'); setPage('add') }), [])
 
@@ -73,7 +77,7 @@ function Screens() {
   }
   const View = PAGE_VIEWS[page]
   return (
-    <Layout page={selected} onNavigate={navigate}>
+    <Layout page={selected} shownPage={page} onNavigate={navigate}>
       {/* The reset key clears a page's error when switching away from it. */}
       <PageBoundary resetKey={page}>
         <View />

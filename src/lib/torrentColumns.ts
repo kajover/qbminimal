@@ -1,3 +1,4 @@
+import { CircleDot, ListOrdered, type LucideIcon } from 'lucide-react'
 import type { Torrent } from '@/types'
 import { getTrackerHost, parseTags } from './torrentFilters'
 import { getStateLabel } from './torrentState'
@@ -7,7 +8,7 @@ import { t } from '@/i18n'
 // The torrent table's columns. Each can be shown or hidden, dragged to a new place, and resized,
 // and the layout is kept per device.
 export const COLUMN_IDS = [
-  'priority', 'name', 'size', 'progress', 'state', 'num_seeds', 'num_leechs', 'dlspeed', 'upspeed', 'eta', 'ratio',
+  'priority', 'name', 'size', 'progress', 'state_icon', 'state', 'num_seeds', 'num_leechs', 'dlspeed', 'upspeed', 'eta', 'ratio',
   'popularity', 'category', 'tags', 'added_on', 'completion_on', 'tracker', 'downloaded', 'uploaded', 'amount_left',
   'time_active', 'seeding_time', 'last_activity', 'availability', 'dl_limit', 'up_limit', 'save_path',
 ] as const
@@ -24,6 +25,10 @@ export interface ColumnDef {
   defaultVisible: boolean
   // Numbers line up on the right.
   numeric?: boolean
+  // Shown in the header in place of the name.
+  icon?: LucideIcon
+  // Clicking the title sorts by it, unless another column already sorts the same.
+  unsorted?: boolean
 }
 
 const col = (id: ColumnId, label: string, width: number, defaultVisible: boolean, extra: Partial<ColumnDef> = {}): ColumnDef =>
@@ -31,10 +36,12 @@ const col = (id: ColumnId, label: string, width: number, defaultVisible: boolean
 
 export const COLUMNS: ColumnDef[] = [
   // The queue position, headed # as in qBittorrent.
-  col('priority', t('Queue'), 44, true, { numeric: true, header: '#', minWidth: 36 }),
+  col('priority', t('Queue'), 44, true, { numeric: true, icon: ListOrdered, minWidth: 36 }),
   col('name', t('Name'), 320, true, { minWidth: 120 }),
   col('size', t('Size'), 90, true, { numeric: true }),
   col('progress', t('Progress'), 140, true, { minWidth: 80 }),
+  // The state as an icon, named on hover. Status sorts and filters the same, so it does neither.
+  col('state_icon', t('Status icon'), 40, true, { icon: CircleDot, minWidth: 36, unsorted: true }),
   col('state', t('Status'), 116, true, { minWidth: 80 }),
   col('num_seeds', t('Seeds'), 88, true, { numeric: true }),
   col('num_leechs', t('Peers'), 88, true, { numeric: true }),
@@ -181,7 +188,7 @@ export const trackerHost = (url: string | undefined): string => (url ? getTracke
 function sortValue(torrent: Torrent, id: ColumnId): number | string {
   switch (id) {
     case 'name': return torrent.name
-    case 'state': return torrent.state
+    case 'state': case 'state_icon': return torrent.state
     case 'category': return torrent.category ?? ''
     case 'tags': return torrent.tags ?? ''
     case 'tracker': return trackerHost(torrent.tracker)
@@ -208,7 +215,7 @@ export function compareTorrents(a: Torrent, b: Torrent, id: ColumnId): number {
 
 // How each column is filtered from its title (see lib/columnFilters).
 const FILTER_KINDS: Record<ColumnId, FilterKind> = {
-  priority: 'number', name: 'text', size: 'size', progress: 'percent', state: 'set', num_seeds: 'number', num_leechs: 'number',
+  priority: 'number', name: 'text', size: 'size', progress: 'percent', state_icon: 'set', state: 'set', num_seeds: 'number', num_leechs: 'number',
   dlspeed: 'speed', upspeed: 'speed', eta: 'duration', ratio: 'number', popularity: 'number', category: 'set', tags: 'set',
   added_on: 'date', completion_on: 'date', tracker: 'set', downloaded: 'size', uploaded: 'size', amount_left: 'size',
   time_active: 'duration', seeding_time: 'duration', last_activity: 'date', availability: 'number', dl_limit: 'speed',
@@ -222,7 +229,7 @@ function filterValue(torrent: Torrent, id: ColumnId): number | string | string[]
   switch (id) {
     case 'priority': return torrent.priority > 0 ? torrent.priority : NaN
     case 'progress': return torrent.progress * 100
-    case 'state': return getStateLabel(torrent.state, torrent.completion_on)
+    case 'state': case 'state_icon': return getStateLabel(torrent.state, torrent.completion_on)
     case 'eta': return torrent.eta >= 0 && torrent.eta < 8640000 ? torrent.eta : Infinity
     case 'popularity': return torrent.popularity === undefined ? NaN : torrent.popularity < 0 ? Infinity : torrent.popularity
     case 'availability': return torrent.availability !== undefined && torrent.availability >= 0 ? torrent.availability : NaN
@@ -237,7 +244,8 @@ function filterValue(torrent: Torrent, id: ColumnId): number | string | string[]
   }
 }
 
-export const TORRENT_FILTER_COLUMNS: FilterColumn<Torrent>[] = COLUMNS.map(def => ({
+// The status icon has no filter of its own: Status filters the same.
+export const TORRENT_FILTER_COLUMNS: FilterColumn<Torrent>[] = COLUMNS.filter(def => def.id !== 'state_icon').map(def => ({
   id: def.id,
   label: def.label,
   kind: FILTER_KINDS[def.id],

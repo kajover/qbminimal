@@ -12,7 +12,7 @@ const api = vi.hoisted(() => {
   }))
   return {
     state,
-    searchPlugins: vi.fn(async () => [{ name: 'demo', fullName: 'Demo', enabled: true, version: '1', url: '', supportedCategories: [] }]),
+    searchPlugins: vi.fn(async () => [{ name: 'demo', fullName: 'Demo', enabled: true, version: '1', url: '', supportedCategories: [{ id: 'movies', name: 'Movies' }] }]),
     startSearch: vi.fn(async () => {
       const id = state.nextId++
       state.searches.push({ id, status: state.status, total: results.length })
@@ -32,6 +32,7 @@ vi.mock('@/lib/api', async (importOriginal) => {
 })
 
 const { SearchView } = await import('./SearchView')
+const { forgetShownSearch } = await import('@/hooks/useSearchJob')
 
 function renderView() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -57,6 +58,7 @@ describe('search', () => {
     api.state.nextId = 1
     api.state.searches = []
     for (const mock of [api.startSearch, api.stopSearch, api.deleteSearch]) mock.mockClear()
+    forgetShownSearch()
     // The sidebar starts closed; most tests here use it.
     localStorage.setItem('qbminimal.searchSidebar', 'open')
   })
@@ -69,16 +71,24 @@ describe('search', () => {
     expect(titles).toEqual(['Name', 'Size', 'Seeds', 'Leeches', 'Plugin', 'Actions'])
   })
 
-  it('picks plugins and the category in the sidebar, and searches with them', async () => {
+  it('searches with every enabled plugin, filters results by plugin, and searches again in a category', async () => {
     renderView()
     const sidebar = screen.getByRole('complementary', { name: 'Search options' })
     expect(within(sidebar).getByRole('button', { name: 'Manage plugins' })).toBeInTheDocument()
-    await userEvent.click(await within(sidebar).findByRole('checkbox', { name: /^Demo/ }))
-    await userEvent.click(within(sidebar).getByRole('checkbox', { name: /Movies/ }))
-    // The sidebar button shows a dot while the choices narrow the search.
-    expect(screen.getByRole('button', { name: 'Search options (filters on)' })).toBeInTheDocument()
     await search()
-    expect(api.startSearch).toHaveBeenCalledWith('ubuntu', 'demo', 'movies')
+    expect(api.startSearch).toHaveBeenCalledWith('ubuntu', 'enabled', 'all')
+    await screen.findAllByText('ubuntu-desktop.iso')
+
+    // A plugin shows how many results it found, and picking it shows only those.
+    const demo = within(sidebar).getByRole('checkbox', { name: /^Demo/ })
+    expect(demo).toHaveTextContent('2')
+    await userEvent.click(demo)
+    expect(screen.getByRole('button', { name: 'Search options (filters on)' })).toBeInTheDocument()
+    await userEvent.click(within(sidebar).getByRole('button', { name: 'Clear the Plugins filter' }))
+
+    // Picking a category searches again in it.
+    await userEvent.click(within(sidebar).getByRole('checkbox', { name: /Movies/ }))
+    await waitFor(() => expect(api.startSearch).toHaveBeenLastCalledWith('ubuntu', 'enabled', 'movies'))
   })
 
   it('gives every column, the name too, a resize handle, and saves a fitted width', async () => {

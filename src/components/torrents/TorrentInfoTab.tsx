@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { CopyButton } from '@/components/CopyButton'
 import { getTorrentExportUrl } from '@/lib/api'
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format'
-import { DOWN_SPEED_COLOR, ratioColor, UP_SPEED_COLOR } from '@/lib/torrentState'
+import { DOWN_SPEED_COLOR, UP_SPEED_COLOR } from '@/lib/torrentState'
 import { cn } from '@/lib/utils'
 import type { Torrent } from '@/types'
 import { DetailsHeading } from './DetailsHeading'
@@ -19,20 +19,25 @@ type Value = ReactNode | undefined | false
 const shown = (value: Value) => value !== undefined && value !== false && value !== '' && value !== null
 
 // An identifier or path: its name above, the value in a fixed-width font, and a copy button.
-// `wide` spans both columns; `empty` is shown, without a copy button, when there's no value.
-function Identity({ label, value, wide, empty }: { label: string; value: string | undefined; wide?: boolean; empty?: string }) {
+// `wide` spans both columns in a larger font; `full` spans both columns, for a long value such as
+// the magnet link. `empty` is shown, without a copy button, when there's no value. `extra` follows
+// the copy button, such as Export .torrent beside the magnet link; on phones it goes below, so the
+// value keeps the row.
+function Identity({ label, value, wide, full, empty, extra }: { label: string; value: string | undefined; wide?: boolean; full?: boolean; empty?: string; extra?: ReactNode }) {
   if (!value && !empty) return null
   return (
-    <div className={cn('min-w-0', wide && 'sm:col-span-2')}>
+    <div className={cn('min-w-0', (wide || full) && 'sm:col-span-2')}>
       <dt className="text-xs text-muted-foreground">{label}</dt>
       <dd className="flex min-h-6 min-w-0 items-center gap-1">
         {value ? (
           <>
             <span className={cn('truncate', wide ? 'text-sm font-medium' : 'font-mono text-xs')} dir={wide ? 'auto' : 'ltr'} title={value}>{value}</span>
             <CopyButton text={value} label={label} className="size-6" />
+            {extra && <span className="shrink-0 max-sm:hidden">{extra}</span>}
           </>
         ) : <span className="text-xs text-muted-foreground">{empty}</span>}
       </dd>
+      {value && extra && <dd className="-ms-2 sm:hidden">{extra}</dd>}
     </div>
   )
 }
@@ -67,10 +72,10 @@ export function TorrentInfoTab({ torrent: x }: { torrent: Torrent }) {
   const pair = (a: number, b: number) => `${Math.max(a, 0)} / ${Math.max(b, 0)}`
   const exportButton = x.has_metadata === false ? (
     <span className="inline-flex cursor-not-allowed" title={t('Available once qBittorrent has this torrent\'s metadata')}>
-      <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" disabled><Download />{t('Export .torrent')}</Button>
+      <Button size="sm" variant="ghost" className="h-6 shrink-0 px-2 text-xs text-muted-foreground" disabled><Download />{t('Export .torrent')}</Button>
     </span>
   ) : (
-    <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" asChild>
+    <Button size="sm" variant="ghost" className="h-6 shrink-0 px-2 text-xs text-muted-foreground" asChild>
       <a href={getTorrentExportUrl(x.hash)} download={`${x.name}.torrent`}><Download />{t('Export .torrent')}</a>
     </Button>
   )
@@ -81,15 +86,16 @@ export function TorrentInfoTab({ torrent: x }: { torrent: Torrent }) {
       {x.error && <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{x.error}</p>}
 
       <section>
-        <DetailsHeading end={exportButton}>{t('About')}</DetailsHeading>
+        <DetailsHeading>{t('About')}</DetailsHeading>
         <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
           <Identity label={t('Name')} value={x.name} wide />
+          <Identity label={t('Size')} value={formatBytes(x.size)} />
           <Identity label={t('Hash')} value={x.hash} />
           <Identity label={t('Hash (v2)')} value={x.infohash_v2} />
           <Identity label={t('Save path')} value={x.save_path} />
-          {/* qBittorrent's temporary path; shown even when unused, so it's clear where files go. */}
-          <Identity label={t('Incomplete files')} value={x.download_path} empty={t('In the save path')} />
-          <Identity label={t('Magnet link')} value={x.magnet_uri} />
+          {/* qBittorrent's temporary path; without one, incomplete files are in the save path, shown again. */}
+          <Identity label={t('Incomplete files')} value={x.download_path || x.save_path} />
+          <Identity label={t('Magnet link')} value={x.magnet_uri} full extra={exportButton} />
           <Identity label={t('Comment')} value={x.comment} />
         </dl>
       </section>
@@ -99,7 +105,7 @@ export function TorrentInfoTab({ torrent: x }: { torrent: Torrent }) {
           <Stat label={t('Progress')} value={t('{part} of {whole}', { part: `${Math.floor(x.progress * 100)}%`, whole: formatBytes(x.size) })} />
           <Stat label={t('Downloaded')} value={formatBytes(x.downloaded ?? x.total_downloaded ?? 0)} />
           <Stat label={t('Uploaded')} value={formatBytes(x.uploaded)} />
-          <Stat label={t('Ratio')} value={x.ratio.toFixed(2)} className={ratioColor(x.ratio)} />
+          <Stat label={t('Ratio')} value={x.ratio.toFixed(2)} />
           <Stat label={t('Wasted')} value={has(x.total_wasted) && formatBytes(x.total_wasted!)} />
           <Stat label={t('Queue position')} value={x.priority > 0 ? x.priority : t('Not queued')} />
         </Column>

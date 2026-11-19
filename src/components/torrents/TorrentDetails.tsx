@@ -41,7 +41,7 @@ function initialHeight() {
 // Everything about one torrent. The open tab is remembered, also for the next time details open,
 // and each tab's key is the hash, so its content starts fresh for another torrent.
 // `end` sits at the end of the tabs' row, for the close button.
-function DetailsTabs({ torrent, listClassName, end }: { torrent: Torrent; listClassName?: string; end?: ReactNode }) {
+function DetailsTabs({ torrent, listClassName, end, onDelete }: { torrent: Torrent; listClassName?: string; end?: ReactNode; onDelete?: () => void }) {
   // Its speeds are recorded while the details are open, whichever tab shows, for the Details graph.
   useEffect(() => watchTorrentSpeeds(torrent.hash), [torrent.hash])
   const [tab, setTab] = useState<TabId>(() => {
@@ -55,7 +55,8 @@ function DetailsTabs({ torrent, listClassName, end }: { torrent: Torrent; listCl
   }
   return (
     <Tabs value={tab} onValueChange={choose} className="min-h-0 flex-1">
-      <div className="flex items-center gap-2">
+      {/* The tabs take the row's whole width, apart from a gap before the close button. */}
+      <div className="flex items-center gap-3">
         <TabsList className={cn('grid min-w-0 flex-1 grid-cols-5', listClassName)}>
           {/* Icons where there's room beside the names. */}
           {TABS.map(({ id, label, icon: Icon }) => <TabsTrigger key={id} value={id} className="gap-1 px-0.5 text-xs sm:px-3"><Icon className="size-3.5 max-sm:hidden" />{label}</TabsTrigger>)}
@@ -63,8 +64,8 @@ function DetailsTabs({ torrent, listClassName, end }: { torrent: Torrent; listCl
         {end && <div className="ms-auto shrink-0">{end}</div>}
       </div>
       <TabsContent value="details" className="overflow-y-auto"><TorrentInfoTab torrent={torrent} /></TabsContent>
-      <TabsContent value="content" className="flex min-h-0 flex-col overflow-hidden"><TorrentContentTab key={torrent.hash} hash={torrent.hash} /></TabsContent>
-      <TabsContent value="actions" className="overflow-y-auto"><TorrentActions key={torrent.hash} torrent={torrent} /></TabsContent>
+      <TabsContent value="content" className="flex min-h-0 flex-col overflow-hidden"><TorrentContentTab key={torrent.hash} hash={torrent.hash} savePath={torrent.save_path} /></TabsContent>
+      <TabsContent value="actions" className="overflow-y-auto"><TorrentActions key={torrent.hash} torrent={torrent} onDelete={onDelete} /></TabsContent>
       <TabsContent value="trackers" className="overflow-y-auto"><TrackersTab key={torrent.hash} hash={torrent.hash} /></TabsContent>
       <TabsContent value="peers" className="overflow-y-auto"><PeersTab key={torrent.hash} hash={torrent.hash} /></TabsContent>
     </Tabs>
@@ -74,11 +75,13 @@ function DetailsTabs({ torrent, listClassName, end }: { torrent: Torrent; listCl
 interface DetailsProps {
   torrent: Torrent
   onClose: () => void
+  // Asks to delete the torrent, from the Actions tab.
+  onDelete?: () => void
 }
 
 // Wide screens: a panel along the bottom of the window, below the list, with an edge to drag
 // for its height. Picking another torrent in the list shows that one instead.
-export function TorrentDetailsPanel({ torrent, onClose }: DetailsProps) {
+export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps) {
   const [height, setHeight] = useState(initialHeight)
   const drag = useRef<{ y: number; height: number } | null>(null)
 
@@ -141,8 +144,8 @@ export function TorrentDetailsPanel({ torrent, onClose }: DetailsProps) {
           {/* The name is in the Details tab's About; the tabs share their row with the close button. */}
           <h2 className="sr-only">{torrent.name}</h2>
           <DetailsTabs
+            onDelete={onDelete}
             torrent={torrent}
-            listClassName="max-w-xl"
             end={(
               <Button variant="ghost" size="icon" className="size-8 rounded-full bg-muted hover:bg-accent" aria-label={t('Close details')} title={t('Close (Esc)')} onClick={onClose}>
                 <X className="size-4" />
@@ -162,7 +165,7 @@ type Detent = 'medium' | 'large'
 const DISMISS_DISTANCE = 90
 const FLICK_SPEED = 0.6 // px per ms
 
-export function TorrentDetailsDialog({ torrent, onClose }: DetailsProps) {
+export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProps) {
   useBackButtonClose(onClose)
   const [detent, setDetent] = useState<Detent>('medium')
   const [offset, setOffset] = useState<number | null>(null)
@@ -224,6 +227,7 @@ export function TorrentDetailsDialog({ torrent, onClose }: DetailsProps) {
           <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 pb-3">
             <DialogPrimitive.Title className="sr-only">{torrent.name}</DialogPrimitive.Title>
             <DetailsTabs
+              onDelete={onDelete}
               torrent={torrent}
               end={(
                 <DialogPrimitive.Close asChild>

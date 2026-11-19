@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { Loader2, PanelRight, Plus, Search, X } from 'lucide-react'
+import { Eraser, Loader2, PanelRight, Plus, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { SearchInput } from '@/components/SearchInput'
@@ -30,10 +30,8 @@ export function SearchView() {
   const search = useSearchJob()
   const queryClient = useQueryClient()
   const { data: plugins } = useSearchPlugins()
-  const [pattern, setPattern] = useState('')
-  // Plugins ticked in the sidebar; none means every enabled one.
-  const [pluginChoice, setPluginChoice] = useState<string[]>([])
-  const [category, setCategory] = useState('all')
+  const [pattern, setPatternState] = useState(search.pattern)
+  const [category, setCategory] = useState(search.category)
   // Column filters belong to the search shown, so a new search starts without them.
   const [filtersFor, setFiltersFor] = useState<{ job: number | null; filters: ColumnFilters }>({ job: null, filters: {} })
   const filters = filtersFor.job === search.jobId ? filtersFor.filters : {}
@@ -75,27 +73,35 @@ export function SearchView() {
   }, [])
 
   const enabled = (plugins ?? []).filter(plugin => plugin.enabled)
-  // Chosen plugins turned off or removed since are left out; with none left, all enabled ones search.
-  const chosen = pluginChoice.filter(name => enabled.some(p => p.name === name))
-  const plugin = chosen.length ? chosen.join('|') : 'enabled'
+  const setPattern = (text: string) => setPatternState(text)
 
+  // Every enabled plugin searches; the sidebar's plugins narrow the results afterwards.
   const submit = (event: FormEvent) => {
     event.preventDefault()
     // The same button stops a running search, and ignores a click that lands just after it ended.
     if (search.running) void search.cancel()
-    else if (pattern.trim() && !search.justEnded()) void search.start(pattern.trim(), plugin, category)
+    else if (pattern.trim() && !search.justEnded()) void search.start(pattern.trim(), 'enabled', category)
   }
 
-  // Runs a saved search with its own plugins and category, shown in the form and sidebar too.
+  // A category is searched in, so picking one runs the search shown again with it.
+  const changeCategory = (next: string) => {
+    setCategory(next)
+    if (search.searched && !search.running && pattern.trim()) void search.start(pattern.trim(), 'enabled', next)
+  }
+
+  // Runs a saved search with its own category, shown in the form and sidebar too.
   const runAgain = (saved: SavedSearch) => {
-    const names = saved.plugins.split('|').filter(name => enabled.some(p => p.name === name))
     setPattern(saved.pattern)
-    setPluginChoice(names)
     setCategory(saved.category)
-    return search.start(saved.pattern, names.length ? names.join('|') : 'enabled', saved.category)
+    return search.start(saved.pattern, 'enabled', saved.category)
   }
   const targets = useMemo(() => searchFilterTargets(search.results), [search.results])
-  const narrowed = chosen.length > 0 || category !== 'all' || activeCount(filters) > 0
+  const pluginCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const result of search.results) if (result.engineName) counts.set(result.engineName, (counts.get(result.engineName) ?? 0) + 1)
+    return counts
+  }, [search.results])
+  const narrowed = category !== 'all' || activeCount(filters) > 0
   const sidebarLabel = narrowed ? t('Search options (filters on)') : t('Search options')
 
 
@@ -122,15 +128,13 @@ export function SearchView() {
       onStop={(id) => void (id === search.jobId ? search.cancel() : qbitClient.stopSearch(id).then(() => queryClient.invalidateQueries({ queryKey: ['search', 'status'] }), () => toast.error(t('Couldn\'t stop the search in qBittorrent'))))}
       onCleared={search.close}
       plugins={enabled}
-      chosenPlugins={chosen}
-      onPluginsChange={setPluginChoice}
+      pluginCounts={pluginCounts}
       category={category}
-      onCategoryChange={setCategory}
+      onCategoryChange={changeCategory}
       onManagePlugins={() => setPluginsOpen(true)}
       targets={targets}
       filters={filters}
       onFilterChange={setFilter}
-      onClose={() => setSidebarOpen(false)}
     />
   )
 
@@ -169,6 +173,11 @@ export function SearchView() {
                 </>
               ) : <Search className="size-4" />}
             </Button>
+            {/* Takes the results and the text away, stopping a search still running, ready for the
+                next search. Always there, so the field keeps its width; greyed out with nothing to clear. */}
+            <Button type="button" variant="outline" size="icon" disabled={!search.searched} aria-label={t('Clear results')} title={t('Clear results')} onClick={() => { if (search.running) void search.cancel(); search.close(); setPattern(''); document.getElementById('search-pattern')?.focus() }}>
+              <Eraser className="size-4" />
+            </Button>
           </form>
 
           {/* Keyed by search, so each starts on its first page. */}
@@ -198,6 +207,7 @@ export function SearchView() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setAdding(null)}>{t('Cancel')}</Button>
+            {/* Enter adds it: it's the dialog's last button. */}
             <Button disabled={addBusy} onClick={() => adding && void add(adding)} className="gap-2">
               {addBusy ? <Loader2 className="size-4 animate-spin" /> : <Plus />}
               {t('Add')}

@@ -109,6 +109,8 @@ export interface TorrentFile {
   priority: number
   is_seed?: boolean
   piece_range?: [number, number]
+  // Share of the file the connected peers have, from 0; -1 when unknown.
+  availability?: number
 }
 
 export interface TorrentTracker {

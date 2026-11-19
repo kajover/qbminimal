@@ -4,7 +4,7 @@ const LONG_PRESS_MS = 500
 // A finger that moves this far is scrolling, not holding.
 const MOVE_TOLERANCE = 10
 // Clicks on these are the control's own, not the row's.
-const CONTROLS = 'button, a, input, label, select, textarea, [role="checkbox"], [role="menuitem"]'
+const CONTROLS = 'button, a, input, label, select, textarea, [role="checkbox"], [role="menuitem"], [data-row-select]'
 
 interface RowPressHandlers<T> {
   // A click or tap. `touch` says it came from a finger or pen rather than a mouse.

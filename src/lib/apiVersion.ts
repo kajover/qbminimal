@@ -1,5 +1,7 @@
 // Web API versions that added features this app uses. qBittorrent 5.2.3 reports 2.15.1.
 const API_FEATURES = {
+  // torrents/setComment (qBittorrent 5.2); older versions only show a torrent's comment
+  setComment: [2, 12, 1],
   // torrents/parseMetadata and torrents/fetchMetadata (qBittorrent 5.2)
   metadata: [2, 15, 0],
   // app/getFreeSpaceAtPath

@@ -69,3 +69,45 @@ export function buildFileTree(files: TorrentFile[]): FileTreeNode[] {
   finish(root)
   return root.children
 }
+
+export type FileSortField = 'name' | 'progress' | 'size' | 'priority'
+
+const progressOf = (node: FileTreeNode) => (node.kind === 'file' ? node.file.progress : node.size > 0 ? node.done / node.size : 0)
+const sizeOf = (node: FileTreeNode) => (node.kind === 'file' ? node.file.size : node.size)
+
+// The tree with each folder's contents in the given order. `priorityOf`
+// gives a folder's priority (its files', or -1 when they differ).
+export function sortFileTree(nodes: FileTreeNode[], field: FileSortField, descending: boolean, priorityOf: (node: FileTreeNode) => number): FileTreeNode[] {
+  const value = (node: FileTreeNode): number => (field === 'progress' ? progressOf(node) : field === 'size' ? sizeOf(node) : priorityOf(node))
+  // By name, folders come first as in a file manager; by size, progress or priority, folders and
+  // files are sorted together, so the order follows the values alone.
+  const compare = (a: FileTreeNode, b: FileTreeNode) => {
+    if (field === 'name' && a.kind !== b.kind) return a.kind === 'folder' ? -1 : 1
+    const order = field === 'name' ? a.name.localeCompare(b.name, undefined, { numeric: true }) : value(a) - value(b) || a.name.localeCompare(b.name, undefined, { numeric: true })
+    return descending ? -order : order
+  }
+  return [...nodes].sort(compare).map(node => (node.kind === 'folder' ? { ...node, children: sortFileTree(node.children, field, descending, priorityOf) } : node))
+}
+
+// Only the files whose path holds the text, with the folders leading to them; a folder whose own
+// name matches keeps everything inside it.
+export function filterFileTree(nodes: FileTreeNode[], text: string): FileTreeNode[] {
+  const wanted = text.trim().toLowerCase()
+  if (!wanted) return nodes
+  return nodes.flatMap((node): FileTreeNode[] => {
+    if (node.name.toLowerCase().includes(wanted)) return [node]
+    if (node.kind === 'file') return []
+    const children = filterFileTree(node.children, wanted)
+    return children.length ? [{ ...node, children }] : []
+  })
+}
+
+// Every folder's path, to open or close them all at once.
+export function folderPaths(nodes: FileTreeNode[]): string[] {
+  return nodes.flatMap(node => (node.kind === 'folder' ? [node.path, ...folderPaths(node.children)] : []))
+}
+
+// Every file's and folder's path, to open all their details at once.
+export function allNodePaths(nodes: FileTreeNode[]): string[] {
+  return nodes.flatMap(node => (node.kind === 'folder' ? [node.path, ...allNodePaths(node.children)] : [node.path]))
+}

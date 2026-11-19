@@ -58,7 +58,7 @@ export function PreferenceField({ def, value, getValue, onChange, disabled, hasU
       break
     case 'textarea':
       control = (
-        <Textarea id={id} rows={3} value={String(value ?? '')} disabled={disabled} onChange={(e) => onChange(e.target.value)} className="border-input dark:bg-input/30 w-full rounded-md border bg-transparent px-3 py-2 text-sm disabled:opacity-50" />
+        <Textarea id={id} rows={3} value={String(value ?? '')} disabled={disabled} onChange={(e) => onChange(e.target.value)} className="text-sm disabled:opacity-50" />
       )
       break
     case 'path':

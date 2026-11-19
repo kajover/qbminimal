@@ -6,7 +6,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { toast } from '@/hooks/use-toast'
 import { t } from '@/i18n'
 import { copyText } from '@/lib/clipboard'
-import { jsonTokens, type JsonTokenKind, type LogField } from '@/lib/logDetails'
+import type { LogField } from '@/lib/logDetails'
+import { JsonView } from '@/components/JsonView'
 import { formatLogTime } from '@/lib/logExport'
 import { cn } from '@/lib/utils'
 
@@ -34,13 +35,6 @@ export function LogBadge({ row }: { row: LogRow }) {
   return <span className={cn('inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium', row.badge)}>{row.label}</span>
 }
 
-const JSON_COLORS: Record<JsonTokenKind, string> = {
-  key: 'text-sky-700 dark:text-sky-400',
-  string: 'text-emerald-700 dark:text-emerald-400',
-  number: 'text-amber-700 dark:text-amber-400',
-  literal: 'text-violet-700 dark:text-violet-400',
-  plain: 'text-muted-foreground',
-}
 
 async function copy(text: string, label: string) {
   if (await copyText(text)) toast.success(t('{label} copied', { label }))
@@ -78,9 +72,7 @@ export function LogEntryDialog({ row, onClose, onHide }: { row: LogRow; onClose:
           </dl>
         )}
 
-        <pre className="min-w-0 whitespace-pre-wrap rounded-md border bg-muted/40 p-3 font-mono text-xs leading-relaxed [overflow-wrap:anywhere]">
-          {jsonTokens(json).map((token, index) => <span key={index} className={JSON_COLORS[token.kind]}>{token.text}</span>)}
-        </pre>
+        <JsonView json={json} />
 
         <DialogFooter className="flex-row flex-wrap gap-2 sm:justify-start">
           <Button variant="outline" onClick={() => void copy(json, 'JSON')}><Copy />{t('Copy JSON')}</Button>

@@ -19,7 +19,9 @@ import { PAGE_SCROLL_ID, pageScroller } from '@/lib/pageScroll'
 import { t } from '@/i18n'
 
 interface LayoutProps {
+  // The tab that's lit, and the page on screen, which can follow it a few frames later.
   page: PageId
+  shownPage?: PageId
   onNavigate: (page: PageId) => void
   children: ReactNode
 }
@@ -236,7 +238,7 @@ function usePageKeys(onNavigate: (page: PageId) => void) {
   }, [])
 }
 
-export function Layout({ page, onNavigate, children }: LayoutProps) {
+export function Layout({ page, shownPage = page, onNavigate, children }: LayoutProps) {
   const { signOut } = useSession()
   const { shown: sidebarShown, width: sidebarWidth, measured: sidebarMeasured, box: sidebarBox, show: showSidebar, startDrag, resetWidth } = useSidebar()
   const { header: headerRef, nav: navRef } = useBarSizes()
@@ -254,11 +256,6 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
   useScrollbarWidth()
   // Where each page's title row goes; on phones without the selection bar.
   const [slot, setSlot] = useState<HTMLDivElement | null>(null)
-
-  // A newly opened page starts at its top.
-  useEffect(() => {
-    pageScroller().scrollTo(0, 0)
-  }, [page])
 
   const notes = usePageNotes()
   const navButton = ({ id, label, icon: Icon }: (typeof MAIN_PAGES)[number]) => (
@@ -280,7 +277,9 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
     // the header spans it on top and only the area below scrolls, so its scrollbar starts under the
     // header and never changes the header's width.
     <div style={{ '--sidebar-width': `${sidebarMeasured}px` } as CSSProperties} className="min-h-screen bg-background max-md:overflow-x-clip frame:flex frame:h-dvh frame:min-h-0 frame:flex-col frame:overflow-hidden">
-      <header ref={headerRef} className="glass-bar sticky top-0 z-40 border-b pt-[env(safe-area-inset-top)] frame:shrink-0">
+      {/* Its own layer, so iPhone Safari keeps drawing it, blurred, far down a long list. Not a
+          transform, which would hold the selection bar fixed inside it. */}
+      <header ref={headerRef} className="glass-bar sticky top-0 z-40 border-b pt-[env(safe-area-inset-top)] [-webkit-backface-visibility:hidden] [backface-visibility:hidden] frame:shrink-0">
         {/* The same side room as the content below, so the menu button lines up with the list's
             start and the last button with its end: on phones the cards and table reach 0.5rem
             past the page's 1rem margin. In the frame both ends also leave the room the page's
@@ -340,7 +339,8 @@ export function Layout({ page, onNavigate, children }: LayoutProps) {
               scrollbar is on the left right to left. */}
           <main id={PAGE_SCROLL_ID} className={cn('min-w-0 flex-1 frame:h-full frame:overflow-y-auto frame:[scrollbar-gutter:stable] pt-4 pb-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] max-md:pb-[calc(var(--bottom-nav-height,5rem)+1rem)]', !sidebarOpen && 'frame:ltr:pl-[calc(max(1rem,env(safe-area-inset-left))+var(--page-scrollbar,0px))] frame:rtl:pr-[calc(max(1rem,env(safe-area-inset-right))+var(--page-scrollbar,0px))]')}>
             {/* The torrent list and search results take the whole width; the other pages are easier to read narrower. */}
-            <div className={cn(page !== 'torrents' && page !== 'search' && 'mx-auto w-full max-w-4xl')}>
+            {/* Sized for the page on screen, which can trail the tapped tab by a few frames. */}
+            <div className={cn(shownPage !== 'torrents' && shownPage !== 'search' && 'mx-auto w-full max-w-4xl')}>
               <HeaderSlot value={slot ? { element: slot, whole: wide } : null}>{children}</HeaderSlot>
             </div>
           </main>

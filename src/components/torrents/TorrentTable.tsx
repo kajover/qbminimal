@@ -1,17 +1,19 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react'
+import { createElement, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react'
 import { textScale } from '@/lib/textSize'
 import { ArrowDown, ArrowUp, RotateCcw } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
-import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
+import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { columnWidth, DEFAULT_COLUMN_LAYOUT, getColumn, toggleColumn, moveColumn, resizeColumn, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
-import { DOWN_SPEED_COLOR, formatEta, getStateBadge, getStateLabel, ratioColor, UP_SPEED_COLOR, peerPair as pair } from '@/lib/torrentState'
+import { getStateIcon } from '@/lib/stateIcons'
+import { DOWN_SPEED_COLOR, formatEta, getStateBadge, getStateColor, getStateLabel, UP_SPEED_COLOR, peerPair as pair } from '@/lib/torrentState'
 import type { SortDirection } from '@/lib/listSettings'
 import type { RowProps } from '@/hooks/useRowPress'
 import type { Torrent } from '@/types'
 import { useTransferInfo } from '@/hooks/useApi'
 import { BottomScrollbar } from './BottomScrollbar'
+import { ColumnMenuItems } from '@/components/ColumnMenuItems'
 import { fittedWidth, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
 import { ColumnFilterButton, SidebarFilterButton, type FilterTarget } from '@/components/ColumnFilters'
 import type { ColumnFilter, ColumnFilters } from '@/lib/columnFilters'
@@ -27,7 +29,7 @@ const LINKED_SCROLL = typeof CSS !== 'undefined' && typeof CSS.supports === 'fun
 // solid, so it mixes the row's hover tint into the card color. Neither fades: the highlight follows
 // the pointer at once, on the whole row together.
 // Columns of words, which follow the language's direction; all others are numbers or paths.
-const WORD_COLUMNS: ReadonlySet<ColumnId> = new Set(['name', 'state', 'category', 'tags'])
+const WORD_COLUMNS: ReadonlySet<ColumnId> = new Set(['name', 'state', 'state_icon', 'category', 'tags'])
 
 const PINNED_LEFT = 'sticky start-0 z-10 bg-card group-hover:bg-[color-mix(in_oklab,var(--muted)_50%,var(--card))]'
 const PINNED_SELECTED = 'bg-muted group-hover:bg-muted'
@@ -60,12 +62,16 @@ function Cell({ torrent, id }: { torrent: Torrent; id: ColumnId }): ReactNode {
           {getStateLabel(torrent.state, torrent.completion_on)}
         </span>
       )
+    case 'state_icon': {
+      const label = getStateLabel(torrent.state, torrent.completion_on)
+      return createElement(getStateIcon(torrent.state, torrent.completion_on), { role: 'img', 'aria-label': label, className: cn('inline size-4 align-text-bottom', getStateColor(torrent.state, torrent.completion_on)) }, <title>{label}</title>)
+    }
     case 'num_seeds': return pair(torrent.num_seeds, torrent.num_complete)
     case 'num_leechs': return pair(torrent.num_leechs, torrent.num_incomplete)
     case 'dlspeed': return speed(torrent.dlspeed, DOWN_SPEED_COLOR)
     case 'upspeed': return speed(torrent.upspeed, UP_SPEED_COLOR)
     case 'eta': return formatEta(torrent.eta)
-    case 'ratio': return <span className={ratioColor(torrent.ratio)}>{torrent.ratio.toFixed(2)}</span>
+    case 'ratio': return torrent.ratio.toFixed(2)
     case 'category': return <span title={torrent.category}>{torrent.category}</span>
     case 'tags': return <span title={torrent.tags}>{torrent.tags}</span>
     case 'added_on': return formatDateTime(torrent.added_on)
@@ -135,7 +141,8 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   const columnKey = columns.map(def => def.id).join()
   const titleWidths = useMemo(() => Object.fromEntries(columns.map(def =>
     // The title's own width, plus its padding (16px), the arrow (14px and its gap), the filter button (20px and its gap), and a margin.
-    [def.id, Math.ceil(textWidth(def.header ?? def.label, 12 * scale) + 16 + 18 + 22 + 4)])) as Partial<Record<ColumnId, number>>,
+    // A column that neither sorts nor filters needs no room for those.
+    [def.id, Math.ceil((def.icon ? 16 : textWidth(def.header ?? def.label, 12 * scale)) + 16 + (def.unsorted ? 0 : 18 + 22) + 4)])) as Partial<Record<ColumnId, number>>,
   // oxlint-disable-next-line react/exhaustive-deps -- the ids stand for the columns
   [columnKey, scale])
   const minWidthOf = (id: ColumnId) => Math.max(getColumn(id).minWidth * scale, titleWidths[id] ?? 0)
@@ -188,7 +195,8 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
     <div ref={frame} className="rounded-xl border bg-card max-sm:-mx-2" style={LINKED_SCROLL ? { timelineScope: '--table-x', '--table-scroll': `${scrollRange}px` } as CSSProperties : undefined}>
       <div
         ref={head}
-        onWheel={(e) => wheelOnHead(e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX)}
+        // Only the titles' own wheel: the right-click menu's bubbles here through React too.
+        onWheel={(e) => { if (e.currentTarget.contains(e.target as Node)) wheelOnHead(e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX) }}
         className="sticky top-(--sticky-top) z-20 overflow-hidden rounded-t-xl border-b bg-card"
       >
       <table className={cn('table-fixed text-sm tabular-nums', LINKED_SCROLL && 'table-head-linked')} style={tableWidth}>
@@ -219,13 +227,13 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
                   <div className="flex min-w-0 items-center gap-0.5">
                     <button
                       type="button"
-                      onClick={() => onSort(def.id)}
+                      onClick={() => { if (!def.unsorted) onSort(def.id) }}
                       onKeyDown={(e) => drag.onTitleKey(e, def.id)}
-                      title={t('Sort by {label}. Drag to move, or press Alt and an arrow key.', { label: def.label })}
-                      aria-label={def.header ? def.label : undefined}
-                      className={cn('flex min-w-0 flex-1 cursor-grab items-center gap-1 hover:text-foreground active:cursor-grabbing', sorted && 'text-foreground')}
+                      title={def.unsorted ? t('{label}. Drag to move, or press Alt and an arrow key.', { label: def.label }) : t('Sort by {label}. Drag to move, or press Alt and an arrow key.', { label: def.label })}
+                      aria-label={def.header || def.icon ? def.label : undefined}
+                      className={cn('flex min-w-0 flex-1 cursor-grab items-center gap-1 hover:text-foreground active:cursor-grabbing', sorted && 'text-foreground', def.id === 'state_icon' && 'justify-center')}
                     >
-                      <span className="truncate">{def.header ?? def.label}</span>
+                      {def.icon ? <def.icon aria-hidden className="size-4 shrink-0" /> : <span className="truncate">{def.header ?? def.label}</span>}
                       {sorted && (sortDirection === 'asc' ? <ArrowUp className="size-3.5 shrink-0" /> : <ArrowDown className="size-3.5 shrink-0" />)}
                     </button>
                     {filterButton}
@@ -238,12 +246,10 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
           </tr>
         </thead>
         </ContextMenuTrigger>
-        <ContextMenuContent className="max-h-[70vh] w-56">
-          {layout.order.map(id => (
-            <ContextMenuCheckboxItem key={id} checked={!layout.hidden.includes(id)} disabled={id === 'name'} onSelect={(e) => e.preventDefault()} onCheckedChange={() => onLayoutChange(toggleColumn(layout, id))}>
-              {getColumn(id).label}
-            </ContextMenuCheckboxItem>
-          ))}
+        <ContextMenuContent className="max-h-[70vh] w-60">
+          <ContextMenuLabel className="whitespace-normal text-xs font-normal text-muted-foreground">{t('Drag headers to reorder, or drag their edges to resize')}</ContextMenuLabel>
+          <ContextMenuSeparator />
+          <ColumnMenuItems order={layout.order} shown={id => !layout.hidden.includes(id)} locked="name" label={id => getColumn(id).label} onToggle={id => onLayoutChange(toggleColumn(layout, id))} onMove={(id, target) => onLayoutChange(moveColumn(layout, id, target))} Item={ContextMenuCheckboxItem} />
           <ContextMenuSeparator />
           <ContextMenuItem onClick={() => { onLayoutChange(DEFAULT_COLUMN_LAYOUT); onResetSort() }}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
         </ContextMenuContent>
@@ -270,7 +276,8 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
                     openHash === torrent.hash && 'bg-primary/10 hover:bg-primary/15 shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]',
                   )}
                 >
-                  <td className={cn('px-2 py-1.5', PINNED_LEFT, isSelected && PINNED_SELECTED, openHash === torrent.hash && !isSelected && 'bg-[color-mix(in_oklab,var(--primary)_10%,var(--card))] group-hover:bg-[color-mix(in_oklab,var(--primary)_15%,var(--card))]', openHash === torrent.hash && 'shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]')}>
+                  {/* The whole cell toggles the tick box, without opening the details. */}
+                  <td data-row-select onClick={(e) => { if (!(e.target as HTMLElement).closest('[role="checkbox"]')) onToggle(torrent.hash, e.shiftKey) }} className={cn('cursor-pointer px-2 py-1.5', PINNED_LEFT, isSelected && PINNED_SELECTED, openHash === torrent.hash && !isSelected && 'bg-[color-mix(in_oklab,var(--primary)_10%,var(--card))] group-hover:bg-[color-mix(in_oklab,var(--primary)_15%,var(--card))]', openHash === torrent.hash && 'shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]')}>
                     <Checkbox
                       aria-label={t('Select {name}', { name: torrent.name })}
                       checked={isSelected}
@@ -279,7 +286,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
                     />
                   </td>
                   {columns.map(def => (
-                    <td key={def.id} className="truncate px-2 py-1.5 whitespace-nowrap">
+                    <td key={def.id} className={cn('truncate px-2 py-1.5 whitespace-nowrap', def.id === 'state_icon' && 'text-center')}>
                       {/* Numbers, sizes, dates and paths read left to right, also in a right-to-left language. */}
                       {WORD_COLUMNS.has(def.id) ? <Cell torrent={torrent} id={def.id} /> : <span dir="ltr"><Cell torrent={torrent} id={def.id} /></span>}
                     </td>

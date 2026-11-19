@@ -226,7 +226,7 @@ export function AddFilterButton({ targets, onChange, active }: {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button type="button" variant="outline" size="icon" className="relative size-8 shrink-0" aria-label={active ? t('Column filter (filters on)') : t('Column filter')} title={active ? t('Column filter (filters on)') : t('Column filter')}>
+        <Button type="button" variant="ghost" size="icon" className="relative size-7 shrink-0" aria-label={active ? t('Column filter (filters on)') : t('Column filter')} title={active ? t('Column filter (filters on)') : t('Column filter')}>
           <Filter className="size-4" />
           {active && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
         </Button>

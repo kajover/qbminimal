@@ -1,13 +1,13 @@
-import { ArrowDown, ArrowDownToLine, ArrowLeftRight, ArrowUp, ArrowUpToLine, FileCheck, Fingerprint, Folder, FolderInput, Gauge, Hash, ListOrdered, Magnet, Megaphone, Rocket, Sprout, Tag, TagX, Type, WandSparkles, Zap, ZapOff, type LucideIcon } from 'lucide-react'
-import { useTorrentAction } from '@/hooks/useApi'
+import { ArrowDown, ArrowDownToLine, ArrowLeftRight, ArrowUp, ArrowUpToLine, FileCheck, FileDown, Fingerprint, Folder, FolderInput, Gauge, List, ListOrdered, Magnet, Megaphone, MessageSquare, Rocket, Sprout, Tag, TagX, Type, WandSparkles, Zap, type LucideIcon } from 'lucide-react'
+import { useApiFeature, useTorrentAction } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
-import { qbitClient } from '@/lib/api'
+import { getTorrentExportUrl, qbitClient } from '@/lib/api'
 import { copyText } from '@/lib/clipboard'
 import type { Torrent } from '@/types'
 import { t } from '@/i18n'
 
 // Actions that need a value first open a small dialog.
-export type BulkPrompt = 'category' | 'addTags' | 'removeTags' | 'location' | 'limits' | 'shareLimits' | 'autoOn' | 'queuePosition'
+export type BulkPrompt = 'category' | 'addTags' | 'removeTags' | 'location' | 'limits' | 'shareLimits' | 'autoOn' | 'queuePosition' | 'comment'
 
 export interface MenuEntry {
   // Stable, for remembering which actions are pinned to the selection bar.
@@ -30,9 +30,22 @@ export interface MenuGroup {
   icons?: boolean
 }
 
+// Saves each torrent's .torrent file, named after it, through a link the browser downloads.
+function exportTorrents(torrents: Torrent[]) {
+  for (const torrent of torrents) {
+    const link = document.createElement('a')
+    link.href = getTorrentExportUrl(torrent.hash)
+    link.download = `${torrent.name}.torrent`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+  }
+}
+
 // Everything that can be done to a set of torrents besides starting, stopping, and deleting them.
 export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) => void): MenuGroup[] {
   const action = useTorrentAction()
+  const canComment = useApiFeature('setComment')
   const hashes = torrents.map(t => t.hash)
   const one = torrents.length === 1
 
@@ -72,9 +85,7 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
       name: 'Transfer',
       icons: true,
       entries: [
-        allForced
-          ? { ...run('forceStart', t('Stop forcing'), h => qbitClient.setForceStart(h, false), t('Force start off'), t('Failed to change force start'), ZapOff), pressed: true }
-          : run('forceStart', t('Force start'), h => qbitClient.setForceStart(h, true), t('Force start on'), t('Failed to change force start'), Zap),
+        { ...run('forceStart', t('Force start'), h => qbitClient.setForceStart(h, !allForced), allForced ? t('Force start off') : t('Force start on'), t('Failed to change force start'), Zap), checked: allForced },
         run('recheck', t('Recheck'), h => qbitClient.recheckTorrents(h), t('Recheck started'), t('Failed to start recheck'), FileCheck),
         run('reannounce', t('Reannounce'), h => qbitClient.reannounceTorrents(h), t('Reannounce sent'), t('Failed to reannounce'), Megaphone),
       ],
@@ -82,12 +93,14 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
     {
       name: 'Organize',
       entries: [
-        prompt('category', t('Set category...'), 'category', Folder),
-        prompt('addTags', t('Add tags...'), 'addTags', Tag),
-        prompt('removeTags', t('Remove tags...'), 'removeTags', TagX),
-        prompt('location', t('Move files...'), 'location', FolderInput),
-        prompt('limits', t('Speed limits...'), 'limits', Gauge),
-        prompt('shareLimits', t('Seeding limits...'), 'shareLimits', Sprout),
+        prompt('category', t('Set category'), 'category', Folder),
+        prompt('addTags', t('Add tags'), 'addTags', Tag),
+        prompt('removeTags', t('Remove tags'), 'removeTags', TagX),
+        prompt('location', t('Move files'), 'location', FolderInput),
+        prompt('limits', t('Speed limits'), 'limits', Gauge),
+        prompt('shareLimits', t('Seeding limits'), 'shareLimits', Sprout),
+        // qBittorrent 5.2 and newer can change a comment.
+        { ...prompt('comment', t('Comment'), 'comment', MessageSquare), disabled: !canComment },
       ],
     },
     {
@@ -99,14 +112,14 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
         run('queueDown', t('Move down'), h => qbitClient.moveInQueue(h, 'down'), queue, queueFailed, ArrowDown),
         run('queueBottom', t('Move to bottom'), h => qbitClient.moveInQueue(h, 'bottom'), queue, queueFailed, ArrowDownToLine),
         // A number for the position, typed in.
-        { ...prompt('queuePosition', t('Set queue position...'), 'queuePosition', Hash), disabled: !torrents.some(torrent => torrent.priority > 0) },
+        { ...prompt('queuePosition', t('Set queue position'), 'queuePosition', ListOrdered), disabled: !torrents.some(torrent => torrent.priority > 0) },
       ],
     },
     {
       name: 'Options',
       entries: [
         // qBittorrent only toggles these two, so each torrent that needs the change is toggled.
-        option('sequential', t('Sequential download'), torrent => !!torrent.seq_dl, h => qbitClient.toggleSequentialDownload(h), t('Sequential download on'), t('Sequential download off'), t('Failed to change sequential download'), ListOrdered),
+        option('sequential', t('Sequential download'), torrent => !!torrent.seq_dl, h => qbitClient.toggleSequentialDownload(h), t('Sequential download on'), t('Sequential download off'), t('Failed to change sequential download'), List),
         option('firstLast', t('Download first and last pieces first'), torrent => !!torrent.f_l_piece_prio, h => qbitClient.toggleFirstLastPiecePrio(h), t('First and last pieces first on'), t('First and last pieces first off'), t('Failed to change piece order'), ArrowLeftRight),
         option('superSeeding', t('Super seeding'), torrent => !!torrent.super_seeding, (h, on) => qbitClient.setSuperSeeding(h, on), t('Super seeding on'), t('Super seeding off'), t('Failed to change super seeding'), Rocket),
         // Turning it on can move files, so that asks first.
@@ -121,6 +134,8 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
         copy('copyName', one ? t('Copy name') : t('Copy names'), torrents.map(torrent => torrent.name), one ? t('Name copied') : t('Names copied'), one ? t("Couldn't copy the name") : t("Couldn't copy the names"), Type),
         copy('copyHash', one ? t('Copy hash') : t('Copy hashes'), hashes, one ? t('Hash copied') : t('Hashes copied'), one ? t("Couldn't copy the hash") : t("Couldn't copy the hashes"), Fingerprint),
         copy('copyMagnet', one ? t('Copy magnet link') : t('Copy magnet links'), torrents.map(torrent => torrent.magnet_uri).filter(Boolean), one ? t('Magnet link copied') : t('Magnet links copied'), one ? t("Couldn't copy the magnet link") : t("Couldn't copy the magnet links"), Magnet),
+        // qBittorrent's .torrent file of each, saved by the browser.
+        { id: 'export', label: one ? t('Export .torrent') : t('Export .torrent files'), icon: FileDown, onSelect: () => exportTorrents(torrents) },
       ],
     },
   ]

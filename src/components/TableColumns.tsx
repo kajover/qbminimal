@@ -5,9 +5,10 @@ import { t } from '@/i18n'
 // What the torrent table and the search results share: columns resized from their end edge, fitted
 // to their content with a double click, and dragged (or moved with Alt and an arrow key) to a new place.
 
-// How wide a text is in the page's font, at the given size and weight.
+// How wide a text is in the page's font, at the given size and weight. Without a canvas (as in
+// tests) it's an estimate; canMeasureText says which.
 let measure: CanvasRenderingContext2D | null | undefined
-export function textWidth(text: string, px: number, weight = 500): number {
+function measurer(): CanvasRenderingContext2D | null {
   if (measure === undefined) {
     try {
       measure = document.createElement('canvas').getContext('2d')
@@ -15,9 +16,14 @@ export function textWidth(text: string, px: number, weight = 500): number {
       measure = null
     }
   }
-  if (!measure) return text.length * px * 0.6
-  measure.font = `${weight} ${px}px ${getComputedStyle(document.body).fontFamily || 'sans-serif'}`
-  return measure.measureText(text).width
+  return measure
+}
+export const canMeasureText = (): boolean => measurer() !== null
+export function textWidth(text: string, px: number, weight = 500, family = getComputedStyle(document.body).fontFamily || 'sans-serif'): number {
+  const context = measurer()
+  if (!context) return text.length * px * 0.6
+  context.font = `${weight} ${px}px ${family}`
+  return context.measureText(text).width
 }
 
 // The width that shows every given cell's content whole: each is copied, unclipped, into a hidden

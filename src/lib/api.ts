@@ -65,6 +65,8 @@ export interface SearchPlugin {
   fullName?: string
   version: string
   enabled: boolean
+  // The categories it can search in, besides all.
+  supportedCategories?: { id: string; name: string }[]
 }
 
 export interface SearchJob {

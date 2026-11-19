@@ -4,7 +4,9 @@ import { ArrowDown, ArrowUp, ArrowUpDown, Columns3, RotateCcw, ChevronLeft, Chev
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ColumnFilterButton, type FilterTarget } from '@/components/ColumnFilters'
-import { fittedWidth, moveInOrder, useColumnDrag, useColumnResize } from '@/components/TableColumns'
+import { ColumnMenuItems } from '@/components/ColumnMenuItems'
+import { canMeasureText, fittedWidth, moveInOrder, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
+import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { searchFilterTargets } from '@/lib/searchFilters'
 import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loadSearchHidden, loadSearchOrder, loadSearchView, saveSearchOrder, SEARCH_SORT_KEYS, saveSearchView, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey, type SearchWidths } from '@/lib/searchSettings'
 import { applyColumnFilters, type ColumnFilter, type ColumnFilters } from '@/lib/columnFilters'
@@ -34,33 +36,18 @@ const MIN_NAME_WIDTH = 240
 const CELL_PADDING = 20
 const TITLE_EXTRAS = 64
 
-// How wide a text is in the given font, measured on a canvas, or null where that isn't possible.
-let canvas: CanvasRenderingContext2D | null | undefined
-function textWidth(text: string, font: string): number | null {
-  if (canvas === undefined) {
-    try {
-      canvas = document.createElement('canvas').getContext('2d')
-    } catch {
-      canvas = null
-    }
-  }
-  if (!canvas) return null
-  canvas.font = font
-  return canvas.measureText(text).width
-}
-
 // Each column but the name as wide as its widest value among all the results, or its title, so
 // widths don't change from page to page.
 function fittedWidths(results: SearchResult[]): SearchWidths {
-  const family = typeof document === 'undefined' ? 'sans-serif' : getComputedStyle(document.body).fontFamily || 'sans-serif'
+  // Without a canvas the columns keep their default widths.
+  if (typeof document === 'undefined' || !canMeasureText()) return {}
+  const family = getComputedStyle(document.body).fontFamily || 'sans-serif'
   const widths: SearchWidths = {}
   for (const column of COLUMNS) {
     if (column.key === 'fileName') continue
-    const title = textWidth(column.label, `500 14px ${family}`)
-    if (title === null) return {}
-    let widest = title + TITLE_EXTRAS
+    let widest = textWidth(column.label, 14, 500, family) + TITLE_EXTRAS
     for (const result of results) {
-      widest = Math.max(widest, (textWidth(String(column.cell(result)), `400 14px ${family}`) ?? 0) + CELL_PADDING)
+      widest = Math.max(widest, textWidth(String(column.cell(result)), 14, 400, family) + CELL_PADDING)
     }
     widths[column.key] = Math.max(MIN_SEARCH_WIDTH, Math.ceil(widest))
   }
@@ -198,6 +185,18 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
     </span>
   )
 
+  // The Columns menu, also opened by right-clicking a column title, as on the torrent list.
+  const columnsHint = t('Drag headers to reorder, or drag their edges to resize')
+  const columnItems = {
+    order,
+    shown: (key: SortKey) => key === 'fileName' || shows(key as ResizableKey),
+    locked: 'fileName' as SortKey,
+    label: (key: SortKey) => COLUMNS.find(c => c.key === key)!.label,
+    onToggle: (key: SortKey) => { if (key !== 'fileName') toggleColumn(key as ResizableKey) },
+    onMove: (key: SortKey, target: SortKey) => setOrder(moveInOrder(order, key, target)),
+  }
+  const resetColumns = () => { setHidden(DEFAULT_SEARCH_HIDDEN); setWidths({}); saveSearchWidths({}); setOrder([...SEARCH_SORT_KEYS]) }
+
   // In the page's header, like the torrent list's buttons.
   const toolbar = (
     <>
@@ -209,14 +208,12 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
               <Columns3 className="size-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {COLUMNS.map(c => (
-              <DropdownMenuCheckboxItem key={c.key} checked={c.key === 'fileName' || shows(c.key)} disabled={c.key === 'fileName'} onSelect={(e) => e.preventDefault()} onCheckedChange={() => c.key !== 'fileName' && toggleColumn(c.key)}>
-                {c.label}
-              </DropdownMenuCheckboxItem>
-            ))}
+          <DropdownMenuContent align="end" className="w-60">
+            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">{columnsHint}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => { setHidden(DEFAULT_SEARCH_HIDDEN); setWidths({}); saveSearchWidths({}); setOrder([...SEARCH_SORT_KEYS]) }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
+            <ColumnMenuItems {...columnItems} Item={DropdownMenuCheckboxItem} />
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={resetColumns}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         )}
@@ -268,11 +265,14 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
       <div ref={frame} className={cn('rounded-xl border bg-card max-sm:-mx-2', (!showTable || sorted.length === 0) && 'hidden')}>
         <div
           ref={head}
-          onWheel={(e) => { const dx = e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX; if (dx && scroller.current) scroller.current.scrollLeft += dx }}
+          // Only the titles' own wheel: the right-click menu's bubbles here through React too.
+          onWheel={(e) => { const dx = e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX; if (dx && scroller.current && e.currentTarget.contains(e.target as Node)) scroller.current.scrollLeft += dx }}
           className="sticky top-(--sticky-top) z-20 overflow-hidden rounded-t-xl border-b bg-card"
         >
           <table className="table-fixed text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
             {colgroup}
+            <ContextMenu>
+            <ContextMenuTrigger asChild>
             <thead>
               <tr>
                 {visible.map(c => {
@@ -298,6 +298,15 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
                 <th aria-hidden />
               </tr>
             </thead>
+            </ContextMenuTrigger>
+            <ContextMenuContent className="max-h-[70vh] w-60">
+              <ContextMenuLabel className="whitespace-normal text-xs font-normal text-muted-foreground">{columnsHint}</ContextMenuLabel>
+              <ContextMenuSeparator />
+              <ColumnMenuItems {...columnItems} Item={ContextMenuCheckboxItem} />
+              <ContextMenuSeparator />
+              <ContextMenuItem onClick={resetColumns}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
+            </ContextMenuContent>
+            </ContextMenu>
           </table>
         </div>
         <div ref={scroller} onScroll={syncScroll} className="overflow-x-auto overscroll-x-none rounded-b-xl">

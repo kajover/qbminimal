@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import type { TorrentList } from '@/hooks/useTorrentList'
 import { DEFAULT_LIST_SETTINGS, type SortField } from '@/lib/listSettings'
-import { DEFAULT_COLUMN_LAYOUT, getColumn, toggleColumn, type ColumnLayout } from '@/lib/torrentColumns'
+import { DEFAULT_COLUMN_LAYOUT, getColumn, moveColumn, toggleColumn, type ColumnLayout } from '@/lib/torrentColumns'
+import { ColumnMenuItems } from '@/components/ColumnMenuItems'
 import { t } from '@/i18n'
 
 // What a card shows, or matters most, for sorting cards. The table sorts from its headers.
@@ -42,7 +43,7 @@ export function QuickSearchField({ list, wide, onClose }: { list: TorrentList; w
       autoFocus={!wide}
       aria-label={t('Search')}
       placeholder={t('Search')}
-      title={t('Searches names, categories and tags. Use * and ? as wildcards, as in *.mkv.')}
+      title={t('Searches names, categories, tags and trackers. With a wildcard the whole name must match: * stands for any text and ? for any one character, as in *.mkv.')}
       value={list.draft}
       onValueChange={(text) => (text ? list.setDraft(text) : list.setQuery(''))}
       onKeyDown={(e) => {
@@ -80,14 +81,10 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen,
               <Columns3 className="size-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="max-h-[70vh] w-56 overflow-y-auto">
+          <DropdownMenuContent align="end" className="max-h-[70vh] w-60 overflow-y-auto">
             <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">{t('Drag headers to reorder, or drag their edges to resize')}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {columns.order.map(id => (
-              <DropdownMenuCheckboxItem key={id} checked={!columns.hidden.includes(id)} disabled={id === 'name'} onSelect={(e) => e.preventDefault()} onCheckedChange={() => onColumnsChange(toggleColumn(columns, id))}>
-                {getColumn(id).label}
-              </DropdownMenuCheckboxItem>
-            ))}
+            <ColumnMenuItems order={columns.order} shown={id => !columns.hidden.includes(id)} locked="name" label={id => getColumn(id).label} onToggle={id => onColumnsChange(toggleColumn(columns, id))} onMove={(id, target) => onColumnsChange(moveColumn(columns, id, target))} Item={DropdownMenuCheckboxItem} />
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => { onColumnsChange(DEFAULT_COLUMN_LAYOUT); list.resetSort() }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
           </DropdownMenuContent>

@@ -1,8 +1,8 @@
 import { type MouseEvent, type ReactNode } from 'react'
-import { Check, ChevronRight, Minus, MoreHorizontal, Plus, type LucideIcon } from 'lucide-react'
+import { Check, ChevronDown, ChevronRight, Minus, MoreHorizontal, Plus, X, type LucideIcon } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { SearchInput } from '@/components/SearchInput'
 import { useLongPress } from '@/hooks/useLongPress'
 import { cn } from '@/lib/utils'
@@ -66,8 +66,47 @@ export function ItemMenu({ name, children }: { name: string; children: ReactNode
   )
 }
 
-export function Section({ id, title, icon: Icon, chosen, folded, onFold, onAdd, addLabel, action, search, onSearch, children }: {
+// The sidebar's title row: the title with the filter button beside it, and Clear filters at the end.
+// Clear filters clears both kinds; its arrow offers clearing only one. The funnel adds a column filter. The header's sidebar button
+// closes the sidebar, so it has no close button of its own.
+export function SidebarHeader({ title, filterButton, sidebarFiltered, columnFiltered, onClearSidebar, onClearColumns }: {
+  title: string
+  filterButton: ReactNode
+  sidebarFiltered: boolean
+  columnFiltered: boolean
+  onClearSidebar: () => void
+  onClearColumns: () => void
+}) {
+  const any = sidebarFiltered || columnFiltered
+  return (
+    <div className="flex items-center gap-1">
+      <h3 className="truncate text-sm font-medium">{title}</h3>
+      {filterButton}
+      {/* Always there, greyed out while nothing is filtered. */}
+      <div className="ms-auto flex shrink-0 items-center text-xs text-muted-foreground">
+        <button type="button" disabled={!any} onClick={() => { if (sidebarFiltered) onClearSidebar(); if (columnFiltered) onClearColumns() }} className="rounded-s px-1 py-1 enabled:hover:text-foreground disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden">
+          {t('Clear filters')}
+        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button type="button" disabled={!any} aria-label={t('Choose which filters to clear')} title={t('Choose which filters to clear')} className="rounded-e border-s px-1 py-1 enabled:hover:text-foreground disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden">
+              <ChevronDown className="size-3.5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem disabled={!sidebarFiltered} onSelect={onClearSidebar}>{t('Clear sidebar filters')}</DropdownMenuItem>
+            <DropdownMenuItem disabled={!columnFiltered} onSelect={onClearColumns}>{t('Clear column filters')}</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  )
+}
+
+export function Section({ id, title, icon: Icon, chosen, onClear, folded, onFold, onAdd, addLabel, action, search, onSearch, children }: {
   id: string; title: string; icon: LucideIcon; chosen: number; folded: boolean; onFold: (id: string) => void; onAdd?: () => void; addLabel?: string
+  // Clears this section's choices only, from its count, which shows an x under the pointer.
+  onClear?: () => void
   // Another button in the title row, such as saving a view.
   action?: ReactNode
   // A field that narrows the section's choices by name.
@@ -78,12 +117,18 @@ export function Section({ id, title, icon: Icon, chosen, folded, onFold, onAdd, 
   return (
     <section className="space-y-1">
       <div className="flex items-center gap-1">
-        <button type="button" aria-expanded={!folded} onClick={() => onFold(id)} className="flex min-w-0 flex-1 items-center gap-1 rounded-md py-1 text-xs font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground">
+        <button type="button" aria-expanded={!folded} onClick={() => onFold(id)} className={cn('flex min-w-0 items-center gap-1 rounded-md py-1 text-xs font-medium tracking-wide text-muted-foreground uppercase hover:text-foreground', !(chosen > 0 && onClear) && 'flex-1')}>
           <ChevronRight className={cn('size-3.5 shrink-0 transition-transform', !folded && 'rotate-90')} />
           <Icon aria-hidden className="size-3.5 shrink-0" />
           <span className="truncate">{title}</span>
-          {chosen > 0 && <span className="rounded-full bg-primary px-1.5 text-[0.7rem] leading-4 text-primary-foreground normal-case">{chosen}</span>}
+          {chosen > 0 && !onClear && <span className="rounded-full bg-primary px-1.5 text-[0.7rem] leading-4 text-primary-foreground normal-case">{chosen}</span>}
         </button>
+        {chosen > 0 && onClear && (
+          <button type="button" onClick={onClear} aria-label={t('Clear the {section} filter', { section: title })} title={t('Clear the {section} filter', { section: title })} className="group/clear me-auto flex h-4 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[0.7rem] leading-4 text-primary-foreground tabular-nums hover:bg-destructive focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden">
+            <span className="group-hover/clear:hidden group-focus-visible/clear:hidden">{chosen}</span>
+            <X aria-hidden className="hidden size-3 group-hover/clear:block group-focus-visible/clear:block" />
+          </button>
+        )}
         {action}
         {onAdd && (
           <Button type="button" variant="ghost" size="icon" className="size-7" aria-label={addLabel} title={addLabel} onClick={onAdd}>

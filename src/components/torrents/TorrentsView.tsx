@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
-import { ChevronLeft, ChevronRight, Pause, Play, Trash2, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { NativeSelect } from '@/components/NativeSelect'
@@ -15,7 +15,6 @@ import { chosenCount, SIDEBAR_COLUMNS } from '@/lib/torrentFilters'
 import { loadFilterViews, type FilterView } from '@/lib/filterViews'
 import { announce } from '@/lib/announce'
 import { loadBarActions, saveBarActions } from '@/lib/actionBar'
-import { Tooltip } from '@/components/ui/tooltip'
 import { toast } from '@/hooks/use-toast'
 import { getColumn, loadColumnLayout, saveColumnLayout, TORRENT_FILTER_COLUMNS, type ColumnLayout } from '@/lib/torrentColumns'
 import { choiceOptions, NONE } from '@/lib/columnFilters'
@@ -30,6 +29,8 @@ import { FilterChoices, FilterSidebar } from './TorrentFilterPanel'
 import { FilterSheet } from '@/components/FilterSidebarParts'
 import { useMarkedTorrents } from '@/hooks/useTrackerIssues'
 import { MoreMenu, TorrentContextMenu } from './TorrentMenus'
+import { SelectionBar } from './SelectionBar'
+import { useListShortcuts } from '@/hooks/useListShortcuts'
 import { ShortcutsDialog } from './ShortcutsDialog'
 import { TorrentTable } from './TorrentTable'
 // Loaded with the list rather than on first use, so the details and dialogs open at once.
@@ -40,13 +41,6 @@ import { t } from '@/i18n'
 
 
 const EMPTY: Torrent[] = []
-
-// Keys typed into a field, or pressed while a dialog or menu is open, aren't list shortcuts.
-function isListShortcut(event: KeyboardEvent) {
-  const target = event.target as HTMLElement
-  if (target.closest('input, textarea, select, [contenteditable="true"]')) return false
-  return !document.querySelector('[role="dialog"], [role="menu"]')
-}
 
 export function TorrentsView() {
   const { data: torrents = EMPTY, isLoading, isError } = useTorrents()
@@ -105,6 +99,8 @@ export function TorrentsView() {
   const entries = groups.flatMap(group => group.entries)
   const pinnedEntries = barActions.flatMap(id => entries.filter(entry => entry.id === id))
   const closeDetails = useCallback(() => setDetailsHash(null), [])
+  // Details in the menus opens the torrent's details, or closes them again.
+  const toggleDetails = (torrent: Torrent) => setDetailsHash(current => (current === torrent.hash ? null : torrent.hash))
 
   // What each column's filter needs. A choice offers the values the torrents have, whatever
   // the other filters show, with what the empty value means for that column.
@@ -250,91 +246,42 @@ export function TorrentsView() {
   })
 
   const withMenu = (target: ReactElement) => (
-    <TorrentContextMenu torrents={selectedTorrents} groups={groups} onDetails={t => setDetailsHash(t.hash)} onStart={start} onStop={stop} onDelete={() => askToDelete(selectedTorrents)}>
+    <TorrentContextMenu torrents={selectedTorrents} groups={groups} onDetails={toggleDetails} detailsHash={detailsHash} onStart={start} onStop={stop} onDelete={() => askToDelete(selectedTorrents)}>
       {target}
     </TorrentContextMenu>
   )
 
-  // Ctrl or Cmd + A selects every matching torrent and with Shift none, + I swaps the selected and
-  // unselected ones, + S starts and + P stops the selection, and + O opens Add, as in qBittorrent.
-  // Delete asks to delete the selection, Escape closes the details and then clears the selection,
-  // / or S opens the search, F the filters, N adds torrents, V switches between table and cards, and ?
-  // lists all of these.
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (!isListShortcut(event)) return
-      const mod = event.metaKey || event.ctrlKey
-      const key = event.key.toLowerCase()
-      if (mod && key === 'a') {
-        event.preventDefault()
-        if (event.shiftKey) selection.clear()
-        else selection.replace(list.matching.map(t => t.hash))
-      } else if (mod && key === 'i') {
-        event.preventDefault()
-        selection.replace(list.matching.filter(t => !selection.selected.has(t.hash)).map(t => t.hash))
-      } else if (mod && (key === 's' || key === 'p') && !event.shiftKey && count > 0) {
-        event.preventDefault()
-        if (key === 's') start()
-        else stop()
-      } else if (mod && key === 'o') {
-        event.preventDefault()
-        setAddOpen(true)
-      } else if ((event.key === 'Delete' || event.key === 'Backspace') && count > 0) {
-        event.preventDefault()
-        askToDelete(selectedTorrents)
-      } else if (event.key === 'Escape') {
-        if (detailsHash) closeDetails()
-        else selection.clear()
-      // S as well as /, which needs Shift on many keyboards, such as German ones.
-      } else if (event.key === '/' || (key === 's' && !mod && !event.altKey && !event.shiftKey)) {
-        event.preventDefault()
-        const field = document.getElementById('torrent-search')
-        if (field) field.focus()
-        else setSearchOpen(true)
-      } else if (event.key === '?') {
-        event.preventDefault()
-        setShortcutsOpen(true)
-      } else if (!mod && !event.altKey && !event.shiftKey && (key === 'f' || key === 'n' || key === 'v')) {
-        event.preventDefault()
-        if (key === 'f') setFiltersOpen(open => !open)
-        else if (key === 'n') setAddOpen(true)
-        else list.showAsTable(!list.showTable)
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+  useListShortcuts({
+    hasSelection: count > 0,
+    selectAll: () => selection.replace(list.matching.map(t => t.hash)),
+    selectNone: selection.clear,
+    invertSelection: () => selection.replace(list.matching.filter(t => !selection.selected.has(t.hash)).map(t => t.hash)),
+    start,
+    stop,
+    add: () => setAddOpen(true),
+    deleteSelection: () => askToDelete(selectedTorrents),
+    escape: () => (detailsHash ? closeDetails() : selection.clear()),
+    search: () => {
+      const field = document.getElementById('torrent-search')
+      if (field) field.focus()
+      else setSearchOpen(true)
+    },
+    showShortcuts: () => setShortcutsOpen(true),
+    toggleFilters: () => setFiltersOpen(open => !open),
+    toggleView: () => list.showAsTable(!list.showTable),
   })
 
-
-  // Phones: where a thumb reaches, just above the tab bar, or where the tab bar would be when it's
-  // off; on tablets as wide as the tab bar. The buttons sit at the end, Delete last. No margin from
-  // the page's spacing, which would lift it off the tab bar. Wide screens: in the header, in the middle of the window, so the list below doesn't move
-  // when a torrent is selected.
   const selectionBar = count > 0 && (
-    <div
-      role="toolbar"
-      aria-label={t('Selected torrents')}
-      className="glass glass-flat-phone z-30 flex items-center gap-1 overflow-x-auto max-md:fixed max-md:inset-x-3 max-md:mx-auto max-md:my-0 max-md:max-w-lg max-md:bottom-[calc(var(--bottom-nav-height,4rem)+var(--selection-bar-gap,0.25rem))] max-md:rounded-full max-md:p-1.5 max-md:px-2 md:absolute md:top-1/2 md:left-1/2 md:max-w-[calc(100vw-38rem)] md:-translate-1/2 md:rounded-xl md:p-0.5"
-    >
-      <Button variant="ghost" size="icon" className="size-8 shrink-0 rounded-full" aria-label={t('Clear selection')} title={t('Clear selection (Esc)')} onClick={selection.clear}>
-        <X className="size-4" />
-      </Button>
-      <span className="pe-1 text-sm whitespace-nowrap tabular-nums">{t('{selected}/{total} selected', { selected: count, total: list.matching.length })}</span>
-      <Button variant="ghost" size="sm" className="gap-1 max-md:ms-auto" title={t('Start')} onClick={start}><Play className="size-4" /><span className="max-sm:sr-only">{t('Start')}</span></Button>
-      <Button variant="ghost" size="sm" className="gap-1" title={t('Stop')} onClick={stop}><Pause className="size-4" /><span className="max-sm:sr-only">{t('Stop')}</span></Button>
-      {pinnedEntries.map(entry => {
-        const Icon = entry.icon
-        return Icon && (
-          <Tooltip key={entry.id} label={entry.label}>
-            <Button variant={entry.pressed || entry.checked ? 'secondary' : 'ghost'} size="icon" className="size-8 shrink-0" aria-label={entry.label} aria-pressed={entry.pressed ?? entry.checked} onClick={entry.onSelect}>
-              <Icon className="size-4" />
-            </Button>
-          </Tooltip>
-        )
-      })}
-      <MoreMenu torrents={selectedTorrents} groups={groups} onCustomize={() => setBarDialogOpen(true)} />
-      <Button variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive" title={t('Delete (Del)')} onClick={() => askToDelete(selectedTorrents)}><Trash2 className="size-4" /><span className="max-sm:sr-only">{t('Delete')}</span></Button>
-    </div>
+    <SelectionBar
+      count={count}
+      total={list.matching.length}
+      pinned={pinnedEntries}
+      onClear={selection.clear}
+      onStart={start}
+      onStop={stop}
+      onDelete={() => askToDelete(selectedTorrents)}
+      more={<MoreMenu torrents={selectedTorrents} groups={groups} onDetails={toggleDetails} detailsHash={detailsHash} onStart={start} onStop={stop} onDelete={() => askToDelete(selectedTorrents)} onCustomize={() => setBarDialogOpen(true)} />}
+    />
   )
 
   const total = torrents.length
@@ -392,7 +339,6 @@ export function TorrentsView() {
       views={views}
       onViewsChange={setViews}
       columnTargets={[...filterTargets.values()]}
-      onClose={() => setFiltersOpen(false)}
     />
   )
 
@@ -487,8 +433,8 @@ export function TorrentsView() {
       {detailsTorrent && (
         <PageBoundary loading={null}>
           {wide
-            ? <TorrentDetailsPanel torrent={detailsTorrent} onClose={closeDetails} />
-            : <TorrentDetailsDialog torrent={detailsTorrent} onClose={closeDetails} />}
+            ? <TorrentDetailsPanel torrent={detailsTorrent} onClose={closeDetails} onDelete={() => askToDelete([detailsTorrent])} />
+            : <TorrentDetailsDialog torrent={detailsTorrent} onClose={closeDetails} onDelete={() => askToDelete([detailsTorrent])} />}
         </PageBoundary>
       )}
     </div>

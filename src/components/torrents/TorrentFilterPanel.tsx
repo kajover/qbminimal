@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { Activity, Ban, ArrowDownToLine, ArrowUpFromLine, Bookmark, Filter, RefreshCw, CircleAlert, CircleCheck, CircleDashed, CircleOff, Columns3, Download, Eye, EyeOff, Folder, FolderInput, FolderX, Globe, Hourglass, ListChecks, Pause, Pencil, Play, Plus, RotateCcw, ServerCrash, ServerOff, Tag, Tags, TriangleAlert, Trash2, Upload, X, type LucideIcon } from 'lucide-react'
-import { FilterItem, ItemMenu, NothingMatches, Section } from '@/components/FilterSidebarParts'
+import { Activity, Bookmark, Filter, RefreshCw, CircleOff, Eye, EyeOff, Folder, FolderX, Globe, Pencil, Plus, Tag, Tags, Trash2, type LucideIcon } from 'lucide-react'
+import { FilterItem, ItemMenu, NothingMatches, Section, SidebarHeader } from '@/components/FilterSidebarParts'
 import { useSidebarSections } from '@/hooks/useSidebarSections'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -14,8 +14,9 @@ import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import { readStored, writeStored } from '@/lib/storage'
 import { renameCategory, renameTag } from '@/lib/renameLabels'
-import { choiceState, chosenCount, parseTags, STATUS_FILTERS, TRACKERLESS, UNCATEGORIZED, UNTAGGED, withChoice, type ChoiceState, type FilterList, type StatusFilter } from '@/lib/torrentFilters'
+import { choiceState, chosenCount, parseTags, STATUS_FILTERS, TRACKERLESS, UNCATEGORIZED, UNTAGGED, withChoice, type ChoiceState, type FilterList } from '@/lib/torrentFilters'
 import { cn } from '@/lib/utils'
+import { STATUS_ICONS } from '@/lib/stateIcons'
 import type { TorrentList } from '@/hooks/useTorrentList'
 import { saveFilterViews, sameFilters, upsertView, type FilterView } from '@/lib/filterViews'
 import type { Torrent, TorrentCategory } from '@/types'
@@ -26,11 +27,6 @@ import { t } from '@/i18n'
 const choiceLabel = (value: string) =>
   value === UNCATEGORIZED ? t('Uncategorized') : value === UNTAGGED ? t('Untagged') : value === TRACKERLESS ? t('No tracker') : value
 
-const STATUS_ICONS: Record<StatusFilter, LucideIcon> = {
-  downloading: Download, seeding: Upload, completed: CircleCheck, running: Play, stopped: Pause, active: Activity, inactive: CircleDashed,
-  stalled: Hourglass, stalledUploading: ArrowUpFromLine, stalledDownloading: ArrowDownToLine, checking: ListChecks, moving: FolderInput,
-  errored: TriangleAlert, trackerError: ServerCrash, unregistered: Ban, trackerDown: ServerOff, trackerWarning: CircleAlert,
-}
 
 interface Choice { value: string; label: string; icon: LucideIcon; count: number }
 
@@ -212,13 +208,12 @@ interface FilterSidebarProps {
   views: FilterView[]
   onViewsChange: (views: FilterView[]) => void
   columnTargets: FilterTarget[]
-  onClose: () => void
 }
 
 // Saved views, then status, categories, tags and trackers, each with tick boxes for any number of
 // choices and a count of the torrents each would show. A choice can also be excluded, hiding what it matches. Views, categories and tags can be added,
 // renamed, changed and deleted right here.
-export function FilterSidebar({ list, torrents, categories, tags, views, onViewsChange, columnTargets, onClose }: FilterSidebarProps) {
+export function FilterSidebar({ list, torrents, categories, tags, views, onViewsChange, columnTargets }: FilterSidebarProps) {
   const { filters } = list
   const { folded, fold, searchProps, matching } = useSidebarSections(FOLDED_KEY, initialFolded)
   const [prompt, setPrompt] = useState<Prompt | null>(null)
@@ -253,6 +248,8 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
   const removeView = (name: string) => changeViews(views.filter(view => view.name !== name))
   const categoryNames = Object.keys(categories).sort((a, b) => a.localeCompare(b))
   const tagNames = [...tags].sort((a, b) => a.localeCompare(b))
+  // Clears one section's choices, from its count.
+  const clearList = (key: FilterList) => () => list.applyFilters({ ...filters, [key]: [], excluded: { ...filters.excluded, [key]: [] } })
   const toggleEmpty = () => {
     writeStored(EMPTY_STATUSES_KEY, showEmpty ? null : 'true')
     setShowEmpty(!showEmpty)
@@ -260,25 +257,15 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
 
   return (
     <div id="torrent-filters" className="space-y-3">
-      <div className="flex items-center gap-1">
-        <h3 className="min-w-0 flex-1 truncate text-sm font-medium">{t('Filters')}</h3>
-        {/* Adds a filter on any table column. */}
-        <AddFilterButton targets={columnTargets} onChange={list.setColumnFilter} active={list.columnFiltered} />
-        <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0 rounded-full bg-muted hover:bg-accent" aria-label={t('Close filters')} title={t('Close filters')} onClick={onClose}>
-          <X className="size-4" />
-        </Button>
-      </div>
-      {/* Each reset clears its own kind of filter. */}
-      <div className="flex flex-wrap items-center gap-1">
-        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 rounded-full px-1.5 has-[>svg]:px-1.5" disabled={!list.sidebarFiltered} title={t('Clear the choices below')} onClick={list.clearSidebarFilters}>
-          <RotateCcw className="size-4" />
-          {t('Reset filters')}
-        </Button>
-        <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 rounded-full px-1.5 has-[>svg]:px-1.5" disabled={!list.columnFiltered} title={t('Clear the column filters')} onClick={list.clearColumnFilters}>
-          <Columns3 className="size-4" />
-          {t('Reset columns')}
-        </Button>
-      </div>
+      {/* The funnel adds a filter on any table column. */}
+      <SidebarHeader
+        title={t('Filters')}
+        filterButton={<AddFilterButton targets={columnTargets} onChange={list.setColumnFilter} active={list.columnFiltered} />}
+        sidebarFiltered={list.sidebarFiltered}
+        columnFiltered={list.columnFiltered}
+        onClearSidebar={list.clearSidebarFilters}
+        onClearColumns={list.clearColumnFilters}
+      />
 
       <Section id="views" title={t('Views')} icon={Bookmark} chosen={0} folded={folded.includes('views')} onFold={fold} action={<SaveViewButton list={list} views={views} onViewsChange={onViewsChange} />} {...(views.length > 0 ? searchProps('views') : {})}>
         {views.length === 0 ? <li className="px-2 py-1 text-sm text-muted-foreground">{t('No saved views yet. Pick some filters, then save them here.')}</li>
@@ -308,13 +295,13 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
 
       {/* Filters set from the table's column titles or the funnel above, each opening its editor. */}
       {activeCount(filters.columns) > 0 && (
-        <Section id="columns" title={t('Column filters')} icon={Filter} chosen={activeCount(filters.columns)} folded={folded.includes('columns')} onFold={fold}>
+        <Section id="columns" title={t('Column filters')} icon={Filter} chosen={activeCount(filters.columns)} onClear={list.clearColumnFilters} folded={folded.includes('columns')} onFold={fold}>
           <li><ColumnFilterChips targets={columnTargets} filters={filters.columns ?? {}} onChange={list.setColumnFilter} className="gap-1.5" /></li>
         </Section>
       )}
 
       <Section
-        id="status" title={t('Status')} icon={Activity} chosen={chosenCount(filters, 'statuses')} folded={folded.includes('status')} onFold={fold} {...searchProps('status')}
+        id="status" title={t('Status')} icon={Activity} chosen={chosenCount(filters, 'statuses')} onClear={clearList('statuses')} folded={folded.includes('status')} onFold={fold} {...searchProps('status')}
         action={(
           <Button type="button" variant="ghost" size="icon" className="size-7" aria-pressed={showEmpty} aria-label={showEmpty ? t('Hide empty statuses') : t('Show empty statuses')} title={showEmpty ? t('Hide empty statuses') : t('Show empty statuses')} onClick={toggleEmpty}>
             {showEmpty ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -324,7 +311,7 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
         {items('statuses', 'status')}
       </Section>
 
-      <Section id="categories" title={t('Categories')} icon={Folder} chosen={chosenCount(filters, 'categories')} folded={folded.includes('categories')} onFold={fold} onAdd={() => setPrompt({ kind: 'newCategory' })} addLabel={t('New category')} {...searchProps('categories')}>
+      <Section id="categories" title={t('Categories')} icon={Folder} chosen={chosenCount(filters, 'categories')} onClear={clearList('categories')} folded={folded.includes('categories')} onFold={fold} onAdd={() => setPrompt({ kind: 'newCategory' })} addLabel={t('New category')} {...searchProps('categories')}>
         {items('categories', 'categories', name => (
           <ItemMenu name={name}>
             <DropdownMenuItem onClick={() => setPrompt({ kind: 'editCategory', name, savePath: categories[name]?.savePath ?? '' })}><Pencil />{t('Edit category')}</DropdownMenuItem>
@@ -333,7 +320,7 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
         ))}
       </Section>
 
-      <Section id="tags" title={t('Tags')} icon={Tags} chosen={chosenCount(filters, 'tags')} folded={folded.includes('tags')} onFold={fold} onAdd={() => setPrompt({ kind: 'newTags' })} addLabel={t('New tags')} {...searchProps('tags')}>
+      <Section id="tags" title={t('Tags')} icon={Tags} chosen={chosenCount(filters, 'tags')} onClear={clearList('tags')} folded={folded.includes('tags')} onFold={fold} onAdd={() => setPrompt({ kind: 'newTags' })} addLabel={t('New tags')} {...searchProps('tags')}>
         {items('tags', 'tags', name => (
           <ItemMenu name={name}>
             <DropdownMenuItem onClick={() => setPrompt({ kind: 'editTag', name })}><Pencil />{t('Rename')}</DropdownMenuItem>
@@ -342,7 +329,7 @@ export function FilterSidebar({ list, torrents, categories, tags, views, onViews
         ))}
       </Section>
 
-      <Section id="trackers" title={t('Trackers')} icon={Globe} chosen={chosenCount(filters, 'trackers')} folded={folded.includes('trackers')} onFold={fold} {...searchProps('trackers')}>
+      <Section id="trackers" title={t('Trackers')} icon={Globe} chosen={chosenCount(filters, 'trackers')} onClear={clearList('trackers')} folded={folded.includes('trackers')} onFold={fold} {...searchProps('trackers')}>
         {items('trackers', 'trackers')}
       </Section>
 

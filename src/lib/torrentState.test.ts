@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatEta, getStateLabel, isStoppedState, ratioColor } from './torrentState'
+import { formatEta, getStateLabel, isStoppedState } from './torrentState'
 
 describe('torrent state helpers', () => {
   it('shortens an ETA to its largest unit', () => {
@@ -18,10 +18,5 @@ describe('torrent state helpers', () => {
     expect(isStoppedState('uploading')).toBe(false)
     expect(getStateLabel('stoppedUP', 1700000000)).toBe('Completed')
     expect(getStateLabel('stoppedDL', 0)).toBe('Stopped')
-  })
-
-  it('colors ratios from poor to healthy', () => {
-    expect(ratioColor(0.2)).toContain('red')
-    expect(ratioColor(7)).toContain('sky')
   })
 })

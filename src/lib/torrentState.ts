@@ -32,7 +32,21 @@ const BADGE: Record<Tone, string> = {
 }
 
 export const getStateColor = (state: string, completedOn: number): string => TEXT[stateTone(state, completedOn)]
-export const getStateBadge = (state: string, completedOn: number): string => BADGE[stateTone(state, completedOn)]
+// As in qui, only the usual moving, waiting and failed states are filled: downloading, seeding,
+// stalled, queued and errors. The rest, such as forced, checking, moving and stopped (completed too),
+// are only outlined in their color.
+const FILLED_STATES = new Set(['downloading', 'uploading', 'stalledDL', 'stalledUP', 'queuedDL', 'queuedUP', 'error', 'missingFiles'])
+
+const OUTLINE: Record<Tone, string> = {
+  blue: 'text-blue-600 ring-1 ring-blue-500/60 ring-inset dark:text-blue-400',
+  green: 'text-green-700 ring-1 ring-green-600/70 ring-inset dark:text-green-400 dark:ring-green-500/70',
+  yellow: 'text-yellow-700 ring-1 ring-yellow-500/70 ring-inset dark:text-yellow-400',
+  red: 'text-red-600 ring-1 ring-red-500/60 ring-inset dark:text-red-400',
+  muted: 'text-muted-foreground ring-1 ring-border ring-inset',
+}
+
+export const getStateBadge = (state: string, completedOn: number): string =>
+  (FILLED_STATES.has(state) ? BADGE : OUTLINE)[stateTone(state, completedOn)]
 
 const LABELS: Record<string, string> = {
   downloading: 'Downloading',
@@ -76,18 +90,10 @@ export function formatEta(seconds: number): string {
   return `${Math.floor(seconds / size)}${suffix}`
 }
 
-// Red for a poor ratio, through yellow, to green and blue for a healthy one.
 // Download green and upload blue, in the list, the cards and the header alike.
 export const DOWN_SPEED_COLOR = 'text-green-600 dark:text-green-500'
 export const UP_SPEED_COLOR = 'text-blue-600 dark:text-blue-400'
 
-export function ratioColor(ratio: number): string {
-  if (ratio < 0.5) return 'text-red-500'
-  if (ratio < 1) return 'text-orange-500'
-  if (ratio < 2) return 'text-yellow-600 dark:text-yellow-400'
-  if (ratio < 5) return 'text-green-600 dark:text-green-400'
-  return 'text-sky-600 dark:text-sky-400'
-}
 
 // Seeds or peers as "connected (in the swarm)", the way qBittorrent shows them.
 export const peerPair = (connected: number, total: number) => `${Math.max(connected, 0)} (${Math.max(total, 0)})`

@@ -23,7 +23,9 @@ import type { ShareLimits } from './shareLimits'
 // A pretend qBittorrent that lives in memory, for trying the app without a server
 // (npm run demo). Actions change its state, and speeds drift a little on every refresh.
 
-const DEMO_WEB_API: string = import.meta.env.VITE_DEMO_WEB_API || '2.11.2'
+// As the newest qBittorrent unless told otherwise, so every feature shows; VITE_DEMO_WEB_API
+// picks an older version to try what the app does there.
+const DEMO_WEB_API: string = import.meta.env.VITE_DEMO_WEB_API || '2.17.0'
 const DEMO_SESSION_KEY = 'qbminimal.demoSession'
 const NOW = Math.floor(Date.now() / 1000)
 
@@ -54,6 +56,9 @@ interface DemoTorrent {
   addedDaysAgo: number
   ratio: number
   stopped?: boolean
+  comment?: string
+  // The on/off options, which the demo keeps so menus and the details show them changing.
+  options?: Partial<Record<'seq_dl' | 'f_l_piece_prio' | 'super_seeding' | 'force_start' | 'auto_tmm', boolean>>
   // A problem its tracker reports, to show the sidebar's tracker statuses.
   trackerIssue?: 'error' | 'unregistered' | 'warning' | 'down'
 }
@@ -102,10 +107,10 @@ function toTorrent(t: DemoTorrent, jitter: number, queuePosition: number): Torre
   return {
     hash: fakeHash(t.name), name: t.name, magnet_uri: `magnet:?xt=urn:btih:${fakeHash(t.name)}`,
     category: t.category, tags: t.tags, tracker: t.tracker, trackers_count: 1, private: false, has_metadata: true,
-    comment: '', created_by: 'mktorrent 1.1', creation_date: added - 86400,
+    comment: t.comment ?? '', created_by: 'mktorrent 1.1', creation_date: added - 86400,
     state, progress: t.progress, size: t.size, total_size: t.size, amount_left: left, completed: downloaded,
     availability: done ? -1 : 1 + t.progress, pieces_num: 480, pieces_have: Math.round(480 * t.progress), piece_size: Math.ceil(t.size / 480),
-    seq_dl: false, f_l_piece_prio: false, super_seeding: false, force_start: false, auto_tmm: false, priority: done ? 0 : queuePosition, popularity: Math.round(t.ratio / Math.max(t.addedDaysAgo / 30, 1) * 100) / 100,
+    seq_dl: false, f_l_piece_prio: false, super_seeding: false, force_start: false, auto_tmm: false, ...t.options, priority: done ? 0 : queuePosition, popularity: Math.round(t.ratio / Math.max(t.addedDaysAgo / 30, 1) * 100) / 100,
     dlspeed, upspeed, downloaded, uploaded: Math.round(downloaded * t.ratio), total_downloaded: downloaded, total_uploaded: Math.round(downloaded * t.ratio), total_wasted: 0,
     ratio: t.ratio, eta: dlspeed > 0 ? Math.round(left / dlspeed) : 8640000,
     num_seeds: running ? 12 : 0, num_complete: 140, num_leechs: running ? 3 : 0, num_incomplete: 22, connections_count: running ? 15 : 0, connections_limit: 100,
@@ -164,7 +169,8 @@ class DemoClient implements ApiClient {
   private rules: Record<string, RSSRule> = {}
   private creatorTasks: TorrentCreatorTask[] = []
   private plugins: SearchPlugin[] = [
-    { name: 'demo', fullName: 'Demo search', version: '1.0', enabled: true },
+    { name: 'demo', fullName: 'Demo search', version: '1.0', enabled: true, supportedCategories: [{ id: 'all', name: 'All categories' }, { id: 'movies', name: 'Movies' }, { id: 'tv', name: 'TV shows' }, { id: 'software', name: 'Software' }] },
+    { name: 'sample', fullName: 'Sample index', version: '0.4', enabled: true, supportedCategories: [{ id: 'all', name: 'All categories' }, { id: 'books', name: 'Books' }] },
     { name: 'archive', fullName: 'Internet Archive', version: '2.3', enabled: false },
   ]
   private rid = 0
@@ -242,7 +248,9 @@ class DemoClient implements ApiClient {
         dl_info_data: 146 * GiB, up_info_data: 83 * GiB, dl_rate_limit: this.limits.down, up_rate_limit: this.limits.up,
         free_space_on_disk: 512 * GiB, alltime_dl: 4.1 * 1024 * GiB, alltime_ul: 8.6 * 1024 * GiB, global_ratio: '2.10',
         total_peer_connections: 46, use_alt_speed_limits: this.altSpeed, session_state: this.sessionPaused,
-        last_external_address_v4: '203.0.113.7',
+        last_external_address_v4: '203.0.113.7', total_wasted_session: 212 * 1024 * 1024,
+        read_cache_hits: '0', read_cache_overload: '0', write_cache_overload: '0', total_buffers_size: 0,
+        queued_io_jobs: 0, average_time_queue: 0, total_queued_size: 0,
       },
     }
   }
@@ -327,14 +335,20 @@ class DemoClient implements ApiClient {
     }
     slots.forEach((slot, i) => { this.torrents[slot] = queue[i] })
   }
-  async setForceStart(hashes: string[], value: boolean) { if (value) this.each(hashes, t => { t.stopped = false }) }
-  async toggleSequentialDownload() {}
-  async toggleFirstLastPiecePrio() {}
-  async setSuperSeeding() {}
-  async setAutoManagement() {}
+  private setOption(hashes: string[], key: keyof NonNullable<DemoTorrent['options']>, value?: boolean) {
+    this.each(hashes, t => { t.options = { ...t.options, [key]: value ?? !t.options?.[key] } })
+  }
+  async setForceStart(hashes: string[], value: boolean) {
+    if (value) this.each(hashes, t => { t.stopped = false })
+    this.setOption(hashes, 'force_start', value)
+  }
+  async toggleSequentialDownload(hashes: string[]) { this.setOption(hashes, 'seq_dl') }
+  async toggleFirstLastPiecePrio(hashes: string[]) { this.setOption(hashes, 'f_l_piece_prio') }
+  async setSuperSeeding(hashes: string[], value: boolean) { this.setOption(hashes, 'super_seeding', value) }
+  async setAutoManagement(hashes: string[], value: boolean) { this.setOption(hashes, 'auto_tmm', value) }
   async setLocation() {}
   async setDownloadPath() {}
-  async setComment() {}
+  async setComment(hashes: string[], comment: string) { this.each(hashes, t => { t.comment = comment }) }
   async renameTorrent(hash: string, name: string) { this.each([hash], t => { t.name = name }) }
   async setDownloadLimit() {}
   async setUploadLimit() {}

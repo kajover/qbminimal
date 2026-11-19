@@ -97,16 +97,21 @@ export function WebSeedsSection({ hash }: { hash: string }) {
         )}
       <form onSubmit={add} className="space-y-1 pt-2">
         <Label htmlFor="new-web-seeds" className="text-xs text-muted-foreground">{t('Add web seeds, one URL per line')}</Label>
-        <Textarea
-          id="new-web-seeds"
-          rows={2}
-          value={newUrls}
-          onChange={(e) => setNewUrls(e.target.value)}
-          placeholder={t('https://files.example.com/path/')}
-          className="border-input dark:bg-input/30 w-full rounded-md border bg-transparent px-2 py-1 font-mono text-xs"
-          dir="ltr"
-        />
-        <Button type="submit" size="sm" variant="outline" className="h-8 text-xs" disabled={action.isPending}><Plus />{t('Add web seeds')}</Button>
+        {/* Laid out like the Comment field under Actions: the box with its button beside it. */}
+        <div className="flex max-w-3xl items-start gap-2">
+          <Textarea
+            id="new-web-seeds"
+            rows={2}
+            wrapperClassName="min-w-0 flex-1"
+            value={newUrls}
+            onChange={(e) => setNewUrls(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); e.currentTarget.form?.requestSubmit() } }}
+            placeholder={t('https://files.example.com/path/')}
+            className="min-h-14 px-2 py-1 font-mono text-xs"
+            dir="ltr"
+          />
+          <Button type="submit" size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs [&_svg:not([class*=size-])]:size-3.5" disabled={action.isPending} title={t('Ctrl or ⌘ and Enter')}><Plus />{t('Add web seeds')}</Button>
+        </div>
       </form>
     </section>
   )

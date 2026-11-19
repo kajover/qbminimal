@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
 import { hasStatus, qbitClient, type LogLevels } from '@/lib/api'
+import { disguiseTorrents, useIncognito } from '@/lib/incognito'
 import { supportsFeature, type ApiFeature } from '@/lib/apiVersion'
 import { parseBannedPeers, removeBannedPeer } from '@/lib/bannedPeers'
 import { findFinished } from '@/lib/finished'
@@ -97,7 +98,12 @@ const pickServerState = (data: MainData) => data.serverState
 const pickTrackers = (data: MainData) => data.trackers
 const pickSpeeds = (data: MainData) => totalSpeeds(data.torrents)
 
-export const useTorrents = () => useMainData(pickTorrents)
+// In incognito mode the names are stand-ins (see lib/incognito).
+const pickDisguised = (data: MainData) => disguiseTorrents(pickTorrents(data))
+export function useTorrents() {
+  const incognito = useIncognito()
+  return useMainData(incognito ? pickDisguised : pickTorrents)
+}
 const pickErrored = (data: MainData) => Object.values(data.torrents).filter(torrent => isErrored(torrent.state)).length
 export const useErroredCount = () => useMainData(pickErrored)
 // Looks a torrent up in the list already fetched, by its hash or, for a hybrid one, its v1 hash.

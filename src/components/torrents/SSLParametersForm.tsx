@@ -41,7 +41,7 @@ export function SSLParametersForm({ hash }: { hash: string }) {
   }
 
   if (!open) {
-    return <Button type="button" size="sm" variant="ghost" className="h-8 px-2 text-xs" onClick={load}><ShieldCheck />{t('SSL torrent certificate...')}</Button>
+    return <Button type="button" size="sm" variant="ghost" className="h-7 gap-1 px-2 text-xs" onClick={load}><ShieldCheck />{t('SSL torrent certificate...')}</Button>
   }
 
   return (
@@ -56,8 +56,8 @@ export function SSLParametersForm({ hash }: { hash: string }) {
             </div>
           ))}
           <div className="flex gap-2">
-            <Button type="submit" size="sm" variant="outline" className="h-8 text-xs" disabled={action.isPending}><Check />{t('Save SSL settings')}</Button>
-            <Button type="button" size="sm" variant="ghost" className="h-8 text-xs" onClick={() => setOpen(false)}>{t('Hide')}</Button>
+            <Button type="submit" size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs [&_svg:not([class*=size-])]:size-3.5" disabled={action.isPending}><Check />{t('Save SSL settings')}</Button>
+            <Button type="button" size="sm" variant="ghost" className="h-7 gap-1 px-2 text-xs [&_svg:not([class*=size-])]:size-3.5" onClick={() => setOpen(false)}>{t('Hide')}</Button>
           </div>
         </>
       )}

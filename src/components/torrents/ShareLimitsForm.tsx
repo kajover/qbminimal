@@ -8,9 +8,10 @@ import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import { getShareLimitForm, parseShareLimits, type ShareLimitMode } from '@/lib/shareLimits'
 import type { Torrent } from '@/types'
+import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
 
-const selectClass = 'border-input dark:bg-input/30 h-8 w-full rounded-md border bg-transparent px-2 text-xs'
+const selectClass = 'border-input dark:bg-input/30 h-7 w-full rounded-md border bg-transparent px-2 text-xs'
 
 const REMOVAL_WARNINGS: Record<string, string> = {
   Remove: t('qBittorrent will remove this torrent without asking once a limit is reached, or right away if it\'s already past one. Its files are kept.'),
@@ -18,7 +19,7 @@ const REMOVAL_WARNINGS: Record<string, string> = {
 }
 
 // Values start from the torrent and don't follow refreshes, so typing isn't overwritten.
-export function ShareLimitsForm({ torrent }: { torrent: Torrent }) {
+export function ShareLimitsForm({ torrent, className }: { torrent: Torrent; className?: string }) {
   const action = useTorrentAction()
   const [form, setForm] = useState(() => getShareLimitForm(torrent))
   // Older qBittorrent versions don't report this setting, so it can't be shown or kept.
@@ -39,35 +40,39 @@ export function ShareLimitsForm({ torrent }: { torrent: Torrent }) {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-2 border-t pt-3">
+    <form onSubmit={submit} className={cn('space-y-2', className)}>
       <div className="space-y-1">
         <Label htmlFor="torrent-share-mode" className="text-xs text-muted-foreground">{t('Seeding limits')}</Label>
-        <select
-          id="torrent-share-mode"
-          value={form.mode}
-          onChange={(e) => setForm({ ...form, mode: e.target.value as ShareLimitMode })}
-          className={selectClass}
-        >
-          <option value="global">{t('Use qBittorrent\'s global limits')}</option>
-          <option value="none">{t('No limit')}</option>
-          <option value="custom">{t('Custom limits')}</option>
-        </select>
+        {/* Saved from beside the choice, like the fields above; only as wide as its longest choice. */}
+        <div className="flex gap-2">
+          <select
+            id="torrent-share-mode"
+            value={form.mode}
+            onChange={(e) => setForm({ ...form, mode: e.target.value as ShareLimitMode })}
+            className={cn(selectClass, 'w-auto min-w-0 max-w-full')}
+          >
+            <option value="global">{t('Use qBittorrent\'s global limits')}</option>
+            <option value="none">{t('No limit')}</option>
+            <option value="custom">{t('Custom limits')}</option>
+          </select>
+          <Button type="submit" size="sm" variant="outline" className="h-7 shrink-0 gap-1 px-2 text-xs [&_svg:not([class*=size-])]:size-3.5" disabled={action.isPending}><Check />{t('Save')}</Button>
+        </div>
       </div>
 
       {form.mode === 'custom' && (
         <>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 @md:grid-cols-3">
             <div className="space-y-1">
               <Label htmlFor="torrent-share-ratio" className="text-xs text-muted-foreground">{t('Ratio')}</Label>
-              <Input id="torrent-share-ratio" type="number" min={0} step="any" placeholder={t('No limit')} value={form.ratio} onChange={(e) => setForm({ ...form, ratio: e.target.value })} className="h-8 text-xs" />
+              <Input id="torrent-share-ratio" type="number" min={0} step="any" placeholder={t('No limit')} value={form.ratio} onChange={(e) => setForm({ ...form, ratio: e.target.value })} className="h-7 text-xs" />
             </div>
             <div className="space-y-1">
               <Label htmlFor="torrent-share-seeding" className="text-xs text-muted-foreground">{t('Seeding time (minutes)')}</Label>
-              <Input id="torrent-share-seeding" type="number" min={0} step={1} placeholder={t('No limit')} value={form.seedingMinutes} onChange={(e) => setForm({ ...form, seedingMinutes: e.target.value })} className="h-8 text-xs" />
+              <Input id="torrent-share-seeding" type="number" min={0} step={1} placeholder={t('No limit')} value={form.seedingMinutes} onChange={(e) => setForm({ ...form, seedingMinutes: e.target.value })} className="h-7 text-xs" />
             </div>
             <div className="space-y-1">
               <Label htmlFor="torrent-share-inactive" className="text-xs text-muted-foreground">{t('Inactive time (minutes)')}</Label>
-              <Input id="torrent-share-inactive" type="number" min={0} step={1} placeholder={t('No limit')} value={form.inactiveMinutes} onChange={(e) => setForm({ ...form, inactiveMinutes: e.target.value })} className="h-8 text-xs" />
+              <Input id="torrent-share-inactive" type="number" min={0} step={1} placeholder={t('No limit')} value={form.inactiveMinutes} onChange={(e) => setForm({ ...form, inactiveMinutes: e.target.value })} className="h-7 text-xs" />
             </div>
           </div>
 
@@ -109,7 +114,6 @@ export function ShareLimitsForm({ torrent }: { torrent: Torrent }) {
         </>
       )}
 
-      <Button type="submit" size="sm" variant="outline" className="h-8 text-xs" disabled={action.isPending}><Check />{t('Save seeding limits')}</Button>
     </form>
   )
 }

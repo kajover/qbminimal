@@ -328,7 +328,7 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
                   value={links}
                   onChange={(e) => setLinks(e.target.value)}
                   placeholder={t('magnet:?xt=...')}
-                  className="border-input dark:bg-input/30 block w-full rounded-md border bg-transparent px-3 py-2 pe-9 text-sm"
+                  className="pe-9 text-sm"
                 />
                 {sourceCount > 0 && (
                   // Clears the links and files, which otherwise stay while other pages are open.
@@ -501,7 +501,8 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={adding}>
+            {/* Enter adds a line for another link, so Ctrl or ⌘ and Enter adds them. */}
+            <Button type="submit" className="w-full" disabled={adding} title={t('Ctrl or ⌘ and Enter')}>
               {adding ? <Loader2 className="me-2 size-4 animate-spin" /> : <Plus />}
               {sourceCount > 1 ? t('Add {sourceCount} torrents', { sourceCount }) : t('Add torrent')}
             </Button>
