@@ -7,9 +7,10 @@ import type { Torrent } from '@/types'
 // and the torrents stay as they are. Each torrent keeps the same stand-in name while it's on.
 const KEY = 'qbminimal.incognito'
 
+// None may match the demo's own torrent names, which the release check looks for in the zip.
 const NAMES = [
   'ubuntu-24.04.1-desktop-amd64.iso', 'ubuntu-24.10-desktop-amd64.iso', 'ubuntu-22.04.4-server-amd64.iso',
-  'debian-12.7.0-amd64-DVD-1.iso', 'debian-13.1.0-amd64-netinst.iso', 'Fedora-Workstation-Live-x86_64-41.iso',
+  'debian-12.7.0-amd64-DVD-1.iso', 'debian-13.1.0-amd64-netinst.iso', 'Fedora-KDE-Live-x86_64-41.iso',
   'Fedora-Server-dvd-x86_64-42.iso', 'archlinux-2024.12.01-x86_64.iso', 'linuxmint-22-cinnamon-64bit.iso',
   'openSUSE-Tumbleweed-DVD-x86_64-Current.iso', 'openSUSE-Leap-15.6-DVD-x86_64.iso', 'manjaro-kde-24.0-linux66.iso',
   'elementary-os-7.1-stable.iso', 'zorin-os-17.1-core-64bit.iso', 'MX-23.3_x64.iso', 'rocky-9.4-x86_64-dvd.iso',
