@@ -1,0 +1,1 @@
+import{Lt as e}from"./dialog-DyTsCbeY.js";import{t}from"./index-BHi4_La3.js";var n=t();function r({className:t,onCheckedChange:r,...i}){return(0,n.jsx)(`input`,{type:`checkbox`,role:`switch`,switch:``,className:e(`switch`,t),onChange:e=>r?.(e.target.checked),...i})}export{r as t};
