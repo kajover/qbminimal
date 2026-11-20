@@ -1,0 +1,1 @@
+import{Et as e}from"./dialog-DUNAZJyk.js";import{t}from"./index-DsUdp2Ta.js";var n=t();function r({className:t,onCheckedChange:r,...i}){return(0,n.jsx)(`input`,{type:`checkbox`,role:`switch`,switch:``,className:e(`switch`,t),onChange:e=>r?.(e.target.checked),...i})}export{r as t};
