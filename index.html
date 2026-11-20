@@ -23,6 +23,24 @@
     <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfdfd" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17181c" />
+    <!-- The theme before the first paint. The app's script sets it too, but only after the page has
+         been drawn once, so a reload in dark mode flashed light first. The colors match the
+         theme-color above; the style alone covers the device's setting if the script can't run. -->
+    <script>
+      try {
+        var theme = localStorage.getItem('theme')
+        var dark = theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.classList.toggle('dark', dark)
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+      } catch (e) {}
+    </script>
+    <style>
+      html { background: #fdfdfd; }
+      html.dark { background: #17181c; }
+      @media (prefers-color-scheme: dark) {
+        html:not([style*='color-scheme']) { background: #17181c; }
+      }
+    </style>
     <!-- The title font is needed straight away, so it isn't shown in a stand-in font first. -->
     <link rel="preload" href="/src/assets/fonts/Silkscreen-Regular.ttf" as="font" type="font/ttf" crossorigin />
   </head>

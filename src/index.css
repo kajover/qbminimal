@@ -15,6 +15,16 @@
   }
 }
 
+/* The opposite of the frame: phones and narrow windows whose scrollbars take no room, where the
+   window scrolls the page. */
+@custom-variant window-scroll {
+  @media (max-width: 1199.98px) {
+    &:where(:root:not([data-scrollbars='room']) *) {
+      @slot;
+    }
+  }
+}
+
 /* qbminimal's palette: neutral greys with a warm red for destructive actions. Components read
    these through the --color-* names below. */
 :root {

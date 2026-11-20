@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Nenhum plugin ativado.",
   "Clear results": "Limpar resultados",
   "Incognito mode": "Modo anônimo",
-  "Hides the real torrent and file names in this browser.": "Oculta os nomes reais de torrents e arquivos neste navegador.",
   "What incognito mode does": "O que o modo anônimo faz",
   "Ctrl or ⌘ and Enter": "Ctrl ou ⌘ e Enter",
   "Search or type a new name": "Buscar ou digitar um novo nome",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} trackers",
   "How many have downloaded it in full, as the tracker says": "Quantos baixaram por completo, segundo o tracker",
   "Export .torrent files": "Exportar arquivos .torrent",
-  "Status icon": "Ícone de status"
+  "Status icon": "Ícone de status",
+  "Hides the real torrent and file names.": "Oculta os nomes reais de torrents e arquivos."
 }

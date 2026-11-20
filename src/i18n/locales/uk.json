@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Немає увімкнених плагінів.",
   "Clear results": "Очистити результати",
   "Incognito mode": "Режим інкогніто",
-  "Hides the real torrent and file names in this browser.": "Приховує справжні назви торентів і файлів у цьому браузері.",
   "What incognito mode does": "Що робить режим інкогніто",
   "Ctrl or ⌘ and Enter": "Ctrl або ⌘ і Enter",
   "Search or type a new name": "Знайдіть або введіть нову назву",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "Трекерів: {count}",
   "How many have downloaded it in full, as the tracker says": "Скільки завантажили його повністю, за даними трекера",
   "Export .torrent files": "Експорт файлів .torrent",
-  "Status icon": "Значок стану"
+  "Status icon": "Значок стану",
+  "Hides the real torrent and file names.": "Приховує справжні назви торентів і файлів."
 }

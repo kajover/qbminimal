@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Nincs bekapcsolt bővítmény.",
   "Clear results": "Találatok törlése",
   "Incognito mode": "Inkognitó mód",
-  "Hides the real torrent and file names in this browser.": "Elrejti a torrentek és fájlok valódi nevét ebben a böngészőben.",
   "What incognito mode does": "Mit csinál az inkognitó mód",
   "Ctrl or ⌘ and Enter": "Ctrl vagy ⌘ és Enter",
   "Search or type a new name": "Keressen vagy írjon be új nevet",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} tracker",
   "How many have downloaded it in full, as the tracker says": "Hányan töltötték le teljesen, a tracker szerint",
   "Export .torrent files": ".torrent fájlok exportálása",
-  "Status icon": "Állapotikon"
+  "Status icon": "Állapotikon",
+  "Hides the real torrent and file names.": "Elrejti a torrentek és fájlok valódi nevét."
 }

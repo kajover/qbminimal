@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "कोई प्लगइन चालू नहीं है।",
   "Clear results": "परिणाम साफ़ करें",
   "Incognito mode": "गुप्त मोड",
-  "Hides the real torrent and file names in this browser.": "इस ब्राउज़र में टोरेंट और फ़ाइलों के असली नाम छिपाता है।",
   "What incognito mode does": "गुप्त मोड क्या करता है",
   "Ctrl or ⌘ and Enter": "Ctrl या ⌘ और Enter",
   "Search or type a new name": "खोजें या नया नाम लिखें",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} ट्रैकर",
   "How many have downloaded it in full, as the tracker says": "ट्रैकर के अनुसार कितनों ने इसे पूरा डाउनलोड किया",
   "Export .torrent files": ".torrent फ़ाइलें निर्यात करें",
-  "Status icon": "स्थिति आइकन"
+  "Status icon": "स्थिति आइकन",
+  "Hides the real torrent and file names.": "टोरेंट और फ़ाइलों के असली नाम छिपाता है।"
 }

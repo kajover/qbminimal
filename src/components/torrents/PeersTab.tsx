@@ -153,7 +153,8 @@ function PeerCard({ id, peer, children }: { id: string; peer: TorrentPeer; child
   const label = expanded ? t('Show less') : t('Show more')
   return (
     <li className="px-2 py-1.5 text-xs">
-      <div className="flex items-center gap-2">
+      {/* The buttons sit on the first line, beside the address, pulled up so they center on it. */}
+      <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-2">
             <PeerFlag code={peer.country_code} country={peer.country} />
@@ -162,7 +163,7 @@ function PeerCard({ id, peer, children }: { id: string; peer: TorrentPeer; child
           </div>
           <p className="truncate text-muted-foreground">{peer.client || t('Unknown client')} · {percent(peer.progress)}</p>
         </div>
-        <div className="flex shrink-0 gap-0.5">
+        <div className="-my-1 flex shrink-0 gap-0.5">
           <Button variant="ghost" size="icon" className="size-6" aria-expanded={expanded} aria-label={label} title={label} onClick={() => setExpanded(!expanded)}>
             <ChevronDown className={cn('size-3.5 transition-transform', expanded && 'rotate-180')} />
           </Button>
@@ -238,6 +239,7 @@ export function PeersTab({ hash }: { hash: string }) {
 
   const banButton = (id: string, peer: TorrentPeer) => (
     <ConfirmAction
+      small
       label={t('Ban {value}', { value: peer.ip ?? id })}
       title={t('Ban this peer?')}
       message={t('{value} will be banned from every torrent, not only this one. You can undo this under Settings > Connection > Banned peers.', { value: peer.ip ?? id })}
@@ -255,7 +257,7 @@ export function PeersTab({ hash }: { hash: string }) {
       <section>
         {/* The search, how many peers there are, and the sorting, on one row, as in Content. */}
         <div className="flex items-center gap-2 px-2 pb-1.5">
-          <SearchInput aria-label={t('Search')} placeholder={t('Search')} value={search} onValueChange={setSearch} className="min-w-0 max-w-64 flex-1" inputClassName="h-7 text-xs" />
+          <SearchInput aria-label={t('Search')} placeholder={t('Search')} value={search} onValueChange={setSearch} className="w-40 min-w-0 shrink sm:w-64" inputClassName="h-7 text-xs" />
           <span className="ms-auto shrink-0 text-xs text-muted-foreground tabular-nums">{total === 1 ? t('1 peer') : t('{count} peers', { count: total })}</span>
           {sortControls}
         </div>
@@ -280,10 +282,10 @@ export function PeersTab({ hash }: { hash: string }) {
                   <thead>
                     <tr className="border-b">
                       <th className={headCell}><SortTitle field="ip" sort={picked ?? noSort} onSort={sortBy}>{t('IP address')}</SortTitle></th>
-                      <th className={cn(headCell, 'w-36')}><SortTitle field="client" sort={picked ?? noSort} onSort={sortBy}>{t('Client')}</SortTitle></th>
-                      <th className={cn(headCell, 'w-28')}><SortTitle field="progress" sort={picked ?? noSort} onSort={sortBy}>{t('Progress')}</SortTitle></th>
-                      <th className={cn(headCell, 'w-32')}><SortTitle field="dl_speed" sort={picked ?? noSort} onSort={sortBy}>{t('Down speed')}</SortTitle></th>
-                      <th className={cn(headCell, 'w-32')}><SortTitle field="up_speed" sort={picked ?? noSort} onSort={sortBy}>{t('Up speed')}</SortTitle></th>
+                      <th className={cn(headCell, 'w-34')}><SortTitle field="client" sort={picked ?? noSort} onSort={sortBy}>{t('Client')}</SortTitle></th>
+                      <th className={cn(headCell, 'w-24')}><SortTitle field="progress" sort={picked ?? noSort} onSort={sortBy}>{t('Progress')}</SortTitle></th>
+                      <th className={cn(headCell, 'w-28')}><SortTitle field="dl_speed" sort={picked ?? noSort} onSort={sortBy}>{t('Down speed')}</SortTitle></th>
+                      <th className={cn(headCell, 'w-28')}><SortTitle field="up_speed" sort={picked ?? noSort} onSort={sortBy}>{t('Up speed')}</SortTitle></th>
                       <th className={cn(headCell, 'w-14')}><span className="sr-only">{t('Show more')}</span></th>
                     </tr>
                   </thead>

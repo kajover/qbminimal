@@ -8,7 +8,7 @@ import { useTorrentAction, useTorrentTrackers } from '@/hooks/useApi'
 import { SearchInput } from '@/components/SearchInput'
 import { nextSort, SortMenu, SortTitle, type ListSort } from './DetailsSort'
 import { cn } from '@/lib/utils'
-import { WebSeedsSection } from './WebSeedsSection'
+import { AddButtonLabel, WebSeedsSection } from './WebSeedsSection'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import type { TorrentTracker } from '@/types'
@@ -107,6 +107,7 @@ function TrackerRow({ hash, tracker, card }: { hash: string; tracker: TorrentTra
         <Pencil className="size-3" />
       </Button>
       <ConfirmAction
+        small
         label={t('Remove {url}', { url: tracker.url })}
         title={t('Remove this tracker?')}
         message={t('{url} will be removed from this torrent. If it\'s a private tracker, you may need this URL to add it back.', { url: tracker.url })}
@@ -131,7 +132,8 @@ function TrackerRow({ hash, tracker, card }: { hash: string; tracker: TorrentTra
               {' · '}{t('Tier {tier}', { tier: tracker.tier })}
             </p>
           </div>
-          {buttons}
+          {/* On the first line, pulled up so they center on it. */}
+          <div className="-my-1">{buttons}</div>
         </div>
       </li>
     )
@@ -144,7 +146,7 @@ function TrackerRow({ hash, tracker, card }: { hash: string; tracker: TorrentTra
         <p className="break-all font-mono" dir="ltr">{tracker.url}</p>
         {tracker.msg && <p className="mt-0.5 text-muted-foreground">{tracker.msg}</p>}
       </td>
-      <td className={cn('px-2 py-1.5', statusClass)}>{statusLabel}</td>
+      <td className={cn('truncate px-2 py-1.5 whitespace-nowrap', statusClass)} title={statusLabel}>{statusLabel}</td>
       <td className="px-2 py-1.5 tabular-nums max-sm:hidden">{tracker.tier}</td>
       <td className="px-2 py-1.5 tabular-nums">{seeds}</td>
       <td className="px-2 py-1.5 tabular-nums">{peers}</td>
@@ -203,7 +205,7 @@ export function TrackersTab({ hash }: { hash: string }) {
       <section>
         {/* The search, how many trackers there are, and the sorting, on one row, as in Content. */}
         <div className="flex items-center gap-2 px-2 pb-1.5">
-          <SearchInput aria-label={t('Search')} placeholder={t('Search')} value={search} onValueChange={setSearch} className="min-w-0 max-w-64 flex-1" inputClassName="h-7 text-xs" />
+          <SearchInput aria-label={t('Search')} placeholder={t('Search')} value={search} onValueChange={setSearch} className="w-40 min-w-0 shrink sm:w-64" inputClassName="h-7 text-xs" />
           <span className="ms-auto shrink-0 text-xs text-muted-foreground tabular-nums">{all.length === 1 ? t('1 tracker') : t('{count} trackers', { count: all.length })}</span>
           <SortMenu fields={SORT_FIELDS} sort={shownSort} onSort={sortBy} onReset={() => setSort(null)} isDefault={!sort} />
         </div>
@@ -225,11 +227,11 @@ export function TrackersTab({ hash }: { hash: string }) {
               <thead>
                 <tr className="border-b">
                   <th className={headCell}>{title('url', t('Tracker'))}</th>
-                  <th className={cn(headCell, 'w-28')}>{title('status', t('Status'))}</th>
-                  <th className={cn(headCell, 'w-16 max-sm:hidden')}>{title('tier', t('Tier'))}</th>
-                  <th className={cn(headCell, 'w-20')}>{title('seeds', t('Seeds'))}</th>
-                  <th className={cn(headCell, 'w-20')}>{title('peers', t('Peers'))}</th>
-                  <th className={cn(headCell, 'w-32 max-sm:hidden')} title={t('How many have downloaded it in full, as the tracker says')}>{title('downloaded', t('Downloaded'))}</th>
+                  <th className={cn(headCell, 'w-34')}>{title('status', t('Status'))}</th>
+                  <th className={cn(headCell, 'w-14 max-sm:hidden')}>{title('tier', t('Tier'))}</th>
+                  <th className={cn(headCell, 'w-18')}>{title('seeds', t('Seeds'))}</th>
+                  <th className={cn(headCell, 'w-18')}>{title('peers', t('Peers'))}</th>
+                  <th className={cn(headCell, 'w-28 max-sm:hidden')} title={t('How many have downloaded it in full, as the tracker says')}>{title('downloaded', t('Downloaded'))}</th>
                   <th className={cn(headCell, 'w-16')}><span className="sr-only">{t('Edit tracker')}</span></th>
                 </tr>
               </thead>
@@ -256,7 +258,7 @@ export function TrackersTab({ hash }: { hash: string }) {
             className="min-h-14 px-2 py-1 font-mono text-xs"
             dir="ltr"
           />
-          <Button type="submit" size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs [&_svg:not([class*=size-])]:size-3.5" disabled={action.isPending} title={t('Ctrl or ⌘ and Enter')}><Plus />{t('Add trackers')}</Button>
+          <Button type="submit" size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs [&_svg:not([class*=size-])]:size-3.5" disabled={action.isPending} title={t('Ctrl or ⌘ and Enter')}><Plus /><AddButtonLabel /></Button>
         </div>
       </form>
 

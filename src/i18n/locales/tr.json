@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Etkin eklenti yok.",
   "Clear results": "Sonuçları temizle",
   "Incognito mode": "Gizli mod",
-  "Hides the real torrent and file names in this browser.": "Bu tarayıcıda gerçek torrent ve dosya adlarını gizler.",
   "What incognito mode does": "Gizli mod ne yapar",
   "Ctrl or ⌘ and Enter": "Ctrl veya ⌘ ve Enter",
   "Search or type a new name": "Arayın veya yeni bir ad yazın",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} izleyici",
   "How many have downloaded it in full, as the tracker says": "İzleyiciye göre kaç kişinin tamamını indirdiği",
   "Export .torrent files": ".torrent dosyalarını dışa aktar",
-  "Status icon": "Durum simgesi"
+  "Status icon": "Durum simgesi",
+  "Hides the real torrent and file names.": "Gerçek torrent ve dosya adlarını gizler."
 }

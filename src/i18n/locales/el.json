@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Δεν υπάρχουν ενεργά πρόσθετα.",
   "Clear results": "Καθαρισμός αποτελεσμάτων",
   "Incognito mode": "Λειτουργία ανωνυμίας",
-  "Hides the real torrent and file names in this browser.": "Κρύβει τα πραγματικά ονόματα torrent και αρχείων σε αυτό το πρόγραμμα περιήγησης.",
   "What incognito mode does": "Τι κάνει η λειτουργία ανωνυμίας",
   "Ctrl or ⌘ and Enter": "Ctrl ή ⌘ και Enter",
   "Search or type a new name": "Αναζητήστε ή γράψτε νέο όνομα",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} trackers",
   "How many have downloaded it in full, as the tracker says": "Πόσοι το έχουν κατεβάσει ολόκληρο, σύμφωνα με τον tracker",
   "Export .torrent files": "Εξαγωγή αρχείων .torrent",
-  "Status icon": "Εικονίδιο κατάστασης"
+  "Status icon": "Εικονίδιο κατάστασης",
+  "Hides the real torrent and file names.": "Κρύβει τα πραγματικά ονόματα torrent και αρχείων."
 }

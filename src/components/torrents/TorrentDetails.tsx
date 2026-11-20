@@ -17,10 +17,10 @@ import { t } from '@/i18n'
 
 const TABS = [
   { id: 'details', label: t('Details'), icon: Info },
-  { id: 'content', label: t('Content'), icon: FolderTree },
   { id: 'actions', label: t('Actions'), icon: SlidersHorizontal },
-  { id: 'trackers', label: t('Trackers'), icon: RadioTower },
+  { id: 'content', label: t('Content'), icon: FolderTree },
   { id: 'peers', label: t('Peers'), icon: Users },
+  { id: 'trackers', label: t('Trackers'), icon: RadioTower },
 ] as const
 
 const HEIGHT_KEY = 'qbminimal.detailsHeight'

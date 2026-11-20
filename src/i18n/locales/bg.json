@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Няма включени добавки.",
   "Clear results": "Изчистване на резултатите",
   "Incognito mode": "Режим инкогнито",
-  "Hides the real torrent and file names in this browser.": "Скрива истинските имена на торентите и файловете в този браузър.",
   "What incognito mode does": "Какво прави режимът инкогнито",
   "Ctrl or ⌘ and Enter": "Ctrl или ⌘ и Enter",
   "Search or type a new name": "Търсете или въведете ново име",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "Тракери: {count}",
   "How many have downloaded it in full, as the tracker says": "Колко са го изтеглили изцяло, според тракера",
   "Export .torrent files": "Експортиране на файлове .torrent",
-  "Status icon": "Икона на състоянието"
+  "Status icon": "Икона на състоянието",
+  "Hides the real torrent and file names.": "Скрива истинските имена на торентите и файловете."
 }

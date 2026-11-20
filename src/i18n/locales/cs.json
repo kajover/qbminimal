@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Nejsou zapnuté žádné pluginy.",
   "Clear results": "Vymazat výsledky",
   "Incognito mode": "Anonymní režim",
-  "Hides the real torrent and file names in this browser.": "Skryje skutečné názvy torrentů a souborů v tomto prohlížeči.",
   "What incognito mode does": "Co dělá anonymní režim",
   "Ctrl or ⌘ and Enter": "Ctrl nebo ⌘ a Enter",
   "Search or type a new name": "Hledejte nebo napište nový název",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "Trackery: {count}",
   "How many have downloaded it in full, as the tracker says": "Kolik ho podle trackeru stáhlo celý",
   "Export .torrent files": "Exportovat soubory .torrent",
-  "Status icon": "Ikona stavu"
+  "Status icon": "Ikona stavu",
+  "Hides the real torrent and file names.": "Skryje skutečné názvy torrentů a souborů."
 }

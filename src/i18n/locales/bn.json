@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "কোনো প্লাগইন চালু নেই।",
   "Clear results": "ফলাফল মুছুন",
   "Incognito mode": "ছদ্মবেশী মোড",
-  "Hides the real torrent and file names in this browser.": "এই ব্রাউজারে টরেন্ট ও ফাইলের আসল নাম লুকায়।",
   "What incognito mode does": "ছদ্মবেশী মোড কী করে",
   "Ctrl or ⌘ and Enter": "Ctrl বা ⌘ এবং Enter",
   "Search or type a new name": "খুঁজুন বা নতুন নাম লিখুন",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count}টি ট্র্যাকার",
   "How many have downloaded it in full, as the tracker says": "ট্র্যাকারের হিসাবে কতজন এটি পুরো ডাউনলোড করেছে",
   "Export .torrent files": ".torrent ফাইল রপ্তানি",
-  "Status icon": "অবস্থার আইকন"
+  "Status icon": "অবস্থার আইকন",
+  "Hides the real torrent and file names.": "টরেন্ট ও ফাইলের আসল নাম লুকায়।"
 }

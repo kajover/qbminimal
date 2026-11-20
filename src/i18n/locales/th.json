@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "ไม่มีปลั๊กอินที่เปิดใช้",
   "Clear results": "ล้างผลลัพธ์",
   "Incognito mode": "โหมดไม่ระบุตัวตน",
-  "Hides the real torrent and file names in this browser.": "ซ่อนชื่อจริงของทอร์เรนต์และไฟล์ในเบราว์เซอร์นี้",
   "What incognito mode does": "โหมดไม่ระบุตัวตนทำอะไร",
   "Ctrl or ⌘ and Enter": "Ctrl หรือ ⌘ และ Enter",
   "Search or type a new name": "ค้นหาหรือพิมพ์ชื่อใหม่",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} แทรกเกอร์",
   "How many have downloaded it in full, as the tracker says": "จำนวนที่ดาวน์โหลดครบแล้ว ตามที่แทรกเกอร์แจ้ง",
   "Export .torrent files": "ส่งออกไฟล์ .torrent",
-  "Status icon": "ไอคอนสถานะ"
+  "Status icon": "ไอคอนสถานะ",
+  "Hides the real torrent and file names.": "ซ่อนชื่อจริงของทอร์เรนต์และไฟล์"
 }

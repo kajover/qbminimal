@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "אין תוספים מופעלים.",
   "Clear results": "ניקוי התוצאות",
   "Incognito mode": "מצב גלישה בסתר",
-  "Hides the real torrent and file names in this browser.": "מסתיר את השמות האמיתיים של הטורנטים והקבצים בדפדפן הזה.",
   "What incognito mode does": "מה עושה מצב גלישה בסתר",
   "Ctrl or ⌘ and Enter": "Ctrl או ⌘ ו-Enter",
   "Search or type a new name": "חפשו או הקלידו שם חדש",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} עוקבים",
   "How many have downloaded it in full, as the tracker says": "כמה הורידו אותו במלואו, לפי העוקב",
   "Export .torrent files": "ייצוא קובצי .torrent",
-  "Status icon": "סמל מצב"
+  "Status icon": "סמל מצב",
+  "Hides the real torrent and file names.": "מסתיר את השמות האמיתיים של הטורנטים והקבצים."
 }

@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "사용 중인 플러그인이 없습니다.",
   "Clear results": "결과 지우기",
   "Incognito mode": "시크릿 모드",
-  "Hides the real torrent and file names in this browser.": "이 브라우저에서 실제 토렌트와 파일 이름을 숨깁니다.",
   "What incognito mode does": "시크릿 모드의 기능",
   "Ctrl or ⌘ and Enter": "Ctrl 또는 ⌘와 Enter",
   "Search or type a new name": "검색하거나 새 이름 입력",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "트래커 {count}개",
   "How many have downloaded it in full, as the tracker says": "트래커가 알려 준 전체 다운로드 수",
   "Export .torrent files": ".torrent 파일 내보내기",
-  "Status icon": "상태 아이콘"
+  "Status icon": "상태 아이콘",
+  "Hides the real torrent and file names.": "실제 토렌트와 파일 이름을 숨깁니다."
 }

@@ -43,13 +43,13 @@ export function ShareLimitsForm({ torrent, className }: { torrent: Torrent; clas
     <form onSubmit={submit} className={cn('space-y-2', className)}>
       <div className="space-y-1">
         <Label htmlFor="torrent-share-mode" className="text-xs text-muted-foreground">{t('Seeding limits')}</Label>
-        {/* Saved from beside the choice, like the fields above; only as wide as its longest choice. */}
+        {/* Saved from beside the choice, like the fields above. As wide as they are on phones; elsewhere only as wide as its longest choice. */}
         <div className="flex gap-2">
           <select
             id="torrent-share-mode"
             value={form.mode}
             onChange={(e) => setForm({ ...form, mode: e.target.value as ShareLimitMode })}
-            className={cn(selectClass, 'w-auto min-w-0 max-w-full')}
+            className={cn(selectClass, 'w-full min-w-0 flex-1 @md:w-auto @md:max-w-full @md:flex-none')}
           >
             <option value="global">{t('Use qBittorrent\'s global limits')}</option>
             <option value="none">{t('No limit')}</option>

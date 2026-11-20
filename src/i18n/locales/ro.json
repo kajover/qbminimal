@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Niciun plugin activat.",
   "Clear results": "Goliți rezultatele",
   "Incognito mode": "Mod incognito",
-  "Hides the real torrent and file names in this browser.": "Ascunde numele reale ale torrentelor și fișierelor în acest browser.",
   "What incognito mode does": "Ce face modul incognito",
   "Ctrl or ⌘ and Enter": "Ctrl sau ⌘ și Enter",
   "Search or type a new name": "Căutați sau scrieți un nume nou",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} trackere",
   "How many have downloaded it in full, as the tracker says": "Câți l-au descărcat complet, după tracker",
   "Export .torrent files": "Exportați fișierele .torrent",
-  "Status icon": "Pictogramă de stare"
+  "Status icon": "Pictogramă de stare",
+  "Hides the real torrent and file names.": "Ascunde numele reale ale torrentelor și fișierelor."
 }

@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "沒有啟用的外掛。",
   "Clear results": "清除結果",
   "Incognito mode": "無痕模式",
-  "Hides the real torrent and file names in this browser.": "在此瀏覽器中隱藏真實的種子與檔案名稱。",
   "What incognito mode does": "無痕模式的作用",
   "Ctrl or ⌘ and Enter": "Ctrl 或 ⌘ 加 Enter",
   "Search or type a new name": "搜尋或輸入新名稱",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} 個 Tracker",
   "How many have downloaded it in full, as the tracker says": "依 Tracker 統計完整下載的數量",
   "Export .torrent files": "匯出 .torrent 檔案",
-  "Status icon": "狀態圖示"
+  "Status icon": "狀態圖示",
+  "Hides the real torrent and file names.": "隱藏真實的種子與檔案名稱。"
 }

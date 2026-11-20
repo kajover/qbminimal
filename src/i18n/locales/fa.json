@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "هیچ افزونه‌ای فعال نیست.",
   "Clear results": "پاک کردن نتایج",
   "Incognito mode": "حالت ناشناس",
-  "Hides the real torrent and file names in this browser.": "نام‌های واقعی تورنت‌ها و پرونده‌ها را در این مرورگر پنهان می‌کند.",
   "What incognito mode does": "حالت ناشناس چه می‌کند",
   "Ctrl or ⌘ and Enter": "Ctrl یا ⌘ و Enter",
   "Search or type a new name": "جست‌وجو کنید یا نام تازه‌ای بنویسید",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} ردیاب",
   "How many have downloaded it in full, as the tracker says": "چند نفر آن را کامل بارگیری کرده‌اند، به گفته ردیاب",
   "Export .torrent files": "برون‌بری پرونده‌های .torrent",
-  "Status icon": "نماد وضعیت"
+  "Status icon": "نماد وضعیت",
+  "Hides the real torrent and file names.": "نام‌های واقعی تورنت‌ها و پرونده‌ها را پنهان می‌کند."
 }

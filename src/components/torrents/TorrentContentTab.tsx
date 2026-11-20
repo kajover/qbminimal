@@ -27,9 +27,9 @@ const DEFAULT_SORT: ListSort<FileSortField> = { field: 'name', descending: false
 // Numbers start at the start edge of their column, like the other tabs' tables. Phones show
 // progress, size and priority under the name instead, which leaves the name room to show whole.
 // A gap after the percentage, before the size.
-const PROGRESS_COL = 'w-36 shrink-0 pe-4 tabular-nums max-sm:hidden'
-const SIZE_COL = 'w-20 shrink-0 truncate tabular-nums max-sm:hidden'
-const PRIORITY_COL = 'w-36 shrink-0'
+const PROGRESS_COL = 'w-52 shrink-0 pe-4 tabular-nums max-sm:hidden'
+const SIZE_COL = 'w-28 shrink-0 truncate tabular-nums max-sm:hidden'
+const PRIORITY_COL = 'w-40 shrink-0'
 
 // qBittorrent's file priorities, as its own file list offers them.
 const PRIORITIES: [number, string][] = [[0, t("Don't download")], [1, t('Normal')], [6, t('High')], [7, t('Maximum')]]
@@ -226,8 +226,8 @@ export function TorrentContentTab({ hash, savePath }: { hash: string; savePath?:
     return (
       <>
       {/* The percentage beside the arrow, so it shows while the row is closed. */}
-      <span className="shrink-0 font-normal leading-6 text-muted-foreground tabular-nums sm:hidden">{Math.floor(progress * 100)}%</span>
-      <Button type="button" variant="ghost" size="icon" className="size-6 shrink-0 font-normal sm:hidden" aria-expanded={open} aria-label={label} title={label} onClick={(e) => { e.stopPropagation(); toggleDetails(node.path) }}>
+      <span className="shrink-0 font-normal text-muted-foreground tabular-nums sm:hidden">{Math.floor(progress * 100)}%</span>
+      <Button type="button" variant="ghost" size="icon" className="-my-1 size-6 shrink-0 font-normal sm:hidden" aria-expanded={open} aria-label={label} title={label} onClick={(e) => { e.stopPropagation(); toggleDetails(node.path) }}>
         <ChevronDown className={cn('size-3.5 transition-transform', open && 'rotate-180')} />
       </Button>
       </>
@@ -308,7 +308,7 @@ export function TorrentContentTab({ hash, savePath }: { hash: string; savePath?:
     <div className="flex min-h-0 flex-col pt-1">
       {/* The search, how many files there are and their size, and the sorting, on one row. */}
       <div className="flex items-center gap-2 px-2 pb-1.5">
-        <SearchInput aria-label={t('Search')} placeholder={t('Search')} value={search} onValueChange={setSearch} className="min-w-0 max-w-64 flex-1" inputClassName="h-7 text-xs" />
+        <SearchInput aria-label={t('Search')} placeholder={t('Search')} value={search} onValueChange={setSearch} className="w-40 min-w-0 shrink sm:w-64" inputClassName="h-7 text-xs" />
         <span className="ms-auto shrink-0 text-xs text-muted-foreground tabular-nums">
           {all.length === 1 ? t('1 file ({size})', { size: bytes(all) }) : t('{count} files ({size})', { count: all.length, size: bytes(all) })}
         </span>

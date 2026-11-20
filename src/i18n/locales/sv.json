@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Inga tillägg aktiverade.",
   "Clear results": "Rensa resultat",
   "Incognito mode": "Inkognitoläge",
-  "Hides the real torrent and file names in this browser.": "Döljer de riktiga torrent- och filnamnen i den här webbläsaren.",
   "What incognito mode does": "Vad inkognitoläget gör",
   "Ctrl or ⌘ and Enter": "Ctrl eller ⌘ och Enter",
   "Search or type a new name": "Sök eller skriv ett nytt namn",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} trackers",
   "How many have downloaded it in full, as the tracker says": "Hur många som har hämtat den helt, enligt trackern",
   "Export .torrent files": "Exportera .torrent-filer",
-  "Status icon": "Statusikon"
+  "Status icon": "Statusikon",
+  "Hides the real torrent and file names.": "Döljer de riktiga torrent- och filnamnen."
 }

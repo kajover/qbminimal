@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { useTheme, type Theme } from '@/lib/theme'
 import { ALargeSmall, Captions, Check, ExternalLink, Gauge, Info, Languages, Monitor, Moon, Palette, PanelLeft, Sun, Undo2, VenetianMask, type LucideIcon } from 'lucide-react'
 import { Tooltip } from '@/components/ui/tooltip'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { setIncognito, useIncognito } from '@/lib/incognito'
 import { Button } from '@/components/ui/button'
@@ -74,12 +75,17 @@ function IncognitoSwitch() {
     <div className="mt-3 flex items-center justify-between gap-2">
       <span className="flex items-center gap-1">
         <IconLabel htmlFor="option-incognito" icon={VenetianMask}>{t('Incognito mode')}</IconLabel>
-        {/* What it does, under the pointer or on focus. */}
-        <Tooltip label={t('Hides the real torrent and file names in this browser.')}>
-          <Button type="button" variant="ghost" size="icon" className="size-6 text-muted-foreground" aria-label={t('What incognito mode does')}>
-            <Info className="size-3.5" />
-          </Button>
-        </Tooltip>
+        {/* What it does: under the pointer, and on a click or tap, since phones have no pointer to rest. */}
+        <Popover>
+          <Tooltip label={t('Hides the real torrent and file names.')}>
+            <PopoverTrigger asChild>
+              <Button type="button" variant="ghost" size="icon" className="size-6 text-muted-foreground" aria-label={t('What incognito mode does')}>
+                <Info className="size-3.5" />
+              </Button>
+            </PopoverTrigger>
+          </Tooltip>
+          <PopoverContent className="w-auto px-2.5 py-2 text-xs whitespace-nowrap">{t('Hides the real torrent and file names.')}</PopoverContent>
+        </Popover>
       </span>
       <Switch id="option-incognito" checked={on} onCheckedChange={setIncognito} />
     </div>

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { useTorrentAction, useWebSeeds } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
+import { cn } from '@/lib/utils'
 import { DetailsHeading } from './DetailsHeading'
 import { t } from '@/i18n'
 
@@ -46,11 +47,12 @@ function WebSeedRow({ hash, url }: { hash: string; url: string }) {
 
   return (
     <li className="flex items-start gap-1 py-1 hover:bg-muted/50">
-      <p className="min-w-0 flex-1 py-0.5 font-mono text-xs break-all" dir="ltr">{url}</p>
+      <p className="min-w-0 flex-1 py-1 font-mono text-xs break-all" dir="ltr">{url}</p>
       <Button type="button" variant="ghost" size="icon" className="size-6 shrink-0" aria-label={t('Edit {url}', { url })} title={t('Edit web seed')} onClick={() => { setValue(url); setEditing(true) }}>
         <Pencil className="size-3" />
       </Button>
       <ConfirmAction
+        small
         label={t('Remove {url}', { url })}
         title={t('Remove this web seed?')}
         message={t('{url} will no longer be used to download this torrent.', { url })}
@@ -62,6 +64,18 @@ function WebSeedRow({ hash, url }: { hash: string; url: string }) {
         <Trash2 className="size-3" />
       </ConfirmAction>
     </li>
+  )
+}
+
+// The add buttons for trackers and web seeds are both as wide as the longer of their labels, so
+// the boxes beside them are the same width too.
+export function AddButtonLabel({ webSeeds }: { webSeeds?: boolean }) {
+  const labels = [t('Add trackers'), t('Add web seeds')]
+  const shown = webSeeds ? 1 : 0
+  return (
+    <span className="grid">
+      {labels.map((label, i) => <span key={label} className={cn('col-start-1 row-start-1', i !== shown && 'invisible')}>{label}</span>)}
+    </span>
   )
 }
 
@@ -110,7 +124,7 @@ export function WebSeedsSection({ hash }: { hash: string }) {
             className="min-h-14 px-2 py-1 font-mono text-xs"
             dir="ltr"
           />
-          <Button type="submit" size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs [&_svg:not([class*=size-])]:size-3.5" disabled={action.isPending} title={t('Ctrl or ⌘ and Enter')}><Plus />{t('Add web seeds')}</Button>
+          <Button type="submit" size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs [&_svg:not([class*=size-])]:size-3.5" disabled={action.isPending} title={t('Ctrl or ⌘ and Enter')}><Plus /><AddButtonLabel webSeeds /></Button>
         </div>
       </form>
     </section>

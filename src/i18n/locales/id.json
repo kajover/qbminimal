@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Tidak ada plugin yang aktif.",
   "Clear results": "Hapus hasil",
   "Incognito mode": "Mode penyamaran",
-  "Hides the real torrent and file names in this browser.": "Menyembunyikan nama asli torrent dan berkas di browser ini.",
   "What incognito mode does": "Apa yang dilakukan mode penyamaran",
   "Ctrl or ⌘ and Enter": "Ctrl atau ⌘ dan Enter",
   "Search or type a new name": "Cari atau ketik nama baru",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} tracker",
   "How many have downloaded it in full, as the tracker says": "Berapa yang sudah mengunduh penuh, menurut tracker",
   "Export .torrent files": "Ekspor berkas .torrent",
-  "Status icon": "Ikon status"
+  "Status icon": "Ikon status",
+  "Hides the real torrent and file names.": "Menyembunyikan nama asli torrent dan berkas."
 }

@@ -1367,7 +1367,6 @@
   "No plugins enabled.": "Không có plugin nào được bật.",
   "Clear results": "Xóa kết quả",
   "Incognito mode": "Chế độ ẩn danh",
-  "Hides the real torrent and file names in this browser.": "Ẩn tên thật của torrent và tệp trong trình duyệt này.",
   "What incognito mode does": "Chế độ ẩn danh làm gì",
   "Ctrl or ⌘ and Enter": "Ctrl hoặc ⌘ và Enter",
   "Search or type a new name": "Tìm hoặc nhập tên mới",
@@ -1409,5 +1408,6 @@
   "{count} trackers": "{count} tracker",
   "How many have downloaded it in full, as the tracker says": "Số người đã tải trọn vẹn, theo tracker",
   "Export .torrent files": "Xuất tệp .torrent",
-  "Status icon": "Biểu tượng trạng thái"
+  "Status icon": "Biểu tượng trạng thái",
+  "Hides the real torrent and file names.": "Ẩn tên thật của torrent và tệp."
 }
