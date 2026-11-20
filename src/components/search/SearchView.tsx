@@ -181,7 +181,7 @@ export function SearchView() {
           </form>
 
           {/* Keyed by search, so each starts on its first page. */}
-          <SearchResults key={search.jobId ?? 'none'} results={search.results} onAdd={setAdding} toolbarSlot={toolbarSlot} filters={filters} onFilterChange={setFilter} />
+          <SearchResults searchId={search.jobId ?? null} results={search.results} onAdd={setAdding} toolbarSlot={toolbarSlot} filters={filters} onFilterChange={setFilter} />
           {search.results.length === 0 && search.searched && !search.running && <p className="py-8 text-center text-sm text-muted-foreground">{t('Nothing found')}</p>}
         </div>
         {sidebarOpen && wide && (

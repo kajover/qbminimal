@@ -17,6 +17,7 @@ import type {
 import type { ApiClient, LogLevels, QueueMove, SearchJob, SearchPlugin } from './api'
 import { isApiAtLeast } from './apiVersion'
 import type { MainDataUpdate } from './mainData'
+import { STAND_INS } from './incognito'
 import type { PrefDef } from './preferences'
 import type { ShareLimits } from './shareLimits'
 
@@ -70,15 +71,21 @@ const SEED: DemoTorrent[] = [
   { name: 'Big Buck Bunny (2008) [4K]', size: 680 * MiB, progress: 0, down: 0, up: 0, category: 'Movies', tags: 'open-movie', tracker: 'udp://tracker.opentrackr.org:1337/announce', addedDaysAgo: 0.01, ratio: 0, stopped: true },
 ]
 
-// The seed torrents, repeated with numbered names when the address asks for more
-// (?torrents=40), for trying long lists.
+// The seed torrents and, when the address asks for more (?torrents=40), for trying long lists,
+// more like them under incognito mode's believable names and sizes. Past those, numbered copies.
 function demoTorrents(): DemoTorrent[] {
   const wanted = Number(new URLSearchParams(globalThis.location?.search ?? '').get('torrents'))
   const count = Number.isFinite(wanted) && wanted > SEED.length ? Math.min(wanted, 2000) : SEED.length
   return Array.from({ length: count }, (_, i) => {
     const seed = SEED[i % SEED.length]
-    const copy = Math.floor(i / SEED.length)
-    return { ...seed, name: copy ? `${seed.name} (${copy + 1})` : seed.name }
+    const extra = i - SEED.length
+    if (extra < 0) return seed
+    if (extra < STAND_INS.length) {
+      const [name, mb] = STAND_INS[extra]
+      const movie = /\.mkv$|Blender/.test(name)
+      return { ...seed, name, size: mb * MiB, category: movie ? 'Movies' : 'Linux', tags: movie ? 'open-movie' : 'iso' }
+    }
+    return { ...seed, name: `${seed.name} (${Math.floor(i / SEED.length) + 1})` }
   })
 }
 

@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "Hur många som har hämtat den helt, enligt trackern",
   "Export .torrent files": "Exportera .torrent-filer",
   "Status icon": "Statusikon",
-  "Hides the real torrent and file names.": "Döljer de riktiga torrent- och filnamnen.",
+  "Hides the real torrent and file names": "Döljer de riktiga torrent- och filnamnen",
   "Colored": "Färgat",
   "Monochrome": "Monokrom",
-  "Colors": "Färger"
+  "Colors": "Färger",
+  "All plugins": "Alla insticksmoduler"
 }

@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "Πόσοι το έχουν κατεβάσει ολόκληρο, σύμφωνα με τον tracker",
   "Export .torrent files": "Εξαγωγή αρχείων .torrent",
   "Status icon": "Εικονίδιο κατάστασης",
-  "Hides the real torrent and file names.": "Κρύβει τα πραγματικά ονόματα torrent και αρχείων.",
+  "Hides the real torrent and file names": "Κρύβει τα πραγματικά ονόματα torrent και αρχείων",
   "Colored": "Έγχρωμα",
   "Monochrome": "Μονόχρωμα",
-  "Colors": "Χρώματα"
+  "Colors": "Χρώματα",
+  "All plugins": "Όλες οι προσθήκες"
 }

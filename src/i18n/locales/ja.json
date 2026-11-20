@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "トラッカーによると、完全にダウンロードした数",
   "Export .torrent files": ".torrent ファイルをエクスポート",
   "Status icon": "状態アイコン",
-  "Hides the real torrent and file names.": "実際のトレントとファイルの名前を隠します。",
+  "Hides the real torrent and file names": "実際のトレントとファイルの名前を隠します",
   "Colored": "カラー",
   "Monochrome": "モノクロ",
-  "Colors": "色"
+  "Colors": "色",
+  "All plugins": "すべてのプラグイン"
 }

@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "كم شخصًا نزّله كاملًا، حسب المتتبع",
   "Export .torrent files": "تصدير ملفات .torrent",
   "Status icon": "أيقونة الحالة",
-  "Hides the real torrent and file names.": "يخفي الأسماء الحقيقية للتورنت والملفات.",
+  "Hides the real torrent and file names": "يخفي الأسماء الحقيقية للتورنت والملفات",
   "Colored": "ملوّن",
   "Monochrome": "أحادي اللون",
-  "Colors": "الألوان"
+  "Colors": "الألوان",
+  "All plugins": "جميع الملحقات"
 }

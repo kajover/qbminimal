@@ -107,13 +107,16 @@ export function SearchSidebar(props: SearchSidebarProps) {
   const categories = SEARCH_CATEGORIES.filter(([value]) => value === 'all' || value === category || supported.has(value))
   const shownCategories = matching('categories', categories, ([, label]) => t(label))
   const sidebarFiltered = category !== 'all' || pluginFilter.length > 0
-  const columnFiltered = Object.keys(filters).some(id => id !== 'engineName' && filters[id] && activeCount({ [id]: filters[id] }) > 0)
+  // The plugin filter shows as the ticked plugins below, so it's left out of the column filters.
+  const columnFilters: ColumnFilters = Object.fromEntries(Object.entries(filters).filter(([id]) => id !== 'engineName'))
+  const columnFiltered = activeCount(columnFilters) > 0
+  const allResults = [...pluginCounts.values()].reduce((sum, count) => sum + count, 0)
 
   return (
     <div id="search-sidebar" className="space-y-3">
       {/* The funnel adds a filter on any column of the results. */}
       <SidebarHeader
-        title={t('Search options')}
+        title={t('Filters')}
         filterButton={<AddFilterButton targets={targets} onChange={onFilterChange} active={activeCount(filters) > 0} />}
         sidebarFiltered={sidebarFiltered}
         columnFiltered={columnFiltered}
@@ -213,9 +216,9 @@ export function SearchSidebar(props: SearchSidebarProps) {
       </Section>
 
       {/* Filters set from the table's titles or the funnel above, each opening its editor. */}
-      {activeCount(filters) > 0 && (
-        <Section id="columns" title={t('Column filters')} icon={Filter} chosen={activeCount(filters)} onClear={() => targets.forEach(target => filters[target.id] && onFilterChange(target.id, null))} folded={folded.includes('columns')} onFold={fold}>
-          <li><ColumnFilterChips targets={targets} filters={filters} onChange={onFilterChange} className="gap-1.5" /></li>
+      {columnFiltered && (
+        <Section id="columns" title={t('Column filters')} icon={Filter} chosen={activeCount(columnFilters)} onClear={() => targets.forEach(target => columnFilters[target.id] && onFilterChange(target.id, null))} folded={folded.includes('columns')} onFold={fold}>
+          <li><ColumnFilterChips targets={targets.filter(target => target.id !== 'engineName')} filters={columnFilters} onChange={onFilterChange} className="gap-1.5" /></li>
         </Section>
       )}
 
@@ -230,9 +233,18 @@ export function SearchSidebar(props: SearchSidebarProps) {
         {/* Every enabled plugin searches; turning them on and off is under Manage plugins. */}
         {pluginRows.length === 0 ? <li className="px-2 py-1 text-sm text-muted-foreground">{t('No plugins enabled.')}</li>
           : shownPlugins.length === 0 ? nothing
-          : shownPlugins.map(row => (
-            <FilterItem key={row.name} icon={Puzzle} label={row.label} count={countOf(row)} muted={countOf(row) === 0} checked={pluginFilter.includes(valueOf(row))} onToggle={() => togglePlugin(valueOf(row))} />
-          ))}
+          : (
+            <>
+              {/* Every plugin's results, as All categories is for the categories. Hidden while the
+                  section's search narrows the list. */}
+              {shownPlugins.length === pluginRows.length && (
+                <FilterItem icon={LayoutGrid} label={t('All plugins')} count={allResults} muted checked={pluginFilter.length === 0} onToggle={() => onFilterChange('engineName', null)} />
+              )}
+              {shownPlugins.map(row => (
+                <FilterItem key={row.name} icon={Puzzle} label={row.label} count={countOf(row)} muted={countOf(row) === 0} checked={pluginFilter.includes(valueOf(row))} onToggle={() => togglePlugin(valueOf(row))} />
+              ))}
+            </>
+          )}
       </Section>
 
       {/* qBittorrent searches one category at a time, so picking one searches again. Results don't

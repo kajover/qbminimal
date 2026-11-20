@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import type { TorrentList } from '@/hooks/useTorrentList'
 import { DEFAULT_LIST_SETTINGS, type SortField } from '@/lib/listSettings'
-import { DEFAULT_COLUMN_LAYOUT, getColumn, moveColumn, toggleColumn, type ColumnLayout } from '@/lib/torrentColumns'
+import { DEFAULT_COLUMN_LAYOUT, getColumn, isDefaultLayout, moveColumn, toggleColumn, type ColumnLayout } from '@/lib/torrentColumns'
 import { ColumnMenuItems } from '@/components/ColumnMenuItems'
 import { t } from '@/i18n'
 
@@ -86,7 +86,7 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen,
             <DropdownMenuSeparator />
             <ColumnMenuItems order={columns.order} shown={id => !columns.hidden.includes(id)} locked="name" label={id => getColumn(id).label} onToggle={id => onColumnsChange(toggleColumn(columns, id))} onMove={(id, target) => onColumnsChange(moveColumn(columns, id, target))} Item={DropdownMenuCheckboxItem} />
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => { onColumnsChange(DEFAULT_COLUMN_LAYOUT); list.resetSort() }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
+            <DropdownMenuItem disabled={isDefaultLayout(columns) && list.sort.field === DEFAULT_LIST_SETTINGS.sortField && list.sort.direction === DEFAULT_LIST_SETTINGS.sortDirection} onClick={() => { onColumnsChange(DEFAULT_COLUMN_LAYOUT); list.resetSort() }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (

@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "据 Tracker 统计完整下载的数量",
   "Export .torrent files": "导出 .torrent 文件",
   "Status icon": "状态图标",
-  "Hides the real torrent and file names.": "隐藏真实的种子和文件名称。",
+  "Hides the real torrent and file names": "隐藏真实的种子和文件名称",
   "Colored": "彩色",
   "Monochrome": "Monochrome",
-  "Colors": "颜色"
+  "Colors": "颜色",
+  "All plugins": "所有插件"
 }

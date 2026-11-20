@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "Kolik ho podle trackeru stáhlo celý",
   "Export .torrent files": "Exportovat soubory .torrent",
   "Status icon": "Ikona stavu",
-  "Hides the real torrent and file names.": "Skryje skutečné názvy torrentů a souborů.",
+  "Hides the real torrent and file names": "Skryje skutečné názvy torrentů a souborů",
   "Colored": "Barevně",
   "Monochrome": "Jednobarevné",
-  "Colors": "Barvy"
+  "Colors": "Barvy",
+  "All plugins": "Všechny pluginy"
 }

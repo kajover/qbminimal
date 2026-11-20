@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "Колко са го изтеглили изцяло, според тракера",
   "Export .torrent files": "Експортиране на файлове .torrent",
   "Status icon": "Икона на състоянието",
-  "Hides the real torrent and file names.": "Скрива истинските имена на торентите и файловете.",
+  "Hides the real torrent and file names": "Скрива истинските имена на торентите и файловете",
   "Colored": "Цветно",
   "Monochrome": "Едноцветно",
-  "Colors": "Цветове"
+  "Colors": "Цветове",
+  "All plugins": "Всички добавки"
 }

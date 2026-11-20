@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "İzleyiciye göre kaç kişinin tamamını indirdiği",
   "Export .torrent files": ".torrent dosyalarını dışa aktar",
   "Status icon": "Durum simgesi",
-  "Hides the real torrent and file names.": "Gerçek torrent ve dosya adlarını gizler.",
+  "Hides the real torrent and file names": "Gerçek torrent ve dosya adlarını gizler",
   "Colored": "Renkli",
   "Monochrome": "Tek renkli",
-  "Colors": "Renkler"
+  "Colors": "Renkler",
+  "All plugins": "Tüm eklentiler"
 }

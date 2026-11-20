@@ -46,6 +46,9 @@ export function useSearchJob() {
     queryKey: ['search', 'results', job?.id],
     enabled: !!job,
     refetchInterval: job?.running ? 1000 : false,
+    // Opening a saved search keeps the results shown until its own arrive, so the table doesn't
+    // empty for a moment. A new search starts empty.
+    placeholderData: (previous) => (job && !job.running ? previous : undefined),
     queryFn: async () => {
       const current = job!
       const data = await qbitClient.getSearchResults(current.id)

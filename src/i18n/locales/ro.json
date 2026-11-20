@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "Câți l-au descărcat complet, după tracker",
   "Export .torrent files": "Exportați fișierele .torrent",
   "Status icon": "Pictogramă de stare",
-  "Hides the real torrent and file names.": "Ascunde numele reale ale torrentelor și fișierelor.",
+  "Hides the real torrent and file names": "Ascunde numele reale ale torrentelor și fișierelor",
   "Colored": "Colorat",
   "Monochrome": "Monocrom",
-  "Colors": "Culori"
+  "Colors": "Culori",
+  "All plugins": "Toate modulele"
 }

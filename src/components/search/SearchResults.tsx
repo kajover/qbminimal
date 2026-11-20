@@ -57,7 +57,9 @@ function fittedWidths(results: SearchResult[]): SearchWidths {
 
 // Found torrents, sortable, 20 a page: a table on wide screens and a list on phones.
 
-export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterChange }: {
+export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, onFilterChange }: {
+  // The search shown: another one starts again at the first page, sorted by seeds.
+  searchId: number | null
   results: SearchResult[]
   onAdd: (result: SearchResult) => void
   // The column filters, kept by the page so the sidebar can show and change them.
@@ -69,6 +71,13 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
   // Each search starts with the most seeds first; a sort picked here lasts for this search.
   const [sort, setSort] = useState<SearchSort>(DEFAULT_SEARCH_SORT)
   const [page, setPage] = useState(1)
+  // Reset here rather than by drawing the table anew, which made it flash between searches.
+  const [shownSearch, setShownSearch] = useState(searchId)
+  if (searchId !== shownSearch) {
+    setShownSearch(searchId)
+    setSort(DEFAULT_SEARCH_SORT)
+    setPage(1)
+  }
   const [widths, setWidths] = useState(loadSearchWidths)
   const [hidden, setHiddenState] = useState(loadSearchHidden)
   const setHidden = (next: ResizableKey[]) => { setHiddenState(next); saveSearchHidden(next) }
@@ -196,6 +205,9 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
     onMove: (key: SortKey, target: SortKey) => setOrder(moveInOrder(order, key, target)),
   }
   const resetColumns = () => { setHidden(DEFAULT_SEARCH_HIDDEN); setWidths({}); saveSearchWidths({}); setOrder([...SEARCH_SORT_KEYS]) }
+  // Nothing to reset: Reset columns is greyed out.
+  const columnsDefault = Object.keys(widths).length === 0 && order.join() === SEARCH_SORT_KEYS.join()
+    && hidden.length === DEFAULT_SEARCH_HIDDEN.length && hidden.every(key => DEFAULT_SEARCH_HIDDEN.includes(key))
 
   // In the page's header, like the torrent list's buttons.
   const toolbar = (
@@ -213,7 +225,7 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
             <DropdownMenuSeparator />
             <ColumnMenuItems {...columnItems} Item={DropdownMenuCheckboxItem} />
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={resetColumns}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
+            <DropdownMenuItem disabled={columnsDefault} onClick={resetColumns}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         )}
@@ -304,7 +316,7 @@ export function SearchResults({ results, onAdd, toolbarSlot, filters, onFilterCh
               <ContextMenuSeparator />
               <ColumnMenuItems {...columnItems} Item={ContextMenuCheckboxItem} />
               <ContextMenuSeparator />
-              <ContextMenuItem onClick={resetColumns}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
+              <ContextMenuItem disabled={columnsDefault} onClick={resetColumns}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
             </ContextMenuContent>
             </ContextMenu>
           </table>

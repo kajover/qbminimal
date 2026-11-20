@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "כמה הורידו אותו במלואו, לפי העוקב",
   "Export .torrent files": "ייצוא קובצי .torrent",
   "Status icon": "סמל מצב",
-  "Hides the real torrent and file names.": "מסתיר את השמות האמיתיים של הטורנטים והקבצים.",
+  "Hides the real torrent and file names": "מסתיר את השמות האמיתיים של הטורנטים והקבצים",
   "Colored": "צבעוני",
   "Monochrome": "מונוכרום",
-  "Colors": "צבעים"
+  "Colors": "צבעים",
+  "All plugins": "כל המתקעים"
 }

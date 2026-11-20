@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "Скільки завантажили його повністю, за даними трекера",
   "Export .torrent files": "Експорт файлів .torrent",
   "Status icon": "Значок стану",
-  "Hides the real torrent and file names.": "Приховує справжні назви торентів і файлів.",
+  "Hides the real torrent and file names": "Приховує справжні назви торентів і файлів",
   "Colored": "Кольорові",
   "Monochrome": "Чорно-білий",
-  "Colors": "Кольори"
+  "Colors": "Кольори",
+  "All plugins": "Всі додатки"
 }

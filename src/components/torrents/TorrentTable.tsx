@@ -5,10 +5,10 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { columnWidth, DEFAULT_COLUMN_LAYOUT, getColumn, toggleColumn, moveColumn, resizeColumn, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
+import { columnWidth, DEFAULT_COLUMN_LAYOUT, getColumn, isDefaultLayout, toggleColumn, moveColumn, resizeColumn, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
 import { getStateIcon } from '@/lib/stateIcons'
 import { DOWN_SPEED_COLOR, formatEta, getStateBadge, getStateColor, getStateLabel, UP_SPEED_COLOR, peerPair as pair } from '@/lib/torrentState'
-import type { SortDirection } from '@/lib/listSettings'
+import { DEFAULT_LIST_SETTINGS, type SortDirection } from '@/lib/listSettings'
 import type { RowProps } from '@/hooks/useRowPress'
 import type { Torrent } from '@/types'
 import { useTransferInfo } from '@/hooks/useApi'
@@ -251,7 +251,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
           <ContextMenuSeparator />
           <ColumnMenuItems order={layout.order} shown={id => !layout.hidden.includes(id)} locked="name" label={id => getColumn(id).label} onToggle={id => onLayoutChange(toggleColumn(layout, id))} onMove={(id, target) => onLayoutChange(moveColumn(layout, id, target))} Item={ContextMenuCheckboxItem} />
           <ContextMenuSeparator />
-          <ContextMenuItem onClick={() => { onLayoutChange(DEFAULT_COLUMN_LAYOUT); onResetSort() }}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
+          <ContextMenuItem disabled={isDefaultLayout(layout) && sortField === DEFAULT_LIST_SETTINGS.sortField && sortDirection === DEFAULT_LIST_SETTINGS.sortDirection} onClick={() => { onLayoutChange(DEFAULT_COLUMN_LAYOUT); onResetSort() }}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
         </ContextMenuContent>
         </ContextMenu>
       </table>

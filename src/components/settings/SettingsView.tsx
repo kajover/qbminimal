@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useLayoutEffect, useState, type ReactNode } from 'react'
 import { useTheme, type Theme } from '@/lib/theme'
 import { ALargeSmall, Captions, Check, Contrast, ExternalLink, Gauge, Info, Languages, Monitor, Moon, Paintbrush, Palette, PanelLeft, Rainbow, Sun, Undo2, VenetianMask, type LucideIcon } from 'lucide-react'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -93,14 +93,14 @@ function IncognitoSwitch() {
         <IconLabel htmlFor="option-incognito" icon={VenetianMask}>{t('Incognito mode')}</IconLabel>
         {/* What it does: under the pointer, and on a click or tap, since phones have no pointer to rest. */}
         <Popover>
-          <Tooltip label={t('Hides the real torrent and file names.')}>
+          <Tooltip label={t('Hides the real torrent and file names')}>
             <PopoverTrigger asChild>
               <Button type="button" variant="ghost" size="icon" className="size-6 text-muted-foreground" aria-label={t('What incognito mode does')}>
                 <Info className="size-3.5" />
               </Button>
             </PopoverTrigger>
           </Tooltip>
-          <PopoverContent className="w-auto px-2.5 py-2 text-xs whitespace-nowrap">{t('Hides the real torrent and file names.')}</PopoverContent>
+          <PopoverContent className="w-auto px-2.5 py-2 text-xs whitespace-nowrap">{t('Hides the real torrent and file names')}</PopoverContent>
         </Popover>
       </span>
       <Switch id="option-incognito" checked={on} onCheckedChange={setIncognito} />
@@ -108,8 +108,36 @@ function IncognitoSwitch() {
   )
 }
 
+// Whether either row of choice buttons (theme, colors) is too narrow for its label and buttons side
+// by side. Then both rows put their buttons below the label, so the two always look alike.
+function useStackedChoices() {
+  // Set once the rows are on the page, which starts the measuring.
+  const [themeRow, setThemeRow] = useState<HTMLDivElement | null>(null)
+  const [colorsRow, setColorsRow] = useState<HTMLDivElement | null>(null)
+  const [stacked, setStacked] = useState(false)
+  useLayoutEffect(() => {
+    const rows = [themeRow, colorsRow].filter((row): row is HTMLDivElement => !!row)
+    if (!rows.length || typeof ResizeObserver === 'undefined') return
+    const tooNarrow = (row: HTMLDivElement) => {
+      const [label, group] = [row.firstElementChild as HTMLElement, row.lastElementChild as HTMLElement]
+      const gap = parseFloat(getComputedStyle(row).columnGap) || 0
+      const buttons = [...group.children] as HTMLElement[]
+      const buttonGap = parseFloat(getComputedStyle(group).columnGap) || 0
+      const needed = label.offsetWidth + gap + buttons.reduce((sum, button) => sum + button.offsetWidth, 0) + buttonGap * (buttons.length - 1)
+      return needed > row.clientWidth
+    }
+    const measure = () => setStacked(rows.some(tooNarrow))
+    const observer = new ResizeObserver(measure)
+    rows.forEach(row => observer.observe(row))
+    measure()
+    return () => observer.disconnect()
+  }, [themeRow, colorsRow])
+  return { themeRow: setThemeRow, colorsRow: setColorsRow, stacked }
+}
+
 function AppSection() {
   const { theme, setTheme } = useTheme()
+  const { themeRow, colorsRow, stacked } = useStackedChoices()
   const menuBar = useDisplayOption('menuBar')
   const colors = useDisplayOption('colors')
   const [textSize, setTextSizeState] = useState(chosenTextSize)
@@ -141,9 +169,9 @@ function AppSection() {
           <CardTitle>{t('Appearance')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={ROW}>
+          <div ref={themeRow} className={ROW}>
             <IconLabel icon={Palette}>{t('Theme')}</IconLabel>
-            <div className={CHOICES} role="group" aria-label={t('Theme')}>
+            <div className={cn(CHOICES, stacked && 'basis-full')} role="group" aria-label={t('Theme')}>
               {themeOptions.map(({ value, label, icon: Icon }) => (
                 <Button key={value} variant={theme === value ? 'secondary' : 'outline'} size="sm" aria-pressed={theme === value} onClick={() => setTheme(value)} className={choice(theme === value)}>
                   <Icon className="size-3.5" />
@@ -152,9 +180,9 @@ function AppSection() {
               ))}
             </div>
           </div>
-          <div className={cn('mt-3', ROW)}>
+          <div ref={colorsRow} className={cn('mt-3', ROW)}>
             <IconLabel icon={Paintbrush}>{t('Colors')}</IconLabel>
-            <div className={CHOICES} role="group" aria-label={t('Colors')}>
+            <div className={cn(CHOICES, stacked && 'basis-full')} role="group" aria-label={t('Colors')}>
               {colorOptions.map(({ value, label, icon: Icon }) => (
                 <Button key={label} variant={colors === value ? 'secondary' : 'outline'} size="sm" aria-pressed={colors === value} onClick={() => setDisplayOption('colors', value)} className={choice(colors === value)}>
                   <Icon className="size-3.5" />

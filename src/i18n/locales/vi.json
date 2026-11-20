@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "Số người đã tải trọn vẹn, theo tracker",
   "Export .torrent files": "Xuất tệp .torrent",
   "Status icon": "Biểu tượng trạng thái",
-  "Hides the real torrent and file names.": "Ẩn tên thật của torrent và tệp.",
+  "Hides the real torrent and file names": "Ẩn tên thật của torrent và tệp",
   "Colored": "Có màu",
   "Monochrome": "Đơn sắc",
-  "Colors": "Màu"
+  "Colors": "Màu",
+  "All plugins": "Tất cả tiện ích"
 }

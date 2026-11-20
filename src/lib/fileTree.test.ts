@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { buildFileTree, filterFileTree, folderPaths, sortFileTree, type FileTreeFolder, type FileTreeNode } from './fileTree'
 import type { TorrentFile } from '@/types'
 
@@ -63,5 +63,19 @@ describe('incognito file names', () => {
     const base = incognitoName('abc').replace(/\.iso$/, '')
     const files = disguiseFiles([{ name: 'Show/S01/a.mkv' }, { name: 'Show/b.srt' }], 'abc')
     expect(files.map(f => f.name)).toEqual([`${base}/${base}-extras-1/${base}-1.mkv`, `${base}/${base}-2.srt`])
+  })
+
+  it('gives every torrent its own name, sized like the torrent', async () => {
+    const { disguiseTorrents } = await import('./incognito')
+    const GB = 1024 ** 3
+    const torrents = Array.from({ length: 60 }, (_, i) => ({ hash: `h${i}`, name: `real ${i}`, size: (i % 5 + 1) * GB }) as never)
+    const names = disguiseTorrents(torrents).map(torrent => (torrent as { name: string }).name)
+    expect(new Set(names).size).toBe(60)
+    vi.resetModules()
+    const fresh = await import('./incognito')
+    const [small, movie] = fresh.disguiseTorrents([{ hash: 'small', name: 'tool.iso', size: 70 * 1024 ** 2 }, { hash: 'movie', name: 'Film.2020.2160p.mkv', size: 40 * GB }] as never[]) as { name: string }[]
+    expect(small.name).toMatch(/alpine|TinyCore|netinst/)
+    expect(movie.name).toMatch(/Remux|Blender/)
+    expect(fresh.disguiseFiles([{ name: 'whatever.mkv' }], 'movie')).toEqual([{ name: movie.name }])
   })
 })

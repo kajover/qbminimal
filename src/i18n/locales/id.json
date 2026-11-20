@@ -1409,8 +1409,9 @@
   "How many have downloaded it in full, as the tracker says": "Berapa yang sudah mengunduh penuh, menurut tracker",
   "Export .torrent files": "Ekspor berkas .torrent",
   "Status icon": "Ikon status",
-  "Hides the real torrent and file names.": "Menyembunyikan nama asli torrent dan berkas.",
+  "Hides the real torrent and file names": "Menyembunyikan nama asli torrent dan berkas",
   "Colored": "Berwarna",
   "Monochrome": "Monokrom",
-  "Colors": "Warna"
+  "Colors": "Warna",
+  "All plugins": "Semua plugin"
 }

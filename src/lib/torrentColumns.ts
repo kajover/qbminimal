@@ -88,6 +88,14 @@ export const DEFAULT_COLUMN_LAYOUT: ColumnLayout = {
   widths: {},
 }
 
+// Whether a layout is the one Reset columns gives, so that choice can show there's nothing to undo.
+export function isDefaultLayout(layout: ColumnLayout): boolean {
+  const sameSet = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every(id => b.includes(id))
+  return layout.order.join() === DEFAULT_COLUMN_LAYOUT.order.join()
+    && sameSet(layout.hidden, DEFAULT_COLUMN_LAYOUT.hidden)
+    && Object.keys(layout.widths).length === 0
+}
+
 const isColumnId = (value: unknown): value is ColumnId => typeof value === 'string' && BY_ID.has(value as ColumnId)
 
 // Keeps what it can from a saved layout. Columns added in a later version join next to the column
