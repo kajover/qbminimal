@@ -1409,5 +1409,8 @@
   "How many have downloaded it in full, as the tracker says": "Hányan töltötték le teljesen, a tracker szerint",
   "Export .torrent files": ".torrent fájlok exportálása",
   "Status icon": "Állapotikon",
-  "Hides the real torrent and file names.": "Elrejti a torrentek és fájlok valódi nevét."
+  "Hides the real torrent and file names.": "Elrejti a torrentek és fájlok valódi nevét.",
+  "Colored": "Színes",
+  "Monochrome": "Egyszínű",
+  "Colors": "Színek"
 }

@@ -15,20 +15,22 @@ function stateTone(state: string, completedOn: number): Tone {
   return 'muted'
 }
 
+// Each color is marked "tint", so the Monochrome choice under Settings > App can make it plain
+// (see index.css): "tint-fill" for a filled badge, "tint-ring" for an outlined one.
 const TEXT: Record<Tone, string> = {
-  blue: 'text-blue-500',
-  green: 'text-green-500',
-  yellow: 'text-yellow-500',
-  red: 'text-red-500',
-  muted: 'text-muted-foreground',
+  blue: 'tint text-blue-500',
+  green: 'tint text-green-500',
+  yellow: 'tint text-yellow-500',
+  red: 'tint text-red-500',
+  muted: 'tint text-muted-foreground',
 }
 
 const BADGE: Record<Tone, string> = {
-  blue: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
-  green: 'bg-green-500/15 text-green-700 dark:text-green-400',
-  yellow: 'bg-yellow-500/15 text-yellow-700 dark:text-yellow-400',
-  red: 'bg-red-500/15 text-red-600 dark:text-red-400',
-  muted: 'bg-muted text-muted-foreground',
+  blue: 'tint tint-fill bg-blue-500/15 text-blue-600 dark:text-blue-400',
+  green: 'tint tint-fill bg-green-500/15 text-green-700 dark:text-green-400',
+  yellow: 'tint tint-fill bg-yellow-500/15 text-yellow-700 dark:text-yellow-400',
+  red: 'tint tint-fill bg-red-500/15 text-red-600 dark:text-red-400',
+  muted: 'tint tint-fill bg-muted text-muted-foreground',
 }
 
 export const getStateColor = (state: string, completedOn: number): string => TEXT[stateTone(state, completedOn)]
@@ -38,11 +40,11 @@ export const getStateColor = (state: string, completedOn: number): string => TEX
 const FILLED_STATES = new Set(['downloading', 'uploading', 'stalledDL', 'stalledUP', 'queuedDL', 'queuedUP', 'error', 'missingFiles'])
 
 const OUTLINE: Record<Tone, string> = {
-  blue: 'text-blue-600 ring-1 ring-blue-500/60 ring-inset dark:text-blue-400',
-  green: 'text-green-700 ring-1 ring-green-600/70 ring-inset dark:text-green-400 dark:ring-green-500/70',
-  yellow: 'text-yellow-700 ring-1 ring-yellow-500/70 ring-inset dark:text-yellow-400',
-  red: 'text-red-600 ring-1 ring-red-500/60 ring-inset dark:text-red-400',
-  muted: 'text-muted-foreground ring-1 ring-border ring-inset',
+  blue: 'tint tint-ring text-blue-600 ring-1 ring-blue-500/60 ring-inset dark:text-blue-400',
+  green: 'tint tint-ring text-green-700 ring-1 ring-green-600/70 ring-inset dark:text-green-400 dark:ring-green-500/70',
+  yellow: 'tint tint-ring text-yellow-700 ring-1 ring-yellow-500/70 ring-inset dark:text-yellow-400',
+  red: 'tint tint-ring text-red-600 ring-1 ring-red-500/60 ring-inset dark:text-red-400',
+  muted: 'tint tint-ring text-muted-foreground ring-1 ring-border ring-inset',
 }
 
 export const getStateBadge = (state: string, completedOn: number): string =>
@@ -91,8 +93,8 @@ export function formatEta(seconds: number): string {
 }
 
 // Download green and upload blue, in the list, the cards and the header alike.
-export const DOWN_SPEED_COLOR = 'text-green-600 dark:text-green-500'
-export const UP_SPEED_COLOR = 'text-blue-600 dark:text-blue-400'
+export const DOWN_SPEED_COLOR = 'tint text-green-600 dark:text-green-500'
+export const UP_SPEED_COLOR = 'tint text-blue-600 dark:text-blue-400'
 
 
 // Seeds or peers as "connected (in the swarm)", the way qBittorrent shows them.

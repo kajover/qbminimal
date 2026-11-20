@@ -1409,5 +1409,8 @@
   "How many have downloaded it in full, as the tracker says": "트래커가 알려 준 전체 다운로드 수",
   "Export .torrent files": ".torrent 파일 내보내기",
   "Status icon": "상태 아이콘",
-  "Hides the real torrent and file names.": "실제 토렌트와 파일 이름을 숨깁니다."
+  "Hides the real torrent and file names.": "실제 토렌트와 파일 이름을 숨깁니다.",
+  "Colored": "컬러",
+  "Monochrome": "단색",
+  "Colors": "색상"
 }

@@ -8,7 +8,7 @@ import { useUpdateNotice } from '@/hooks/useUpdateNotice'
 import { qbitClient } from '@/lib/api'
 import { canInstall, installUpdate, pageActions, UpdateError, type UpdateFailure } from '@/lib/selfUpdate'
 import { checkForUpdates } from '@/lib/updateNotice'
-import { QBITTORRENT_DOWNLOADS, QBMINIMAL_RELEASES } from '@/lib/updates'
+import { countReleaseDownload, QBITTORRENT_DOWNLOADS, QBMINIMAL_RELEASES } from '@/lib/updates'
 import { t } from '@/i18n'
 
 // Asks GitHub for the newest qbminimal and qBittorrent releases: by itself, in the background after
@@ -38,6 +38,7 @@ export function UpdateCheck() {
       const { oldRemoved } = await installUpdate({
         client: qbitClient, torrentUrl, version: latestVersion, currentPath: oldPath,
         onProgress: setInstalling, signal: control.signal, currentVersion: __APP_VERSION__,
+        onAdded: () => countReleaseDownload(latestVersion),
       })
       setInstalling(null)
       setInstalled(true)
@@ -79,8 +80,9 @@ export function UpdateCheck() {
     <div className="mt-4 space-y-3 border-t pt-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">{t('Checks GitHub for new releases by itself every 12 hours.')}</p>
-        {/* Installing sits beside checking, once there's something to install. */}
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        {/* Installing sits beside checking, once there's something to install. At the end, also
+            when they wrap below the text on phones. */}
+        <div className="ms-auto flex flex-wrap items-center justify-end gap-2">
           {installed ? (
             <Button size="sm" onClick={pageActions.reload}><RefreshCw />{t('Reload')}</Button>
           ) : installing !== null ? (

@@ -41,10 +41,10 @@ function splitFolder(path: string): { parent: string; name: string; separator: s
 }
 
 // Whether the update can be installed from here: qBittorrent has to use an alternative Web UI at
-// a folder we can find the parent of.
+// a folder we can find the parent of. Never in the demo, which has no qBittorrent to install into.
 export function canInstall(prefs: Record<string, unknown> | undefined, torrentUrl: string | undefined): prefs is Record<string, unknown> {
   const path = prefs?.alternative_webui_path
-  return !!torrentUrl && prefs?.alternative_webui_enabled === true && typeof path === 'string' && updateTarget(path, '0.0.0') !== null
+  return !__DEMO__ && !!torrentUrl && prefs?.alternative_webui_enabled === true && typeof path === 'string' && updateTarget(path, '0.0.0') !== null
 }
 
 export type UpdateFailure = 'add' | 'stalled' | 'failed' | 'missing' | 'switch' | 'canceled'
@@ -77,6 +77,8 @@ export interface InstallOptions {
   stallMs?: number
   // The version that's running now, whose folder is removed once the new one is in use.
   currentVersion?: string
+  // Called once qBittorrent has taken the update's torrent.
+  onAdded?: () => void
 }
 
 // The torrent of a release, which every release from 1.6.8 on has. Older folders can't be removed
@@ -136,7 +138,7 @@ export const pageActions = { reload: () => window.location.reload() }
 // removes the torrent, keeping the files. Throws an UpdateError; stopping it with `signal`
 // removes the torrent and its files.
 // Says whether the previous version's files were removed too.
-export async function installUpdate({ client, torrentUrl, version, currentPath, onProgress, signal, pollMs = 1000, stallMs = STALL_MS, currentVersion }: InstallOptions): Promise<{ oldRemoved: boolean }> {
+export async function installUpdate({ client, torrentUrl, version, currentPath, onProgress, signal, pollMs = 1000, stallMs = STALL_MS, currentVersion, onAdded }: InstallOptions): Promise<{ oldRemoved: boolean }> {
   const target = updateTarget(currentPath, version)
   if (!target) throw new UpdateError('add')
   const mine = async () => (await client.getTorrentsInfo()).filter(torrent => torrent.name === target.name && sameFolder(torrent.save_path, target.savePath))
@@ -153,6 +155,7 @@ export async function installUpdate({ client, torrentUrl, version, currentPath, 
         paused: 'false', stopped: 'false',
       }, []) as { failure_count?: number; success_count?: number; pending_count?: number } | undefined
       if (result?.failure_count && !result.success_count && !result.pending_count) throw new Error('refused')
+      onAdded?.()
     }
   } catch {
     throw new UpdateError('add')

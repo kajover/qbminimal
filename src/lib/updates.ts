@@ -35,6 +35,18 @@ async function getJson(url: string) {
 }
 
 export const UPDATE_TORRENT_ASSET = 'qbminimal-update.torrent'
+export const RELEASE_ZIP_ASSET = 'qbminimal-release.zip'
+
+// An update installs through its torrent, which GitHub counts on the .torrent file only. The zip is
+// downloaded once as well, and thrown away, so its count shows every install, by hand or in the
+// app, and the .torrent's count shows how many came through the app. Not waited for, so the update
+// is no slower, and failing here changes nothing.
+export function countReleaseDownload(version: string) {
+  const parsed = parseVersion(version)
+  if (!parsed || typeof fetch !== 'function') return
+  fetch(`https://github.com/kajover/qbminimal/releases/download/v${parsed.join('.')}/${RELEASE_ZIP_ASSET}`, { mode: 'no-cors', cache: 'no-store', credentials: 'omit' })
+    .catch(() => undefined)
+}
 
 // The newest qbminimal release, and where its update torrent is, if it has one.
 export async function latestQbminimalRelease(): Promise<{ version: Version | null; torrentUrl?: string }> {

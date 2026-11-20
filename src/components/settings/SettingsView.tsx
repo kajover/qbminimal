@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { useTheme, type Theme } from '@/lib/theme'
-import { ALargeSmall, Captions, Check, ExternalLink, Gauge, Info, Languages, Monitor, Moon, Palette, PanelLeft, Sun, Undo2, VenetianMask, type LucideIcon } from 'lucide-react'
+import { ALargeSmall, Captions, Check, Contrast, ExternalLink, Gauge, Info, Languages, Monitor, Moon, Paintbrush, Palette, PanelLeft, Rainbow, Sun, Undo2, VenetianMask, type LucideIcon } from 'lucide-react'
 import { Tooltip } from '@/components/ui/tooltip'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
@@ -32,6 +32,22 @@ const themeOptions: { value: Theme; label: string; icon: typeof Monitor }[] = [
   { value: 'dark', label: t('Dark'), icon: Moon },
 ]
 
+// Each row under Appearance is as tall as its tallest, a drop-down, so the rows are evenly spaced
+// whether they hold buttons, a drop-down or a switch.
+const ROW = 'flex min-h-9 flex-wrap items-center justify-between gap-2'
+
+// A row of choices, such as the theme: at the end of its row, and compact enough to stay beside
+// its label on a phone.
+const CHOICES = 'ms-auto flex flex-wrap justify-end gap-1'
+// The chosen one keeps an invisible border as wide as the others' outline, so nothing moves on a click.
+const choice = (chosen: boolean) => cn('gap-1 has-[>svg]:px-2', chosen && 'border border-transparent')
+
+// Torrents' statuses and speeds in color, or plain.
+const colorOptions: { value: boolean; label: string; icon: typeof Monitor }[] = [
+  { value: true, label: t('Colored'), icon: Rainbow },
+  { value: false, label: t('Monochrome'), icon: Contrast },
+]
+
 const textSizeLabels: Record<TextSize, string> = {
   small: t('Small'),
   default: t('Default'),
@@ -56,7 +72,7 @@ function OptionSwitch({ option, label, icon, className }: { option: DisplayOptio
   const on = useDisplayOption(option)
   const id = `option-${option}`
   return (
-    <div className={cn('mt-3 flex items-center justify-between gap-2', className)}>
+    <div className={cn('mt-3', ROW, className)}>
       <IconLabel htmlFor={id} icon={icon}>{label}</IconLabel>
       <Switch
         id={id}
@@ -72,7 +88,7 @@ function OptionSwitch({ option, label, icon, className }: { option: DisplayOptio
 function IncognitoSwitch() {
   const on = useIncognito()
   return (
-    <div className="mt-3 flex items-center justify-between gap-2">
+    <div className={cn('mt-3', ROW)}>
       <span className="flex items-center gap-1">
         <IconLabel htmlFor="option-incognito" icon={VenetianMask}>{t('Incognito mode')}</IconLabel>
         {/* What it does: under the pointer, and on a click or tap, since phones have no pointer to rest. */}
@@ -95,6 +111,7 @@ function IncognitoSwitch() {
 function AppSection() {
   const { theme, setTheme } = useTheme()
   const menuBar = useDisplayOption('menuBar')
+  const colors = useDisplayOption('colors')
   const [textSize, setTextSizeState] = useState(chosenTextSize)
   const { data: qbittorrentVersion } = useAppVersion()
   const { data: webApiVersion } = useWebApiVersion()
@@ -124,18 +141,29 @@ function AppSection() {
           <CardTitle>{t('Appearance')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className={ROW}>
             <IconLabel icon={Palette}>{t('Theme')}</IconLabel>
-            <div className="flex flex-wrap gap-1" role="group" aria-label={t('Theme')}>
+            <div className={CHOICES} role="group" aria-label={t('Theme')}>
               {themeOptions.map(({ value, label, icon: Icon }) => (
-                <Button key={value} variant={theme === value ? 'secondary' : 'outline'} size="sm" aria-pressed={theme === value} onClick={() => setTheme(value)} className="gap-2">
-                  <Icon className="size-4" />
+                <Button key={value} variant={theme === value ? 'secondary' : 'outline'} size="sm" aria-pressed={theme === value} onClick={() => setTheme(value)} className={choice(theme === value)}>
+                  <Icon className="size-3.5" />
                   <span>{label}</span>
                 </Button>
               ))}
             </div>
           </div>
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <div className={cn('mt-3', ROW)}>
+            <IconLabel icon={Paintbrush}>{t('Colors')}</IconLabel>
+            <div className={CHOICES} role="group" aria-label={t('Colors')}>
+              {colorOptions.map(({ value, label, icon: Icon }) => (
+                <Button key={label} variant={colors === value ? 'secondary' : 'outline'} size="sm" aria-pressed={colors === value} onClick={() => setDisplayOption('colors', value)} className={choice(colors === value)}>
+                  <Icon className="size-3.5" />
+                  <span>{label}</span>
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className={cn('mt-3', ROW)}>
             <IconLabel htmlFor="language" icon={Languages}>{t('Language')}</IconLabel>
             {/* Changing it reloads the page, so every text is redrawn in the new language. */}
             <NativeSelect id="language" value={chosenLanguage()} onChange={(e) => setLanguage(e.target.value as LanguageChoice)}>
@@ -143,7 +171,7 @@ function AppSection() {
               {LANGUAGES.map(language => <option key={language.code} value={language.code}>{language.name}</option>)}
             </NativeSelect>
           </div>
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <div className={cn('mt-3', ROW)}>
             <IconLabel htmlFor="text-size" icon={ALargeSmall}>{t('Text size')}</IconLabel>
             <NativeSelect
               id="text-size"
@@ -289,9 +317,10 @@ export function SettingsView() {
   return (
     <div className="space-y-4">
       <PageHeader title={t('Settings')} />
-      <nav aria-label={t('Settings sections')} className="flex flex-wrap gap-1">
+      {/* Narrow enough that all nine fit in two rows on a phone. */}
+      <nav aria-label={t('Settings sections')} className="flex flex-wrap gap-0.5">
         {SECTIONS.map(section => (
-          <Button key={section.id} size="sm" variant={sectionId === section.id ? 'secondary' : 'ghost'} aria-current={sectionId === section.id ? 'page' : undefined} onClick={() => setSectionId(section.id)}>
+          <Button key={section.id} size="sm" variant={sectionId === section.id ? 'secondary' : 'ghost'} className="px-2" aria-current={sectionId === section.id ? 'page' : undefined} onClick={() => setSectionId(section.id)}>
             {section.title}
           </Button>
         ))}

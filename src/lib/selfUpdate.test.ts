@@ -60,7 +60,9 @@ describe('install update', () => {
   it('adds the torrent, waits for it, switches the Web UI and removes the torrent but not its files', async () => {
     const client = fakeClient([0, 0.4, 1])
     const percents: number[] = []
-    await run(client, { onProgress: percent => percents.push(percent) })
+    const onAdded = vi.fn()
+    await run(client, { onProgress: percent => percents.push(percent), onAdded })
+    expect(onAdded).toHaveBeenCalledOnce()
     expect(client.addTorrents).toHaveBeenCalledWith(expect.objectContaining({
       urls: 'https://example.org/qbminimal-update.torrent', savepath: '/opt', autoTMM: 'false', contentLayout: 'Original', stopped: 'false',
     }), [])
@@ -105,8 +107,10 @@ describe('install update', () => {
     await run(client)
     client.addTorrents.mockClear()
     // The torrent is still listed, as after a reload in the middle of a download.
-    await run(client)
+    const onAdded = vi.fn()
+    await run(client, { onAdded })
     expect(client.addTorrents).not.toHaveBeenCalled()
+    expect(onAdded).not.toHaveBeenCalled()
   })
 })
 

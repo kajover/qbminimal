@@ -1409,5 +1409,8 @@
   "How many have downloaded it in full, as the tracker says": "Wie viele ihn vollständig heruntergeladen haben, laut Tracker",
   "Export .torrent files": ".torrent-Dateien exportieren",
   "Status icon": "Status-Symbol",
-  "Hides the real torrent and file names.": "Verbirgt die echten Torrent- und Dateinamen."
+  "Hides the real torrent and file names.": "Verbirgt die echten Torrent- und Dateinamen.",
+  "Colored": "Farbig",
+  "Monochrome": "Einfarbig",
+  "Colors": "Farben"
 }

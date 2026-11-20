@@ -1409,5 +1409,8 @@
   "How many have downloaded it in full, as the tracker says": "چند نفر آن را کامل بارگیری کرده‌اند، به گفته ردیاب",
   "Export .torrent files": "برون‌بری پرونده‌های .torrent",
   "Status icon": "نماد وضعیت",
-  "Hides the real torrent and file names.": "نام‌های واقعی تورنت‌ها و پرونده‌ها را پنهان می‌کند."
+  "Hides the real torrent and file names.": "نام‌های واقعی تورنت‌ها و پرونده‌ها را پنهان می‌کند.",
+  "Colored": "رنگی",
+  "Monochrome": "تک‌رنگ",
+  "Colors": "رنگ‌ها"
 }

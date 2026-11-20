@@ -21,6 +21,8 @@ vi.mock('@/lib/api', async (importOriginal) => {
   return { ...actual, qbitClient: new Proxy(api, { get: (target, key) => (key in target ? target[key as keyof typeof target] : async () => []) }) }
 })
 
+vi.mock('@/lib/updates', async (importOriginal) => ({ ...await importOriginal<typeof import('@/lib/updates')>(), countReleaseDownload: vi.fn() }))
+
 vi.mock('@/hooks/useUpdateNotice', () => ({
   useUpdateNotice: () => ({
     lastChecked: 1,
@@ -32,6 +34,7 @@ vi.mock('@/hooks/useUpdateNotice', () => ({
 
 const { UpdateCheck } = await import('./UpdateCheck')
 const { pageActions } = await import('@/lib/selfUpdate')
+const { countReleaseDownload } = await import('@/lib/updates')
 
 function renderIt() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -55,6 +58,7 @@ describe('install update', () => {
     await waitFor(() => expect(api.setPreferences).toHaveBeenCalledWith({ alternative_webui_path: '/opt/qbminimal-9.9.9' }), { timeout: 5000 })
     expect(api.addTorrents).toHaveBeenCalledWith(expect.objectContaining({ savepath: '/opt' }), [])
     expect((api.addTorrents.mock.calls as unknown as [Record<string, string>][])[0][0]).not.toHaveProperty('tags')
+    expect(countReleaseDownload).toHaveBeenCalledExactlyOnceWith('9.9.9')
     await waitFor(() => expect(api.deleteTorrents).toHaveBeenCalledWith(['abc'], false))
     const reload = await screen.findByRole('button', { name: 'Reload' }, { timeout: 3000 })
     expect(pageActions.reload).not.toHaveBeenCalled()

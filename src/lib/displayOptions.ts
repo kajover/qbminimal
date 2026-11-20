@@ -10,6 +10,8 @@ const DISPLAY_OPTIONS = {
   headerSpeeds: false,
   // The pages in a sidebar on wide screens and a tab bar on phones, besides the menu button.
   menuBar: false,
+  // Torrents' statuses and speeds in their colors; off, they're plain (Monochrome).
+  colors: true,
 } as const
 
 export type DisplayOption = keyof typeof DISPLAY_OPTIONS

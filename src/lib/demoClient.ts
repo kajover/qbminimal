@@ -48,8 +48,6 @@ interface DemoTorrent {
   up: number
   category: string
   tags: string
-  // For the pretend update download: when it began. It reaches 100% a few seconds later.
-  startedAt?: number
   // Where it was saved, when not the category's folder.
   savePath?: string
   tracker: string
@@ -264,24 +262,17 @@ class DemoClient implements ApiClient {
 
   async addTorrents(params: Record<string, string>, files: File[]) {
     const names = [...(params.urls ?? '').split('\n').filter(Boolean).map(url => url.split('/').pop() || url), ...files.map(f => f.name.replace(/\.torrent$/, ''))]
-    // The update torrent is named after its release, like qbminimal-1.2.3, and is a small download.
-    const update = (params.urls ?? '').endsWith('/qbminimal-update.torrent')
-    const version = /\/releases\/download\/v?([\d.]+)\//.exec(params.urls ?? '')?.[1]
-    for (const name of update && version ? [`qbminimal-${version}`] : names) {
+    for (const name of names) {
       if (!this.torrents.some(t => t.name === name)) {
-        this.torrents.push({ name, size: update ? 2 * MiB : 900 * MiB, progress: 0, down: update ? 500_000 : 1_800_000, up: 20_000, category: params.category ?? '', tags: params.tags ?? '', tracker: 'udp://tracker.opentrackr.org:1337/announce', addedDaysAgo: 0, ratio: 0, stopped: params.stopped === 'true', startedAt: update ? Date.now() : undefined, savePath: params.savepath })
+        this.torrents.push({ name, size: 900 * MiB, progress: 0, down: 1_800_000, up: 20_000, category: params.category ?? '', tags: params.tags ?? '', tracker: 'udp://tracker.opentrackr.org:1337/announce', addedDaysAgo: 0, ratio: 0, stopped: params.stopped === 'true', savePath: params.savepath })
       }
     }
     return { success_count: Math.max(names.length, 1), failure_count: 0, pending_count: 0 }
   }
 
-  // Every torrent. The pretend update download finishes about 4 seconds after it was added.
   async getTorrentsInfo() {
     const unfinished = this.torrents.filter(t => t.progress < 1)
-    return this.torrents.map(t => {
-      if (t.startedAt) t.progress = Math.min(1, (Date.now() - t.startedAt) / 4000)
-      return toTorrent(t, 1, unfinished.indexOf(t) + 1)
-    })
+    return this.torrents.map(t => toTorrent(t, 1, unfinished.indexOf(t) + 1))
   }
 
   async addTorrentUrl(url: string, options: { category?: string } = {}) {

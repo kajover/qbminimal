@@ -1409,5 +1409,8 @@
   "How many have downloaded it in full, as the tracker says": "ट्रैकर के अनुसार कितनों ने इसे पूरा डाउनलोड किया",
   "Export .torrent files": ".torrent फ़ाइलें निर्यात करें",
   "Status icon": "स्थिति आइकन",
-  "Hides the real torrent and file names.": "टोरेंट और फ़ाइलों के असली नाम छिपाता है।"
+  "Hides the real torrent and file names.": "टोरेंट और फ़ाइलों के असली नाम छिपाता है।",
+  "Colored": "रंगीन",
+  "Monochrome": "एकरंगा",
+  "Colors": "रंग"
 }

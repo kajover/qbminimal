@@ -31,6 +31,15 @@ async function request(path, { method = 'GET', form } = {}) {
   return { status: response.status, body, headers: response.headers }
 }
 
+// Adds a .torrent file, as a form upload.
+async function addTorrentFile(file, fields) {
+  const form = new FormData()
+  for (const [key, value] of Object.entries(fields)) form.append(key, value)
+  form.append('torrents', new Blob([fs.readFileSync(file)], { type: 'application/x-bittorrent' }), path.basename(file))
+  const response = await fetch(`${api}/torrents/add`, { method: 'POST', headers: { ...(cookie && { Cookie: cookie }), Referer: base }, body: form })
+  return { status: response.status, body: await response.text() }
+}
+
 const hasKeys = (object, keys) => keys.filter(key => !(object && key in object))
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -120,19 +129,20 @@ const searches = await request('search/status')
 check(searches.status === 200 && Array.isArray(searches.body), 'search/status answers with a list')
 
 // --- Installing an update, and removing the previous version with its folder ---
+// The latest release's update torrent, built by CI from the same files and web seed as the
+// release's own (see ci.yml), so these runs don't count as downloads of the release.
 const downloads = process.env.QBT_DOWNLOADS
 const downloadsHere = process.env.QBT_DOWNLOADS_HOST
-if (downloads && downloadsHere) {
-  // The latest release's tag, from where GitHub's "latest" link leads.
-  const latest = await fetch('https://github.com/kajover/qbminimal/releases/latest', { redirect: 'manual' })
-  const releaseVersion = (latest.headers.get('location') ?? '').match(/\/tag\/v([\d.]+)$/)?.[1]
-  check(!!releaseVersion, `finds the latest release (${releaseVersion})`)
-  if (releaseVersion) {
+const updateTorrent = process.env.QBT_UPDATE_TORRENT
+const releaseVersion = process.env.QBT_UPDATE_VERSION
+if (downloads && downloadsHere && updateTorrent) {
+  const ready = /^\d+\.\d+\.\d+$/.test(releaseVersion ?? '') && fs.existsSync(updateTorrent)
+  check(ready, `has the latest release's update torrent (${releaseVersion})`)
+  if (ready) {
     const name = `qbminimal-${releaseVersion}`
-    const urls = `https://github.com/kajover/qbminimal/releases/download/v${releaseVersion}/qbminimal-update.torrent`
     const findUpdate = async () => (await request('torrents/info')).body?.find?.(item => item.name === name && item.save_path.replace(/\/+$/, '') === downloads.replace(/\/+$/, ''))
     // As the update adds it: into a folder of its own, beside the current one.
-    await request('torrents/add', { method: 'POST', form: { urls, savepath: downloads, autoTMM: 'false', contentLayout: 'Original' } })
+    await addTorrentFile(updateTorrent, { savepath: downloads, autoTMM: 'false', contentLayout: 'Original' })
     let update
     for (let attempt = 0; attempt < 120; attempt++) {
       update = await findUpdate()
@@ -147,7 +157,7 @@ if (downloads && downloadsHere) {
     check(fs.existsSync(path.join(folder, 'LICENSE')), 'removing the torrent keeps the files')
 
     // As the next update removes it: added again over its folder, unchecked, and deleted with its files.
-    await request('torrents/add', { method: 'POST', form: { urls, savepath: downloads, autoTMM: 'false', contentLayout: 'Original', paused: 'true', stopped: 'true', skip_checking: 'true' } })
+    await addTorrentFile(updateTorrent, { savepath: downloads, autoTMM: 'false', contentLayout: 'Original', paused: 'true', stopped: 'true', skip_checking: 'true' })
     let again
     for (let attempt = 0; attempt < 30 && !again; attempt++) {
       again = await findUpdate()

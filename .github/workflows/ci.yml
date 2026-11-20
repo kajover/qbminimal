@@ -59,6 +59,17 @@ jobs:
             curl -sf http://127.0.0.1:8080/api/v2/app/version && break
             sleep 2
           done
+      # The update test installs the latest release from a torrent built here, from the same files and
+      # web seed as the release's own, so CI runs don't add to the release's download counts.
+      - name: Build the latest release's update torrent
+        run: |
+          version="$(curl -s -o /dev/null -w '%{redirect_url}' "https://github.com/$GITHUB_REPOSITORY/releases/latest" | sed 's|.*/tag/v||')"
+          git fetch -q --depth 1 origin updates
+          mkdir -p "$RUNNER_TEMP/update"
+          git archive FETCH_HEAD "$version" | tar -x -C "$RUNNER_TEMP/update"
+          node scripts/make-update-torrent.mjs "$RUNNER_TEMP/update/$version/qbminimal-$version" "qbminimal-$version" "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/updates/$version/" "$RUNNER_TEMP/update.torrent"
+          echo "QBT_UPDATE_VERSION=$version" >> "$GITHUB_ENV"
+          echo "QBT_UPDATE_TORRENT=$RUNNER_TEMP/update.torrent" >> "$GITHUB_ENV"
       - name: Check qbminimal against qBittorrent
         # The update test downloads into the profile's downloads folder, seen here as well.
         env:

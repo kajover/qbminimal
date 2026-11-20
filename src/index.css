@@ -265,6 +265,12 @@
   flex-shrink: 0;
   cursor: pointer;
 }
+/* Safari's own switch, at the size of the one other browsers get, rather than its larger default. */
+:root.native-switch .switch {
+  width: 2.75rem;
+  height: 1.625rem;
+  margin: 0;
+}
 .switch:disabled {
   cursor: default;
   opacity: 0.5;
@@ -304,6 +310,27 @@
 .switch:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
+}
+
+/* Monochrome under Settings > App: torrents' statuses and speeds lose their colors and read like
+   the text around them. Badges keep their shape, filled in grey or outlined. */
+:root[data-colors='off'] .tint {
+  color: inherit;
+}
+:root[data-colors='off'] .tint-fill {
+  background-color: var(--muted);
+  color: var(--foreground);
+}
+:root[data-colors='off'] .tint-ring {
+  --tw-ring-color: var(--border);
+  color: var(--foreground);
+}
+/* The speed graph: both lines grey, told apart by upload's dashes. */
+:root[data-colors='off'] .tint-stroke {
+  stroke: var(--muted-foreground);
+}
+:root[data-colors='off'] .tint-dot {
+  background-color: var(--muted-foreground);
 }
 
 /* Liquid Glass, as far as browsers allow: frosted, tinted and lit along the top edge. Only the

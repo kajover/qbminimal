@@ -18,9 +18,9 @@ import { t } from '@/i18n'
 const STATUS: Record<number, [label: string, className: string]> = {
   0: [t('Disabled'), 'text-muted-foreground'],
   1: [t('Not contacted yet'), 'text-muted-foreground'],
-  2: [t('Working'), 'text-green-600 dark:text-green-400'],
-  3: [t('Updating'), 'text-blue-600 dark:text-blue-400'],
-  4: [t('Not working'), 'text-red-600 dark:text-red-400'],
+  2: [t('Working'), 'tint text-green-600 dark:text-green-400'],
+  3: [t('Updating'), 'tint text-blue-600 dark:text-blue-400'],
+  4: [t('Not working'), 'tint text-red-600 dark:text-red-400'],
 }
 const statusOf = (tracker: TorrentTracker) => STATUS[tracker.status] ?? [String(tracker.status), 'text-muted-foreground']
 const count = (value: number | undefined) => Math.max(value ?? 0, 0)

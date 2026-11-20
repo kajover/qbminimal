@@ -7,8 +7,8 @@ const WIDTH = 600
 const HEIGHT = 120
 // Download green and upload blue, as in the header, in the color-blind-safe shades index.css sets. Upload is dashed too, so the two never rely on color alone.
 const SERIES = [
-  { key: 'down', label: t('Download'), stroke: 'stroke-green-600', dot: 'bg-green-600', dash: undefined },
-  { key: 'up', label: t('Upload'), stroke: 'stroke-blue-600 dark:stroke-blue-500', dot: 'bg-blue-600 dark:bg-blue-500', dash: '6 4' },
+  { key: 'down', label: t('Download'), stroke: 'tint-stroke stroke-green-600', dot: 'tint-dot bg-green-600', dash: undefined },
+  { key: 'up', label: t('Upload'), stroke: 'tint-stroke stroke-blue-600 dark:stroke-blue-500', dot: 'tint-dot bg-blue-600 dark:bg-blue-500', dash: '6 4' },
 ] as const
 
 const speed = (bytes: number) => `${formatBytes(bytes)}/s`

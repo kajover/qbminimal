@@ -1409,5 +1409,8 @@
   "How many have downloaded it in full, as the tracker says": "依 Tracker 統計完整下載的數量",
   "Export .torrent files": "匯出 .torrent 檔案",
   "Status icon": "狀態圖示",
-  "Hides the real torrent and file names.": "隱藏真實的種子與檔案名稱。"
+  "Hides the real torrent and file names.": "隱藏真實的種子與檔案名稱。",
+  "Colored": "彩色",
+  "Monochrome": "單色",
+  "Colors": "顏色"
 }
