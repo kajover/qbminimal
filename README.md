@@ -12,7 +12,7 @@ A minimal, phone-friendly Web UI for [qBittorrent](https://www.qbittorrent.org/)
 Built with React 19, TypeScript 7, Vite 8, and Tailwind CSS 4.
 
 > [!TIP]
-> ### [▶ Try the live demo](https://kajover.github.io/qbminimal/?signedin)
+> # [▶ Try the live demo](https://kajover.github.io/qbminimal/?signedin)
 > It runs in your browser on sample torrents, with no qBittorrent behind it, so nothing you do there changes anything. It works on phones too.
 
 ## Screenshots
