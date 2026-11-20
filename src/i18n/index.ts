@@ -31,7 +31,6 @@ export const LANGUAGES = [
   { code: 'fa', name: 'فارسی' },
   { code: 'he', name: 'עברית' },
   { code: 'hi', name: 'हिन्दी' },
-  { code: 'bn', name: 'বাংলা' },
   { code: 'th', name: 'ไทย' },
   { code: 'zh-Hans', name: '中文（简体）' },
   { code: 'zh-Hant', name: '中文（繁體）' },

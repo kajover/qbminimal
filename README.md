@@ -62,7 +62,7 @@ In dark mode, on a desktop and on a phone:
 - **Incognito mode** under **Settings > App** shows made-up Linux names in place of the real torrent and file names in this browser, for screenshots. Nothing changes in qBittorrent.
 - **Notifications** when a torrent finishes, if you turn them on. Messages appear above the bars at the bottom of a phone, and in the bottom corner on wide screens.
 - **Keyboard shortcuts** for the torrent list and for moving between pages (G and a number), listed in **Settings > App** and shown with `?`. Enter accepts a dialog, and Ctrl or ⌘ and Enter does it from a text box.
-- **30 languages**, listed [below](#languages).
+- **29 languages**, listed [below](#languages).
 - **Accessibility options**, described [below](#accessibility).
 - **Settings**: every qBittorrent preference, shown only when your qBittorrent version has it.
 - A sidebar you can hide on wide screens.
@@ -82,7 +82,6 @@ In dark mode, on a desktop and on a phone:
 | --- | --- | --- |
 | English | English | The original |
 | Arabic | العربية | [Edit ar.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/ar.json) |
-| Bengali | বাংলা | [Edit bn.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/bn.json) |
 | Bulgarian | Български | [Edit bg.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/bg.json) |
 | Chinese (Simplified) | 中文（简体） | [Edit zh-Hans.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/zh-Hans.json) |
 | Chinese (Traditional) | 中文（繁體） | [Edit zh-Hant.json](https://github.com/kajover/qbminimal/edit/main/src/i18n/locales/zh-Hant.json) |
