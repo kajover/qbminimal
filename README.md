@@ -12,8 +12,8 @@ A minimal, phone-friendly Web UI for [qBittorrent](https://www.qbittorrent.org/)
 Built with React 19, TypeScript 7, Vite 8, and Tailwind CSS 4.
 
 > [!TIP]
-> [▶ Try the live demo](https://kajover.github.io/qbminimal/?signedin)
-> It runs in your browser on sample torrents, with no qBittorrent behind it, so nothing you do there changes anything. It works on phones too.
+> #### [▶ Try the live demo](https://kajover.github.io/qbminimal/?signedin)
+> It runs in your browser on sample torrents, with no qBittorrent behind it, for you to try it out.
 
 ## Screenshots
 
@@ -193,7 +193,7 @@ Then run `npm run deploy` for the latest release, or `scripts/deploy.sh --zip qb
 
 ## Credits
 
-qbminimal is influenced by [qbitWebber](https://github.com/ksuaning-au/qbitWebber), the project it started from, and by [qui](https://github.com/autobrr/qui), whose torrent table, column filters and details panel inspired qbminimal's.
+qbminimal is influenced by [qbitWebber](https://github.com/ksuaning-au/qbitWebber), the project it started from, and by [qui](https://github.com/autobrr/qui), whose UI/UX inspired qbminimal's.
 
 Third-party components and their licenses are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
