@@ -28,3 +28,10 @@ export function useRSSAction() {
   })
 }
 
+
+// A section's list below its toolbar, as on the Logs page, scrolling on its own.
+export const RSS_LIST = 'min-h-0 flex-1 overflow-y-auto'
+// The toolbar: a short search, then the buttons at the end in a group as wide in every section, so
+// the search is as wide in each as in Articles, where the feed picker shares the group on phones.
+export const RSS_SEARCH = 'me-1 min-w-0 flex-1 sm:max-w-56'
+export const RSS_TOOLS = 'ms-auto flex w-48 shrink-0 items-center justify-end gap-1 sm:w-auto'

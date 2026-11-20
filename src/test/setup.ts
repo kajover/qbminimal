@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'localStorage', { value: storage, configurable: true })
 
   window.matchMedia ??= ((query: string) => ({
-    matches: /min-width: 1200px|pointer: fine/.test(query),
+    matches: /min-width:|pointer: fine/.test(query),
     media: query,
     onchange: null,
     addEventListener: () => {},

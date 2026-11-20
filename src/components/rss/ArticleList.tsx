@@ -10,16 +10,15 @@ interface ArticleListProps {
   onDownload: (url: string) => void
 }
 
-// A feed's articles, unread ones in bold. Opening one marks it read.
+// A feed's articles, unread ones in bold, as rows like the Logs page's. Opening one marks it read.
 export function ArticleList({ articles, onOpened, onDownload }: ArticleListProps) {
-  if (articles.length === 0) return <p className="py-8 text-center text-sm text-muted-foreground">{t('No articles')}</p>
   return (
-    <ul className="space-y-2">
+    <ul className="divide-y">
       {articles.map(article => {
         const link = article.url || article.link
         return (
-          <li key={article.id} className="flex items-start gap-2 rounded-md border p-3">
-            <Rss className={cn('mt-1 size-4 shrink-0', article.isRead ? 'text-muted-foreground' : 'text-primary')} aria-label={article.isRead ? t('Read') : t('Unread')} />
+          <li key={article.id} className="flex items-start gap-2 px-2 py-2 transition-colors hover:bg-muted/60">
+            <Rss className={cn('mt-0.5 size-4 shrink-0', article.isRead ? 'text-muted-foreground' : 'text-primary')} aria-label={article.isRead ? t('Read') : t('Unread')} />
             <div className="min-w-0 flex-1">
               {link ? (
                 <a href={link} target="_blank" rel="noopener noreferrer" className={cn('text-sm hover:underline', !article.isRead && 'font-semibold')} onClick={() => onOpened(article)}>{article.title}</a>

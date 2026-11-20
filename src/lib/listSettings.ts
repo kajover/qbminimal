@@ -16,7 +16,8 @@ export interface ListSettings {
 }
 
 // Sorted by queue position (#), as qBittorrent sorts its list until you choose otherwise.
-export const DEFAULT_LIST_SETTINGS: ListSettings = { sortField: 'priority', sortDirection: 'asc', view: 'auto', pageSize: 20 }
+// 100 at a time: the list scrolls them on wide screens.
+export const DEFAULT_LIST_SETTINGS: ListSettings = { sortField: 'priority', sortDirection: 'asc', view: 'auto', pageSize: 100 }
 
 const STORAGE_KEY = 'qbminimal.torrentList'
 // Settings saved before version 2 kept the old default sort by name, so that one is left behind.
@@ -55,3 +56,9 @@ export function saveListSettings(settings: ListSettings): void {
     // Private browsing can block storage. The list still works, it just won't be remembered.
   }
 }
+
+// The pages bar's room at its sides, so its text starts at the inside of the checkboxes' border
+// (9px in from the table's edge), and its arrows end as far from the other side: inside the table,
+// or below it, past its 1px border.
+export const PAGE_BAR_IN_TABLE = 'px-[calc(0.5rem+1px)] py-1.5'
+export const PAGE_BAR_BELOW_TABLE = 'px-[calc(0.5rem+2px)]'

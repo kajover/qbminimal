@@ -26,5 +26,5 @@ export function FreeSpaceHint({ path }: { path: string }) {
   })
 
   if (!supported || free === undefined || !Number.isFinite(free) || free < 0) return null
-  return <p className="text-xs text-muted-foreground">{t('{size} free there', { size: formatBytes(free) })}</p>
+  return <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{t('{size} free', { size: formatBytes(free) })}</span>
 }

@@ -414,21 +414,15 @@
       /* Not lower: the window ends 16px above Safari's floating address bar, and Safari cuts off
          any fixed bar placed past that edge. */
       --bottom-edge: var(--nav-gap);
+      /* Safari's toolbar grows about 40px when it expands at the end of a scrolled page, without
+         the page moving, so the bar at the end of the cards keeps that much more room. */
+      --toolbar-room: 2.5rem;
     }
   }
-}
-/* Where bars that stay in view while the page scrolls stick: under the header where the window
-   scrolls, and at the top of the area below the header in the frame, which scrolls on its own. */
-:root {
-  --sticky-top: var(--header-height, 3rem);
-}
-:root[data-scrollbars='room'] {
-  --sticky-top: 0px;
 }
 @media (min-width: 1200px) { /* --breakpoint-md */
   :root {
     --bottom-nav-height: 0px;
-    --sticky-top: 0px;
   }
 }
 /* Phones without the tab bar (Settings > Menu bar off): the selection bar and the table's

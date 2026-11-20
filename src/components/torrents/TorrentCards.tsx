@@ -72,7 +72,8 @@ export function TorrentCards({ torrents, selected, showCheckboxes, onToggle, ope
           >
             {showCheckboxes && (
               <Checkbox
-                className="mt-0.5"
+                // Its top meets the top of the first line, as the status icon's does.
+                className="mt-px"
                 aria-label={t('Select {name}', { name: torrent.name })}
                 checked={isSelected}
                 onClick={(e) => { e.preventDefault(); onToggle(torrent.hash, e.shiftKey) }}
@@ -84,7 +85,7 @@ export function TorrentCards({ torrents, selected, showCheckboxes, onToggle, ope
               <div className="flex items-center gap-x-7 text-xs whitespace-nowrap">
                 {/* The table's status icon, then the status, in its color without a badge. */}
                 <span className={cn('inline-flex min-w-[8em] shrink-0 items-center gap-1.5', getStateColor(torrent.state, torrent.completion_on))} title={torrent.error || undefined}>
-                  {createElement(getStateIcon(torrent.state, torrent.completion_on), { 'aria-hidden': true, className: 'size-3.5 shrink-0' })}
+                  {createElement(getStateIcon(torrent.state, torrent.completion_on), { 'aria-hidden': true, className: 'size-3 shrink-0' })}
                   {getStateLabel(torrent.state, torrent.completion_on)}
                 </span>
                 <span className="text-muted-foreground tabular-nums">{Math.round(torrent.progress * 100)}%</span>

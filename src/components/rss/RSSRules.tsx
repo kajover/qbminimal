@@ -1,7 +1,6 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-import { Download, Pencil, Plus, Save, Trash2, Upload } from 'lucide-react'
+import { Download, Plus, Save, Trash2, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -9,7 +8,9 @@ import { Label } from '@/components/ui/label'
 import { useCategories, useRemoveRSSRule, useRSSFeeds, useRSSRules, useSetRSSRule } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import type { RSSRule } from '@/types'
-import { RuleExtras } from './RuleExtras'
+import { RuleMenu } from './RuleExtras'
+import { SearchInput } from '@/components/SearchInput'
+import { RSS_LIST, RSS_SEARCH, RSS_TOOLS } from './rssActions'
 import { exportRules, parseRulesFile } from '@/lib/rssRulesFile'
 import { t } from '@/i18n'
 
@@ -31,6 +32,7 @@ export function RSSRules() {
   const [editorOpen, setEditorOpen] = useState(false)
   const [removing, setRemoving] = useState<string | null>(null)
   const [removeOpen, setRemoveOpen] = useState(false)
+  const [search, setSearch] = useState('')
 
   const feeds = feedsData?.feeds ?? []
   const importInput = useRef<HTMLInputElement>(null)
@@ -112,39 +114,44 @@ export function RSSRules() {
     }
   }
 
+  const needle = search.trim().toLowerCase()
+  const shownRules = Object.entries(rules ?? {}).filter(([name, rule]) => !needle || name.toLowerCase().includes(needle) || rule.mustContain?.toLowerCase().includes(needle))
+
   return (
-    <Card className="gap-2">
-      <CardHeader className="flex items-center justify-between">
-        <CardTitle>{t('Download rules')}</CardTitle>
-        <div className="flex gap-1">
+    // The page's rules section: a toolbar and the list, as on the Logs page.
+    <>
+      <div className="flex items-center gap-1">
+        <SearchInput className={RSS_SEARCH} aria-label={t('Filter rules')} placeholder={t('Search')} value={search} onValueChange={setSearch} />
         <input ref={importInput} type="file" accept=".json,application/json" className="hidden" onChange={importFile} />
-        <Button size="sm" variant="outline" aria-label={t('Import rules')} title={t('Import rules from a file')} disabled={importing} onClick={() => importInput.current?.click()}>
-          <Upload className="size-4" />
+        <div className={RSS_TOOLS}>
+        <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Import rules')} title={t('Import rules from a file')} disabled={importing} onClick={() => importInput.current?.click()}>
+          <Upload />
         </Button>
-        <Button size="sm" variant="outline" aria-label={t('Export rules')} title={t('Export rules to a file')} disabled={!rules || Object.keys(rules).length === 0} onClick={download}>
-          <Download className="size-4" />
+        <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Export rules')} title={t('Export rules to a file')} disabled={!rules || Object.keys(rules).length === 0} onClick={download}>
+          <Download />
         </Button>
-        <Button size="sm" variant="outline" aria-label={t('Add rule')} title={t('Add rule')} onClick={() => open({ name: '', isNew: true, rule: EMPTY_RULE })}>
-          <Plus className="size-4" />
+        <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Add rule')} title={t('Add rule')} onClick={() => open({ name: '', isNew: true, rule: EMPTY_RULE })}>
+          <Plus />
         </Button>
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent>
+      <div className={RSS_LIST}>
       {Object.keys(rules ?? {}).length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t('No rules configured')}</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{t('No rules configured')}</p>
+      ) : shownRules.length === 0 ? (
+        <p className="py-8 text-center text-sm text-muted-foreground">{t('No matching entries')}</p>
       ) : (
         <ul className="divide-y">
-        {Object.entries(rules ?? {}).map(([name, rule]) => (
-          <li key={name} className="flex items-center gap-2 py-2">
+        {shownRules.map(([name, rule]) => (
+          <li key={name} className="flex items-center gap-2 px-2 py-2 transition-colors hover:bg-muted/60">
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{name}</p>
                 <p className="truncate text-xs text-muted-foreground">
                   {rule.enabled ? t('On') : t('Off')}{rule.mustContain ? t(' · Must contain: {mustContain}', { mustContain: rule.mustContain }) : ''}
                 </p>
               </div>
-              <RuleExtras name={name} existing={Object.keys(rules ?? {})} />
-              <Button variant="ghost" size="icon" className="size-8" aria-label={t('Edit {name}', { name })} title={t('Edit')} onClick={() => open({
+              <RuleMenu name={name} existing={Object.keys(rules ?? {})} onDelete={() => { setRemoving(name); setRemoveOpen(true) }} onEdit={() => open({
                 name,
                 isNew: false,
                 rule: {
@@ -153,16 +160,12 @@ export function RSSRules() {
                   assignedCategory: rule.torrentParams?.category ?? rule.assignedCategory ?? '',
                   savePath: rule.torrentParams?.save_path ?? rule.savePath ?? '',
                 },
-              })}>
-                <Pencil className="size-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="size-8" aria-label={t('Delete {name}', { name })} title={t('Delete')} onClick={() => { setRemoving(name); setRemoveOpen(true) }}>
-                <Trash2 className="size-4" />
-              </Button>
+              })} />
           </li>
         ))}
         </ul>
       )}
+      </div>
 
       <Dialog open={editorOpen} onOpenChange={setEditorOpen}>
         <DialogContent aria-describedby={undefined} className="max-h-[85vh] overflow-y-auto">
@@ -242,7 +245,6 @@ export function RSSRules() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      </CardContent>
-    </Card>
+    </>
   )
 }

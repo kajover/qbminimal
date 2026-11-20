@@ -13,6 +13,8 @@ interface FeedTreeProps {
   feeds: RSSFeed[]
   folders: string[]
   selected: string | null
+  // Shows the matching feeds by name or address, without their folders.
+  search?: string
   onSelect: (uid: string) => void
   onRefresh: (path: string, label: string) => void
   onMarkRead: (path: string) => void
@@ -20,7 +22,7 @@ interface FeedTreeProps {
 }
 
 // qBittorrent's feed folders as a tree, each feed and folder with its own menu.
-export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMarkRead, onPrompt }: FeedTreeProps) {
+export function FeedTree({ feeds, folders, selected, search = '', onSelect, onRefresh, onMarkRead, onPrompt }: FeedTreeProps) {
   const menu = (label: string, items: [string, LucideIcon, () => void, boolean?][]) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,7 +31,7 @@ export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMark
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-        {items.map(([text, Icon, run, danger]) => <DropdownMenuItem key={text} className={cn(danger && 'text-destructive')} onClick={run}><Icon className="size-4" />{text}</DropdownMenuItem>)}
+        {items.map(([text, Icon, run, danger]) => <DropdownMenuItem key={text} variant={danger ? 'destructive' : 'default'} onClick={run}><Icon className="size-4" />{text}</DropdownMenuItem>)}
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -42,17 +44,22 @@ export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMark
         aria-pressed={selected === feed.uid}
         onClick={() => onSelect(feed.uid)}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(feed.uid) } }}
-        className={cn('flex cursor-pointer items-start gap-1 rounded-md border p-2.5 hover:bg-accent', selected === feed.uid && 'border-primary')}
+        className={cn('flex cursor-pointer items-start gap-1 px-2 py-2 transition-colors outline-hidden hover:bg-muted/60 focus-visible:bg-muted/60', selected === feed.uid && 'bg-muted')}
         style={{ marginLeft: depth * STEP }}
       >
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium">{feed.title}</span>
-          <span className="block truncate text-xs text-muted-foreground">{feed.url}</span>
-          <span className="mt-1 flex flex-wrap gap-1 text-xs">
-            {feed.unreadCount > 0 && <span className="rounded bg-primary px-1.5 py-0.5 text-primary-foreground">{t('{count} new', { count: feed.unreadCount })}</span>}
-            {feed.isLoading && <span className="text-muted-foreground">{t('Refreshing...')}</span>}
-            {feed.hasError && <span className="text-destructive">{t('Couldn\'t fetch')}</span>}
+          {/* The new count beside the name, so each feed takes two lines. */}
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="truncate text-sm font-medium">{feed.title}</span>
+            {feed.unreadCount > 0 && <span className="shrink-0 rounded bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">{t('{count} new', { count: feed.unreadCount })}</span>}
           </span>
+          <span className="block truncate text-xs text-muted-foreground">{feed.url}</span>
+          {(feed.isLoading || feed.hasError) && (
+            <span className="block text-xs">
+              {feed.isLoading && <span className="text-muted-foreground">{t('Refreshing...')}</span>}
+              {feed.hasError && <span className="text-destructive">{t('Couldn\'t fetch')}</span>}
+            </span>
+          )}
         </span>
         {menu(feed.title, [
           [t('Refresh'), RefreshCw, () => onRefresh(feed.path, t('Refreshing feed'))],
@@ -61,7 +68,7 @@ export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMark
           [t('Move to folder'), FolderInput, () => onPrompt({ kind: 'move', path: feed.path })],
           [t('Change address'), Link, () => onPrompt({ kind: 'url', feed })],
           [t('Refresh time'), Clock, () => onPrompt({ kind: 'interval', feed })],
-          [t('Remove'), Trash2, () => onPrompt({ kind: 'remove', path: feed.path, isFolder: false }), true],
+          [t('Delete'), Trash2, () => onPrompt({ kind: 'remove', path: feed.path, isFolder: false }), true],
         ])}
       </div>
     </li>
@@ -71,8 +78,8 @@ export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMark
   const level = (parent: string, depth: number) => (
     <>
       {folders.filter(path => getRSSParent(path) === parent).map(path => (
-        <li key={`folder:${path}`} className="space-y-2">
-          <div className="flex items-center gap-1 text-sm font-medium" style={{ marginLeft: depth * STEP }}>
+        <li key={`folder:${path}`}>
+          <div className="flex items-center gap-1 px-2 py-2 text-sm font-medium" style={{ marginLeft: depth * STEP }}>
             <Folder className="size-4 text-yellow-500" />
             <span className="min-w-0 flex-1 truncate">{rssName(path)}</span>
             {menu(t('folder {name}', { name: rssName(path) }), [
@@ -80,16 +87,22 @@ export function FeedTree({ feeds, folders, selected, onSelect, onRefresh, onMark
               [t('Mark all as read'), CheckCheck, () => onMarkRead(path)],
               [t('Rename'), Pencil, () => onPrompt({ kind: 'rename', path, isFolder: true })],
               [t('Move to folder'), FolderInput, () => onPrompt({ kind: 'move', path })],
-              [t('Remove'), Trash2, () => onPrompt({ kind: 'remove', path, isFolder: true }), true],
+              [t('Delete'), Trash2, () => onPrompt({ kind: 'remove', path, isFolder: true }), true],
             ])}
           </div>
-          <ul className="space-y-2">{level(path, depth + 1)}</ul>
+          <ul className="divide-y border-t">{level(path, depth + 1)}</ul>
         </li>
       ))}
       {feeds.filter(feed => getRSSParent(feed.path) === parent).map(feed => feedRow(feed, depth))}
     </>
   )
 
-  if (feeds.length === 0 && folders.length === 0) return <p className="text-sm text-muted-foreground">{t('No feeds yet. Add one with +.')}</p>
-  return <ul className="space-y-2">{level('', 0)}</ul>
+  const note = (text: string) => <p className="py-8 text-center text-sm text-muted-foreground">{text}</p>
+  if (feeds.length === 0 && folders.length === 0) return note(t('No feeds yet. Add one with +.'))
+  const needle = search.trim().toLowerCase()
+  if (needle) {
+    const found = feeds.filter(feed => feed.title.toLowerCase().includes(needle) || feed.url.toLowerCase().includes(needle))
+    return found.length ? <ul className="divide-y">{found.map(feed => feedRow(feed, 0))}</ul> : note(t('No matching entries'))
+  }
+  return <ul className="divide-y">{level('', 0)}</ul>
 }

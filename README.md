@@ -47,6 +47,12 @@ In dark mode, on a desktop and on a phone:
   <img src="docs/screenshots/mobile-cards-dark.png" alt="The torrent cards in dark mode on a phone" width="200">
 </p>
 
+In monochrome (Settings, Colors), with statuses and speeds in plain text:
+
+<p>
+  <img src="docs/screenshots/desktop-table-monochrome.png" alt="The torrent table in monochrome on a desktop, with the selected torrent's details below it" width="66%">
+</p>
+
 ## Features
 
 - **Torrent list** as a table or as cards, each torrent with an icon for its status. In the table you can show, hide and reorder columns (from the Columns button or by right-clicking a header, dragging a column's handle), drag titles, and resize columns, sort by any of them, and filter each one: a range of sizes, speeds, dates or ratios, text a name or path contains, or a set of states. The column titles stay in view while you scroll. The layout is remembered on each device.

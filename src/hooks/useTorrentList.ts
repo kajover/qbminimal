@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { ROOM_FOR_TABLE } from '@/lib/pageScroll'
 import { DEFAULT_LIST_SETTINGS, loadListSettings, saveListSettings, type ListView, type SortDirection, type SortField } from '@/lib/listSettings'
 import { compareTorrents, TORRENT_FILTER_COLUMNS } from '@/lib/torrentColumns'
 import { activeCount, applyColumnFilters, loadColumnFilters, saveColumnFilters, withFilter, type ColumnFilter } from '@/lib/columnFilters'
@@ -7,7 +8,7 @@ import { countFilterOptions, cycleChoice, excludeChoice, filterTorrents, searchT
 import type { Torrent } from '@/types'
 
 // Matches --breakpoint-md in index.css.
-const WIDE_SCREEN = '(min-width: 1200px)'
+
 
 const COLUMN_FILTERS_TABLE = 'torrents'
 
@@ -22,10 +23,13 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
   const [query, setQuery] = useState('')
   const [filters, setFilters] = useState<TorrentFilters>(() => ({ ...NO_FILTERS, columns: withoutSidebarColumns(loadColumnFilters(COLUMN_FILTERS_TABLE)) }))
   const [sort, setSort] = useState<{ field: SortField; direction: SortDirection }>({ field: saved.sortField, direction: saved.sortDirection })
+  // Whether the sort shows in the column titles: once one is picked, even the default queue order,
+  // but not on first load in the default order or after a reset.
+  const [sortShown, setSortShown] = useState(saved.sortField !== DEFAULT_LIST_SETTINGS.sortField || saved.sortDirection !== DEFAULT_LIST_SETTINGS.sortDirection)
   const [view, setView] = useState<ListView>(saved.view)
   const [pageSize, setPageSize] = useState(saved.pageSize)
   const [requestedPage, setRequestedPage] = useState(1)
-  const wide = useMediaQuery(WIDE_SCREEN)
+  const roomy = useMediaQuery(ROOM_FOR_TABLE)
 
   // The draft becomes the search after a pause in typing.
   useEffect(() => {
@@ -119,19 +123,23 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
     counts,
     trackerHosts: [...hosts.keys()].sort(),
     sort,
-    // Picking the sorted column again flips the direction.
+    sortShown,
+    // Picking the sorted column again flips the direction. A first pick of the default column,
+    // while its order isn't shown yet, shows it as it is.
     sortBy: (field: SortField) => {
-      setSort(current => ({ field, direction: current.field === field && current.direction === 'asc' ? 'desc' : 'asc' }))
+      setSort(current => (!sortShown && current.field === field ? current : { field, direction: current.field === field && current.direction === 'asc' ? 'desc' : 'asc' }))
+      setSortShown(true)
       setRequestedPage(1)
     },
     // Back to qBittorrent's queue order, as on first use.
     resetSort: () => {
       setSort({ field: DEFAULT_LIST_SETTINGS.sortField, direction: DEFAULT_LIST_SETTINGS.sortDirection })
+      setSortShown(false)
       setRequestedPage(1)
     },
-    // 'auto' follows the screen: the table when wide, cards on phones.
-    showTable: view === 'table' || (view === 'auto' && wide),
-    showAsTable: (table: boolean) => setView(table === wide ? 'auto' : table ? 'table' : 'cards'),
+    // 'auto' follows the screen: the table where it fits, cards on phones.
+    showTable: view === 'table' || (view === 'auto' && roomy),
+    showAsTable: (table: boolean) => setView(table === roomy ? 'auto' : table ? 'table' : 'cards'),
     matching,
     rows: matching.slice((page - 1) * pageSize, page * pageSize),
     page,

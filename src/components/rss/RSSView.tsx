@@ -2,29 +2,48 @@ import { useState } from 'react'
 import { CheckCheck, FolderPlus, Plus, RefreshCw } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { NativeSelect } from '@/components/NativeSelect'
 import { PageHeader } from '@/components/PageHeader'
+import { SearchInput } from '@/components/SearchInput'
 import { useRSSFeeds, useRSSItems } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
+import { FILL_PAGE } from '@/lib/pageScroll'
 import { ArticleList } from './ArticleList'
 import { FeedTree } from './FeedTree'
 import { RSSPromptDialog } from './RSSPromptDialog'
-import { useRSSAction, type Prompt } from './rssActions'
+import { RSS_LIST, RSS_SEARCH, RSS_TOOLS, rssName, useRSSAction, type Prompt } from './rssActions'
 import { RSSRules } from './RSSRules'
 import { t } from '@/i18n'
+
+type Section = 'articles' | 'feeds' | 'rules'
+
+// One section at a time, picked like the Settings sections, so no list runs on below another.
+const SECTIONS: { id: Section; title: string }[] = [
+  { id: 'articles', title: t('Articles') },
+  { id: 'feeds', title: t('Feeds') },
+  { id: 'rules', title: t('Download rules') },
+]
 
 export function RSSView() {
   const queryClient = useQueryClient()
   const feedsQuery = useRSSFeeds()
-  const [openFeed, setOpenFeed] = useState<string | null>(null)
-  const articlesQuery = useRSSItems(openFeed ?? '')
+  const [section, setSection] = useState<Section>('articles')
+  const [chosenFeed, setChosenFeed] = useState<string | null>(null)
+  const [articleSearch, setArticleSearch] = useState('')
+  const [feedSearch, setFeedSearch] = useState('')
   const [prompt, setPrompt] = useState<Prompt | null>(null)
+  // The feed or folder whose articles are about to be marked read, asked about first.
+  const [readAll, setReadAll] = useState<string | null>(null)
   const action = useRSSAction()
 
   const feeds = feedsQuery.data?.feeds ?? []
   const folders = feedsQuery.data?.folders ?? []
-  const feed = feeds.find(f => f.uid === openFeed)
+  // The chosen feed, or else the first, so the articles show something straight away.
+  const feed = feeds.find(f => f.uid === chosenFeed) ?? feeds[0]
+  const articlesQuery = useRSSItems(feed?.uid ?? '')
 
   // Read state is a convenience, so a failure to save it isn't worth a message.
   const markRead = (path: string, articleId?: string) =>
@@ -42,42 +61,79 @@ export function RSSView() {
     }
   }
 
+  const needle = articleSearch.trim().toLowerCase()
+  const articles = (articlesQuery.data?.articles ?? []).filter(a => !needle || a.title.toLowerCase().includes(needle) || a.description?.toLowerCase().includes(needle))
+  const note = (text: string) => <p className="py-8 text-center text-sm text-muted-foreground">{text}</p>
+
   return (
-    <div className="space-y-4">
+    // The page fills the screen and the section's list scrolls on its own.
+    <div className={FILL_PAGE}>
       <PageHeader title={t('RSS')} />
+      <nav aria-label={t('RSS sections')} className="flex flex-wrap gap-0.5">
+        {SECTIONS.map(item => (
+          <Button key={item.id} size="sm" variant={section === item.id ? 'secondary' : 'ghost'} className="px-2" aria-current={section === item.id ? 'page' : undefined} onClick={() => setSection(item.id)}>
+            {item.title}
+          </Button>
+        ))}
+      </nav>
 
-      {feedsQuery.isLoading ? <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading feeds...')}</p> : (
-        <div className="flex flex-col gap-4 md:flex-row md:items-start">
-          <Card className="gap-2 md:w-80">
-            <CardHeader className="flex items-center justify-between gap-1">
-              <CardTitle>{t('Feeds')}</CardTitle>
-              <div className="flex gap-1">
-                <Button size="sm" variant="outline" aria-label={t('Refresh all feeds')} title={t('Refresh all feeds')} disabled={feeds.length === 0} onClick={() => refresh('', t('Refreshing all feeds'))}><RefreshCw className="size-4" /></Button>
-                <Button size="sm" variant="outline" aria-label={t('New folder')} title={t('New folder')} onClick={() => setPrompt({ kind: 'addFolder' })}><FolderPlus className="size-4" /></Button>
-                <Button size="sm" variant="outline" aria-label={t('Add feed')} title={t('Add feed')} onClick={() => setPrompt({ kind: 'addFeed' })}><Plus className="size-4" /></Button>
+      <Card className="min-h-0 flex-1">
+        <CardContent className="flex min-h-0 flex-1 flex-col gap-3">
+          {section === 'articles' && (
+            <>
+              <div className="flex items-center gap-1">
+                <SearchInput className={RSS_SEARCH} aria-label={t('Filter articles')} placeholder={t('Search')} value={articleSearch} onValueChange={setArticleSearch} />
+                <div className={RSS_TOOLS}>
+                <NativeSelect className="min-w-0 flex-1 sm:w-56 sm:flex-none" aria-label={t('Feed')} value={feed?.uid ?? ''} disabled={feeds.length === 0} onChange={(e) => setChosenFeed(e.target.value)}>
+                  {feeds.map(f => <option key={f.uid} value={f.uid}>{f.unreadCount > 0 ? `${f.title} (${f.unreadCount})` : f.title}</option>)}
+                </NativeSelect>
+                <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Mark all as read')} title={t('Mark all as read')} disabled={!feed || feed.unreadCount === 0} onClick={() => feed && setReadAll(feed.path)}><CheckCheck /></Button>
+                <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Refresh')} title={t('Refresh')} disabled={!feed} onClick={() => feed && refresh(feed.path, t('Refreshing feed'))}><RefreshCw /></Button>
+                </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <FeedTree feeds={feeds} folders={folders} selected={openFeed} onSelect={setOpenFeed} onRefresh={refresh} onMarkRead={markRead} onPrompt={setPrompt} />
-            </CardContent>
-          </Card>
-
-          <Card className="min-w-0 flex-1 gap-2">
-            <CardHeader className="flex flex-wrap items-center justify-between gap-2">
-              <CardTitle className="min-w-0 truncate">{feed?.title ?? t('Articles')}</CardTitle>
-              {feed && <Button size="sm" variant="ghost" disabled={feed.unreadCount === 0} onClick={() => markRead(feed.path)}><CheckCheck />{t('Mark all as read')}</Button>}
-            </CardHeader>
-            <CardContent>
-              {!feed ? <p className="py-8 text-center text-sm text-muted-foreground">{t('Pick a feed to see its articles')}</p>
-                : articlesQuery.isLoading ? <p className="py-8 text-center text-sm text-muted-foreground">{t('Loading articles...')}</p>
-                : <ArticleList articles={articlesQuery.data?.articles ?? []} onOpened={a => { if (!a.isRead) void markRead(feed.path, a.id) }} onDownload={addTorrent} />}
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      <RSSRules />
+              <div className={RSS_LIST}>
+                {feedsQuery.isLoading ? note(t('Loading feeds...'))
+                  : !feed ? note(t('No feeds yet. Add one with +.'))
+                  : articlesQuery.isLoading ? note(t('Loading articles...'))
+                  : articles.length === 0 ? note(needle ? t('No matching entries') : t('No articles'))
+                  : <ArticleList articles={articles} onOpened={a => { if (!a.isRead) void markRead(feed.path, a.id) }} onDownload={addTorrent} />}
+              </div>
+            </>
+          )}
+          {section === 'feeds' && (
+            <>
+              <div className="flex items-center gap-1">
+                <SearchInput className={RSS_SEARCH} aria-label={t('Filter feeds')} placeholder={t('Search')} value={feedSearch} onValueChange={setFeedSearch} />
+                <div className={RSS_TOOLS}>
+                <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Refresh all feeds')} title={t('Refresh all feeds')} disabled={feeds.length === 0} onClick={() => refresh('', t('Refreshing all feeds'))}><RefreshCw /></Button>
+                <Button variant="outline" size="icon" className="shrink-0" aria-label={t('New folder')} title={t('New folder')} onClick={() => setPrompt({ kind: 'addFolder' })}><FolderPlus /></Button>
+                <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Add feed')} title={t('Add feed')} onClick={() => setPrompt({ kind: 'addFeed' })}><Plus /></Button>
+                </div>
+              </div>
+              <div className={RSS_LIST}>
+                {feedsQuery.isLoading ? note(t('Loading feeds...')) : (
+                  // Picking a feed shows its articles.
+                  <FeedTree feeds={feeds} folders={folders} search={feedSearch} selected={feed?.uid ?? null} onSelect={(uid) => { setChosenFeed(uid); setSection('articles') }} onRefresh={refresh} onMarkRead={setReadAll} onPrompt={setPrompt} />
+                )}
+              </div>
+            </>
+          )}
+          {section === 'rules' && <RSSRules />}
+        </CardContent>
+      </Card>
       {prompt && <RSSPromptDialog prompt={prompt} folders={folders} onClose={() => setPrompt(null)} />}
+      <Dialog open={readAll !== null} onOpenChange={(open) => { if (!open) setReadAll(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('Mark all as read?')}</DialogTitle>
+            <DialogDescription>{t('Every article in {name} is marked as read.', { name: rssName(readAll ?? '') })}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReadAll(null)}>{t('Cancel')}</Button>
+            <Button onClick={() => { if (readAll !== null) void markRead(readAll); setReadAll(null) }}><CheckCheck />{t('Mark all as read')}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

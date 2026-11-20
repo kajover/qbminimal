@@ -132,7 +132,7 @@ function useNewEntries(scroller: RefObject<HTMLElement | null>, latest: (number 
 // On phones a long entry stops after four lines; it opens in full.
 function Message({ row }: { row: LogRow }) {
   return (
-    <span className="min-w-0 basis-full [overflow-wrap:anywhere] max-md:line-clamp-4 md:basis-0 md:flex-1">
+    <span className="min-w-0 basis-full [overflow-wrap:anywhere] @max-lg:line-clamp-4 @lg:basis-0 @lg:flex-1">
       {row.summary && <span className="block">{row.summary}</span>}
       {row.fields.length > 0 && (
         <span className="block text-muted-foreground">
@@ -154,10 +154,12 @@ function LogWindow({ rows, note, latest, autoScroll, onOpen }: { rows: LogRow[];
   const size = useFitToScreen(box)
   const onScroll = useNewEntries(scroller, latest, autoScroll)
   return (
-    <div ref={box} style={size} className="flex flex-col text-sm">
+    // Columns with titles wherever the list has room for them, as on wide screens: it follows its
+    // own width, so a tablet or a phone on its side gets them too.
+    <div ref={box} style={size} className="@container flex flex-col text-sm">
       {note ?? (
         <>
-          <div aria-hidden className="flex gap-3 border-b px-2 py-2 text-xs font-medium text-muted-foreground max-md:hidden">
+          <div aria-hidden className="flex gap-3 border-b px-2 py-2 text-xs font-medium text-muted-foreground @max-lg:hidden">
             <span className="w-40 shrink-0">{t('Date and time')}</span>
             <span className="w-20 shrink-0">{t('Level')}</span>
             <span className="min-w-0 flex-1">{t('Message')}</span>
@@ -167,9 +169,10 @@ function LogWindow({ rows, note, latest, autoScroll, onOpen }: { rows: LogRow[];
             <ul className="divide-y">
               {rows.map(row => (
                 <li key={row.key} data-log-key={row.key}>
-                  <button type="button" onClick={() => onOpen(row)} className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 px-2 py-2 text-start transition-colors hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:outline-hidden md:flex-nowrap md:items-start">
-                    <span className="w-40 shrink-0 text-xs tabular-nums text-muted-foreground md:pt-0.5">{formatLogTime(row.timestamp)}</span>
-                    <span className="w-20 shrink-0"><LogBadge row={row} /></span>
+                  <button type="button" onClick={() => onOpen(row)} className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 px-2 py-2 @lg:gap-x-3 text-start transition-colors hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:outline-hidden @lg:flex-nowrap @lg:items-start">
+                    {/* Columns under the titles where they fit; elsewhere the level follows the time closely. */}
+                    <span className="shrink-0 text-xs tabular-nums text-muted-foreground @lg:w-40 @lg:pt-0.5">{formatLogTime(row.timestamp)}</span>
+                    <span className="shrink-0 @lg:w-20"><LogBadge row={row} /></span>
                     <Message row={row} />
                   </button>
                 </li>

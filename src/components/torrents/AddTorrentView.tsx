@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState, type DragEvent, type FormE
 import { ChevronDown, ChevronRight, ListChecks, Loader2, Plus, RefreshCw, Upload, X } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PageHeader } from '@/components/PageHeader'
 import { FreeSpaceHint } from './FreeSpaceHint'
@@ -37,10 +37,14 @@ const REREAD_TIMEOUT_MS = 20000
 // qBittorrent's answer to a file choice for a torrent whose file list it doesn't hold.
 const isForgottenFileList = (error: unknown) => error instanceof Error && error.message.includes('filePriorities')
 
-function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
+// `aside` sits at the end of the label's line, so a note that loads later doesn't move the form.
+function Field({ label, htmlFor, aside, children }: { label: string; htmlFor: string; aside?: ReactNode; children: ReactNode }) {
   return (
     <div className="space-y-1">
-      <Label htmlFor={htmlFor} className="text-xs text-muted-foreground">{label}</Label>
+      <div className="flex items-baseline justify-between gap-2">
+        <Label htmlFor={htmlFor} className="text-xs text-muted-foreground">{label}</Label>
+        {aside}
+      </div>
       {children}
     </div>
   )
@@ -415,9 +419,8 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
                   </Field>
                 </div>
 
-                <Field label={t('Save path (blank = default)')} htmlFor="add-save-path">
+                <Field label={t('Save path (blank = default)')} htmlFor="add-save-path" aside={<FreeSpaceHint path={options.savePath} />}>
                   <Input id="add-save-path" value={options.savePath} onChange={(e) => set('savePath', e.target.value)} className="h-9" />
-                  <FreeSpaceHint path={options.savePath} />
                 </Field>
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -510,25 +513,31 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
   )
 }
 
+// The two parts of the page, picked like the RSS and Settings sections.
+const SECTIONS = [
+  { id: 'add', title: t('Add torrents') },
+  { id: 'create', title: t('Create a torrent') },
+] as const
+
 export function AddTorrentView() {
-  const [showCreator, setShowCreator] = useState(false)
+  const [section, setSection] = useState<'add' | 'create'>('add')
   return (
     <div className="space-y-4">
       <PageHeader title={t('Add')} />
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('Add torrents')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AddTorrentForm />
-        </CardContent>
-      </Card>
-
-      <Button type="button" variant="ghost" size="sm" className="-ms-3" aria-expanded={showCreator} onClick={() => setShowCreator(!showCreator)}>
-        {showCreator ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4 rtl:rotate-180" />}
-        {t('Create a torrent')}
-      </Button>
-      {showCreator && <TorrentCreator />}
+      <nav aria-label={t('Add sections')} className="flex flex-wrap gap-0.5">
+        {SECTIONS.map(item => (
+          <Button key={item.id} size="sm" variant={section === item.id ? 'secondary' : 'ghost'} className="px-2" aria-current={section === item.id ? 'page' : undefined} onClick={() => setSection(item.id)}>
+            {item.title}
+          </Button>
+        ))}
+      </nav>
+      {section === 'add' ? (
+        <Card>
+          <CardContent>
+            <AddTorrentForm />
+          </CardContent>
+        </Card>
+      ) : <TorrentCreator />}
     </div>
   )
 }

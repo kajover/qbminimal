@@ -85,11 +85,6 @@ export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps
   const [height, setHeight] = useState(initialHeight)
   const drag = useRef<{ y: number; height: number } | null>(null)
 
-  // Shared, so the table's scrollbar can sit just above the panel.
-  useEffect(() => {
-    document.documentElement.style.setProperty('--details-height', `${height}px`)
-  }, [height])
-  useEffect(() => () => { document.documentElement.style.removeProperty('--details-height') }, [])
 
   const commit = (next: number) => {
     const clamped = clampHeight(next)
@@ -116,8 +111,9 @@ export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps
 
   return (
     <>
-      {/* Room at the end of the page, so the last rows can scroll above the panel. */}
-      <div aria-hidden style={{ height }} />
+      {/* Room at the end of the page, so the last rows can scroll above the panel. Not in the
+          frame, where the panel lies over the list and its pages bar. */}
+      <div aria-hidden className="frame:hidden" style={{ height }} />
       <section
         aria-label={t('Torrent details')}
         data-keeps-swipes

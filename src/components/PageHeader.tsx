@@ -5,7 +5,17 @@ import { cn } from '@/lib/utils'
 
 // The same title row on every page: the page name on the left, its main buttons on the right, and
 // on wide screens anything given as `middle` between them.
-export function PageHeader({ title, middle, actions, className, ref }: { title: ReactNode; middle?: ReactNode; actions?: ReactNode; className?: string; ref?: Ref<HTMLDivElement> }) {
+export function PageHeader({ title, middle, middleWidth, actions, className, ref }: {
+  title: ReactNode
+  // Placed by the header: a function gets whether it went into the header bar.
+  middle?: ReactNode | ((inHeader: boolean) => ReactNode)
+  // How wide `middle` needs to be. Below wide screens it goes into the header bar when that much
+  // room is left between the title and the buttons.
+  middleWidth?: number
+  actions?: ReactNode
+  className?: string
+  ref?: Ref<HTMLDivElement>
+}) {
   // Compact mode on a wide screen: the same row, a little tighter, inside the header bar.
   const slot = use(HeaderSlot)
   const row = useRef<HTMLDivElement | null>(null)
@@ -14,6 +24,8 @@ export function PageHeader({ title, middle, actions, className, ref }: { title: 
   // When this page's buttons leave the title no room (on phones with the speeds shown, say), only
   // screen readers get it. Each page measures its own row, so a page with room keeps its title.
   const [crowded, setCrowded] = useState(false)
+  // The room between the title and the buttons, for `middle`.
+  const [free, setFree] = useState(0)
   useLayoutEffect(() => {
     const box = row.current
     const title = heading.current
@@ -21,22 +33,32 @@ export function PageHeader({ title, middle, actions, className, ref }: { title: 
     const measure = () => {
       const gap = parseFloat(getComputedStyle(box).columnGap) || 0
       // scrollWidth is the title's full width, even while it's hidden or cut short.
-      setCrowded(title.scrollWidth > box.clientWidth - (buttons.current?.offsetWidth ?? 0) - 2 * gap)
+      const room = box.clientWidth - (buttons.current?.offsetWidth ?? 0) - 2 * gap
+      setCrowded(title.scrollWidth > room)
+      setFree(room - title.scrollWidth)
     }
-    const observer = new ResizeObserver(measure)
+    // Again on the next frame, once the buttons have settled after a jump in the window's width.
+    let frame = 0
+    const remeasure = () => { measure(); cancelAnimationFrame(frame); frame = requestAnimationFrame(measure) }
+    const observer = new ResizeObserver(remeasure)
     observer.observe(box)
+    observer.observe(title)
     if (buttons.current) observer.observe(buttons.current)
+    window.addEventListener('resize', remeasure)
     measure()
-    return () => observer.disconnect()
+    return () => { observer.disconnect(); window.removeEventListener('resize', remeasure); cancelAnimationFrame(frame) }
   }, [slot, title])
   const setRow = (node: HTMLDivElement | null) => {
     row.current = node
     if (typeof ref === 'function') ref(node)
     else if (ref) (ref as { current: HTMLDivElement | null }).current = node
   }
+  const inHeader = !!slot && (slot.whole || (middleWidth !== undefined && middleWidth <= free))
+  const place = (inBar: boolean) => (typeof middle === 'function' ? middle(inBar) : middle)
   if (slot) {
-    // Compact mode: the row goes up into the header bar, a little tighter. On phones `middle` stays
-    // in the page, since it places itself (the selection bar sits above the screen's bottom edge).
+    // Compact mode: the row goes up into the header bar, a little tighter. Where `middle` doesn't fit
+    // there it stays in the page, since it places itself (the selection bar above the screen's
+    // bottom edge).
     return (
       <>
         {createPortal(
@@ -44,13 +66,13 @@ export function PageHeader({ title, middle, actions, className, ref }: { title: 
           <div ref={setRow} className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
             {/* Just the title: the header has no room for a line below it. */}
             <h2 ref={heading} className={cn('min-w-0 shrink truncate text-lg font-semibold leading-tight', crowded && 'sr-only')}>{title}</h2>
-            <div className="flex min-w-0 flex-1 justify-center">{slot.whole && middle}</div>
+            <div className="flex min-w-0 flex-1 justify-center">{inHeader && place(true)}</div>
             {/* As close together as the buttons above the search results. */}
             {actions && <div ref={buttons} className="flex shrink-0 items-center gap-1">{actions}</div>}
           </div>,
           slot.element,
         )}
-        {!slot.whole && middle}
+        {!inHeader && place(false)}
       </>
     )
   }
@@ -61,7 +83,7 @@ export function PageHeader({ title, middle, actions, className, ref }: { title: 
       </div>
       {/* On phones its content places itself (for example fixed above the tab bar), so the wrapper
           takes no room in the row. */}
-      {middle && <div className="flex min-w-0 max-md:contents md:flex-1 md:justify-center">{middle}</div>}
+      {middle && <div className="flex min-w-0 max-md:contents md:flex-1 md:justify-center">{place(false)}</div>}
       {actions && <div className="flex shrink-0 items-center gap-1">{actions}</div>}
     </div>
   )

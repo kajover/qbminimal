@@ -4,7 +4,7 @@ import { Download, FolderOpen, Loader2, Plus, Trash2 } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { FolderPicker } from '@/components/settings/FolderPicker'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input, Textarea } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -77,10 +77,8 @@ export function TorrentCreator() {
   }
 
   return (
+    // Its tab on the Add page names it, as on the RSS page.
     <Card>
-      <CardHeader>
-        <CardTitle>{t('Create a torrent')}</CardTitle>
-      </CardHeader>
       <CardContent className="space-y-4">
         <form onSubmit={submit} className="space-y-3">
           <Field label={t('File or folder to share')} htmlFor="creator-source">

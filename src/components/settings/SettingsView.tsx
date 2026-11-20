@@ -24,6 +24,7 @@ import { Switch } from '@/components/ui/switch'
 import { setDisplayOption, useDisplayOption, type DisplayOption } from '@/lib/displayOptions'
 import { chosenTextSize, setTextSize, TEXT_SIZES, type TextSize } from '@/lib/textSize'
 import { chosenLanguage, LANGUAGES, setLanguage, t, type LanguageChoice } from '@/i18n'
+import { FILL_PAGE } from '@/lib/pageScroll'
 
 // System is the default, so it comes first.
 const themeOptions: { value: Theme; label: string; icon: typeof Monitor }[] = [
@@ -326,7 +327,7 @@ function PreferencesSection({ sectionId, edits, setEdits }: { sectionId: string;
       ))}
 
       {(changeCount > 0 || invalid.length > 0) && (
-        <div className="glass sticky bottom-2 z-10 flex items-center justify-between gap-2 rounded-2xl p-3 max-md:bottom-[calc(var(--bottom-nav-height,5rem)+0.5rem)]">
+        <div className="glass sticky bottom-1 z-10 flex items-center justify-between gap-2 rounded-2xl p-3">
           <span className="text-sm">{changeCount === 1 ? t('1 unsaved change') : t('{changeCount} unsaved changes', { changeCount })}</span>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setEdits(() => ({}))}><Undo2 />{t('Discard')}</Button>
@@ -343,7 +344,7 @@ export function SettingsView() {
   const [edits, setEdits] = useState<Record<string, unknown>>({})
 
   return (
-    <div className="space-y-4">
+    <div className={FILL_PAGE}>
       <PageHeader title={t('Settings')} />
       {/* Narrow enough that all nine fit in two rows on a phone. */}
       <nav aria-label={t('Settings sections')} className="flex flex-wrap gap-0.5">
@@ -353,7 +354,11 @@ export function SettingsView() {
           </Button>
         ))}
       </nav>
-      {sectionId === 'app' ? <AppSection /> : <PreferencesSection sectionId={sectionId} edits={edits} setEdits={setEdits} />}
+      {/* The section stops at the bottom of the screen and scrolls on its own, with room for the
+          cards' shadows and, on phones, their wider edges. */}
+      <div className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1 pb-1 max-sm:-mx-2 max-sm:px-2">
+        {sectionId === 'app' ? <AppSection /> : <PreferencesSection sectionId={sectionId} edits={edits} setEdits={setEdits} />}
+      </div>
     </div>
   )
 }

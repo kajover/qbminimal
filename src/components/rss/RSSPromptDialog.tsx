@@ -54,7 +54,7 @@ export function RSSPromptDialog({ prompt, folders, onClose }: { prompt: Prompt; 
         return run(() => qbitClient.setRSSFeedRefreshInterval(prompt.feed.path, minutes * 60), t('Refresh time saved'), t('Failed to save the refresh time'))
       }
       case 'remove':
-        return run(() => qbitClient.removeRSSFeed(prompt.path), prompt.isFolder ? t('Folder removed') : t('Feed removed'), t('Failed to remove'))
+        return run(() => qbitClient.removeRSSFeed(prompt.path), prompt.isFolder ? t('Folder deleted') : t('Feed deleted'), t('Failed to delete'))
     }
   }
 
@@ -65,7 +65,7 @@ export function RSSPromptDialog({ prompt, folders, onClose }: { prompt: Prompt; 
     move: t('Move to folder'),
     url: t('Change feed address'),
     interval: t('Refresh time'),
-    remove: prompt.kind === 'remove' && prompt.isFolder ? t('Remove this folder?') : t('Remove this feed?'),
+    remove: prompt.kind === 'remove' && prompt.isFolder ? t('Delete this folder?') : t('Delete this feed?'),
   }
   const movableFolders = prompt.kind === 'move' ? folders.filter(f => f !== prompt.path && !f.startsWith(`${prompt.path}\\`)) : folders
 
@@ -76,7 +76,7 @@ export function RSSPromptDialog({ prompt, folders, onClose }: { prompt: Prompt; 
           <DialogTitle>{titles[prompt.kind]}</DialogTitle>
           {prompt.kind === 'remove' && (
             <DialogDescription>
-              {prompt.isFolder ? t('{rssName} and every feed in it will be removed.', { rssName: rssName(prompt.path) }) : t('{rssName} will be removed. Torrents it already added stay.', { rssName: rssName(prompt.path) })}
+              {prompt.isFolder ? t('{rssName} and every feed in it will be deleted.', { rssName: rssName(prompt.path) }) : t('{rssName} will be deleted. Torrents it already added stay.', { rssName: rssName(prompt.path) })}
             </DialogDescription>
           )}
           {prompt.kind === 'interval' && <DialogDescription>{t('Leave it blank to use the time set in Settings > RSS.')}</DialogDescription>}
@@ -108,7 +108,7 @@ export function RSSPromptDialog({ prompt, folders, onClose }: { prompt: Prompt; 
             <Button type="button" variant="outline" onClick={onClose}>{t('Cancel')}</Button>
             <Button type="submit" variant={prompt.kind === 'remove' ? 'destructive' : 'default'} disabled={action.isPending}>
               {prompt.kind === 'remove' ? <Trash2 /> : <Save />}
-              {prompt.kind === 'remove' ? t('Remove') : t('Save')}
+              {prompt.kind === 'remove' ? t('Delete') : t('Save')}
             </Button>
           </DialogFooter>
         </form>

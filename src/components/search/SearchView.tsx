@@ -22,8 +22,9 @@ import { SearchPluginsDialog } from './SearchPluginsDialog'
 import { SearchResults } from './SearchResults'
 import { SearchSidebar } from './SearchSidebar'
 import { t } from '@/i18n'
+import { ROOM_FOR_SIDEBAR } from '@/lib/pageScroll'
 
-// Whether the sidebar was left open on a wide screen, kept on this device.
+// Whether the sidebar was left open beside the results, kept on this device.
 const SIDEBAR_KEY = 'qbminimal.searchSidebar'
 
 export function SearchView() {
@@ -36,14 +37,14 @@ export function SearchView() {
   const [filtersFor, setFiltersFor] = useState<{ job: number | null; filters: ColumnFilters }>({ job: null, filters: {} })
   const filters = filtersFor.job === search.jobId ? filtersFor.filters : {}
   const setFilter = (id: string, filter: ColumnFilter | null) => setFiltersFor({ job: search.jobId, filters: withFilter(filters, id, filter) })
-  // The sidebar starts closed. On wide screens it stays open once opened there; on phones it opens
-  // over the page each time.
-  const wide = useMediaQuery('(min-width: 1200px)')
+  // The sidebar starts closed. Where it fits beside the results it stays open once opened there; on
+  // phones it opens over the page each time.
+  const sideBySide = useMediaQuery(ROOM_FOR_SIDEBAR)
   const [sidebarPref, setSidebarPref] = useState(() => readStored(SIDEBAR_KEY))
   const [sheetOpen, setSheetOpen] = useState(false)
-  const sidebarOpen = wide ? sidebarPref === 'open' : sheetOpen
+  const sidebarOpen = sideBySide ? sidebarPref === 'open' : sheetOpen
   const setSidebarOpen = (open: boolean) => {
-    if (!wide) return setSheetOpen(open)
+    if (!sideBySide) return setSheetOpen(open)
     setSidebarPref(open ? 'open' : null)
     writeStored(SIDEBAR_KEY, open ? 'open' : null)
   }
@@ -102,7 +103,7 @@ export function SearchView() {
     return counts
   }, [search.results])
   const narrowed = category !== 'all' || activeCount(filters) > 0
-  const sidebarLabel = narrowed ? t('Search options (filters on)') : t('Search options')
+  const sidebarLabel = narrowed ? t('Filters (on)') : t('Filters')
 
 
   const add = async (result: SearchResult) => {
@@ -139,7 +140,9 @@ export function SearchView() {
   )
 
   return (
-    <div className="space-y-4">
+    // In the frame (wide screens) the page fills the window: the search field stays, only the
+    // results scroll, and the sidebar beside them on its own. Phones scroll the whole page.
+    <div className="flex flex-col gap-4 frame:h-full">
       {/* The results put their filter, columns and view buttons here, as the torrent list does,
           shown before a search too so the view can be picked first. */}
       {/* The results put their columns and view buttons here, as the torrent list does, shown before
@@ -157,12 +160,12 @@ export function SearchView() {
         )}
       />
 
-      {/* Beside the results on wide screens, over them on phones, as on the torrent list. */}
-      <div className={cn(sidebarOpen && wide && 'flex items-start gap-4')}>
-        {!wide && <FilterSheet open={sheetOpen} onOpenChange={setSheetOpen}>{sidebar}</FilterSheet>}
-        <div className="min-w-0 flex-1 space-y-4">
+      {/* Beside the results where it fits, over them on phones, as on the torrent list. */}
+      <div className={cn('frame:flex frame:min-h-0 frame:flex-1', sidebarOpen && sideBySide && 'flex items-start gap-4 frame:items-stretch')}>
+        {!sideBySide && <FilterSheet open={sheetOpen} onOpenChange={setSheetOpen}>{sidebar}</FilterSheet>}
+        <div className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0">
           {/* A short field: the plugins and category are in the sidebar. */}
-          <form onSubmit={submit} className="flex max-w-xl items-center gap-2">
+          <form onSubmit={submit} className="flex max-w-xl shrink-0 items-center gap-2">
             <SearchInput id="search-pattern" aria-label={t('Search for')} placeholder={t('Search')} value={pattern} onValueChange={setPattern} required className="min-w-0 flex-1" />
             {/* While searching, the spinner turns into a stop button under the pointer. */}
             <Button type="submit" className="group" aria-label={search.running ? t('Stop search') : t('Search')} title={search.running ? t('Stop search') : t('Search')}>
@@ -184,8 +187,11 @@ export function SearchView() {
           <SearchResults searchId={search.jobId ?? null} results={search.results} onAdd={setAdding} toolbarSlot={toolbarSlot} filters={filters} onFilterChange={setFilter} />
           {search.results.length === 0 && search.searched && !search.running && <p className="py-8 text-center text-sm text-muted-foreground">{t('Nothing found')}</p>}
         </div>
-        {sidebarOpen && wide && (
-          <aside aria-label={t('Search options')} className="sticky top-4 max-h-[calc(100dvh-var(--header-height,3rem)-2rem)] w-72 shrink-0 overflow-y-auto rounded-xl border bg-card p-3">
+        {sidebarOpen && sideBySide && (
+          <aside aria-label={t('Filters')} className="sticky top-0 max-h-[calc(100dvh-var(--header-height,3rem)-2rem)] w-72 shrink-0 overflow-y-auto rounded-xl border bg-card p-3 window-scroll:top-[calc(var(--header-height,3rem)+1rem)] window-scroll:max-h-[calc(100dvh-var(--header-height,3rem)-var(--bottom-nav-height,0px)-2rem)]">
+            {/* Sticks at the top of the scrolling area, whose own padding already leaves the gap; an
+                offset would add to it and push the sidebar below what's beside it. Where the window
+                scrolls, it sticks below the header, which lies over the page. */}
             {sidebar}
           </aside>
         )}

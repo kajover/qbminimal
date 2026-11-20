@@ -14,6 +14,9 @@ import { PAGE_SIZES } from '@/lib/listSettings'
 import { chosenCount, SIDEBAR_COLUMNS } from '@/lib/torrentFilters'
 import { loadFilterViews, type FilterView } from '@/lib/filterViews'
 import { announce } from '@/lib/announce'
+import { inFrame, pageScroller, ROOM_FOR_HEADER_SEARCH, ROOM_FOR_SIDEBAR } from '@/lib/pageScroll'
+import { holdWheel } from '@/lib/holdWheel'
+import { PAGE_BAR_BELOW_TABLE, PAGE_BAR_IN_TABLE } from '@/lib/listSettings'
 import { loadBarActions, saveBarActions } from '@/lib/actionBar'
 import { toast } from '@/hooks/use-toast'
 import { getColumn, loadColumnLayout, saveColumnLayout, TORRENT_FILTER_COLUMNS, type ColumnLayout } from '@/lib/torrentColumns'
@@ -55,6 +58,13 @@ export function TorrentsView() {
   const warnIfPaused = useSessionPausedWarning()
   const remove = useDeleteTorrents()
   const wide = useMediaQuery('(min-width: 1200px)')
+  // The filters beside the list, and the quick search in the header, wherever they fit.
+  const sideBySide = useMediaQuery(ROOM_FOR_SIDEBAR)
+  const headerSearch = useMediaQuery(ROOM_FOR_HEADER_SEARCH)
+  const framed = inFrame(wide)
+  // Outside the frame the table fills the screen and scrolls on its own, so the page starts at its
+  // top: the cards' scroll would otherwise leave the column titles above the screen.
+  useEffect(() => { if (!framed && list.showTable) pageScroller().scrollTo(0, 0) }, [framed, list.showTable])
   const mouse = useMediaQuery('(pointer: fine)')
 
   const selection = useSelection(list.rows.map(t => t.hash))
@@ -88,8 +98,11 @@ export function TorrentsView() {
     setAllBarActions(current => ({ ...current, [barKind]: ids }))
     saveBarActions(barKind, ids)
   }
-  // On phones the table's scrollbar moves up above the selection bar, which takes the bottom spot.
-  const phoneBar = count > 0 && !wide
+  // Below wide screens the selection bar goes into the header where it fits, or else above the
+  // bottom edge, where the table's scrollbar moves up above it.
+  const [barWidth, setBarWidth] = useState<number>()
+  const [barInHeader, setBarInHeader] = useState(false)
+  const phoneBar = count > 0 && !wide && !barInHeader
   useEffect(() => {
     if (!phoneBar) return
     const root = document.documentElement.style
@@ -271,8 +284,11 @@ export function TorrentsView() {
     toggleView: () => list.showAsTable(!list.showTable),
   })
 
-  const selectionBar = count > 0 && (
+  const selectionBar = (inHeader: boolean) => count > 0 && (
     <SelectionBar
+      inHeader={inHeader}
+      onWidth={setBarWidth}
+      onPlace={setBarInHeader}
       count={count}
       total={list.matching.length}
       pinned={pinnedEntries}
@@ -290,6 +306,7 @@ export function TorrentsView() {
       // The title opens the connection status and statistics.
       title={t('Torrents')}
       middle={selectionBar}
+      middleWidth={barWidth}
       actions={total > 0
         ? <TorrentToolbar list={list} filtersOpen={filtersOpen} onToggleFilters={() => setFiltersOpen(open => !open)} searchOpen={searchOpen} onSearchOpenChange={setSearchOpen} columns={columns} onColumnsChange={changeColumns} onAdd={() => setAddOpen(true)} />
         : !isLoading && <AddTorrentButton onAdd={() => setAddOpen(true)} />}
@@ -343,15 +360,40 @@ export function TorrentsView() {
   )
 
 
+  // Its text starts at the inside of the checkboxes' border, and its arrows end as far from the
+  // other side: in the table, in the cards (10px in from their border), or below them.
+  // The page size and pages, always in view below the list: below the cards or rows that scroll in
+  // the frame, at the bottom of the table, or kept above the tab bar below the cards.
+  const pageBar = list.matching.length > 0 ? (
+    <div className="flex items-center justify-between gap-2">
+      <label className="flex items-center gap-2 text-xs text-muted-foreground">
+        {t('Show')}
+        <NativeSelect className="h-7 text-xs text-foreground" value={list.pageSize} onChange={(e) => list.setPageSize(Number(e.target.value))}>
+          {PAGE_SIZES.map(size => <option key={size} value={size}>{size}</option>)}
+        </NativeSelect>
+        {t('per page')}
+      </label>
+      {list.pageCount > 1 && (
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon-xs" className="size-7 shadow-none" aria-label={t('Previous page')} disabled={list.page === 1} onClick={() => list.setPage(list.page - 1)}><ChevronLeft className="size-3.5 rtl:rotate-180" /></Button>
+          <span className="text-xs tabular-nums">{list.page} / {list.pageCount}</span>
+          <Button variant="outline" size="icon-xs" className="size-7 shadow-none" aria-label={t('Next page')} disabled={list.page === list.pageCount} onClick={() => list.setPage(list.page + 1)}><ChevronRight className="size-3.5 rtl:rotate-180" /></Button>
+        </div>
+      )}
+    </div>
+  ) : null
+
   return (
-    <div className="space-y-4">
+    // In the frame (wide screens) the page fills the window above the details panel: only the
+    // table or cards scroll, and the sidebar beside them on its own. Phones scroll the whole page.
+    <div className="flex flex-col gap-4 frame:h-full">
       {header}
 
-      {/* The filters open on the list's end side: beside it on wide screens, over it on phones. */}
-      <div className={cn(filtersOpen && wide && 'flex items-start gap-4')}>
-        {!wide && <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}>{sidebar}</FilterSheet>}
-        <div className="min-w-0 flex-1 space-y-4">
-          {searchOpen && !wide && <QuickSearchField list={list} wide={false} onClose={() => setSearchOpen(false)} />}
+      {/* The filters open on the list's end side: beside it where it fits, over it on phones. */}
+      <div className={cn('frame:flex frame:min-h-0 frame:flex-1', filtersOpen && sideBySide && 'flex items-start gap-4 frame:items-stretch')}>
+        {!sideBySide && <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}>{sidebar}</FilterSheet>}
+        <div className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0">
+          {searchOpen && !headerSearch && <QuickSearchField list={list} wide={false} onClose={() => setSearchOpen(false)} />}
 
         {list.matching.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-8 text-sm text-muted-foreground">
@@ -371,6 +413,7 @@ export function TorrentsView() {
             openHash={detailsTorrent ? detailsTorrent.hash : null}
             sortField={list.sort.field}
             sortDirection={list.sort.direction}
+            sortShown={list.sortShown}
             onSort={list.sortBy}
             rowProps={rowProps}
             wrapBody={withMenu}
@@ -382,47 +425,41 @@ export function TorrentsView() {
               choices: (id) => <FilterChoices list={list} listKey={SIDEBAR_COLUMNS[id]} categories={categories ?? {}} tags={tags ?? []} />,
             }}
             onColumnFilter={list.setColumnFilter}
+            footer={framed ? null : <div className={PAGE_BAR_IN_TABLE}>{pageBar}</div>}
           />
         ) : (
-          <TorrentCards
-            torrents={list.rows}
-            selected={selection.selected}
-            showCheckboxes={mouse || count > 0}
-            onToggle={toggleBox}
-            openHash={detailsTorrent ? detailsTorrent.hash : null}
-            rowProps={rowProps}
-            wrapList={withMenu}
-          />
-        )}
-
-        {list.matching.length > PAGE_SIZES[0] && (
-          <div className="flex flex-wrap items-center justify-between gap-2 px-2">
-            <label className="flex items-center gap-2 text-sm text-muted-foreground">
-              {t('Show')}
-              <NativeSelect className="h-8 text-foreground" value={list.pageSize} onChange={(e) => list.setPageSize(Number(e.target.value))}>
-                {PAGE_SIZES.map(size => <option key={size} value={size}>{size}</option>)}
-              </NativeSelect>
-              {t('per page')}
-            </label>
-            {list.pageCount > 1 && (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" aria-label={t('Previous page')} disabled={list.page === 1} onClick={() => list.setPage(list.page - 1)}><ChevronLeft className="size-4 rtl:rotate-180" /></Button>
-                <span className="text-sm tabular-nums">{list.page} / {list.pageCount}</span>
-                <Button variant="outline" size="sm" aria-label={t('Next page')} disabled={list.page === list.pageCount} onClick={() => list.setPage(list.page + 1)}><ChevronRight className="size-4 rtl:rotate-180" /></Button>
-              </div>
-            )}
+          // Scrolled on their own in the frame, with room for the cards' shadows. Placed, so the
+          // cards' hidden labels are placed in it, not in the page, which they'd make scroll.
+          <div className="relative frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1">
+            <TorrentCards
+              torrents={list.rows}
+              selected={selection.selected}
+              showCheckboxes={mouse || count > 0}
+              onToggle={toggleBox}
+              openHash={detailsTorrent ? detailsTorrent.hash : null}
+              rowProps={rowProps}
+              wrapList={withMenu}
+            />
           </div>
         )}
+        {/* At the window's bottom even below a short list, level with the sidebar's Logout. */}
+        {framed && pageBar && <div ref={holdWheel} className={cn('mt-auto shrink-0', list.showTable ? PAGE_BAR_BELOW_TABLE : 'px-[calc(0.625rem+2px)]')}>{pageBar}</div>}
+        {/* After the last card, outside the frame, as wide as the cards. */}
+        {!framed && !list.showTable && pageBar && <div className="glass-bar mb-[var(--toolbar-room,0px)] rounded-xl border px-[calc(0.625rem+1px)] py-1.5 max-sm:-mx-2">{pageBar}</div>}
+
         </div>
-        {filtersOpen && wide && (
-          <aside aria-label={t('Filters')} className="sticky top-4 max-h-[calc(100dvh-var(--header-height,3rem)-2rem)] w-72 shrink-0 overflow-y-auto rounded-xl border bg-card p-3">
+        {filtersOpen && sideBySide && (
+          <aside aria-label={t('Filters')} className="sticky top-0 max-h-[calc(100dvh-var(--header-height,3rem)-2rem)] w-72 shrink-0 overflow-y-auto rounded-xl border bg-card p-3 window-scroll:top-[calc(var(--header-height,3rem)+1rem)] window-scroll:max-h-[calc(100dvh-var(--header-height,3rem)-var(--bottom-nav-height,0px)-2rem)]">
+            {/* Sticks at the top of the scrolling area, whose own padding already leaves the gap; an
+                offset would add to it and push the sidebar below what's beside it. Where the window
+                scrolls, it sticks below the header, which lies over the page. */}
             {sidebar}
           </aside>
         )}
       </div>
 
-      {/* Keeps the last cards clear of the selection bar on phones. */}
-      {count > 0 && <div aria-hidden className="h-[calc(3.5rem+var(--table-scrollbar-space,0px))] md:hidden" />}
+      {/* Keeps the last cards clear of the selection bar at the bottom; the table goes under it. */}
+      {phoneBar && !list.showTable && <div aria-hidden className="h-14" />}
 
       <DeleteTorrentsDialog key={deleteRequest.id} torrents={deleteRequest.torrents} open={deleteOpen} onOpenChange={setDeleteOpen} onConfirm={confirmDelete} />
       <BulkPromptDialog torrents={selectedTorrents} prompt={prompt} onClose={() => setPrompt(null)} />

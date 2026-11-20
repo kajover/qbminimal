@@ -8,11 +8,10 @@ import { cn } from '@/lib/utils'
 import { columnWidth, DEFAULT_COLUMN_LAYOUT, getColumn, isDefaultLayout, toggleColumn, moveColumn, resizeColumn, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
 import { getStateIcon } from '@/lib/stateIcons'
 import { DOWN_SPEED_COLOR, formatEta, getStateBadge, getStateColor, getStateLabel, UP_SPEED_COLOR, peerPair as pair } from '@/lib/torrentState'
-import { DEFAULT_LIST_SETTINGS, type SortDirection } from '@/lib/listSettings'
+import type { SortDirection } from '@/lib/listSettings'
 import type { RowProps } from '@/hooks/useRowPress'
 import type { Torrent } from '@/types'
 import { useTransferInfo } from '@/hooks/useApi'
-import { BottomScrollbar } from './BottomScrollbar'
 import { ColumnMenuItems } from '@/components/ColumnMenuItems'
 import { fittedWidth, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
 import { ColumnFilterButton, SidebarFilterButton, type FilterTarget } from '@/components/ColumnFilters'
@@ -109,6 +108,8 @@ interface TorrentTableProps {
   openHash: string | null
   sortField: ColumnId
   sortDirection: SortDirection
+  // Whether the sort is marked in the titles: not in the default order before one is picked.
+  sortShown: boolean
   onSort: (field: ColumnId) => void
   // Click, long-press, and right-click handlers for a row.
   rowProps: (torrent: Torrent) => RowProps
@@ -120,14 +121,17 @@ interface TorrentTableProps {
   // Columns the sidebar filters: their titles offer the sidebar's own tick boxes.
   sidebarFilter?: { has: (columnId: string) => boolean; active: (columnId: string) => boolean; choices: (columnId: string) => ReactNode }
   onColumnFilter: (id: ColumnId, filter: ColumnFilter | null) => void
+  /** Shown below the rows (the pages, outside the frame). */
+  footer?: ReactNode
 }
 
 // A table whose columns can be dragged to a new place, resized from their right edge, sorted by
 // clicking, and shown or hidden from the Columns menu. Alt + arrow keys on a header move it too.
 // Clicking a row selects it and opens its details; Ctrl or Cmd adds to the selection, Shift a range.
-export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, selected, selectAllState, onToggle, onSelectAll, openHash, sortField, sortDirection, onSort, rowProps, wrapBody, columnFilters, filterTargets, onColumnFilter, sidebarFilter }: TorrentTableProps) {
+export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, selected, selectAllState, onToggle, onSelectAll, openHash, sortField, sortDirection, sortShown, onSort, rowProps, wrapBody, columnFilters, filterTargets, onColumnFilter, sidebarFilter, footer }: TorrentTableProps) {
   const { data: serverState } = useTransferInfo()
   // qBittorrent hides its # column while queueing is off, when every torrent would show *.
+  const defaultSort = !sortShown
   const columns = visibleColumns(layout).filter(def => def.id !== 'priority' || serverState?.queueing !== false)
   const scroller = useRef<HTMLDivElement>(null)
   const head = useRef<HTMLDivElement>(null)
@@ -192,12 +196,14 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   )
 
   return (
-    <div ref={frame} className="rounded-xl border bg-card max-sm:-mx-2" style={LINKED_SCROLL ? { timelineScope: '--table-x', '--table-scroll': `${scrollRange}px` } as CSSProperties : undefined}>
+    // Outside the frame it reaches as far down as the selection bar, which then covers its pages
+    // bar; it sits into the page's bottom padding, so the page itself doesn't scroll.
+    <div ref={frame} className="flex min-h-0 flex-col rounded-xl border bg-card max-sm:-mx-2 window-scroll:-mb-[calc(1rem-var(--selection-bar-gap,0.25rem))] window-scroll:max-h-[calc(100dvh-var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))-var(--bottom-nav-height,0px)-var(--selection-bar-gap,0.25rem)-1rem)]" style={LINKED_SCROLL ? { timelineScope: '--table-x', '--table-scroll': `${scrollRange}px` } as CSSProperties : undefined}>
       <div
         ref={head}
         // Only the titles' own wheel: the right-click menu's bubbles here through React too.
         onWheel={(e) => { if (e.currentTarget.contains(e.target as Node)) wheelOnHead(e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX) }}
-        className="sticky top-(--sticky-top) z-20 overflow-hidden rounded-t-xl border-b bg-card"
+        className="shrink-0 overflow-hidden rounded-t-xl border-b bg-card"
       >
       <table className={cn('table-fixed text-sm tabular-nums', LINKED_SCROLL && 'table-head-linked')} style={tableWidth}>
         {colgroup}
@@ -209,7 +215,8 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
               <Checkbox aria-label={t('Select all')} checked={selectAllState} onCheckedChange={(checked) => onSelectAll(checked === true)} />
             </th>
             {columns.map(def => {
-              const sorted = sortField === def.id
+              // The default order, by queue position, isn't marked until a sort is picked.
+              const sorted = sortField === def.id && !defaultSort
               const { className: dragClass, ...dragProps } = drag.titleProps(def.id)
               const target = filterTargets.get(def.id)
               const filterButton = target ? <ColumnFilterButton target={target} filter={columnFilters[def.id]} onChange={(filter) => onColumnFilter(def.id, filter)} />
@@ -218,7 +225,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
                 <th
                   key={def.id}
                   {...dragProps}
-                  aria-sort={sorted ? (sortDirection === 'asc' ? 'ascending' : 'descending') : undefined}
+                  aria-sort={sortField === def.id ? (sortDirection === 'asc' ? 'ascending' : 'descending') : undefined}
                   className={cn(
                     'group/th relative h-10 select-none px-2 text-start align-middle font-medium text-muted-foreground',
                     dragClass,
@@ -251,13 +258,13 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
           <ContextMenuSeparator />
           <ColumnMenuItems order={layout.order} shown={id => !layout.hidden.includes(id)} locked="name" label={id => getColumn(id).label} onToggle={id => onLayoutChange(toggleColumn(layout, id))} onMove={(id, target) => onLayoutChange(moveColumn(layout, id, target))} Item={ContextMenuCheckboxItem} />
           <ContextMenuSeparator />
-          <ContextMenuItem disabled={isDefaultLayout(layout) && sortField === DEFAULT_LIST_SETTINGS.sortField && sortDirection === DEFAULT_LIST_SETTINGS.sortDirection} onClick={() => { onLayoutChange(DEFAULT_COLUMN_LAYOUT); onResetSort() }}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
+          <ContextMenuItem disabled={isDefaultLayout(layout) && defaultSort} onClick={() => { onLayoutChange(DEFAULT_COLUMN_LAYOUT); onResetSort() }}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
         </ContextMenuContent>
         </ContextMenu>
       </table>
       </div>
       {/* Its own scrollbar is hidden: the one at the bottom of the screen stands in for it. */}
-      <div ref={scroller} onScroll={() => syncScroll(scroller.current, head.current)} style={LINKED_SCROLL ? { scrollTimeline: '--table-x inline' } as CSSProperties : undefined} className="overflow-x-auto overscroll-x-none rounded-b-xl scrollbar-none">
+      <div ref={scroller} onScroll={() => syncScroll(scroller.current, head.current)} style={LINKED_SCROLL ? { scrollTimeline: '--table-x inline' } as CSSProperties : undefined} className="min-h-0 overflow-auto overscroll-x-none rounded-b-xl">
       <table className="table-fixed caption-bottom text-sm tabular-nums" style={tableWidth}>
         {colgroup}
         {wrapBody(
@@ -299,7 +306,8 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
         )}
       </table>
       </div>
-      <BottomScrollbar target={scroller} />
+      {/* Below the rows, so it stays in view while they scroll. */}
+      {footer && <div className="shrink-0 border-t">{footer}</div>}
     </div>
   )
 }

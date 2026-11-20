@@ -48,7 +48,7 @@ async function search(text = 'ubuntu') {
 
 // The buttons above the results that show, in order: those in a hidden part are left out.
 const toolbar = () => {
-  const bar = screen.getByRole('button', { name: /^Search options/ }).parentElement!
+  const bar = screen.getByRole('button', { name: /^Filters/ }).parentElement!
   return within(bar).getAllByRole('button').filter(button => !button.closest('.hidden')).map(button => button.getAttribute('aria-label'))
 }
 
@@ -73,7 +73,7 @@ describe('search', () => {
 
   it('searches with every enabled plugin, filters results by plugin, and searches again in a category', async () => {
     renderView()
-    const sidebar = screen.getByRole('complementary', { name: 'Search options' })
+    const sidebar = screen.getByRole('complementary', { name: 'Filters' })
     expect(within(sidebar).getByRole('button', { name: 'Manage plugins' })).toBeInTheDocument()
     await search()
     expect(api.startSearch).toHaveBeenCalledWith('ubuntu', 'enabled', 'all')
@@ -83,7 +83,7 @@ describe('search', () => {
     const demo = within(sidebar).getByRole('checkbox', { name: /^Demo/ })
     expect(demo).toHaveTextContent('2')
     await userEvent.click(demo)
-    expect(screen.getByRole('button', { name: 'Search options (filters on)' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Filters (on)' })).toBeInTheDocument()
     await userEvent.click(within(sidebar).getByRole('button', { name: 'Clear the Plugins filter' }))
 
     // Picking a category searches again in it.
@@ -107,16 +107,16 @@ describe('search', () => {
     renderView()
     await search()
     await screen.findAllByText('ubuntu-desktop.iso')
-    expect(toolbar()).toEqual(['Columns', 'Card view', 'Search options'])
+    expect(toolbar()).toEqual(['Columns', 'Card view', 'Filters'])
 
     await userEvent.click(screen.getByRole('button', { name: 'Card view' }))
-    expect(toolbar()).toEqual(['Sort: Seeds', 'Table view', 'Search options'])
+    expect(toolbar()).toEqual(['Sort: Seeds', 'Table view', 'Filters'])
     expect(screen.getAllByRole('table')[0].closest('.hidden')).not.toBeNull()
     // Wide screens show the table by default, so cards are the choice kept.
     expect(localStorage.getItem('qbminimal.searchView')).toBe('cards')
 
     await userEvent.click(screen.getByRole('button', { name: 'Table view' }))
-    expect(toolbar()).toEqual(['Columns', 'Card view', 'Search options'])
+    expect(toolbar()).toEqual(['Columns', 'Card view', 'Filters'])
     expect(localStorage.getItem('qbminimal.searchView')).toBeNull()
   })
 
@@ -173,7 +173,7 @@ describe('search', () => {
     localStorage.setItem('qbminimal.keepSearches', 'on')
     api.state.searches = [{ id: 3, status: 'Running', total: 2 }, { id: 4, status: 'Stopped', total: 2 }]
     renderView()
-    const sidebar = screen.getByRole('complementary', { name: 'Search options' })
+    const sidebar = screen.getByRole('complementary', { name: 'Filters' })
     await userEvent.click(await within(sidebar).findByRole('button', { name: /^Search 4/ }))
     await waitFor(() => expect(api.getSearchResults).toHaveBeenCalledWith(4))
     await userEvent.click(within(sidebar).getByRole('button', { name: 'Stop search' }))
@@ -184,7 +184,7 @@ describe('search', () => {
     localStorage.setItem('qbminimal.keepSearches', 'on')
     api.state.searches = Array.from({ length: 12 }, (_, i) => ({ id: i + 1, status: 'Stopped', total: 1 }))
     renderView()
-    const sidebar = screen.getByRole('complementary', { name: 'Search options' })
+    const sidebar = screen.getByRole('complementary', { name: 'Filters' })
     // Each name's span carries it whole as its title.
     expect(await within(sidebar).findByTitle('Search 12')).toBeInTheDocument()
     expect(within(sidebar).getByTitle('Search 3')).toBeInTheDocument()
@@ -199,9 +199,9 @@ describe('search', () => {
     localStorage.setItem('qbminimal.keepSearches', 'on')
     api.state.searches = [{ id: 3, status: 'Stopped', total: 2 }, { id: 4, status: 'Stopped', total: 2 }]
     renderView()
-    expect(screen.queryByRole('complementary', { name: 'Search options' })).toBeNull()
-    await userEvent.click(screen.getByRole('button', { name: 'Search options' }))
-    const sidebar = screen.getByRole('complementary', { name: 'Search options' })
+    expect(screen.queryByRole('complementary', { name: 'Filters' })).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: 'Filters' }))
+    const sidebar = screen.getByRole('complementary', { name: 'Filters' })
     await within(sidebar).findByTitle('Search 4')
     await userEvent.click(within(sidebar).getByRole('button', { name: 'Saved search settings' }))
     await userEvent.click(await screen.findByRole('switch', { name: 'Keep past searches' }))

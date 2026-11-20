@@ -15,6 +15,7 @@ import { SpeedChart } from './SpeedChart'
 import { torrentOverview } from '@/lib/torrentOverview'
 import { CONNECTION_LABELS } from '@/lib/statusNotes'
 import { t } from '@/i18n'
+import { FILL_PAGE } from '@/lib/pageScroll'
 
 const size = (bytes: number | undefined) => (bytes === undefined ? '-' : formatBytes(bytes))
 const count = (value: number | undefined) => (value === undefined ? '-' : value.toLocaleString())
@@ -77,10 +78,11 @@ function AlternativeLimitsButton({ on }: { on: boolean }) {
 // qBittorrent's connection status and statistics, as a page like Logs.
 export function StatisticsView() {
   return (
-    <div className="space-y-4">
+    // The card stops at the bottom of the screen and only its contents scroll.
+    <div className={FILL_PAGE}>
       <PageHeader title={t('Statistics')} />
-      <Card>
-        <CardContent className="space-y-4">
+      <Card className="min-h-0">
+        <CardContent className="min-h-0 space-y-4 overflow-y-auto">
           <Statistics />
         </CardContent>
       </Card>

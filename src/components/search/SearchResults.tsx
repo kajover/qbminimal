@@ -1,4 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { inFrame, pageScroller, ROOM_FOR_TABLE } from '@/lib/pageScroll'
+import { holdWheel } from '@/lib/holdWheel'
+import { PAGE_BAR_BELOW_TABLE, PAGE_BAR_IN_TABLE } from '@/lib/listSettings'
 import { createPortal } from 'react-dom'
 import { ArrowDown, ArrowUp, ArrowUpDown, Columns3, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, LayoutList, Table2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -28,7 +31,8 @@ const COLUMNS: { key: SortKey; label: string; numeric?: boolean; className?: str
   { key: 'pubDate', label: t('Published'), numeric: true, className: 'truncate text-muted-foreground', cell: r => formatDateTime(published(r)) },
 ]
 
-const PER_PAGE = 20
+// As many as is useful at once; the table scrolls them.
+const PER_PAGE = 100
 const ACTIONS_WIDTH = 96
 // The name never fits into less than this, so narrow screens scroll the table instead.
 const MIN_NAME_WIDTH = 240
@@ -70,12 +74,16 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
 }) {
   // Each search starts with the most seeds first; a sort picked here lasts for this search.
   const [sort, setSort] = useState<SearchSort>(DEFAULT_SEARCH_SORT)
+  // The sort shows in the titles once one is picked, but not in the default order (most seeds
+  // first) before that, nor after a reset.
+  const [sortShown, setSortShown] = useState(false)
   const [page, setPage] = useState(1)
   // Reset here rather than by drawing the table anew, which made it flash between searches.
   const [shownSearch, setShownSearch] = useState(searchId)
   if (searchId !== shownSearch) {
     setShownSearch(searchId)
     setSort(DEFAULT_SEARCH_SORT)
+    setSortShown(false)
     setPage(1)
   }
   const [widths, setWidths] = useState(loadSearchWidths)
@@ -88,14 +96,19 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   const visible = order.map(key => COLUMNS.find(c => c.key === key)!).filter(c => c.key === 'fileName' || !hidden.includes(c.key))
   const shows = (key: ResizableKey) => !hidden.includes(key)
 
-  // Like the torrent list: the table on wide screens and cards on phones, unless one is picked.
+  // Like the torrent list: the table where it fits and cards on phones, unless one is picked.
   const wide = useMediaQuery('(min-width: 1200px)')
+  const roomy = useMediaQuery(ROOM_FOR_TABLE)
+  const framed = inFrame(wide)
   const [view, setViewState] = useState(loadSearchView)
-  const showTable = view ? view === 'table' : wide
+  const showTable = view ? view === 'table' : roomy
+  // Outside the frame the table scrolls on its own, so the page starts at its top: the cards'
+  // scroll would otherwise leave the column titles above the screen.
+  useEffect(() => { if (!framed && showTable) pageScroller().scrollTo(0, 0) }, [framed, showTable])
   const switchView = () => {
     const next = showTable ? 'cards' : 'table'
     // Back to following the screen when the pick matches it.
-    const saved = (next === 'table') === wide ? null : next
+    const saved = (next === 'table') === roomy ? null : next
     setViewState(saved)
     saveSearchView(saved)
   }
@@ -108,11 +121,14 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   const frame = useRef<HTMLDivElement>(null)
   const head = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
-  // The table is only there once results arrive, so it's watched from then on.
+  // The table is only there once results arrive, so it's watched from then on. Measured before it's
+  // first drawn, so the name doesn't show at a stand-in width for a frame, coming back to the page.
   const hasResults = results.length > 0
-  useEffect(() => {
+  useLayoutEffect(() => {
     const box = frame.current
-    if (!box || typeof ResizeObserver === 'undefined') return
+    if (!box) return
+    setTableWidth(box.clientWidth)
+    if (typeof ResizeObserver === 'undefined') return
     const observer = new ResizeObserver(() => setTableWidth(box.clientWidth))
     observer.observe(box)
     return () => observer.disconnect()
@@ -170,10 +186,14 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   const current = Math.min(page, pages)
   const shown = sorted.slice((current - 1) * PER_PAGE, current * PER_PAGE)
   // Numbers start with the largest first, text from A.
+  // A first pick of the default column, while its order isn't shown yet, shows it as it is.
   const sortBy = (key: SortKey) => {
-    setSort({ key, desc: sort.key === key ? !sort.desc : COLUMNS.find(c => c.key === key)?.numeric ?? false })
+    if (sortShown || sort.key !== key) setSort({ key, desc: sort.key === key ? !sort.desc : COLUMNS.find(c => c.key === key)?.numeric ?? false })
+    setSortShown(true)
     setPage(1)
   }
+  const resetSort = () => { setSort(DEFAULT_SEARCH_SORT); setSortShown(false); setPage(1) }
+  const marked = (key: SortKey) => sortShown && sort.key === key
 
   const sortLabel = COLUMNS.find(c => c.key === sort.key)?.label ?? ''
   const arrow = sort.desc ? '↓' : '↑'
@@ -204,9 +224,10 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
     onToggle: (key: SortKey) => { if (key !== 'fileName') toggleColumn(key as ResizableKey) },
     onMove: (key: SortKey, target: SortKey) => setOrder(moveInOrder(order, key, target)),
   }
-  const resetColumns = () => { setHidden(DEFAULT_SEARCH_HIDDEN); setWidths({}); saveSearchWidths({}); setOrder([...SEARCH_SORT_KEYS]) }
+  // Puts the sort back too, as on the torrent list.
+  const resetColumns = () => { setHidden(DEFAULT_SEARCH_HIDDEN); setWidths({}); saveSearchWidths({}); setOrder([...SEARCH_SORT_KEYS]); resetSort() }
   // Nothing to reset: Reset columns is greyed out.
-  const columnsDefault = Object.keys(widths).length === 0 && order.join() === SEARCH_SORT_KEYS.join()
+  const columnsDefault = !sortShown && Object.keys(widths).length === 0 && order.join() === SEARCH_SORT_KEYS.join()
     && hidden.length === DEFAULT_SEARCH_HIDDEN.length && hidden.every(key => DEFAULT_SEARCH_HIDDEN.includes(key))
 
   // In the page's header, like the torrent list's buttons.
@@ -243,11 +264,11 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
             <DropdownMenuSeparator />
             {COLUMNS.map(c => (
               <DropdownMenuItem key={c.key} onClick={() => sortBy(c.key)}>
-                {c.label} {sort.key === c.key && arrow}
+                {c.label} {marked(c.key) && arrow}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled={sort.key === DEFAULT_SEARCH_SORT.key && sort.desc === DEFAULT_SEARCH_SORT.desc} onClick={() => { setSort(DEFAULT_SEARCH_SORT); setPage(1) }}>
+            <DropdownMenuItem disabled={!sortShown} onClick={resetSort}>
               <RotateCcw />{t('Reset sorting')}
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -259,27 +280,43 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
     </>
   )
 
+  // Its text and arrows line up with the first column's text: in the table, in the cards (12px in
+  // from their border), or below them, past the border.
+  // The count and pages, always in view below the results: below what scrolls in the frame, at the
+  // bottom of the table, or kept above the tab bar below the cards.
+  const pageBar = sorted.length > 0 ? (
+    <div className="flex items-center justify-between gap-2 text-xs">
+      <span className="text-muted-foreground">{t('{from}-{to} of {total}', { from: (current - 1) * PER_PAGE + 1, to: Math.min(current * PER_PAGE, sorted.length), total: sorted.length })}</span>
+      {pages > 1 && (
+        <span className="flex items-center gap-2">
+          <Button variant="outline" size="icon-xs" className="size-7 shadow-none" aria-label={t('Previous page')} disabled={current === 1} onClick={() => setPage(current - 1)}><ChevronLeft className="size-3.5 rtl:rotate-180" /></Button>
+          <span className="tabular-nums">{current} / {pages}</span>
+          <Button variant="outline" size="icon-xs" className="size-7 shadow-none" aria-label={t('Next page')} disabled={current === pages} onClick={() => setPage(current + 1)}><ChevronRight className="size-3.5 rtl:rotate-180" /></Button>
+        </span>
+      )}
+    </div>
+  ) : null
+
   const placedToolbar = toolbarSlot ? createPortal(toolbar, toolbarSlot) : <div className="flex justify-end gap-1">{toolbar}</div>
   // Before a search, only the buttons.
   if (results.length === 0) return placedToolbar
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2 frame:min-h-0">
       {placedToolbar}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">{sorted.length === results.length ? t('{count} results', { count: results.length }) : t('{length} of {total} results', { length: sorted.length, total: results.length })}</span>
-      </div>
 
       {/* Filters are added and listed in the sidebar; the table also filters from its titles. */}
 
       {sorted.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">{t('No results match these filters')}</p>}
 
-      <div ref={frame} className={cn('rounded-xl border bg-card max-sm:-mx-2', (!showTable || sorted.length === 0) && 'hidden')}>
+      {/* Outside the frame as tall as the screen below the search box (2.25rem and its 1rem gap),
+          down to where the torrent table ends, so only the rows scroll. */}
+      <div ref={frame} className={cn('flex min-h-0 flex-col rounded-xl border bg-card max-sm:-mx-2 window-scroll:-mb-[calc(1rem-var(--selection-bar-gap,0.25rem))] window-scroll:max-h-[calc(100dvh-var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))-var(--bottom-nav-height,0px)-var(--selection-bar-gap,0.25rem)-4.25rem)]', (!showTable || sorted.length === 0) && 'hidden')}>
         <div
           ref={head}
           // Only the titles' own wheel: the right-click menu's bubbles here through React too.
           onWheel={(e) => { const dx = e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX; if (dx && scroller.current && e.currentTarget.contains(e.target as Node)) scroller.current.scrollLeft += dx }}
-          className="sticky top-(--sticky-top) z-20 overflow-hidden rounded-t-xl border-b bg-card"
+          className="shrink-0 overflow-hidden rounded-t-xl border-b bg-card"
         >
           <table className="table-fixed text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
             {colgroup}
@@ -295,10 +332,10 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
                         <button
                           type="button" onClick={() => sortBy(c.key)} onKeyDown={(e) => drag.onTitleKey(e, c.key)}
                           title={t('Sort by {label}. Drag to move, or press Alt and an arrow key.', { label: c.label })}
-                          className={cn('flex min-w-0 flex-1 cursor-grab items-center gap-1 hover:text-foreground active:cursor-grabbing', sort.key === c.key && 'text-foreground')}
+                          className={cn('flex min-w-0 flex-1 cursor-grab items-center gap-1 hover:text-foreground active:cursor-grabbing', marked(c.key) && 'text-foreground')}
                         >
                           <span className="truncate">{c.label}</span>
-                          {sort.key === c.key && (sort.desc ? <ArrowDown className="size-3.5 shrink-0" /> : <ArrowUp className="size-3.5 shrink-0" />)}
+                          {marked(c.key) && (sort.desc ? <ArrowDown className="size-3.5 shrink-0" /> : <ArrowUp className="size-3.5 shrink-0" />)}
                         </button>
                         <ColumnFilterButton target={targets.get(c.key)!} filter={filters[c.key]} onChange={(filter) => setFilter(c.key, filter)} />
                       </div>
@@ -321,12 +358,13 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
             </ContextMenu>
           </table>
         </div>
-        <div ref={scroller} onScroll={syncScroll} className="overflow-x-auto overscroll-x-none rounded-b-xl">
+        <div ref={scroller} onScroll={syncScroll} className="min-h-0 overflow-auto overscroll-x-none rounded-b-xl">
           <table className="table-fixed text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
             {colgroup}
             <tbody>
               {shown.map(result => (
-                <tr key={`${result.fileUrl}|${result.descrLink}`} className="cursor-pointer border-b last:border-0 hover:bg-muted/50" onClick={() => result.fileUrl && onAdd(result)}>
+                // Only its add button asks to add it, so a click to read or select a name doesn't.
+                <tr key={`${result.fileUrl}|${result.descrLink}`} className="border-b last:border-0 hover:bg-muted/50">
                   {visible.map(c => (
                     <td key={c.key} className={cn('truncate px-2 py-1.5 whitespace-nowrap', c.className)} title={c.key === 'fileName' ? result.fileName : undefined}>
                       {/* Numbers, sizes and dates read left to right, also in a right-to-left language. */}
@@ -340,10 +378,15 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
             </tbody>
           </table>
         </div>
+        {/* Below the rows, so it stays in view while they scroll. */}
+        {!framed && pageBar && <div className={cn('shrink-0 border-t', PAGE_BAR_IN_TABLE)}>{pageBar}</div>}
       </div>
 
       {/* Laid out like the torrent cards: a grid on wide screens. */}
-      <ul className={cn('grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3', showTable && 'hidden')}>
+      {/* Scrolled on their own in the frame, with room for the cards' shadows. Placed, so hidden
+          labels in the cards are placed in it, not in the page, which they'd make scroll. */}
+      <div className={cn('relative frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1', showTable && 'hidden')}>
+      <ul className="grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3">
         {shown.map(result => (
           <li key={`${result.fileUrl}|${result.descrLink}`} className="flex items-start gap-2 rounded-xl border bg-card px-3 py-2.5">
             <button type="button" className="min-w-0 flex-1 text-start" onClick={() => result.fileUrl && onAdd(result)}>
@@ -357,17 +400,12 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
           </li>
         ))}
       </ul>
+      </div>
+      {/* At the window's bottom even below a short list, level with the sidebar's Logout. */}
+      {framed && pageBar && <div ref={holdWheel} className={cn('mt-auto shrink-0', showTable ? PAGE_BAR_BELOW_TABLE : 'px-[calc(0.75rem+1px)]')}>{pageBar}</div>}
+      {/* After the last result, outside the frame, as wide as the cards. */}
+      {!framed && !showTable && pageBar && <div className="glass-bar mb-[var(--toolbar-room,0px)] rounded-xl border px-3 py-1.5 max-sm:-mx-2">{pageBar}</div>}
 
-      {pages > 1 && (
-        <div className="flex items-center justify-between px-2 text-sm">
-          <span className="text-muted-foreground">{t('{from}-{to} of {total}', { from: (current - 1) * PER_PAGE + 1, to: Math.min(current * PER_PAGE, sorted.length), total: sorted.length })}</span>
-          <span className="flex items-center gap-2">
-            <Button variant="outline" size="sm" aria-label={t('Previous page')} disabled={current === 1} onClick={() => setPage(current - 1)}><ChevronLeft className="size-4" /></Button>
-            <span className="tabular-nums">{current} / {pages}</span>
-            <Button variant="outline" size="sm" aria-label={t('Next page')} disabled={current === pages} onClick={() => setPage(current + 1)}><ChevronRight className="size-4" /></Button>
-          </span>
-        </div>
-      )}
     </div>
   )
 }

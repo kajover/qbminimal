@@ -49,7 +49,9 @@ function PagesMenu({ page, onNavigate }: { page: PageId; onNavigate: (page: Page
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative max-md:size-8" aria-label={notes.length ? `${t('Menu')}: ${notes.map(note => note.label).join(', ')}` : t('Menu')} title={t('Menu')} onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }}>
-          <Menu className="size-5" />
+          {/* A pixel lower: its middle line then meets the middle of the title's lowercase letters, not
+              of its capitals, so the two read as one line. */}
+          <Menu className="size-5 translate-y-px" />
           {notes[0] && <span aria-hidden className={cn('absolute end-0.5 top-0.5 size-2.5 rounded-full ring-2 ring-background', notes[0].dot)} />}
         </Button>
       </DropdownMenuTrigger>
@@ -66,6 +68,9 @@ function PagesMenu({ page, onNavigate }: { page: PageId; onNavigate: (page: Page
     </DropdownMenu>
   )
 }
+
+// Pages that fill the frame's height, so only their lists scroll, not the page.
+const FILLS_FRAME = new Set<string>(['torrents', 'search', 'statistics', 'rss', 'settings'])
 
 // The phone tab bar's own height, as --nav-bar-height (index.css adds its gap above the home
 // indicator to make --bottom-nav-height), and the header's, as --header-height. The page scrolls
@@ -276,7 +281,7 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
     // In the frame (from the md width, or wherever scrollbars take room) the window holds still:
     // the header spans it on top and only the area below scrolls, so its scrollbar starts under the
     // header and never changes the header's width.
-    <div style={{ '--sidebar-width': `${sidebarMeasured}px` } as CSSProperties} className="min-h-screen bg-background max-md:overflow-x-clip frame:flex frame:h-dvh frame:min-h-0 frame:flex-col frame:overflow-hidden">
+    <div style={{ '--sidebar-width': `${sidebarMeasured}px` } as CSSProperties} className="min-h-dvh bg-background max-md:overflow-x-clip frame:flex frame:h-dvh frame:min-h-0 frame:flex-col frame:overflow-hidden">
       {/* Fixed where the window scrolls: iPhone Safari stops drawing a sticky header while the page
           is pulled past its end, leaving an empty strip. The page leaves its height free at the
           top instead. Not a transform, which would hold the selection bar fixed inside it. */}
@@ -305,12 +310,13 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
           <div ref={sidebarBox} className={cn('relative z-35 hidden h-full shrink-0', menuBar && 'md:flex')}>
             {/* The header's room at the start, so the pages line up under the menu button. */}
             {sidebarShown && (
-              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto pt-2 pe-2 pb-4 ps-[calc(1rem+var(--page-scrollbar,0px))]">
+              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto pt-2 pe-2 pb-3 ps-[calc(1rem+var(--page-scrollbar,0px))]">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{MAIN_PAGES.map(navButton)}</nav>
                 <div className="mt-2 flex flex-col gap-1 border-t pt-2">
                   {EXTRA_PAGES.map(navButton)}
                 </div>
-                {/* At the bottom and quieter, apart from the pages. */}
+                {/* At the bottom and quieter, apart from the pages. The sidebar's bottom room puts its
+                    text on the same line as that of the pages bar below Torrents and Search. */}
                 <Button variant="ghost" className="mt-auto w-full justify-start gap-2 overflow-hidden text-muted-foreground" onClick={() => void signOut()}>
                   <LogOut className="size-4" />
                   <span className="truncate">{t('Logout')}</span>
@@ -340,8 +346,9 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
               scrollbar is on the left right to left. */}
           <main id={PAGE_SCROLL_ID} className={cn('min-w-0 flex-1 frame:h-full frame:overflow-y-auto frame:[scrollbar-gutter:stable] pt-4 window-scroll:pt-[calc(var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))+1rem)] pb-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] max-md:pb-[calc(var(--bottom-nav-height,5rem)+1rem)]', !sidebarOpen && 'frame:ltr:pl-[calc(max(1rem,env(safe-area-inset-left))+var(--page-scrollbar,0px))] frame:rtl:pr-[calc(max(1rem,env(safe-area-inset-right))+var(--page-scrollbar,0px))]')}>
             {/* The torrent list and search results take the whole width; the other pages are easier to read narrower. */}
-            {/* Sized for the page on screen, which can trail the tapped tab by a few frames. */}
-            <div className={cn(shownPage !== 'torrents' && shownPage !== 'search' && 'mx-auto w-full max-w-4xl')}>
+            {/* Sized for the page on screen, which can trail the tapped tab by a few frames. Some fill
+                the frame's height, so only their lists scroll. */}
+            <div className={cn(shownPage !== 'torrents' && shownPage !== 'search' && 'mx-auto w-full max-w-4xl', FILLS_FRAME.has(shownPage) && 'frame:h-full')}>
               <HeaderSlot value={slot ? { element: slot, whole: wide } : null}>{children}</HeaderSlot>
             </div>
           </main>

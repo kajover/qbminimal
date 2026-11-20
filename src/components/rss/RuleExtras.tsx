@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
-import { Eye, Pencil, TextCursorInput } from 'lucide-react'
+import { Eye, MoreVertical, Pencil, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
@@ -80,17 +81,25 @@ function RenameDialog({ name, existing, onClose }: { name: string; existing: str
   )
 }
 
-// Preview and rename buttons for one rule in the list.
-export function RuleExtras({ name, existing }: { name: string; existing: string[] }) {
+// One rule's actions behind a menu, as for each feed: its matches, rename, edit and delete.
+export function RuleMenu({ name, existing, onEdit, onDelete }: { name: string; existing: string[]; onEdit: () => void; onDelete: () => void }) {
   const [open, setOpen] = useState<'matches' | 'rename' | null>(null)
   return (
     <>
-      <Button variant="ghost" size="icon" className="size-8" aria-label={t('Show matches for {name}', { name })} title={t('Show matching articles')} onClick={() => setOpen('matches')}>
-        <Eye className="size-4" />
-      </Button>
-      <Button variant="ghost" size="icon" className="size-8" aria-label={t('Rename {name}', { name })} title={t('Rename')} onClick={() => setOpen('rename')}>
-        <TextCursorInput className="size-4" />
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="size-7 shrink-0" aria-label={t('Actions for {label}', { label: name })} title={t('Actions')}>
+            <MoreVertical className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setOpen('matches')}><Eye className="size-4" />{t('Show matching articles')}</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOpen('rename')}><Pencil className="size-4" />{t('Rename')}</DropdownMenuItem>
+          {/* Not the pencil, which renames, as everywhere else. */}
+          <DropdownMenuItem onClick={onEdit}><SlidersHorizontal className="size-4" />{t('Edit')}</DropdownMenuItem>
+          <DropdownMenuItem variant="destructive" onClick={onDelete}><Trash2 className="size-4" />{t('Delete')}</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       {open === 'matches' && <MatchesDialog name={name} onClose={() => setOpen(null)} />}
       {open === 'rename' && <RenameDialog name={name} existing={existing} onClose={() => setOpen(null)} />}
     </>

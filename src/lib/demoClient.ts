@@ -71,11 +71,17 @@ const SEED: DemoTorrent[] = [
   { name: 'Big Buck Bunny (2008) [4K]', size: 680 * MiB, progress: 0, down: 0, up: 0, category: 'Movies', tags: 'open-movie', tracker: 'udp://tracker.opentrackr.org:1337/announce', addedDaysAgo: 0.01, ratio: 0, stopped: true },
 ]
 
-// The seed torrents and, when the address asks for more (?torrents=40), for trying long lists,
-// more like them under incognito mode's believable names and sizes. Past those, numbered copies.
+// 200 torrents, so the demo shows the lists as they look in real use: the seed torrents, more like
+// them under incognito mode's believable names and sizes, and past those numbered copies. The
+// address can ask for another number (?torrents=40), down to just the seed torrents.
+const DEMO_COUNT = (() => {
+  const asked = new URLSearchParams(globalThis.location?.search ?? '').get('torrents')
+  const wanted = asked === null ? 200 : Number(asked)
+  return Number.isFinite(wanted) ? Math.min(Math.max(wanted, SEED.length), 2000) : 200
+})()
+
 function demoTorrents(): DemoTorrent[] {
-  const wanted = Number(new URLSearchParams(globalThis.location?.search ?? '').get('torrents'))
-  const count = Number.isFinite(wanted) && wanted > SEED.length ? Math.min(wanted, 2000) : SEED.length
+  const count = DEMO_COUNT
   return Array.from({ length: count }, (_, i) => {
     const seed = SEED[i % SEED.length]
     const extra = i - SEED.length
@@ -144,21 +150,26 @@ async function samplePreferences(): Promise<Record<string, unknown>> {
   return { ...prefs, save_path: '/downloads', alternative_webui_enabled: true, alternative_webui_path: '/opt/qbminimal', locale: 'en', web_ui_username: 'demo', resolve_peer_countries: true }
 }
 
+// With a long torrent list (as by default) many feeds, articles and download rules too; with just a
+// few torrents (?torrents=13) two feeds of four articles.
+const MANY = DEMO_COUNT > 40
 const FEEDS: { feed: RSSFeed; articles: RSSItem[] }[] = [
   { name: 'Distro releases', url: 'https://example.org/distros.xml' },
   { name: 'Open movies', url: 'https://example.org/movies.xml' },
+  ...(MANY ? Array.from({ length: 30 }, (_, i) => ({ name: `Feed ${i + 3}`, url: `https://example.org/feed-${i + 3}.xml` })) : []),
 ].map(({ name, url }, index) => {
   const uid = `{demo-feed-${index}}`
-  const articles: RSSItem[] = Array.from({ length: 4 }, (_, n) => ({
+  const articles: RSSItem[] = Array.from({ length: MANY ? 80 : 4 }, (_, n) => ({
     id: `${uid}-${n}`, feedUID: uid, title: `${name}: item ${n + 1}`, torrentUrl: `https://example.org/${index}/${n}.torrent`,
     date: new Date((NOW - n * 86400) * 1000).toUTCString(), isRead: n > 1,
   }))
   return { feed: { uid, path: name, url, title: name, unreadCount: articles.filter(a => !a.isRead).length, hasError: false }, articles }
 })
 
-const SEARCH_HITS: SearchResult[] = SEED.map((t, i) => ({
+// One result per sample torrent, so the long torrent list also gives a long list of results.
+const SEARCH_HITS: SearchResult[] = demoTorrents().map((t, i) => ({
   fileName: t.name, fileUrl: `https://example.org/download/${i}.torrent`, fileSize: t.size,
-  nbSeeders: 200 - i * 30, nbLeechers: 10 + i, siteUrl: i % 2 ? 'https://example.org' : 'https://example.net', descrLink: `https://example.org/view/${i}`,
+  nbSeeders: Math.max(200 - i * 30, 1), nbLeechers: 10 + i, siteUrl: i % 2 ? 'https://example.org' : 'https://example.net', descrLink: `https://example.org/view/${i}`,
   engineName: i % 2 ? 'demo' : 'sample', pubDate: NOW - (i + 1) * 86_400,
 }))
 
@@ -171,7 +182,7 @@ class DemoClient implements ApiClient {
   private limits = { down: 0, up: 0 }
   private sessionPaused = false
   private searches: { id: number; endsAt: number }[] = []
-  private rules: Record<string, RSSRule> = {}
+  private rules: Record<string, RSSRule> = MANY ? Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`Rule ${i + 1}`, { enabled: i % 3 > 0, mustContain: `show ${i + 1}` } as RSSRule])) : {}
   private creatorTasks: TorrentCreatorTask[] = []
   private plugins: SearchPlugin[] = [
     { name: 'demo', fullName: 'Demo search', version: '1.0', enabled: true, supportedCategories: [{ id: 'all', name: 'All categories' }, { id: 'movies', name: 'Movies' }, { id: 'tv', name: 'TV shows' }, { id: 'software', name: 'Software' }] },

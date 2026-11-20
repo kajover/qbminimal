@@ -92,9 +92,10 @@ export function formatEta(seconds: number): string {
   return `${Math.floor(seconds / size)}${suffix}`
 }
 
-// Download green and upload blue, in the list, the cards and the header alike.
-export const DOWN_SPEED_COLOR = 'tint text-green-600 dark:text-green-500'
-export const UP_SPEED_COLOR = 'tint text-blue-600 dark:text-blue-400'
+// Download blue and upload green, as the Downloading and Seeding statuses are, in the list, the
+// cards and the details alike.
+export const DOWN_SPEED_COLOR = 'tint text-blue-600 dark:text-blue-400'
+export const UP_SPEED_COLOR = 'tint text-green-600 dark:text-green-500'
 
 
 // Seeds or peers as "connected (in the swarm)", the way qBittorrent shows them.

@@ -4,10 +4,11 @@ import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import type { TorrentList } from '@/hooks/useTorrentList'
-import { DEFAULT_LIST_SETTINGS, type SortField } from '@/lib/listSettings'
+import type { SortField } from '@/lib/listSettings'
 import { DEFAULT_COLUMN_LAYOUT, getColumn, isDefaultLayout, moveColumn, toggleColumn, type ColumnLayout } from '@/lib/torrentColumns'
 import { ColumnMenuItems } from '@/components/ColumnMenuItems'
 import { t } from '@/i18n'
+import { ROOM_FOR_HEADER_SEARCH } from '@/lib/pageScroll'
 
 // What a card shows, or matters most, for sorting cards. The table sorts from its headers.
 const CARD_SORTS: SortField[] = ['priority', 'name', 'state', 'progress', 'size', 'dlspeed', 'upspeed', 'eta', 'ratio', 'num_seeds', 'num_leechs', 'added_on', 'completion_on', 'category']
@@ -57,8 +58,9 @@ export function QuickSearchField({ list, wide, onClose }: { list: TorrentList; w
 }
 
 function QuickSearch({ list, open, onOpenChange }: { list: TorrentList; open: boolean; onOpenChange: (open: boolean) => void }) {
-  const wide = useMediaQuery('(min-width: 1200px)')
-  if (wide) return <QuickSearchField list={list} wide />
+  // In the header wherever it fits beside the buttons.
+  const roomy = useMediaQuery(ROOM_FOR_HEADER_SEARCH)
+  if (roomy) return <QuickSearchField list={list} wide />
   return (
     <Button variant={open ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={t('Search')} title={t('Search')} aria-expanded={open} aria-controls="torrent-search" onClick={() => onOpenChange(!open)}>
       <Search className="size-4" />
@@ -69,6 +71,8 @@ function QuickSearch({ list, open, onOpenChange }: { list: TorrentList; open: bo
 
 export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen, onSearchOpenChange, columns, onColumnsChange, onAdd }: TorrentToolbarProps) {
   const arrow = list.sort.direction === 'asc' ? '↑' : '↓'
+  // The default order, by queue position, isn't marked in the sort menu until it's picked.
+  const defaultSort = !list.sortShown
   return (
     <>
       <QuickSearch list={list} open={searchOpen} onOpenChange={onSearchOpenChange} />
@@ -86,7 +90,7 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen,
             <DropdownMenuSeparator />
             <ColumnMenuItems order={columns.order} shown={id => !columns.hidden.includes(id)} locked="name" label={id => getColumn(id).label} onToggle={id => onColumnsChange(toggleColumn(columns, id))} onMove={(id, target) => onColumnsChange(moveColumn(columns, id, target))} Item={DropdownMenuCheckboxItem} />
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled={isDefaultLayout(columns) && list.sort.field === DEFAULT_LIST_SETTINGS.sortField && list.sort.direction === DEFAULT_LIST_SETTINGS.sortDirection} onClick={() => { onColumnsChange(DEFAULT_COLUMN_LAYOUT); list.resetSort() }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
+            <DropdownMenuItem disabled={isDefaultLayout(columns) && defaultSort} onClick={() => { onColumnsChange(DEFAULT_COLUMN_LAYOUT); list.resetSort() }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
@@ -102,12 +106,12 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen,
             <DropdownMenuSeparator />
             {CARD_SORTS.map(field => (
               <DropdownMenuItem key={field} onClick={() => list.sortBy(field)}>
-                {getColumn(field).label} {list.sort.field === field && arrow}
+                {getColumn(field).label} {list.sort.field === field && !defaultSort && arrow}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
             {/* Back to qBittorrent's queue order. */}
-            <DropdownMenuItem disabled={list.sort.field === DEFAULT_LIST_SETTINGS.sortField && list.sort.direction === DEFAULT_LIST_SETTINGS.sortDirection} onClick={list.resetSort}>
+            <DropdownMenuItem disabled={defaultSort} onClick={list.resetSort}>
               <RotateCcw className="size-4" />{t('Reset sorting')}
             </DropdownMenuItem>
           </DropdownMenuContent>
