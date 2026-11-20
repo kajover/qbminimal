@@ -690,7 +690,6 @@
   "Wasted": "Zahozeno",
   "Yes": "Ano",
   "{part} of {whole}": "{part} z {whole}",
-  "More": "Více",
   "More actions": "Další akce",
   "Start": "Spustit",
   "{count} torrents": "Torrenty: {count}",
@@ -736,7 +735,6 @@
   "1 torrent": "1 torrent",
   "Clear filters": "Zrušit filtry",
   "Clear selection": "Zrušit výběr",
-  "Clear selection (Esc)": "Zrušit výběr (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Torrenty se nepodařilo načíst. Zkontrolujte připojení k qBittorrentu.",
   "Delete (Del)": "Smazat (Del)",
   "Loading torrents": "Načítání torrentů",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Označit vše jako přečtené?",
   "Every article in {name} is marked as read.": "Všechny články v {name} budou označeny jako přečtené.",
   "Add sections": "Sekce přidávání",
-  "{size} free": "{size} k dispozici"
+  "{size} free": "{size} k dispozici",
+  "Already added": "Už přidáno",
+  "Recheck the data?": "Zkontrolovat data znovu?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent znovu přečte všechna stažená data {count} {noun}, aby je zkontroloval. Do té doby nestahuje ani nesdílí."
 }

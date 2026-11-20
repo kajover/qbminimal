@@ -1,10 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { t } from '@/i18n'
+import { perLanguage, t } from '@/i18n'
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
 const MOD = isMac ? '⌘' : 'Ctrl'
 
-const GROUPS: { title: string; keys: [string[], string][] }[] = [
+const GROUPS = perLanguage((): { title: string; keys: [string[], string][] }[] => [
   {
     title: t('Mouse'),
     keys: [
@@ -47,13 +47,13 @@ const GROUPS: { title: string; keys: [string[], string][] }[] = [
       [['?'], t('Show this list')],
     ],
   },
-]
+])
 
 // The list of keys and clicks, in Settings > App and in the window ? opens on the torrent list.
 export function ShortcutsList() {
   return (
     <>
-      {GROUPS.map(group => (
+      {GROUPS().map(group => (
         <section key={group.title} className="space-y-1.5">
           <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{group.title}</h3>
           <dl className="space-y-1 text-sm">

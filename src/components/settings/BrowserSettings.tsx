@@ -13,7 +13,8 @@ const canHandleMagnets = () => window.isSecureContext && typeof navigator.regist
 
 function Row({ icon, title, description, children }: { icon: ReactNode; title: string; description: string; children: ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
+    // A button that wraps below the text stays at the row's end (the left in a right-to-left language).
+    <div className="flex flex-wrap items-center justify-between gap-3 [&>:nth-child(2)]:ms-auto">
       <div className="flex min-w-0 flex-1 gap-3">
         <span className="mt-0.5 text-muted-foreground">{icon}</span>
         <div className="min-w-0">

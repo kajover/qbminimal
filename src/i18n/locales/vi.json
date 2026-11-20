@@ -690,7 +690,6 @@
   "Wasted": "Lãng phí",
   "Yes": "Đồng ý",
   "{part} of {whole}": "{part}/{whole}",
-  "More": "Thêm",
   "More actions": "Thêm thao tác",
   "Start": "Chạy",
   "{count} torrents": "{count} torrent",
@@ -736,7 +735,6 @@
   "1 torrent": "1 torrent",
   "Clear filters": "Xóa bộ lọc",
   "Clear selection": "Bỏ chọn",
-  "Clear selection (Esc)": "Bỏ chọn (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Không thể tải torrent. Hãy kiểm tra kết nối đến qBittorrent.",
   "Delete (Del)": "Xóa (Del)",
   "Loading torrents": "Đang tải torrent",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Đánh dấu tất cả đã đọc?",
   "Every article in {name} is marked as read.": "Mọi bài viết trong {name} được đánh dấu đã đọc.",
   "Add sections": "Các mục thêm",
-  "{size} free": "{size} trống"
+  "{size} free": "{size} trống",
+  "Already added": "Đã thêm",
+  "Recheck the data?": "Kiểm tra lại dữ liệu?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent đọc lại toàn bộ dữ liệu đã tải của {count} {noun} để kiểm tra. Trong lúc đó, nó không tải xuống và không chia sẻ."
 }

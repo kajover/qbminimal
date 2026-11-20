@@ -7,7 +7,7 @@ import type { Torrent } from '@/types'
 import { t } from '@/i18n'
 
 // Actions that need a value first open a small dialog.
-export type BulkPrompt = 'category' | 'addTags' | 'removeTags' | 'location' | 'limits' | 'shareLimits' | 'autoOn' | 'queuePosition' | 'comment'
+export type BulkPrompt = 'category' | 'addTags' | 'removeTags' | 'location' | 'limits' | 'shareLimits' | 'autoOn' | 'recheck' | 'queuePosition' | 'comment'
 
 export interface MenuEntry {
   // Stable, for remembering which actions are pinned to the selection bar.
@@ -86,7 +86,8 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
       icons: true,
       entries: [
         { ...run('forceStart', t('Force start'), h => qbitClient.setForceStart(h, !allForced), allForced ? t('Force start off') : t('Force start on'), t('Failed to change force start'), Zap), checked: allForced },
-        run('recheck', t('Recheck'), h => qbitClient.recheckTorrents(h), t('Recheck started'), t('Failed to start recheck'), FileCheck),
+        // Always asked first: it reads every file again.
+        prompt('recheck', t('Recheck'), 'recheck', FileCheck),
         run('reannounce', t('Reannounce'), h => qbitClient.reannounceTorrents(h), t('Reannounce sent'), t('Failed to reannounce'), Megaphone),
       ],
     },

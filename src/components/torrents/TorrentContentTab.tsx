@@ -18,7 +18,7 @@ import { formatBytes } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import type { TorrentFile } from '@/types'
-import { t } from '@/i18n'
+import { perLanguage, t } from '@/i18n'
 
 const INDENT = 16
 // Names from A, folders first, until another order is picked.
@@ -32,7 +32,7 @@ const SIZE_COL = 'w-28 shrink-0 truncate tabular-nums max-sm:hidden'
 const PRIORITY_COL = 'w-40 shrink-0'
 
 // qBittorrent's file priorities, as its own file list offers them.
-const PRIORITIES: [number, string][] = [[0, t("Don't download")], [1, t('Normal')], [6, t('High')], [7, t('Maximum')]]
+const PRIORITIES = perLanguage((): [number, string][] => [[0, t("Don't download")], [1, t('Normal')], [6, t('High')], [7, t('Maximum')]])
 const MIXED = -1
 
 // Finished files can be saved straight from qBittorrent 5.3. Otherwise the button explains why not.
@@ -167,7 +167,7 @@ export function TorrentContentTab({ hash, savePath }: { hash: string; savePath?:
       onChange={(e) => void prioritize(indexes, Number(e.target.value))}
     >
       {value === MIXED && <option value={MIXED} disabled>{t('Mixed')}</option>}
-      {PRIORITIES.map(([priority, label]) => <option key={priority} value={priority}>{label}</option>)}
+      {PRIORITIES().map(([priority, label]) => <option key={priority} value={priority}>{label}</option>)}
     </NativeSelect>
   )
   const wantBox = (name: string, state: boolean | 'indeterminate', indexes: number[]) => (

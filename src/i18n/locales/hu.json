@@ -690,7 +690,6 @@
   "Wasted": "Elpazarolva",
   "Yes": "Igen",
   "{part} of {whole}": "{part} / {whole}",
-  "More": "Továbbiak",
   "More actions": "További műveletek",
   "Start": "Indítás",
   "{count} torrents": "{count} torrent",
@@ -736,7 +735,6 @@
   "1 torrent": "1 torrent",
   "Clear filters": "Szűrők törlése",
   "Clear selection": "Kijelölés megszüntetése",
-  "Clear selection (Esc)": "Kijelölés megszüntetése (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "A torrentek nem tölthetők be. Ellenőrizd a kapcsolatot a qBittorrenttel.",
   "Delete (Del)": "Törlés (Del)",
   "Loading torrents": "Torrentek betöltése",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Mindet olvasottnak jelölöd?",
   "Every article in {name} is marked as read.": "A(z) {name} minden cikke olvasottként lesz megjelölve.",
   "Add sections": "Hozzáadási szakaszok",
-  "{size} free": "{size} szabad"
+  "{size} free": "{size} szabad",
+  "Already added": "Már hozzáadva",
+  "Recheck the data?": "Újraellenőrzöd az adatokat?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "A qBittorrent ellenőrzéshez újra beolvassa {count} {noun} összes letöltött adatát. Addig nem tölt le és nem oszt meg."
 }

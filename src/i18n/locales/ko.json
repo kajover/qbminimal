@@ -690,7 +690,6 @@
   "Wasted": "낭비됨",
   "Yes": "예",
   "{part} of {whole}": "{whole} 중 {part}",
-  "More": "더 보기",
   "More actions": "추가 작업",
   "Start": "시작",
   "{count} torrents": "토렌트 {count}개",
@@ -736,7 +735,6 @@
   "1 torrent": "토렌트 1개",
   "Clear filters": "필터 지우기",
   "Clear selection": "선택 해제",
-  "Clear selection (Esc)": "선택 해제 (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "토렌트를 불러오지 못했습니다. qBittorrent 연결을 확인하세요.",
   "Delete (Del)": "삭제 (Del)",
   "Loading torrents": "토렌트 불러오는 중",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "모두 읽음으로 표시할까요?",
   "Every article in {name} is marked as read.": "{name}의 모든 글이 읽음으로 표시됩니다.",
   "Add sections": "추가 섹션",
-  "{size} free": "{size} 남음"
+  "{size} free": "{size} 남음",
+  "Already added": "이미 추가됨",
+  "Recheck the data?": "데이터를 다시 검사할까요?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent가 확인을 위해 {count}개 {noun}의 다운로드한 데이터를 모두 다시 읽습니다. 그동안에는 다운로드하거나 시드하지 않습니다."
 }

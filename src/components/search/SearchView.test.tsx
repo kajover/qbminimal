@@ -79,6 +79,8 @@ describe('search', () => {
     expect(api.startSearch).toHaveBeenCalledWith('ubuntu', 'enabled', 'all')
     await screen.findAllByText('ubuntu-desktop.iso')
 
+    // Plugins and categories start folded.
+    await userEvent.click(within(sidebar).getByRole('button', { name: /^Plugins/, expanded: false }))
     // A plugin shows how many results it found, and picking it shows only those.
     const demo = within(sidebar).getByRole('checkbox', { name: /^Demo/ })
     expect(demo).toHaveTextContent('2')
@@ -87,6 +89,7 @@ describe('search', () => {
     await userEvent.click(within(sidebar).getByRole('button', { name: 'Clear the Plugins filter' }))
 
     // Picking a category searches again in it.
+    await userEvent.click(within(sidebar).getByRole('button', { name: /^Categories/, expanded: false }))
     await userEvent.click(within(sidebar).getByRole('checkbox', { name: /Movies/ }))
     await waitFor(() => expect(api.startSearch).toHaveBeenLastCalledWith('ubuntu', 'enabled', 'movies'))
   })
@@ -167,6 +170,23 @@ describe('search', () => {
 
     expect(await screen.findByRole('button', { name: 'Delete every search' })).toBeInTheDocument()
     expect(api.deleteSearch).not.toHaveBeenCalled()
+  })
+
+  it('replaces a kept search when the same one runs again, and keeps the others', async () => {
+    localStorage.setItem('qbminimal.keepSearches', 'on')
+    api.state.searches = [{ id: 6, status: 'Stopped', total: 3 }, { id: 7, status: 'Stopped', total: 3 }, { id: 8, status: 'Stopped', total: 3 }]
+    api.state.nextId = 9
+    localStorage.setItem('qbminimal.searchPatterns', JSON.stringify({
+      6: { pattern: 'debian', plugins: 'enabled', category: 'all' },
+      7: { pattern: 'ubuntu', plugins: 'enabled', category: 'all' },
+      8: { pattern: 'ubuntu', plugins: 'enabled', category: 'movies' },
+    }))
+    renderView()
+    await search()
+
+    await waitFor(() => expect(api.deleteSearch).toHaveBeenCalledWith(7))
+    expect(api.deleteSearch).toHaveBeenCalledTimes(1)
+    expect(Object.keys(JSON.parse(localStorage.getItem('qbminimal.searchPatterns')!))).toEqual(['6', '8', '9'])
   })
 
   it('opens another saved search while one runs, and stops the running one from its own button', async () => {

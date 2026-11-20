@@ -95,8 +95,15 @@ function demoTorrents(): DemoTorrent[] {
   })
 }
 
-// A stable fake hash per name, so the same torrent keeps its hash between refreshes.
+// A stable fake hash per name, so the same torrent keeps its hash between refreshes. Worked out
+// once per name: actions on thousands of torrents look each one up.
+const hashCache = new Map<string, string>()
 function fakeHash(name: string): string {
+  let known = hashCache.get(name)
+  if (!known) hashCache.set(name, known = computeHash(name))
+  return known
+}
+function computeHash(name: string): string {
   let h = 0x811c9dc5
   let out = ''
   for (let round = 0; out.length < 40; round++) {
@@ -192,11 +199,10 @@ class DemoClient implements ApiClient {
   private rid = 0
 
   private find = (hash: string) => this.torrents.find(t => fakeHash(t.name) === hash)
+  // One pass over the torrents, so changing thousands at once stays quick.
   private each(hashes: string[], change: (t: DemoTorrent) => void) {
-    for (const hash of hashes) {
-      const t = this.find(hash)
-      if (t) change(t)
-    }
+    const wanted = new Set(hashes)
+    for (const t of this.torrents) if (wanted.has(fakeHash(t.name))) change(t)
   }
 
   onUnauthorized(): void {}
@@ -325,14 +331,18 @@ class DemoClient implements ApiClient {
 
   async pauseTorrents(hashes: string[]) { this.each(hashes, t => { t.stopped = true }) }
   async resumeTorrents(hashes: string[]) { this.each(hashes, t => { t.stopped = false }) }
-  async deleteTorrents(hashes: string[]) { this.torrents = this.torrents.filter(t => !hashes.includes(fakeHash(t.name))) }
+  async deleteTorrents(hashes: string[]) {
+    const gone = new Set(hashes)
+    this.torrents = this.torrents.filter(t => !gone.has(fakeHash(t.name)))
+  }
   async recheckTorrents() {}
   async reannounceTorrents() {}
   // The queue is the unfinished torrents in list order; moving them reorders those places only.
   async moveInQueue(hashes: string[], move: QueueMove) {
     const slots = this.torrents.flatMap((t, i) => (t.progress < 1 ? [i] : []))
     const queue = slots.map(i => this.torrents[i])
-    const picked = (t: DemoTorrent) => hashes.includes(fakeHash(t.name))
+    const chosen = new Set(hashes)
+    const picked = (t: DemoTorrent) => chosen.has(fakeHash(t.name))
     if (move === 'top' || move === 'bottom') {
       const moving = queue.filter(picked)
       const rest = queue.filter(t => !picked(t))

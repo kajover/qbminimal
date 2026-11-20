@@ -8,10 +8,10 @@ import { t } from '@/i18n'
 
 // qBittorrent's file priorities: 0 skips the file.
 const FILE_PRIORITIES = [
-  { value: 1, label: t('Normal') },
-  { value: 6, label: t('High') },
-  { value: 7, label: t('Maximum') },
-  { value: 0, label: t('Don\'t download') },
+  { value: 1, get label() { return t('Normal') } },
+  { value: 6, get label() { return t('High') } },
+  { value: 7, get label() { return t('Maximum') } },
+  { value: 0, get label() { return t('Don\'t download') } },
 ]
 
 interface Props {

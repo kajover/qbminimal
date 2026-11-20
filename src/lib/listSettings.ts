@@ -16,8 +16,8 @@ export interface ListSettings {
 }
 
 // Sorted by queue position (#), as qBittorrent sorts its list until you choose otherwise.
-// 100 at a time: the list scrolls them on wide screens.
-export const DEFAULT_LIST_SETTINGS: ListSettings = { sortField: 'priority', sortDirection: 'asc', view: 'auto', pageSize: 100 }
+// 20 at a time, a screenful, with the pages bar below.
+export const DEFAULT_LIST_SETTINGS: ListSettings = { sortField: 'priority', sortDirection: 'asc', view: 'auto', pageSize: 20 }
 
 const STORAGE_KEY = 'qbminimal.torrentList'
 // Settings saved before version 2 kept the old default sort by name, so that one is left behind.

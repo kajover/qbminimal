@@ -31,42 +31,43 @@ export interface ColumnDef {
   unsorted?: boolean
 }
 
-const col = (id: ColumnId, label: string, width: number, defaultVisible: boolean, extra: Partial<ColumnDef> = {}): ColumnDef =>
-  ({ id, label, width, minWidth: 48, defaultVisible, ...extra })
+// The label is read when it's shown, so it follows a change of language.
+const col = (id: ColumnId, label: () => string, width: number, defaultVisible: boolean, extra: Partial<ColumnDef> = {}): ColumnDef =>
+  Object.defineProperty({ id, width, minWidth: 48, defaultVisible, ...extra }, 'label', { get: label, enumerable: true }) as ColumnDef
 
 export const COLUMNS: ColumnDef[] = [
   // The queue position, headed # as in qBittorrent.
-  col('priority', t('Queue'), 44, true, { numeric: true, icon: ListOrdered, minWidth: 36 }),
-  col('name', t('Name'), 320, true, { minWidth: 120 }),
-  col('size', t('Size'), 90, true, { numeric: true }),
-  col('progress', t('Progress'), 140, true, { minWidth: 80 }),
+  col('priority', () => t('Queue'), 44, true, { numeric: true, icon: ListOrdered, minWidth: 36 }),
+  col('name', () => t('Name'), 320, true, { minWidth: 120 }),
+  col('size', () => t('Size'), 90, true, { numeric: true }),
+  col('progress', () => t('Progress'), 140, true, { minWidth: 80 }),
   // The state as an icon, named on hover. Status sorts and filters the same, so it does neither.
-  col('state_icon', t('Status icon'), 40, true, { icon: CircleDot, minWidth: 36, unsorted: true }),
-  col('state', t('Status'), 116, true, { minWidth: 80 }),
-  col('num_seeds', t('Seeds'), 88, true, { numeric: true }),
-  col('num_leechs', t('Peers'), 88, true, { numeric: true }),
-  col('dlspeed', t('Down speed'), 110, true, { numeric: true }),
-  col('upspeed', t('Up speed'), 110, true, { numeric: true }),
-  col('eta', t('ETA'), 72, true, { numeric: true }),
-  col('ratio', t('Ratio'), 72, true, { numeric: true }),
-  col('popularity', t('Popularity'), 88, true, { numeric: true }),
-  col('category', t('Category'), 130, true),
-  col('tags', t('Tags'), 150, false),
+  col('state_icon', () => t('Status icon'), 40, true, { icon: CircleDot, minWidth: 36, unsorted: true }),
+  col('state', () => t('Status'), 116, true, { minWidth: 80 }),
+  col('num_seeds', () => t('Seeds'), 88, true, { numeric: true }),
+  col('num_leechs', () => t('Peers'), 88, true, { numeric: true }),
+  col('dlspeed', () => t('Down speed'), 110, true, { numeric: true }),
+  col('upspeed', () => t('Up speed'), 110, true, { numeric: true }),
+  col('eta', () => t('ETA'), 72, true, { numeric: true }),
+  col('ratio', () => t('Ratio'), 72, true, { numeric: true }),
+  col('popularity', () => t('Popularity'), 88, true, { numeric: true }),
+  col('category', () => t('Category'), 130, true),
+  col('tags', () => t('Tags'), 150, false),
   // Dates always show whole: "2026-11-06 19:11" with a margin for wider fonts, even when a narrower
   // width was saved.
-  col('added_on', t('Added'), 160, true, { minWidth: 152 }),
-  col('completion_on', t('Completed on'), 160, false, { minWidth: 152 }),
-  col('tracker', t('Tracker'), 150, false),
-  col('downloaded', t('Downloaded'), 100, false, { numeric: true }),
-  col('uploaded', t('Uploaded'), 100, false, { numeric: true }),
-  col('amount_left', t('Remaining'), 100, false, { numeric: true }),
-  col('time_active', t('Time active'), 100, false, { numeric: true }),
-  col('seeding_time', t('Seeding time'), 104, false, { numeric: true }),
-  col('last_activity', t('Last activity'), 160, false, { minWidth: 152 }),
-  col('availability', t('Availability'), 96, false, { numeric: true }),
-  col('dl_limit', t('Down limit'), 100, false, { numeric: true }),
-  col('up_limit', t('Up limit'), 100, false, { numeric: true }),
-  col('save_path', t('Save path'), 200, false),
+  col('added_on', () => t('Added'), 160, true, { minWidth: 152 }),
+  col('completion_on', () => t('Completed on'), 160, false, { minWidth: 152 }),
+  col('tracker', () => t('Tracker'), 150, false),
+  col('downloaded', () => t('Downloaded'), 100, false, { numeric: true }),
+  col('uploaded', () => t('Uploaded'), 100, false, { numeric: true }),
+  col('amount_left', () => t('Remaining'), 100, false, { numeric: true }),
+  col('time_active', () => t('Time active'), 100, false, { numeric: true }),
+  col('seeding_time', () => t('Seeding time'), 104, false, { numeric: true }),
+  col('last_activity', () => t('Last activity'), 160, false, { minWidth: 152 }),
+  col('availability', () => t('Availability'), 96, false, { numeric: true }),
+  col('dl_limit', () => t('Down limit'), 100, false, { numeric: true }),
+  col('up_limit', () => t('Up limit'), 100, false, { numeric: true }),
+  col('save_path', () => t('Save path'), 200, false),
 ]
 
 const BY_ID = new Map(COLUMNS.map(def => [def.id, def]))
@@ -255,7 +256,7 @@ function filterValue(torrent: Torrent, id: ColumnId): number | string | string[]
 // The status icon has no filter of its own: Status filters the same.
 export const TORRENT_FILTER_COLUMNS: FilterColumn<Torrent>[] = COLUMNS.filter(def => def.id !== 'state_icon').map(def => ({
   id: def.id,
-  label: def.label,
+  get label() { return def.label },
   kind: FILTER_KINDS[def.id],
   value: (torrent: Torrent) => filterValue(torrent, def.id),
 }))

@@ -23,19 +23,21 @@ import { ShortcutsList } from '@/components/torrents/ShortcutsDialog'
 import { Switch } from '@/components/ui/switch'
 import { setDisplayOption, useDisplayOption, type DisplayOption } from '@/lib/displayOptions'
 import { chosenTextSize, setTextSize, TEXT_SIZES, type TextSize } from '@/lib/textSize'
-import { chosenLanguage, LANGUAGES, setLanguage, t, type LanguageChoice } from '@/i18n'
+import { changedLanguage, chosenLanguage, LANGUAGES, setLanguage, t, type LanguageChoice } from '@/i18n'
 import { FILL_PAGE } from '@/lib/pageScroll'
 
 // System is the default, so it comes first.
 const themeOptions: { value: Theme; label: string; icon: typeof Monitor }[] = [
-  { value: 'system', label: t('System'), icon: Monitor },
-  { value: 'light', label: t('Light'), icon: Sun },
-  { value: 'dark', label: t('Dark'), icon: Moon },
+  { value: 'system', get label() { return t('System') }, icon: Monitor },
+  { value: 'light', get label() { return t('Light') }, icon: Sun },
+  { value: 'dark', get label() { return t('Dark') }, icon: Moon },
 ]
 
 // Each row under Appearance is as tall as its tallest, a drop-down, so the rows are evenly spaced
-// whether they hold buttons, a drop-down or a switch.
-const ROW = 'flex min-h-9 flex-wrap items-center justify-between gap-2'
+// whether they hold buttons, a drop-down or a switch. A control that wraps below its label stays
+// at the row's end, like the theme's buttons: the right, or the left in a right-to-left language.
+// The second child is the control; a switch reads it from --switch-start (see index.css).
+const ROW = 'flex min-h-9 flex-wrap items-center justify-between gap-2 [&>:nth-child(2)]:ms-auto [&>:nth-child(2)]:[--switch-start:auto]'
 
 // A row of choices, such as the theme: at the end of its row, and compact enough to stay beside
 // its label on a phone.
@@ -45,18 +47,18 @@ const choice = (chosen: boolean) => cn('gap-1 has-[>svg]:px-2', chosen && 'borde
 
 // Torrents' statuses and speeds in color, or plain.
 const colorOptions: { value: boolean; label: string; icon: typeof Monitor }[] = [
-  { value: true, label: t('Colored'), icon: Rainbow },
-  { value: false, label: t('Monochrome'), icon: Contrast },
+  { value: true, get label() { return t('Colored') }, icon: Rainbow },
+  { value: false, get label() { return t('Monochrome') }, icon: Contrast },
 ]
 
 const textSizeLabels: Record<TextSize, string> = {
-  small: t('Small'),
-  default: t('Default'),
-  large: t('Large'),
-  larger: t('Larger'),
+  get small() { return t('Small') },
+  get default() { return t('Default') },
+  get large() { return t('Large') },
+  get larger() { return t('Larger') },
 }
 
-const SECTIONS = [{ id: 'app', title: t('App') }, ...PREFERENCE_SECTIONS.map(({ id, title }) => ({ id, title }))]
+const SECTIONS = [{ id: 'app', get title() { return t('App') } }, ...PREFERENCE_SECTIONS.map(section => ({ id: section.id, get title() { return section.title } }))]
 
 // An on/off choice from lib/displayOptions, which applies it to the page at once.
 // An option's name with its icon in front, as each of the App options shows it.
@@ -137,6 +139,13 @@ function useStackedChoices() {
 }
 
 function AppSection() {
+  // Drawn again for a new language: the field in view and focused, as it was left.
+  useLayoutEffect(() => {
+    if (!changedLanguage()) return
+    const field = document.getElementById('language')
+    field?.scrollIntoView({ block: 'center' })
+    field?.focus({ preventScroll: true })
+  }, [])
   const { theme, setTheme } = useTheme()
   const { themeRow, colorsRow, stacked } = useStackedChoices()
   const menuBar = useDisplayOption('menuBar')
@@ -194,8 +203,8 @@ function AppSection() {
           </div>
           <div className={cn('mt-3', ROW)}>
             <IconLabel htmlFor="language" icon={Languages}>{t('Language')}</IconLabel>
-            {/* Changing it reloads the page, so every text is redrawn in the new language. */}
-            <NativeSelect id="language" value={chosenLanguage()} onChange={(e) => setLanguage(e.target.value as LanguageChoice)}>
+            {/* Applies at once: the pages are drawn again in the new language, still on Settings. */}
+            <NativeSelect id="language" value={chosenLanguage()} onChange={(e) => void setLanguage(e.target.value as LanguageChoice)}>
               <option value="auto">{t('Same as the browser')}</option>
               {LANGUAGES.map(language => <option key={language.code} value={language.code}>{language.name}</option>)}
             </NativeSelect>

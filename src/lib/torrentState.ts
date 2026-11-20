@@ -76,6 +76,9 @@ const LABELS: Record<string, string> = {
   queuedUP: 'Queued',
 }
 
+// Every label a torrent's status can show, in the current language, so its column can fit them.
+export const stateLabels = (): string[] => [...new Set([...Object.values(LABELS), 'Completed'])].map(label => t(label))
+
 export function getStateLabel(state: string, completedOn: number): string {
   if (isStoppedState(state) && completedOn > 0) return t('Completed')
   return LABELS[state] ? t(LABELS[state]) : state

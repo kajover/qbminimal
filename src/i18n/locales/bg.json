@@ -690,7 +690,6 @@
   "Wasted": "Изгубени",
   "Yes": "Да",
   "{part} of {whole}": "{part} от {whole}",
-  "More": "Още",
   "More actions": "Още действия",
   "Start": "Стартиране",
   "{count} torrents": "Торенти: {count}",
@@ -736,7 +735,6 @@
   "1 torrent": "1 торент",
   "Clear filters": "Изчистване на филтрите",
   "Clear selection": "Изчистване на избора",
-  "Clear selection (Esc)": "Изчистване на избора (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Торентите не можаха да се заредят. Проверете връзката с qBittorrent.",
   "Delete (Del)": "Изтриване (Del)",
   "Loading torrents": "Зареждане на торенти",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Да се отбележат ли всички като прочетени?",
   "Every article in {name} is marked as read.": "Всяка статия в {name} се отбелязва като прочетена.",
   "Add sections": "Раздели за добавяне",
-  "{size} free": "{size} свободни"
+  "{size} free": "{size} свободни",
+  "Already added": "Вече е добавен",
+  "Recheck the data?": "Повторна проверка на данните?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent прочита отново всички изтеглени данни на {count} {noun}, за да ги провери. Дотогава не изтегля и не споделя."
 }

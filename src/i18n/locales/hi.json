@@ -690,7 +690,6 @@
   "Wasted": "व्यर्थ",
   "Yes": "हाँ",
   "{part} of {whole}": "{whole} में से {part}",
-  "More": "और",
   "More actions": "और कार्रवाइयाँ",
   "Start": "शुरू करें",
   "{count} torrents": "{count} टोरेंट",
@@ -736,7 +735,6 @@
   "1 torrent": "1 टोरेंट",
   "Clear filters": "फ़िल्टर हटाएँ",
   "Clear selection": "चयन हटाएँ",
-  "Clear selection (Esc)": "चयन हटाएँ (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "टोरेंट लोड नहीं हो सके। qBittorrent से कनेक्शन जाँचें।",
   "Delete (Del)": "डिलीट करें (Del)",
   "Loading torrents": "टॉरेंटों को लोड किया जा रहा है",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "सभी को पढ़ा हुआ मार्क करें?",
   "Every article in {name} is marked as read.": "{name} के सभी लेख पढ़े हुए मार्क हो जाते हैं।",
   "Add sections": "जोड़ने के भाग",
-  "{size} free": "{size} खाली"
+  "{size} free": "{size} खाली",
+  "Already added": "पहले से जोड़ा गया",
+  "Recheck the data?": "डेटा दोबारा जाँचें?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent जाँचने के लिए {count} {noun} का सारा डाउनलोड किया गया डेटा फिर से पढ़ता है। तब तक वह न डाउनलोड करता है न सीड करता है।"
 }

@@ -8,12 +8,12 @@ export const published = (r: SearchResult) => (r.pubDate && r.pubDate > 0 ? r.pu
 
 // Each column can be filtered like the torrent table's: a text match, a range, or a choice of sites.
 export const SEARCH_FILTER_COLUMNS: FilterColumn<SearchResult>[] = [
-  { id: 'fileName', label: t('Name'), kind: 'text', value: r => r.fileName },
-  { id: 'fileSize', label: t('Size'), kind: 'size', value: r => (r.fileSize >= 0 ? r.fileSize : NaN) },
-  { id: 'nbSeeders', label: t('Seeds'), kind: 'number', value: r => r.nbSeeders },
-  { id: 'nbLeechers', label: t('Leeches'), kind: 'number', value: r => r.nbLeechers },
-  { id: 'engineName', label: t('Plugin'), kind: 'set', value: r => r.engineName ?? '' },
-  { id: 'pubDate', label: t('Published'), kind: 'date', value: r => published(r) || NaN },
+  { id: 'fileName', get label() { return t('Name') }, kind: 'text', value: r => r.fileName },
+  { id: 'fileSize', get label() { return t('Size') }, kind: 'size', value: r => (r.fileSize >= 0 ? r.fileSize : NaN) },
+  { id: 'nbSeeders', get label() { return t('Seeds') }, kind: 'number', value: r => r.nbSeeders },
+  { id: 'nbLeechers', get label() { return t('Leeches') }, kind: 'number', value: r => r.nbLeechers },
+  { id: 'engineName', get label() { return t('Plugin') }, kind: 'set', value: r => r.engineName ?? '' },
+  { id: 'pubDate', get label() { return t('Published') }, kind: 'date', value: r => published(r) || NaN },
 ]
 
 // What each column can be filtered by, for the table's titles and the sidebar's funnel.

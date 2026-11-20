@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
-import { forgetSearches, keepSearchesOn, readSavedSearches, rememberSearch } from '@/lib/searchPatterns'
+import { forgetSearches, keepSearchesOn, readSavedSearches, rememberSearch, type SavedSearch } from '@/lib/searchPatterns'
 import { t } from '@/i18n'
 
 // Searches longer than this are stopped, keeping what they found.
@@ -74,6 +74,18 @@ export function useSearchJob() {
     void queryClient.invalidateQueries({ queryKey: ['search', 'status'] })
   }
 
+  // With saved searches kept, the same search again (same text, plugins and category) replaces the
+  // earlier one, as Run again does, so the list doesn't fill up with it.
+  const deleteSame = async (keep: number, search: SavedSearch) => {
+    const same = Object.entries(readSavedSearches())
+      .filter(([id, saved]) => Number(id) !== keep && saved.pattern === search.pattern && saved.plugins === search.plugins && saved.category === search.category)
+      .map(([id]) => Number(id))
+    if (!same.length) return
+    const outcomes = await Promise.allSettled(same.map(id => qbitClient.deleteSearch(id)))
+    forgetSearches(same.filter((_, i) => outcomes[i].status === 'fulfilled'))
+    void queryClient.invalidateQueries({ queryKey: ['search', 'status'] })
+  }
+
   // Says whether the search started.
   const start = async (pattern: string, plugins: string, category: string) => {
     // Checked first only to explain a search that can't find anything.
@@ -87,7 +99,8 @@ export function useSearchJob() {
       rememberSearch(id, { pattern, plugins, category })
       startTimes.set(id, Date.now())
       setJob({ id, running: true, startedAt: Date.now() }, { pattern, category })
-      if (!keepSearchesOn()) void deleteOthers(id)
+      // Done before saying it started, so Run again sees which searches are left.
+      await (keepSearchesOn() ? deleteSame(id, { pattern, plugins, category }) : deleteOthers(id))
       void queryClient.invalidateQueries({ queryKey: ['search', 'status'] })
       return true
     } catch (error) {

@@ -53,6 +53,7 @@ export function SearchView() {
   useEffect(() => { toggleSidebar.current = () => setSidebarOpen(!sidebarOpen) })
   const [pluginsOpen, setPluginsOpen] = useState(false)
   const [toolbarSlot, setToolbarSlot] = useState<HTMLDivElement | null>(null)
+  const [pageBarSlot, setPageBarSlot] = useState<HTMLDivElement | null>(null)
   const [adding, setAdding] = useState<SearchResult | null>(null)
   const [addBusy, setAddBusy] = useState(false)
 
@@ -160,31 +161,32 @@ export function SearchView() {
         )}
       />
 
+      {/* A short field: the plugins and category are in the sidebar. Above it, so the sidebar
+          starts where the results do. */}
+      <form onSubmit={submit} className="flex max-w-xl shrink-0 items-center gap-2">
+        <SearchInput id="search-pattern" aria-label={t('Search for')} placeholder={t('Search')} value={pattern} onValueChange={setPattern} required className="min-w-0 flex-1" />
+        {/* While searching, the spinner turns into a stop button under the pointer. */}
+        <Button type="submit" className="group" aria-label={search.running ? t('Stop search') : t('Search')} title={search.running ? t('Stop search') : t('Search')}>
+          {search.running ? (
+            <>
+              <Loader2 className="size-4 animate-spin group-hover:hidden group-focus-visible:hidden" />
+              <X className="hidden size-4 group-hover:block group-focus-visible:block" />
+            </>
+          ) : <Search className="size-4" />}
+        </Button>
+        {/* Takes the results and the text away, stopping a search still running, ready for the
+            next search. Always there, so the field keeps its width; greyed out with nothing to clear. */}
+        <Button type="button" variant="outline" size="icon" disabled={!search.searched} aria-label={t('Clear results')} title={t('Clear results')} onClick={() => { if (search.running) void search.cancel(); search.close(); setPattern(''); document.getElementById('search-pattern')?.focus() }}>
+          <Eraser className="size-4" />
+        </Button>
+      </form>
+
       {/* Beside the results where it fits, over them on phones, as on the torrent list. */}
       <div className={cn('frame:flex frame:min-h-0 frame:flex-1', sidebarOpen && sideBySide && 'flex items-start gap-4 frame:items-stretch')}>
         {!sideBySide && <FilterSheet open={sheetOpen} onOpenChange={setSheetOpen}>{sidebar}</FilterSheet>}
         <div className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0">
-          {/* A short field: the plugins and category are in the sidebar. */}
-          <form onSubmit={submit} className="flex max-w-xl shrink-0 items-center gap-2">
-            <SearchInput id="search-pattern" aria-label={t('Search for')} placeholder={t('Search')} value={pattern} onValueChange={setPattern} required className="min-w-0 flex-1" />
-            {/* While searching, the spinner turns into a stop button under the pointer. */}
-            <Button type="submit" className="group" aria-label={search.running ? t('Stop search') : t('Search')} title={search.running ? t('Stop search') : t('Search')}>
-              {search.running ? (
-                <>
-                  <Loader2 className="size-4 animate-spin group-hover:hidden group-focus-visible:hidden" />
-                  <X className="hidden size-4 group-hover:block group-focus-visible:block" />
-                </>
-              ) : <Search className="size-4" />}
-            </Button>
-            {/* Takes the results and the text away, stopping a search still running, ready for the
-                next search. Always there, so the field keeps its width; greyed out with nothing to clear. */}
-            <Button type="button" variant="outline" size="icon" disabled={!search.searched} aria-label={t('Clear results')} title={t('Clear results')} onClick={() => { if (search.running) void search.cancel(); search.close(); setPattern(''); document.getElementById('search-pattern')?.focus() }}>
-              <Eraser className="size-4" />
-            </Button>
-          </form>
-
           {/* Keyed by search, so each starts on its first page. */}
-          <SearchResults searchId={search.jobId ?? null} results={search.results} onAdd={setAdding} toolbarSlot={toolbarSlot} filters={filters} onFilterChange={setFilter} />
+          <SearchResults searchId={search.jobId ?? null} results={search.results} onAdd={setAdding} toolbarSlot={toolbarSlot} pageBarSlot={pageBarSlot} filters={filters} onFilterChange={setFilter} />
           {search.results.length === 0 && search.searched && !search.running && <p className="py-8 text-center text-sm text-muted-foreground">{t('Nothing found')}</p>}
         </div>
         {sidebarOpen && sideBySide && (
@@ -196,6 +198,9 @@ export function SearchView() {
           </aside>
         )}
       </div>
+
+      {/* The results' pages bar, below the sidebar too, as on the torrent list. */}
+      <div ref={setPageBarSlot} className="mt-auto shrink-0 empty:hidden" />
 
       <SearchPluginsDialog open={pluginsOpen} onOpenChange={setPluginsOpen} />
 

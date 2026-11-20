@@ -1,13 +1,15 @@
 import { createElement, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react'
 import { textScale } from '@/lib/textSize'
+import { useRowWindow } from '@/hooks/useRowWindow'
 import { ArrowDown, ArrowUp, RotateCcw } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Tooltip } from '@/components/ui/tooltip'
 import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { columnWidth, DEFAULT_COLUMN_LAYOUT, getColumn, isDefaultLayout, toggleColumn, moveColumn, resizeColumn, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
 import { getStateIcon } from '@/lib/stateIcons'
-import { DOWN_SPEED_COLOR, formatEta, getStateBadge, getStateColor, getStateLabel, UP_SPEED_COLOR, peerPair as pair } from '@/lib/torrentState'
+import { DOWN_SPEED_COLOR, formatEta, getStateBadge, getStateColor, getStateLabel, stateLabels, UP_SPEED_COLOR, peerPair as pair } from '@/lib/torrentState'
 import type { SortDirection } from '@/lib/listSettings'
 import type { RowProps } from '@/hooks/useRowPress'
 import type { Torrent } from '@/types'
@@ -146,7 +148,12 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   const titleWidths = useMemo(() => Object.fromEntries(columns.map(def =>
     // The title's own width, plus its padding (16px), the arrow (14px and its gap), the filter button (20px and its gap), and a margin.
     // A column that neither sorts nor filters needs no room for those.
-    [def.id, Math.ceil((def.icon ? 16 : textWidth(def.header ?? def.label, 12 * scale)) + 16 + (def.unsorted ? 0 : 18 + 22) + 4)])) as Partial<Record<ColumnId, number>>,
+    [def.id, Math.max(
+      Math.ceil((def.icon ? 16 : textWidth(def.header ?? def.label, 12 * scale)) + 16 + (def.unsorted ? 0 : 18 + 22) + 4),
+      // The status column also fits its longest label in this language: 12px text, the badge's
+      // padding (12px), the cell's (16px), and a margin.
+      def.id === 'state' ? Math.ceil(Math.max(...stateLabels().map(label => textWidth(label, 12 * textScale()))) + 12 + 16 + 4) : 0,
+    )])) as Partial<Record<ColumnId, number>>,
   // oxlint-disable-next-line react/exhaustive-deps -- the ids stand for the columns
   [columnKey, scale])
   const minWidthOf = (id: ColumnId) => Math.max(getColumn(id).minWidth * scale, titleWidths[id] ?? 0)
@@ -171,6 +178,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   const syncScroll = (from: HTMLDivElement | null, to: HTMLDivElement | null) => {
     if (!LINKED_SCROLL && from && to && to.scrollLeft !== from.scrollLeft) to.scrollLeft = from.scrollLeft
   }
+  const rows = useRowWindow(scroller, torrents.length)
   // How far the rows can scroll sideways, which is how far the titles move along the timeline.
   const [scrollRange, setScrollRange] = useState(0)
   useEffect(() => {
@@ -212,7 +220,13 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
         <thead>
           <tr>
             <th className={cn('sticky start-0 z-10 h-10 bg-card px-2 text-start', LINKED_SCROLL && 'table-head-pinned')}>
-              <Checkbox aria-label={t('Select all')} checked={selectAllState} onCheckedChange={(checked) => onSelectAll(checked === true)} />
+              {/* With some selected (a dash), a click clears them; the next one selects all. Its label says which. */}
+              {/* Wrapped, as the tooltip would put its own data-state on the box and hide the dash. */}
+              <Tooltip label={selectAllState === false ? t('Select all') : t('Clear selection')}>
+                <span className="inline-flex">
+                  <Checkbox aria-label={selectAllState === false ? t('Select all') : t('Clear selection')} checked={selectAllState} onCheckedChange={(checked) => onSelectAll(selectAllState !== 'indeterminate' && checked === true)} />
+                </span>
+              </Tooltip>
             </th>
             {columns.map(def => {
               // The default order, by queue position, isn't marked until a sort is picked.
@@ -264,12 +278,14 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
       </table>
       </div>
       {/* Its own scrollbar is hidden: the one at the bottom of the screen stands in for it. */}
-      <div ref={scroller} onScroll={() => syncScroll(scroller.current, head.current)} style={LINKED_SCROLL ? { scrollTimeline: '--table-x inline' } as CSSProperties : undefined} className="min-h-0 overflow-auto overscroll-x-none rounded-b-xl">
+      <div ref={scroller} data-row-scroller onScroll={() => syncScroll(scroller.current, head.current)} style={LINKED_SCROLL ? { scrollTimeline: '--table-x inline' } as CSSProperties : undefined} className="min-h-0 overflow-auto overscroll-x-none rounded-b-xl">
       <table className="table-fixed caption-bottom text-sm tabular-nums" style={tableWidth}>
         {colgroup}
         {wrapBody(
           <tbody>
-            {torrents.map(torrent => {
+            {/* Space for the rows above and below those drawn, so the scrollbar is as for all of them. */}
+            {rows.before > 0 && <tr aria-hidden style={{ height: rows.before }} />}
+            {torrents.slice(rows.start, rows.end).map(torrent => {
               const isSelected = selected.has(torrent.hash)
               return (
                 <tr
@@ -302,6 +318,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
                 </tr>
               )
             })}
+            {rows.after > 0 && <tr aria-hidden style={{ height: rows.after }} />}
           </tbody>,
         )}
       </table>

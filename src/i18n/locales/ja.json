@@ -690,7 +690,6 @@
   "Wasted": "破棄",
   "Yes": "はい",
   "{part} of {whole}": "{whole} 中 {part}",
-  "More": "その他",
   "More actions": "その他の操作",
   "Start": "開始(R)",
   "{count} torrents": "{count} 個のトレント",
@@ -736,7 +735,6 @@
   "1 torrent": "1 個のトレント",
   "Clear filters": "フィルターをクリア",
   "Clear selection": "選択を解除",
-  "Clear selection (Esc)": "選択を解除 (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "トレントを読み込めませんでした。qBittorrent への接続を確認してください。",
   "Delete (Del)": "削除 (Del)",
   "Loading torrents": "Torrentを読み込み中",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "すべて既読にしますか？",
   "Every article in {name} is marked as read.": "{name} のすべての記事が既読になります。",
   "Add sections": "追加のセクション",
-  "{size} free": "空き {size}"
+  "{size} free": "空き {size}",
+  "Already added": "追加済み",
+  "Recheck the data?": "データを再チェックしますか？",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent は {count} {noun}のダウンロード済みデータをすべて読み直して確認します。完了するまでダウンロードもシードも行いません。"
 }

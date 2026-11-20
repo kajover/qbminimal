@@ -690,7 +690,6 @@
   "Wasted": "Змарновано",
   "Yes": "Так",
   "{part} of {whole}": "{part} із {whole}",
-  "More": "Більше",
   "More actions": "Більше дій",
   "Start": "Старт",
   "{count} torrents": "Торентів: {count}",
@@ -736,7 +735,6 @@
   "1 torrent": "1 торент",
   "Clear filters": "Скинути фільтри",
   "Clear selection": "Зняти вибір",
-  "Clear selection (Esc)": "Зняти вибір (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Не вдалося завантажити торенти. Перевірте з'єднання з qBittorrent.",
   "Delete (Del)": "Видалити (Del)",
   "Loading torrents": "Завантаження торрентів",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Позначити все як прочитане?",
   "Every article in {name} is marked as read.": "Усі статті в {name} буде позначено як прочитані.",
   "Add sections": "Розділи додавання",
-  "{size} free": "Вільно {size}"
+  "{size} free": "Вільно {size}",
+  "Already added": "Уже додано",
+  "Recheck the data?": "Перевірити дані знову?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent знову прочитає всі завантажені дані ({count} {noun}), щоб перевірити їх. Доти він не завантажує й не роздає."
 }

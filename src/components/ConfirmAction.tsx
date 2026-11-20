@@ -16,6 +16,8 @@ interface ConfirmActionProps {
   buttonLabel?: string
   // An icon before that text.
   buttonIcon?: LucideIcon
+  // The text button's size, to match the buttons beside it.
+  buttonClassName?: string
   // For a text button that switches something on, so it reads as an off toggle.
   pressed?: boolean
   // The confirm button is red, as for deleting, unless the action is a safe one.
@@ -26,13 +28,13 @@ interface ConfirmActionProps {
 }
 
 // An icon button that asks in a pop-up before acting, like the delete prompt.
-export function ConfirmAction({ label, title, message, confirmLabel, disabled, onConfirm, buttonLabel, buttonIcon: ButtonIcon, pressed, safe, small, children }: ConfirmActionProps) {
+export function ConfirmAction({ label, title, message, confirmLabel, disabled, onConfirm, buttonLabel, buttonIcon: ButtonIcon, buttonClassName, pressed, safe, small, children }: ConfirmActionProps) {
   const [open, setOpen] = useState(false)
 
   return (
     <>
       {buttonLabel ? (
-        <Button type="button" size="sm" variant="outline" title={label} aria-pressed={pressed} disabled={disabled} onClick={() => setOpen(true)}>
+        <Button type="button" size="sm" variant="outline" className={buttonClassName} title={label} aria-pressed={pressed} disabled={disabled} onClick={() => setOpen(true)}>
           {ButtonIcon && <ButtonIcon />}
           {buttonLabel}
         </Button>

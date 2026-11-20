@@ -4,13 +4,13 @@ import { t } from '@/i18n'
 export type PageId = 'torrents' | 'add' | 'rss' | 'search' | 'logs' | 'statistics' | 'settings'
 
 const PAGES: { id: PageId; label: string; icon: LucideIcon }[] = [
-  { id: 'torrents', label: t('Torrents'), icon: Download },
-  { id: 'add', label: t('Add'), icon: Server },
+  { id: 'torrents', get label() { return t('Torrents') }, icon: Download },
+  { id: 'add', get label() { return t('Add') }, icon: Server },
   { id: 'rss', label: 'RSS', icon: Radio },
-  { id: 'search', label: t('Search'), icon: Search },
-  { id: 'logs', label: t('Logs'), icon: FileText },
-  { id: 'statistics', label: t('Statistics'), icon: Activity },
-  { id: 'settings', label: t('Settings'), icon: Settings },
+  { id: 'search', get label() { return t('Search') }, icon: Search },
+  { id: 'logs', get label() { return t('Logs') }, icon: FileText },
+  { id: 'statistics', get label() { return t('Statistics') }, icon: Activity },
+  { id: 'settings', get label() { return t('Settings') }, icon: Settings },
 ]
 
 // Logs and Statistics sit apart from the other pages in the menu and sidebar, and stay off the phone tab bar.

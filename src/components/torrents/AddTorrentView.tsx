@@ -25,6 +25,7 @@ import {
   type TorrentMetadata,
 } from '@/lib/addTorrent'
 import { onIncoming, takeIncoming } from '@/lib/incoming'
+import { readStored, writeStored } from '@/lib/storage'
 import { TorrentCreator } from './TorrentCreator'
 import { t } from '@/i18n'
 
@@ -69,8 +70,26 @@ function CheckField({ id, label, checked, onChange }: { id: string; label: strin
   )
 }
 
+// The save path and category of the last torrents added, kept on this device, so the next ones
+// go to the same place.
+const LAST_PLACE_KEY = 'qbminimal.addPlace'
+function lastPlace(): Pick<AddTorrentOptions, 'savePath' | 'category'> {
+  try {
+    const saved: unknown = JSON.parse(readStored(LAST_PLACE_KEY) ?? 'null')
+    const place = saved && typeof saved === 'object' ? saved as Record<string, unknown> : {}
+    return {
+      savePath: typeof place.savePath === 'string' ? place.savePath : DEFAULT_ADD_OPTIONS.savePath,
+      category: typeof place.category === 'string' ? place.category : DEFAULT_ADD_OPTIONS.category,
+    }
+  } catch {
+    return { savePath: DEFAULT_ADD_OPTIONS.savePath, category: DEFAULT_ADD_OPTIONS.category }
+  }
+}
+const rememberPlace = ({ savePath, category }: AddTorrentOptions) =>
+  writeStored(LAST_PLACE_KEY, savePath || category ? JSON.stringify({ savePath, category }) : null)
+
 // What was entered stays while other pages are open, until it's added or cleared.
-const EMPTY_DRAFT = { links: '', files: [] as File[], options: DEFAULT_ADD_OPTIONS, showOptions: false, metadata: null as TorrentMetadata | null, metadataSource: null as string | null, priorities: [] as number[] }
+const EMPTY_DRAFT = { links: '', files: [] as File[], options: { ...DEFAULT_ADD_OPTIONS, ...lastPlace() }, showOptions: false, metadata: null as TorrentMetadata | null, metadataSource: null as string | null, priorities: [] as number[] }
 let draft = EMPTY_DRAFT
 
 // The fields and options for adding torrents, on the Add page and in the dialog the torrent list's
@@ -254,7 +273,7 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
     }
     // A .torrent read for its file list is added by hash, which picks up the copy qBittorrent kept.
     const addByHash = activeMetadata?.hash && singleSource instanceof File ? activeMetadata.hash : null
-    const params = buildAddParams(options, addByHash ? [addByHash] : linkList, sourceCount)
+    const params = buildAddParams({ ...options, category }, addByHash ? [addByHash] : linkList, sourceCount)
     if (typeof params === 'string') {
       toast.error(params)
       return
@@ -294,6 +313,7 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
       const { ok, message } = describeAddResult(result, sourceCount)
       if (ok) {
         toast.success(message)
+        rememberPlace({ ...options, category })
         clearEntry()
         onAdded?.()
       } else {
@@ -319,6 +339,8 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
   }
 
   const categoryNames = Object.keys(categories ?? {}).sort()
+  // A remembered category deleted since is left out, rather than sent to qBittorrent.
+  const category = categories && !categoryNames.includes(options.category) ? '' : options.category
 
   return (
           <form onSubmit={submit} className="space-y-4">
@@ -399,7 +421,7 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
               </div>
             )}
 
-            <Button type="button" variant="ghost" size="sm" className="-ms-3" aria-expanded={showOptions} onClick={() => setShowOptions(!showOptions)}>
+            <Button type="button" variant="ghost" size="sm" className="-ms-1.5 has-[>svg]:ps-1.5" aria-expanded={showOptions} onClick={() => setShowOptions(!showOptions)}>
               {showOptions ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4 rtl:rotate-180" />}
               {t('More options')}
             </Button>
@@ -408,7 +430,7 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
               <div className="space-y-3 rounded-md border p-3">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <Field label={t('Category')} htmlFor="add-category">
-                    <select id="add-category" value={options.category} onChange={(e) => set('category', e.target.value)} className={selectClass}>
+                    <select id="add-category" value={category} onChange={(e) => set('category', e.target.value)} className={selectClass}>
                       <option value="">{t('No category')}</option>
                       {categoryNames.map(name => <option key={name} value={name}>{name}</option>)}
                     </select>
@@ -515,8 +537,8 @@ function AddTorrentForm({ onAdded }: { onAdded?: () => void }) {
 
 // The two parts of the page, picked like the RSS and Settings sections.
 const SECTIONS = [
-  { id: 'add', title: t('Add torrents') },
-  { id: 'create', title: t('Create a torrent') },
+  { id: 'add', get title() { return t('Add torrents') } },
+  { id: 'create', get title() { return t('Create a torrent') } },
 ] as const
 
 export function AddTorrentView() {

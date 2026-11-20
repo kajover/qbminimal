@@ -1,4 +1,5 @@
 import { useRef, useState, type DragEvent, type KeyboardEvent, type PointerEvent } from 'react'
+import { holdCursor } from '@/lib/dragCursor'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
 
@@ -74,10 +75,13 @@ export function useColumnResize<K extends string>({ widthOf, minWidthOf, onResiz
   const [resizing, setResizing] = useState<{ key: K; width: number } | null>(null)
   // sign is -1 right to left, where a column's resizing edge is on its left.
   const start = useRef<{ x: number; width: number; sign: number } | null>(null)
+  const release = useRef<(() => void) | null>(null)
   const width = (key: K) => (resizing?.key === key ? resizing.width : widthOf(key))
   const end = () => {
     if (resizing) onResize(resizing.key, resizing.width)
     start.current = null
+    release.current?.()
+    release.current = null
     setResizing(null)
   }
   const handle = (key: K, label: string) => (
@@ -91,6 +95,7 @@ export function useColumnResize<K extends string>({ widthOf, minWidthOf, onResiz
         e.stopPropagation()
         e.currentTarget.setPointerCapture(e.pointerId)
         start.current = { x: e.clientX, width: width(key), sign: getComputedStyle(e.currentTarget).direction === 'rtl' ? -1 : 1 }
+        release.current = holdCursor('col-resize')
         setResizing({ key, width: width(key) })
       }}
       onPointerMove={(e: PointerEvent<HTMLSpanElement>) => {

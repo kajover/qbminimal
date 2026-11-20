@@ -10,20 +10,29 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Switch } from '@/components/ui/switch'
 import { SearchInput } from '@/components/SearchInput'
 import { LogBadge, LogEntryDialog, type LogRow } from '@/components/logs/LogEntryDialog'
+import { textWidth } from '@/components/TableColumns'
 import { useLogs, usePeerLog } from '@/hooks/useApi'
 import { t } from '@/i18n'
 import { parseLogMessage } from '@/lib/logDetails'
 import { buildLogText, formatLogTime, logFileName } from '@/lib/logExport'
 import { pageScroller } from '@/lib/pageScroll'
 import { readStored, writeStored } from '@/lib/storage'
+import { textScale } from '@/lib/textSize'
 
 // qBittorrent's log levels. The badge always carries the word, so colour never says it alone.
 const LEVELS = [
-  { key: 'normal', type: 1, label: t('Normal'), badge: 'bg-muted text-muted-foreground' },
-  { key: 'info', type: 2, label: t('Info'), badge: 'bg-blue-500/15 text-blue-700 dark:text-blue-400' },
-  { key: 'warning', type: 4, label: t('Warning'), badge: 'bg-amber-500/15 text-amber-700 dark:text-amber-400' },
-  { key: 'critical', type: 8, label: t('Critical'), badge: 'bg-red-500/15 text-red-700 dark:text-red-400' },
+  { key: 'normal', type: 1, get label() { return t('Normal') }, badge: 'bg-muted text-muted-foreground' },
+  { key: 'info', type: 2, get label() { return t('Info') }, badge: 'bg-blue-500/15 text-blue-700 dark:text-blue-400' },
+  { key: 'warning', type: 4, get label() { return t('Warning') }, badge: 'bg-amber-500/15 text-amber-700 dark:text-amber-400' },
+  { key: 'critical', type: 8, get label() { return t('Critical') }, badge: 'bg-red-500/15 text-red-700 dark:text-red-400' },
 ] as const
+
+// The level column is as wide as its longest badge in this language (12px text and 12px padding),
+// or its title.
+const levelWidth = () => Math.ceil(Math.max(
+  ...[...LEVELS.map(level => level.label), t('blocked'), t('banned')].map(label => textWidth(label, 12 * textScale()) + 12),
+  textWidth(t('Level'), 12 * textScale()),
+) + 2)
 
 const PEER_BADGES = { blocked: 'bg-red-500/15 text-red-700 dark:text-red-400', banned: 'bg-amber-500/15 text-amber-700 dark:text-amber-400' }
 
@@ -153,6 +162,7 @@ function LogWindow({ rows, note, latest, autoScroll, onOpen }: { rows: LogRow[];
   const scroller = useRef<HTMLDivElement>(null)
   const size = useFitToScreen(box)
   const onScroll = useNewEntries(scroller, latest, autoScroll)
+  const levelColumn = useMemo(() => levelWidth(), [])
   return (
     // Columns with titles wherever the list has room for them, as on wide screens: it follows its
     // own width, so a tablet or a phone on its side gets them too.
@@ -161,7 +171,7 @@ function LogWindow({ rows, note, latest, autoScroll, onOpen }: { rows: LogRow[];
         <>
           <div aria-hidden className="flex gap-3 border-b px-2 py-2 text-xs font-medium text-muted-foreground @max-lg:hidden">
             <span className="w-40 shrink-0">{t('Date and time')}</span>
-            <span className="w-20 shrink-0">{t('Level')}</span>
+            <span className="shrink-0" style={{ width: levelColumn }}>{t('Level')}</span>
             <span className="min-w-0 flex-1">{t('Message')}</span>
           </div>
           {/* The browser's own scroll anchoring is left out, as useNewEntries keeps the rows in place. */}
@@ -172,7 +182,7 @@ function LogWindow({ rows, note, latest, autoScroll, onOpen }: { rows: LogRow[];
                   <button type="button" onClick={() => onOpen(row)} className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 px-2 py-2 @lg:gap-x-3 text-start transition-colors hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:outline-hidden @lg:flex-nowrap @lg:items-start">
                     {/* Columns under the titles where they fit; elsewhere the level follows the time closely. */}
                     <span className="shrink-0 text-xs tabular-nums text-muted-foreground @lg:w-40 @lg:pt-0.5">{formatLogTime(row.timestamp)}</span>
-                    <span className="shrink-0 @lg:w-20"><LogBadge row={row} /></span>
+                    <span className="shrink-0 @lg:w-(--level-width)" style={{ '--level-width': `${levelColumn}px` } as CSSProperties}><LogBadge row={row} /></span>
                     <Message row={row} />
                   </button>
                 </li>

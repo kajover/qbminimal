@@ -3,7 +3,7 @@ import { inFrame, pageScroller, ROOM_FOR_TABLE } from '@/lib/pageScroll'
 import { holdWheel } from '@/lib/holdWheel'
 import { PAGE_BAR_BELOW_TABLE, PAGE_BAR_IN_TABLE } from '@/lib/listSettings'
 import { createPortal } from 'react-dom'
-import { ArrowDown, ArrowUp, ArrowUpDown, Columns3, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, LayoutList, Table2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, CircleCheck, Columns3, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, LayoutList, Table2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ColumnFilterButton, type FilterTarget } from '@/components/ColumnFilters'
@@ -15,6 +15,8 @@ import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loa
 import { applyColumnFilters, type ColumnFilter, type ColumnFilters } from '@/lib/columnFilters'
 import { published, SEARCH_FILTER_COLUMNS } from '@/lib/searchFilters'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { useAddedMatcher } from '@/hooks/useApi'
+import { Tooltip } from '@/components/ui/tooltip'
 import { formatBytes, formatDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { SearchResult } from '@/types'
@@ -23,12 +25,12 @@ import { t } from '@/i18n'
 
 // qBittorrent's search plugins only report these, so columns like a tracker's freeleech or group can't be shown.
 const COLUMNS: { key: SortKey; label: string; numeric?: boolean; className?: string; cell: (r: SearchResult) => ReactNode }[] = [
-  { key: 'fileName', label: t('Name'), className: 'truncate', cell: r => r.fileName },
-  { key: 'fileSize', label: t('Size'), numeric: true, cell: r => formatBytes(r.fileSize) },
-  { key: 'nbSeeders', label: t('Seeds'), numeric: true, className: 'text-green-600 dark:text-green-400', cell: r => r.nbSeeders },
-  { key: 'nbLeechers', label: t('Leeches'), numeric: true, className: 'text-red-500', cell: r => r.nbLeechers },
-  { key: 'engineName', label: t('Plugin'), className: 'truncate text-muted-foreground', cell: r => r.engineName || '-' },
-  { key: 'pubDate', label: t('Published'), numeric: true, className: 'truncate text-muted-foreground', cell: r => formatDateTime(published(r)) },
+  { key: 'fileName', get label() { return t('Name') }, className: 'truncate', cell: r => r.fileName },
+  { key: 'fileSize', get label() { return t('Size') }, numeric: true, cell: r => formatBytes(r.fileSize) },
+  { key: 'nbSeeders', get label() { return t('Seeds') }, numeric: true, className: 'text-green-600 dark:text-green-400', cell: r => r.nbSeeders },
+  { key: 'nbLeechers', get label() { return t('Leeches') }, numeric: true, className: 'text-red-500', cell: r => r.nbLeechers },
+  { key: 'engineName', get label() { return t('Plugin') }, className: 'truncate text-muted-foreground', cell: r => r.engineName || '-' },
+  { key: 'pubDate', get label() { return t('Published') }, numeric: true, className: 'truncate text-muted-foreground', cell: r => formatDateTime(published(r)) },
 ]
 
 // As many as is useful at once; the table scrolls them.
@@ -59,9 +61,18 @@ function fittedWidths(results: SearchResult[]): SearchWidths {
 }
 
 
+// Marks a result that's already among the torrents, so it isn't added twice.
+function AddedMark() {
+  return (
+    <Tooltip label={t('Already added')}>
+      <span role="img" aria-label={t('Already added')} className="me-1.5 inline-flex align-text-bottom text-green-600 dark:text-green-500"><CircleCheck className="size-4" /></span>
+    </Tooltip>
+  )
+}
+
 // Found torrents, sortable, 20 a page: a table on wide screens and a list on phones.
 
-export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, onFilterChange }: {
+export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSlot, filters, onFilterChange }: {
   // The search shown: another one starts again at the first page, sorted by seeds.
   searchId: number | null
   results: SearchResult[]
@@ -71,6 +82,8 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   onFilterChange: (id: string, filter: ColumnFilter | null) => void
   // Where the filter, columns or sort, and view buttons go: the page header's button row.
   toolbarSlot?: HTMLElement | null
+  // Where the pages bar goes in the frame: below the sidebar too, so its arrows stay at the page's end.
+  pageBarSlot?: HTMLElement | null
 }) {
   // Each search starts with the most seeds first; a sort picked here lasts for this search.
   const [sort, setSort] = useState<SearchSort>(DEFAULT_SEARCH_SORT)
@@ -117,22 +130,26 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   // when the columns are wider than the screen. Until then each fits its content and the name takes
   // the rest; once the name is resized, a filler column takes any room left over.
   const fitted = useMemo(() => fittedWidths(results), [results])
+  const { data: addedMatch } = useAddedMatcher()
+  const isAdded = (result: SearchResult) => addedMatch?.(result) ?? false
   const [tableWidth, setTableWidth] = useState(0)
   const frame = useRef<HTMLDivElement>(null)
   const head = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
   // The table is only there once results arrive, so it's watched from then on. Measured before it's
-  // first drawn, so the name doesn't show at a stand-in width for a frame, coming back to the page.
+  // first drawn, so the name doesn't show at a stand-in width for a frame, coming back to the page
+  // or from the cards. Hidden behind the cards it measures 0, so the last width is kept.
   const hasResults = results.length > 0
   useLayoutEffect(() => {
     const box = frame.current
     if (!box) return
-    setTableWidth(box.clientWidth)
+    const measure = () => { if (box.clientWidth > 0) setTableWidth(box.clientWidth) }
+    measure()
     if (typeof ResizeObserver === 'undefined') return
-    const observer = new ResizeObserver(() => setTableWidth(box.clientWidth))
+    const observer = new ResizeObserver(measure)
     observer.observe(box)
     return () => observer.disconnect()
-  }, [hasResults])
+  }, [hasResults, showTable])
   const saveWidth = (key: SortKey, width: number) => setWidths(current => {
     const next = { ...current, [key]: Math.max(MIN_SEARCH_WIDTH, Math.round(width)) }
     saveSearchWidths(next)
@@ -297,6 +314,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
     </div>
   ) : null
 
+  const placed = (bar: ReactNode) => (pageBarSlot ? createPortal(bar, pageBarSlot) : bar)
   const placedToolbar = toolbarSlot ? createPortal(toolbar, toolbarSlot) : <div className="flex justify-end gap-1">{toolbar}</div>
   // Before a search, only the buttons.
   if (results.length === 0) return placedToolbar
@@ -368,6 +386,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
                   {visible.map(c => (
                     <td key={c.key} className={cn('truncate px-2 py-1.5 whitespace-nowrap', c.className)} title={c.key === 'fileName' ? result.fileName : undefined}>
                       {/* Numbers, sizes and dates read left to right, also in a right-to-left language. */}
+                      {c.key === 'fileName' && isAdded(result) && <AddedMark />}
                       {c.numeric ? <span dir="ltr">{c.cell(result)}</span> : c.cell(result)}
                     </td>
                   ))}
@@ -391,7 +410,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
           <li key={`${result.fileUrl}|${result.descrLink}`} className="flex items-start gap-2 rounded-xl border bg-card px-3 py-2.5">
             <button type="button" className="min-w-0 flex-1 text-start" onClick={() => result.fileUrl && onAdd(result)}>
               <span className="block text-xs text-muted-foreground">{t('{seeds} seeds · {leeches} leeches', { seeds: result.nbSeeders, leeches: result.nbLeechers })}</span>
-              <span className="block text-sm wrap-anywhere">{result.fileName}</span>
+              <span className="block text-sm wrap-anywhere">{isAdded(result) && <AddedMark />}{result.fileName}</span>
               <span className="block truncate text-xs text-muted-foreground">
                 {[shows('fileSize') && formatBytes(result.fileSize), shows('engineName') && result.engineName, shows('pubDate') && published(result) > 0 && formatDateTime(published(result))].filter(Boolean).join(' · ')}
               </span>
@@ -402,7 +421,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
       </ul>
       </div>
       {/* At the window's bottom even below a short list, level with the sidebar's Logout. */}
-      {framed && pageBar && <div ref={holdWheel} className={cn('mt-auto shrink-0', showTable ? PAGE_BAR_BELOW_TABLE : 'px-[calc(0.75rem+1px)]')}>{pageBar}</div>}
+      {framed && pageBar && placed(<div ref={holdWheel} className={cn('mt-auto shrink-0', showTable ? PAGE_BAR_BELOW_TABLE : 'px-[calc(0.75rem+1px)]')}>{pageBar}</div>)}
       {/* After the last result, outside the frame, as wide as the cards. */}
       {!framed && !showTable && pageBar && <div className="glass-bar mb-[var(--toolbar-room,0px)] rounded-xl border px-3 py-1.5 max-sm:-mx-2">{pageBar}</div>}
 

@@ -270,6 +270,8 @@
   width: 2.75rem;
   height: 1.625rem;
   margin: 0;
+  /* A row can push it to its end (Settings), which this rule, outside the layers, would undo. */
+  margin-inline-start: var(--switch-start, 0);
 }
 .switch:disabled {
   cursor: default;
@@ -281,6 +283,7 @@
   width: 2.75rem;
   height: 1.625rem;
   margin: 0;
+  margin-inline-start: var(--switch-start, 0);
   border-radius: 9999px;
   background: var(--input);
   transition: background-color 0.2s;
@@ -490,4 +493,12 @@ select:not([multiple]):not([size]) {
 }
 [dir='rtl'] select:not([multiple]):not([size]) {
   background-position: left 0.75rem center;
+}
+
+/* While an edge is dragged (holdCursor in src/lib/dragCursor.ts), its cursor shows everywhere, so it
+   doesn't flicker back to an arrow or a hand where the pointer leaves the edge. */
+:root[data-drag-cursor],
+:root[data-drag-cursor] * {
+  cursor: var(--drag-cursor) !important;
+  user-select: none;
 }

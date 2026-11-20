@@ -690,7 +690,6 @@
   "Wasted": "Pierdut",
   "Yes": "Da",
   "{part} of {whole}": "{part} din {whole}",
-  "More": "Mai mult",
   "More actions": "Mai multe acțiuni",
   "Start": "Pornește",
   "{count} torrents": "Torente: {count}",
@@ -736,7 +735,6 @@
   "1 torrent": "1 torent",
   "Clear filters": "Șterge filtrele",
   "Clear selection": "Anulează selecția",
-  "Clear selection (Esc)": "Anulează selecția (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Torentele nu au putut fi încărcate. Verifică conexiunea la qBittorrent.",
   "Delete (Del)": "Șterge (Del)",
   "Loading torrents": "Se încarcă torentele",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Marchezi tot ca citit?",
   "Every article in {name} is marked as read.": "Toate articolele din {name} sunt marcate ca citite.",
   "Add sections": "Secțiuni de adăugare",
-  "{size} free": "{size} liberi"
+  "{size} free": "{size} liberi",
+  "Already added": "Deja adăugat",
+  "Recheck the data?": "Reverifici datele?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent citește din nou toate datele descărcate ale {count} {noun} pentru a le verifica. Până atunci nu descarcă și nu partajează."
 }

@@ -690,7 +690,6 @@
   "Wasted": "已丟棄：",
   "Yes": "是",
   "{part} of {whole}": "{part}/{whole}",
-  "More": "更多",
   "More actions": "更多動作",
   "Start": "啟動",
   "{count} torrents": "{count} 個種子",
@@ -736,7 +735,6 @@
   "1 torrent": "1 個種子",
   "Clear filters": "清除篩選條件",
   "Clear selection": "清除選取",
-  "Clear selection (Esc)": "清除選取（Esc）",
   "Couldn't load torrents. Check the connection to qBittorrent.": "無法載入種子。請檢查與 qBittorrent 的連線。",
   "Delete (Del)": "刪除（Del）",
   "Loading torrents": "正在載入 torrent",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "要全部標示為已讀嗎？",
   "Every article in {name} is marked as read.": "{name} 中的所有文章將標示為已讀。",
   "Add sections": "新增分區",
-  "{size} free": "{size} 可用"
+  "{size} free": "{size} 可用",
+  "Already added": "已新增",
+  "Recheck the data?": "重新檢查資料？",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent 會重新讀取 {count} 個{noun}的所有已下載資料以進行檢查。在此期間不會下載或做種。"
 }

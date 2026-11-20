@@ -690,7 +690,6 @@
   "Wasted": "Spill",
   "Yes": "Ja",
   "{part} of {whole}": "{part} av {whole}",
-  "More": "Mer",
   "More actions": "Fler åtgärder",
   "Start": "Starta",
   "{count} torrents": "Torrenter: {count}",
@@ -736,7 +735,6 @@
   "1 torrent": "1 torrent",
   "Clear filters": "Rensa filter",
   "Clear selection": "Rensa markering",
-  "Clear selection (Esc)": "Rensa markering (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Kunde inte läsa in torrenter. Kontrollera anslutningen till qBittorrent.",
   "Delete (Del)": "Ta bort (Del)",
   "Loading torrents": "Läser in torrenter",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Markera alla som lästa?",
   "Every article in {name} is marked as read.": "Alla artiklar i {name} markeras som lästa.",
   "Add sections": "Avsnitt för att lägga till",
-  "{size} free": "{size} ledigt"
+  "{size} free": "{size} ledigt",
+  "Already added": "Redan tillagd",
+  "Recheck the data?": "Kontrollera data igen?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent läser om all nedladdad data för {count} {noun} för att kontrollera den. Tills dess laddar den varken ned eller delar."
 }

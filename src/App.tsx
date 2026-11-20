@@ -14,7 +14,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { hasIncoming, onIncoming } from '@/lib/incoming'
 import { registerServiceWorker } from '@/lib/notify'
 import { pageScroller } from '@/lib/pageScroll'
-import { t } from '@/i18n'
+import { t, useLanguage } from '@/i18n'
 
 // The torrent list and the Add page (whose form the list's + button opens too) ship in the main
 // script. The other pages load in the background once signed in, so they open at once later.
@@ -43,10 +43,11 @@ const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 50
 // the corner, away from the selection bar and the page's buttons in the header. Swiped down to go.
 const PHONE_TOAST_OFFSET = { bottom: 'calc(var(--bottom-nav-height, 0px) + var(--selection-bar-space, 0px) + 0.5rem)' }
 
-function Screens() {
+function Screens({ onSettings }: { onSettings: boolean }) {
   const { status } = useSession()
   // A magnet link the page was opened for starts on the Add page.
-  const [page, setPage] = useState<PageId>(() => (hasIncoming() ? 'add' : 'torrents'))
+  // After a language change, back on Settings where it was changed.
+  const [page, setPage] = useState<PageId>(() => (hasIncoming() ? 'add' : onSettings ? 'settings' : 'torrents'))
   const [selected, setSelected] = useState(page)
   // A newly shown page starts at its top. Done as it's put on screen, before it's drawn: doing it
   // when the tab lights up would first jump the old page to its top, which flashes.
@@ -89,12 +90,16 @@ function Screens() {
 export default function App() {
   const wide = useMediaQuery('(min-width: 1200px)')
   useEffect(registerServiceWorker, [])
+  // A new language draws the pages again, without signing in again; they open on Settings, where
+  // it was changed.
+  const language = useLanguage()
+  const [firstLanguage] = useState(language)
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster position={wide ? 'bottom-right' : 'bottom-center'} offset={wide ? undefined : PHONE_TOAST_OFFSET} mobileOffset={PHONE_TOAST_OFFSET} />
       <HoverLabels />
       <SessionProvider>
-        <Screens />
+        <Screens key={language} onSettings={language !== firstLanguage} />
       </SessionProvider>
     </QueryClientProvider>
   )

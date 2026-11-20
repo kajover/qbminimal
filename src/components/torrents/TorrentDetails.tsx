@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useBackButtonClose } from '@/hooks/useBackButtonClose'
+import { usePrefetchDetails } from '@/hooks/useApi'
+import { holdCursor } from '@/lib/dragCursor'
 import { readStored, writeStored } from '@/lib/storage'
 import { watchTorrentSpeeds } from '@/lib/speedHistory'
 import { cn } from '@/lib/utils'
@@ -16,11 +18,11 @@ import { TrackersTab } from './TrackersTab'
 import { t } from '@/i18n'
 
 const TABS = [
-  { id: 'details', label: t('Details'), icon: Info },
-  { id: 'actions', label: t('Actions'), icon: SlidersHorizontal },
-  { id: 'content', label: t('Content'), icon: FolderTree },
-  { id: 'peers', label: t('Peers'), icon: Users },
-  { id: 'trackers', label: t('Trackers'), icon: RadioTower },
+  { id: 'details', get label() { return t('Details') }, icon: Info },
+  { id: 'actions', get label() { return t('Actions') }, icon: SlidersHorizontal },
+  { id: 'content', get label() { return t('Content') }, icon: FolderTree },
+  { id: 'peers', get label() { return t('Peers') }, icon: Users },
+  { id: 'trackers', get label() { return t('Trackers') }, icon: RadioTower },
 ] as const
 
 const HEIGHT_KEY = 'qbminimal.detailsHeight'
@@ -44,6 +46,7 @@ function initialHeight() {
 function DetailsTabs({ torrent, listClassName, end, onDelete }: { torrent: Torrent; listClassName?: string; end?: ReactNode; onDelete?: () => void }) {
   // Its speeds are recorded while the details are open, whichever tab shows, for the Details graph.
   useEffect(() => watchTorrentSpeeds(torrent.hash), [torrent.hash])
+  usePrefetchDetails(torrent.hash)
   const [tab, setTab] = useState<TabId>(() => {
     const stored = readStored(TAB_KEY)
     return isTabId(stored) ? stored : 'details'
@@ -57,9 +60,16 @@ function DetailsTabs({ torrent, listClassName, end, onDelete }: { torrent: Torre
     <Tabs value={tab} onValueChange={choose} className="min-h-0 flex-1">
       {/* The tabs take the row's whole width, apart from a gap before the close button. */}
       <div className="flex items-center gap-3">
-        <TabsList className={cn('grid min-w-0 flex-1 grid-cols-5', listClassName)}>
-          {/* Icons where there's room beside the names. */}
-          {TABS.map(({ id, label, icon: Icon }) => <TabsTrigger key={id} value={id} className="gap-1 px-0.5 text-xs sm:px-3"><Icon className="size-3.5 max-sm:hidden" />{label}</TabsTrigger>)}
+        <TabsList className={cn('flex min-w-0 flex-1', listClassName)}>
+          {/* Icons and names where there's room. On phones five names don't fit in every language,
+              so the tabs show their icons and only the open one its name too; the others' names
+              are still read out. */}
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <TabsTrigger key={id} value={id} className="gap-1 px-2 text-xs transition-none max-sm:flex-auto sm:px-3">
+              <Icon className="size-3.5" />
+              <span className="max-sm:in-data-[state=inactive]:sr-only">{label}</span>
+            </TabsTrigger>
+          ))}
         </TabsList>
         {end && <div className="ms-auto shrink-0">{end}</div>}
       </div>
@@ -84,6 +94,7 @@ interface DetailsProps {
 export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps) {
   const [height, setHeight] = useState(initialHeight)
   const drag = useRef<{ y: number; height: number } | null>(null)
+  const release = useRef<(() => void) | null>(null)
 
 
   const commit = (next: number) => {
@@ -95,6 +106,7 @@ export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps
     e.preventDefault()
     e.currentTarget.setPointerCapture(e.pointerId)
     drag.current = { y: e.clientY, height }
+    release.current = holdCursor('row-resize')
   }
   const moveDrag = (e: PointerEvent<HTMLDivElement>) => {
     if (drag.current) setHeight(clampHeight(drag.current.height + drag.current.y - e.clientY))
@@ -102,6 +114,8 @@ export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps
   const endDrag = () => {
     if (drag.current) commit(height)
     drag.current = null
+    release.current?.()
+    release.current = null
   }
   const onEdgeKey = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return

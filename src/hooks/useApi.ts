@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
 import { hasStatus, qbitClient, type LogLevels } from '@/lib/api'
@@ -5,6 +6,7 @@ import { disguiseTorrents, useIncognito } from '@/lib/incognito'
 import { supportsFeature, type ApiFeature } from '@/lib/apiVersion'
 import { parseBannedPeers, removeBannedPeer } from '@/lib/bannedPeers'
 import { findFinished } from '@/lib/finished'
+import { addedMatcher } from '@/lib/alreadyAdded'
 import { applyMainDataUpdate, totalSpeeds, type MainData } from '@/lib/mainData'
 import { finishNoticesOn, notifyInBackground } from '@/lib/notify'
 import { PIECE_DONE } from '@/lib/pieces'
@@ -104,6 +106,9 @@ export function useTorrents() {
   const incognito = useIncognito()
   return useMainData(incognito ? pickDisguised : pickTorrents)
 }
+// Tells whether a search result is already a torrent in the list, by its real name also in incognito mode.
+const pickAddedMatcher = (data: MainData) => addedMatcher(pickTorrents(data))
+export const useAddedMatcher = () => useMainData(pickAddedMatcher)
 const pickErrored = (data: MainData) => Object.values(data.torrents).filter(torrent => isErrored(torrent.state)).length
 export const useErroredCount = () => useMainData(pickErrored)
 // Looks a torrent up in the list already fetched, by its hash or, for a hybrid one, its v1 hash.
@@ -134,6 +139,20 @@ const perTorrent = <T>(hash: string, part: string, load: () => Promise<T>, refet
 export const useTorrentFiles = (hash: string) => useQuery(perTorrent(hash, 'files', () => qbitClient.getTorrentFiles(hash)))
 export const useTorrentTrackers = (hash: string) => useQuery(perTorrent(hash, 'trackers', () => qbitClient.getTorrentTrackers(hash)))
 export const useTorrentPeers = (hash: string) => useQuery(perTorrent(hash, 'peers', () => qbitClient.getTorrentPeers(hash)))
+// The other tabs' lists, fetched soon after the details open, so a first switch to a tab shows them
+// at once. Not straight away: going through the list with the details open fetches only where it stops.
+export function usePrefetchDetails(hash: string) {
+  const client = useQueryClient()
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void client.prefetchQuery(perTorrent(hash, 'files', () => qbitClient.getTorrentFiles(hash)))
+      void client.prefetchQuery(perTorrent(hash, 'trackers', () => qbitClient.getTorrentTrackers(hash)))
+      void client.prefetchQuery(perTorrent(hash, 'peers', () => qbitClient.getTorrentPeers(hash)))
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [client, hash])
+}
+
 export const useWebSeeds = (hash: string) => useQuery(perTorrent(hash, 'webseeds', () => qbitClient.getWebSeeds(hash), false))
 
 export const useTorrentAvailability = (hash: string, enabled: boolean) =>

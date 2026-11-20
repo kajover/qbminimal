@@ -690,7 +690,6 @@
   "Wasted": "تم تضييع",
   "Yes": "نعم",
   "{part} of {whole}": "{part} من {whole}",
-  "More": "المزيد",
   "More actions": "إجراءات أخرى",
   "Start": "ابدأ",
   "{count} torrents": "{count} تورنت",
@@ -736,7 +735,6 @@
   "1 torrent": "تورنت واحد",
   "Clear filters": "مسح عوامل التصفية",
   "Clear selection": "مسح التحديد",
-  "Clear selection (Esc)": "مسح التحديد (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "تعذر تحميل التورنتات. تحقق من الاتصال بـ qBittorrent.",
   "Delete (Del)": "حذف (Del)",
   "Loading torrents": "جارِ تحميل التورنت",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "تعليم الكل كمقروء؟",
   "Every article in {name} is marked as read.": "ستُعلَّم كل مقالة في {name} كمقروءة.",
   "Add sections": "أقسام الإضافة",
-  "{size} free": "{size} متاحة"
+  "{size} free": "{size} متاحة",
+  "Already added": "تمت إضافته بالفعل",
+  "Recheck the data?": "إعادة فحص البيانات؟",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "يقرأ qBittorrent جميع البيانات المنزّلة لـ {count} {noun} مرة أخرى للتحقق منها. حتى ذلك الحين لا ينزّل ولا يشارك."
 }

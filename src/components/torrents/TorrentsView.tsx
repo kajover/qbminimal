@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/PageHeader'
 import { useCategories, useDeleteTorrents, usePauseTorrents, useResumeTorrents, useSessionPausedWarning, useTags, useTorrents, useTrackerMap } from '@/hooks/useApi'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useRowPress, type RowProps } from '@/hooks/useRowPress'
+import { revealRow } from '@/hooks/useRowWindow'
 import { useSelection } from '@/hooks/useSelection'
 import { useTorrentList } from '@/hooks/useTorrentList'
 import { PAGE_SIZES } from '@/lib/listSettings'
@@ -231,7 +232,8 @@ export function TorrentsView() {
       event.preventDefault()
       const next = list.rows[Math.max(0, Math.min(list.rows.length - 1, moves[event.key]))]
       if (!next) return
-      document.querySelector<HTMLElement>(`[data-hash="${next.hash}"]`)?.focus()
+      // A long list may not have drawn that row yet (Home, End).
+      revealRow(list.rows.indexOf(next), next.hash, row => row.focus())
       // Shift extends the selection, Ctrl or Cmd only moves, and a plain arrow selects the row,
       // following with the details when they're open.
       if (event.shiftKey) selection.extendTo(next.hash)
@@ -284,6 +286,7 @@ export function TorrentsView() {
     toggleView: () => list.showAsTable(!list.showTable),
   })
 
+  const matchingSelected = list.matching.filter(t => selection.selected.has(t.hash)).length
   const selectionBar = (inHeader: boolean) => count > 0 && (
     <SelectionBar
       inHeader={inHeader}
@@ -292,11 +295,10 @@ export function TorrentsView() {
       count={count}
       total={list.matching.length}
       pinned={pinnedEntries}
-      onClear={selection.clear}
       onStart={start}
       onStop={stop}
       onDelete={() => askToDelete(selectedTorrents)}
-      more={<MoreMenu torrents={selectedTorrents} groups={groups} onDetails={toggleDetails} detailsHash={detailsHash} onStart={start} onStop={stop} onDelete={() => askToDelete(selectedTorrents)} onCustomize={() => setBarDialogOpen(true)} />}
+      more={<MoreMenu torrents={selectedTorrents} groups={groups} onDetails={toggleDetails} detailsHash={detailsHash} onStart={start} onStop={stop} onDelete={() => askToDelete(selectedTorrents)} onCustomize={() => setBarDialogOpen(true)} cards={list.showTable ? undefined : { onSelectAll: matchingSelected < list.matching.length ? () => selection.replace(list.matching.map(t => t.hash)) : undefined, onClear: selection.clear }} />}
     />
   )
 
@@ -346,7 +348,6 @@ export function TorrentsView() {
     )
   }
 
-  const matchingSelected = list.matching.filter(t => selection.selected.has(t.hash)).length
   const sidebar = (
     <FilterSidebar
       list={list}
@@ -442,8 +443,6 @@ export function TorrentsView() {
             />
           </div>
         )}
-        {/* At the window's bottom even below a short list, level with the sidebar's Logout. */}
-        {framed && pageBar && <div ref={holdWheel} className={cn('mt-auto shrink-0', list.showTable ? PAGE_BAR_BELOW_TABLE : 'px-[calc(0.625rem+2px)]')}>{pageBar}</div>}
         {/* After the last card, outside the frame, as wide as the cards. */}
         {!framed && !list.showTable && pageBar && <div className="glass-bar mb-[var(--toolbar-room,0px)] rounded-xl border px-[calc(0.625rem+1px)] py-1.5 max-sm:-mx-2">{pageBar}</div>}
 
@@ -457,6 +456,11 @@ export function TorrentsView() {
           </aside>
         )}
       </div>
+
+      {/* At the window's bottom even below a short list, level with the sidebar's Logout. Below the
+          filters too, so its arrows stay at the page's end with the filters open, and the filters
+          end where the list does. */}
+      {framed && pageBar && <div ref={holdWheel} className={cn('mt-auto shrink-0', list.showTable ? PAGE_BAR_BELOW_TABLE : 'px-[calc(0.625rem+2px)]')}>{pageBar}</div>}
 
       {/* Keeps the last cards clear of the selection bar at the bottom; the table goes under it. */}
       {phoneBar && !list.showTable && <div aria-hidden className="h-14" />}

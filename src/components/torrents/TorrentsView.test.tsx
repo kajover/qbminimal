@@ -59,6 +59,19 @@ describe('the torrent list', () => {
     expect(await screen.findByRole('region', { name: 'Torrent details' })).toHaveTextContent('bravo')
   })
 
+  it('clears a partial selection from the title checkbox first, then selects all', async () => {
+    await renderView()
+    await userEvent.click(row('bravo'))
+    // Its name says what a click does: clear the selection, then select all.
+    const all = screen.getByRole('checkbox', { name: 'Clear selection' })
+    expect(all).toHaveAttribute('data-state', 'indeterminate')
+    await userEvent.click(all)
+    expect(selectedNames()).toEqual([])
+    expect(all).toHaveAccessibleName('Select all')
+    await userEvent.click(all)
+    expect(selectedNames()).toEqual(['alpha', 'bravo', 'charlie', 'delta'])
+  })
+
   it('adds with Ctrl, selects ranges with Shift, and closes on a second click', async () => {
     await renderView()
     const user = userEvent.setup()

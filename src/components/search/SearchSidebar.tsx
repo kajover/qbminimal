@@ -57,7 +57,7 @@ export function SearchSidebar(props: SearchSidebarProps) {
   // The latest searches listed at first, and how many more "Show more" has revealed.
   const [perPage, setPerPage] = useState(searchesShown)
   const [extra, setExtra] = useState(0)
-  const { folded, fold, searchProps, matching } = useSidebarSections(FOLDED_KEY)
+  const { folded, fold, searchProps, matching } = useSidebarSections(FOLDED_KEY, () => ['plugins', 'categories'])
   const nothing = <NothingMatches />
 
   const saved = readSavedSearches()
@@ -71,9 +71,10 @@ export function SearchSidebar(props: SearchSidebarProps) {
       toast.error(t('Couldn\'t delete the search'), { description: e instanceof Error ? e.message : undefined })
     }
   }
-  // The new search replaces the old one, so the list doesn't fill up with the same text.
+  // The new search replaces the old one, so the list doesn't fill up with the same text. Starting it
+  // already removes a search with the same settings; one saved with other plugins goes here.
   const runAgain = async (id: number, search: SavedSearch) => {
-    if (await onRun(search)) await remove(id)
+    if (await onRun(search) && readSavedSearches()[id]) await remove(id)
   }
   // Deletes every search, or every one but the search shown, when past searches stop being kept.
   const clear = async (keepShown = false) => {

@@ -690,7 +690,6 @@
   "Wasted": "Потеряно",
   "Yes": "Да",
   "{part} of {whole}": "{part} из {whole}",
-  "More": "Ещё",
   "More actions": "Другие действия",
   "Start": "Запустить",
   "{count} torrents": "Торрентов: {count}",
@@ -736,7 +735,6 @@
   "1 torrent": "1 торрент",
   "Clear filters": "Сбросить фильтры",
   "Clear selection": "Снять выбор",
-  "Clear selection (Esc)": "Снять выбор (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Не удалось загрузить торренты. Проверьте подключение к qBittorrent.",
   "Delete (Del)": "Удалить (Del)",
   "Loading torrents": "Подгрузка торрентов",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Отметить все как прочитанные?",
   "Every article in {name} is marked as read.": "Все статьи в {name} отмечаются как прочитанные.",
   "Add sections": "Разделы добавления",
-  "{size} free": "{size} свободно"
+  "{size} free": "{size} свободно",
+  "Already added": "Уже добавлен",
+  "Recheck the data?": "Проверить данные заново?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent заново прочитает все загруженные данные ({count} {noun}), чтобы проверить их. До этого он не загружает и не раздаёт."
 }

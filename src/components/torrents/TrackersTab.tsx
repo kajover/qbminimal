@@ -12,23 +12,23 @@ import { AddButtonLabel, WebSeedsSection } from './WebSeedsSection'
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import type { TorrentTracker } from '@/types'
-import { t } from '@/i18n'
+import { perLanguage, t } from '@/i18n'
 
 // qBittorrent's tracker states, as its own Trackers list names them, with a color for each.
-const STATUS: Record<number, [label: string, className: string]> = {
+const STATUS = perLanguage((): Record<number, [label: string, className: string]> => ({
   0: [t('Disabled'), 'text-muted-foreground'],
   1: [t('Not contacted yet'), 'text-muted-foreground'],
   2: [t('Working'), 'tint text-green-600 dark:text-green-400'],
   3: [t('Updating'), 'tint text-blue-600 dark:text-blue-400'],
   4: [t('Not working'), 'tint text-red-600 dark:text-red-400'],
-}
-const statusOf = (tracker: TorrentTracker) => STATUS[tracker.status] ?? [String(tracker.status), 'text-muted-foreground']
+}))
+const statusOf = (tracker: TorrentTracker) => STATUS()[tracker.status] ?? [String(tracker.status), 'text-muted-foreground']
 const count = (value: number | undefined) => Math.max(value ?? 0, 0)
 
 type SortField = 'url' | 'status' | 'tier' | 'seeds' | 'peers' | 'downloaded'
-const SORT_FIELDS: [SortField, string][] = [
+const SORT_FIELDS = perLanguage((): [SortField, string][] => [
   ['url', t('Tracker')], ['status', t('Status')], ['tier', t('Tier')], ['seeds', t('Seeds')], ['peers', t('Peers')], ['downloaded', t('Downloaded')],
-]
+])
 const sortValue = (tracker: TorrentTracker, field: SortField): number | string => {
   switch (field) {
     case 'url': return tracker.url
@@ -207,7 +207,7 @@ export function TrackersTab({ hash }: { hash: string }) {
         <div className="flex items-center gap-2 px-2 pb-1.5">
           <SearchInput aria-label={t('Search')} placeholder={t('Search')} value={search} onValueChange={setSearch} className="w-40 min-w-0 shrink sm:w-64" inputClassName="h-7 text-xs" />
           <span className="ms-auto shrink-0 text-xs text-muted-foreground tabular-nums">{all.length === 1 ? t('1 tracker') : t('{count} trackers', { count: all.length })}</span>
-          <SortMenu fields={SORT_FIELDS} sort={shownSort} onSort={sortBy} onReset={() => setSort(null)} isDefault={!sort} />
+          <SortMenu fields={SORT_FIELDS()} sort={shownSort} onSort={sortBy} onReset={() => setSort(null)} isDefault={!sort} />
         </div>
         {isLoading ? status(t('Loading trackers...'))
           : isError && !trackers ? status(t('Couldn\'t load trackers'))

@@ -690,7 +690,6 @@
   "Wasted": "Perdidos",
   "Yes": "Sim",
   "{part} of {whole}": "{part} de {whole}",
-  "More": "Mais",
   "More actions": "Mais ações",
   "Start": "Iniciar",
   "{count} torrents": "Torrents: {count}",
@@ -736,7 +735,6 @@
   "1 torrent": "1 torrent",
   "Clear filters": "Limpar filtros",
   "Clear selection": "Limpar seleção",
-  "Clear selection (Esc)": "Limpar seleção (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Não foi possível carregar os torrents. Verifique a conexão com o qBittorrent.",
   "Delete (Del)": "Excluir (Del)",
   "Loading torrents": "Carregando torrents",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Marcar tudo como lido?",
   "Every article in {name} is marked as read.": "Todos os artigos de {name} são marcados como lidos.",
   "Add sections": "Seções de adicionar",
-  "{size} free": "{size} livres"
+  "{size} free": "{size} livres",
+  "Already added": "Já adicionado",
+  "Recheck the data?": "Verificar os dados novamente?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "O qBittorrent lê de novo todos os dados baixados de {count} {noun} para verificá-los. Até lá, não baixa nem compartilha."
 }

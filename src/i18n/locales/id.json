@@ -690,7 +690,6 @@
   "Wasted": "Terbuang",
   "Yes": "Ya",
   "{part} of {whole}": "{part} dari {whole}",
-  "More": "Lainnya",
   "More actions": "Tindakan lainnya",
   "Start": "Mulai",
   "{count} torrents": "{count} torrent",
@@ -736,7 +735,6 @@
   "1 torrent": "1 torrent",
   "Clear filters": "Hapus filter",
   "Clear selection": "Hapus pilihan",
-  "Clear selection (Esc)": "Hapus pilihan (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Tidak dapat memuat torrent. Periksa koneksi ke qBittorrent.",
   "Delete (Del)": "Hapus (Del)",
   "Loading torrents": "Memuat torrent",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Tandai semua sudah dibaca?",
   "Every article in {name} is marked as read.": "Setiap artikel di {name} ditandai sudah dibaca.",
   "Add sections": "Bagian tambah",
-  "{size} free": "{size} tersedia"
+  "{size} free": "{size} tersedia",
+  "Already added": "Sudah ditambahkan",
+  "Recheck the data?": "Periksa ulang data?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent membaca ulang semua data yang diunduh dari {count} {noun} untuk memeriksanya. Sampai selesai, ia tidak mengunduh atau berbagi."
 }

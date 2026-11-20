@@ -22,9 +22,9 @@ type Section = 'articles' | 'feeds' | 'rules'
 
 // One section at a time, picked like the Settings sections, so no list runs on below another.
 const SECTIONS: { id: Section; title: string }[] = [
-  { id: 'articles', title: t('Articles') },
-  { id: 'feeds', title: t('Feeds') },
-  { id: 'rules', title: t('Download rules') },
+  { id: 'articles', get title() { return t('Articles') } },
+  { id: 'feeds', get title() { return t('Feeds') } },
+  { id: 'rules', get title() { return t('Download rules') } },
 ]
 
 export function RSSView() {

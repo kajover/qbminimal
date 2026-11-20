@@ -14,7 +14,9 @@ import { DetailsHeading } from './DetailsHeading'
 import { ShareLimitsForm } from './ShareLimitsForm'
 import { SSLParametersForm } from './SSLParametersForm'
 import type { Torrent } from '@/types'
-import { t } from '@/i18n'
+import { ConfirmAction } from '@/components/ConfirmAction'
+import { recheckMessage } from './BulkPromptDialog'
+import { perLanguage, t } from '@/i18n'
 
 // One headed part of the tab. All but the first are set off by a rule, as in the Details tab.
 function Section({ title, first, children }: { title: string; first?: boolean; children: ReactNode }) {
@@ -42,13 +44,13 @@ function OptionButton({ label, icon: Icon, on, hint, onFlip }: { label: string; 
 }
 
 // What each option's notification says once it's on, or off.
-const FLAG_DONE: Record<Flag, [on: string, off: string]> = {
+const FLAG_DONE = perLanguage((): Record<Flag, [on: string, off: string]> => ({
   force_start: [t('Force start on'), t('Force start off')],
   seq_dl: [t('Sequential download on'), t('Sequential download off')],
   f_l_piece_prio: [t('First and last pieces first on'), t('First and last pieces first off')],
   super_seeding: [t('Super seeding on'), t('Super seeding off')],
   auto_tmm: [t('Automatic management on'), t('Automatic management off')],
-}
+}))
 
 // Buttons as small as Add peers in the Peers tab, so the tab stays compact.
 const SMALL = 'h-7 gap-1 px-2 text-xs [&_svg:not([class*=size-])]:size-3.5'
@@ -140,7 +142,7 @@ export function TorrentActions({ torrent, onDelete }: { torrent: Torrent; onDele
   const flip = (key: Flag, work: (on: boolean) => Promise<unknown>, failed: string) => {
     const on = !isOn(key)
     setSwitched(current => ({ ...current, [key]: on }))
-    void optionAction.mutateAsync({ work: () => work(on), failed }).then(() => toast.success(on ? FLAG_DONE[key][0] : FLAG_DONE[key][1]), () => undefined).finally(() => forget(key))
+    void optionAction.mutateAsync({ work: () => work(on), failed }).then(() => toast.success(on ? FLAG_DONE()[key][0] : FLAG_DONE()[key][1]), () => undefined).finally(() => forget(key))
   }
   const [confirmAuto, setConfirmAuto] = useState(false)
 
@@ -177,9 +179,11 @@ export function TorrentActions({ torrent, onDelete }: { torrent: Torrent; onDele
           <Pause />{t('Stop')}
         </Button>
         <OptionButton label={t('Force start')} icon={Zap} on={isOn('force_start')} onFlip={() => flip('force_start', on => qbitClient.setForceStart(hashes, on), t('Failed to change force start'))} />
-        <Button type="button" size="sm" variant="outline" className={SMALL} onClick={() => run(() => qbitClient.recheckTorrents(hashes), t('Recheck started'), t('Failed to start recheck'))}>
-          <FileCheck />{t('Recheck')}
-        </Button>
+        <ConfirmAction
+          label={t('Recheck')} buttonLabel={t('Recheck')} buttonIcon={FileCheck} buttonClassName={SMALL} safe
+          title={t('Recheck the data?')} message={recheckMessage(1)} confirmLabel={t('Recheck')}
+          onConfirm={() => run(() => qbitClient.recheckTorrents(hashes), t('Recheck started'), t('Failed to start recheck'))}
+        />
         {/* A disabled button shows no tooltip, so the wrapper carries it. */}
         <span className={stopped ? 'cursor-not-allowed' : undefined} title={stopped ? t('Start the torrent first: stopped torrents don\'t contact trackers') : t('Ask the trackers for more peers now')}>
           <Button type="button" size="sm" variant="outline" className={SMALL} disabled={stopped} onClick={() => run(() => qbitClient.reannounceTorrents(hashes), t('Reannounce sent'), t('Failed to reannounce'))}>

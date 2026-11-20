@@ -1,13 +1,13 @@
 import { readStored, writeStored } from './storage'
 
 // The actions shown in the selection bar besides Start, Stop, More, and Delete, by their ids in
-// components/torrents/bulkActions, chosen apart for wide screens and phones, where the bar is
-// narrow and holds none by default. Remembered on this device.
+// components/torrents/bulkActions, chosen apart for wide screens and phones, the same by default:
+// with icons only they fit a phone's bar too. Remembered on this device.
 export type BarKind = 'wide' | 'phone'
 
 export const DEFAULT_BAR_ACTIONS: Record<BarKind, string[]> = {
   wide: ['forceStart', 'recheck', 'reannounce', 'category', 'addTags'],
-  phone: [],
+  phone: ['forceStart', 'recheck', 'reannounce', 'category', 'addTags'],
 }
 
 const storageKey = (kind: BarKind) => (kind === 'wide' ? 'qbminimal.actionBar' : 'qbminimal.actionBar.phone')

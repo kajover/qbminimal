@@ -690,7 +690,6 @@
   "Wasted": "Σπαταλημένα",
   "Yes": "Ναι",
   "{part} of {whole}": "{part} από {whole}",
-  "More": "Περισσότερα",
   "More actions": "Περισσότερες ενέργειες",
   "Start": "Εκκίνηση",
   "{count} torrents": "{count} torrents",
@@ -736,7 +735,6 @@
   "1 torrent": "1 torrent",
   "Clear filters": "Εκκαθάριση φίλτρων",
   "Clear selection": "Εκκαθάριση επιλογής",
-  "Clear selection (Esc)": "Εκκαθάριση επιλογής (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Αδυναμία φόρτωσης torrents. Ελέγξτε τη σύνδεση με το qBittorrent.",
   "Delete (Del)": "Διαγραφή (Del)",
   "Loading torrents": "Φόρτωση torrents",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Σήμανση όλων ως αναγνωσμένων;",
   "Every article in {name} is marked as read.": "Κάθε άρθρο στο {name} σημειώνεται ως αναγνωσμένο.",
   "Add sections": "Ενότητες προσθήκης",
-  "{size} free": "{size} ελεύθερα"
+  "{size} free": "{size} ελεύθερα",
+  "Already added": "Έχει ήδη προστεθεί",
+  "Recheck the data?": "Επανέλεγχος των δεδομένων;",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "Το qBittorrent διαβάζει ξανά όλα τα ληφθέντα δεδομένα {count} {noun} για να τα ελέγξει. Μέχρι τότε δεν κατεβάζει ούτε διαμοιράζει."
 }

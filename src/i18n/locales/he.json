@@ -690,7 +690,6 @@
   "Wasted": "בוזבז",
   "Yes": "כן",
   "{part} of {whole}": "{part} מתוך {whole}",
-  "More": "עוד",
   "More actions": "פעולות נוספות",
   "Start": "התחל",
   "{count} torrents": "טורנטים: {count}",
@@ -736,7 +735,6 @@
   "1 torrent": "טורנט אחד",
   "Clear filters": "ניקוי מסננים",
   "Clear selection": "ניקוי הבחירה",
-  "Clear selection (Esc)": "ניקוי הבחירה (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "לא ניתן לטעון את הטורנטים. בדוק את החיבור ל-qBittorrent.",
   "Delete (Del)": "מחיקה (Del)",
   "Loading torrents": "טוען טורנטים",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "לסמן הכול כנקרא?",
   "Every article in {name} is marked as read.": "כל המאמרים ב-{name} יסומנו כנקראו.",
   "Add sections": "מדורי הוספה",
-  "{size} free": "{size} פנויים"
+  "{size} free": "{size} פנויים",
+  "Already added": "כבר נוסף",
+  "Recheck the data?": "לבדוק את הנתונים מחדש?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent קורא שוב את כל הנתונים שהורדו של {count} {noun} כדי לבדוק אותם. עד אז הוא לא מוריד ולא משתף."
 }

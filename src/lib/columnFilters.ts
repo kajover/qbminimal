@@ -30,10 +30,10 @@ export interface FilterColumn<Row> {
 }
 
 export const TEXT_OPERATORS: { value: TextOperator; label: string }[] = [
-  { value: 'contains', label: t('contains') },
-  { value: 'excludes', label: t("doesn't contain") },
-  { value: 'is', label: t('is') },
-  { value: 'isNot', label: t("isn't") },
+  { value: 'contains', get label() { return t('contains') } },
+  { value: 'excludes', get label() { return t("doesn't contain") } },
+  { value: 'is', get label() { return t('is') } },
+  { value: 'isNot', get label() { return t("isn't") } },
 ]
 
 // The units a range can be typed in. The first is where the editor starts.
@@ -49,9 +49,9 @@ export const UNITS: Partial<Record<FilterKind, { label: string; factor: number }
     { label: 'KB/s', factor: 1024 },
   ],
   duration: [
-    { label: t('hours'), factor: 3600 },
-    { label: t('minutes'), factor: 60 },
-    { label: t('days'), factor: 86400 },
+    { get label() { return t('hours') }, factor: 3600 },
+    { get label() { return t('minutes') }, factor: 60 },
+    { get label() { return t('days') }, factor: 86400 },
   ],
 }
 

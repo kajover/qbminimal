@@ -690,7 +690,6 @@
   "Wasted": "已丢弃：",
   "Yes": "是",
   "{part} of {whole}": "{part}/{whole}",
-  "More": "更多",
   "More actions": "更多操作",
   "Start": "启动",
   "{count} torrents": "{count} 个种子",
@@ -736,7 +735,6 @@
   "1 torrent": "1 个种子",
   "Clear filters": "清除筛选",
   "Clear selection": "清除选择",
-  "Clear selection (Esc)": "清除选择 (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "无法加载种子。请检查与 qBittorrent 的连接。",
   "Delete (Del)": "删除 (Del)",
   "Loading torrents": "加载 Torrent 中",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "全部标为已读？",
   "Every article in {name} is marked as read.": "{name} 中的所有文章将标为已读。",
   "Add sections": "添加分区",
-  "{size} free": "{size} 可用"
+  "{size} free": "{size} 可用",
+  "Already added": "已添加",
+  "Recheck the data?": "重新校验数据？",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent 会重新读取 {count} 个{noun}的全部已下载数据以进行校验。在此期间不会下载或做种。"
 }

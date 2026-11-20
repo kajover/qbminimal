@@ -690,7 +690,6 @@
   "Wasted": "هدر رفت",
   "Yes": "بله",
   "{part} of {whole}": "{part} از {whole}",
-  "More": "بیشتر",
   "More actions": "اقدام‌های بیشتر",
   "Start": "شروع",
   "{count} torrents": "{count} تورنت",
@@ -736,7 +735,6 @@
   "1 torrent": "1 تورنت",
   "Clear filters": "پاک کردن فیلترها",
   "Clear selection": "پاک کردن انتخاب",
-  "Clear selection (Esc)": "پاک کردن انتخاب (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "بارگذاری تورنت‌ها ممکن نبود. اتصال به qBittorrent را بررسی کنید.",
   "Delete (Del)": "حذف (Del)",
   "Loading torrents": "در حال بارگذاری تورنت‌ها",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "همه به‌عنوان خوانده‌شده علامت‌گذاری شوند؟",
   "Every article in {name} is marked as read.": "همه مقاله‌های {name} خوانده‌شده علامت‌گذاری می‌شوند.",
   "Add sections": "بخش‌های افزودن",
-  "{size} free": "{size} آزاد"
+  "{size} free": "{size} آزاد",
+  "Already added": "قبلاً افزوده شده",
+  "Recheck the data?": "داده‌ها دوباره بررسی شوند؟",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent همهٔ داده‌های بارگیری‌شدهٔ {count} {noun} را دوباره می‌خواند تا بررسی کند. تا آن زمان بارگیری یا اشتراک‌گذاری نمی‌کند."
 }

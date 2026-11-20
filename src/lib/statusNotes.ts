@@ -3,9 +3,9 @@ import { t } from '@/i18n'
 
 // qBittorrent's connection states, as the statistics show them.
 export const CONNECTION_LABELS: Record<string, { label: string; description: string; dot: string; text: string }> = {
-  connected: { label: t('Connected'), description: t('Other peers can reach qBittorrent'), dot: 'bg-green-500', text: 'text-green-600 dark:text-green-400' },
-  firewalled: { label: t('Firewalled'), description: t('Peers can\'t connect in, so only outgoing connections work'), dot: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
-  disconnected: { label: t('Disconnected'), description: t('qBittorrent has no network connection'), dot: 'bg-red-500', text: 'text-red-600 dark:text-red-400' },
+  connected: { get label() { return t('Connected') }, get description() { return t('Other peers can reach qBittorrent') }, dot: 'bg-green-500', text: 'text-green-600 dark:text-green-400' },
+  firewalled: { get label() { return t('Firewalled') }, get description() { return t('Peers can\'t connect in, so only outgoing connections work') }, dot: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+  disconnected: { get label() { return t('Disconnected') }, get description() { return t('qBittorrent has no network connection') }, dot: 'bg-red-500', text: 'text-red-600 dark:text-red-400' },
 }
 const PAUSED_DOT = 'bg-muted-foreground'
 const ALTERNATIVE_DOT = 'bg-amber-500'

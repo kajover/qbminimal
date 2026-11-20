@@ -14,8 +14,8 @@ import { t } from '@/i18n'
 const selectClass = 'border-input dark:bg-input/30 h-7 w-full rounded-md border bg-transparent px-2 text-xs'
 
 const REMOVAL_WARNINGS: Record<string, string> = {
-  Remove: t('qBittorrent will remove this torrent without asking once a limit is reached, or right away if it\'s already past one. Its files are kept.'),
-  RemoveWithContent: t('qBittorrent will remove this torrent and permanently delete its files without asking once a limit is reached, or right away if it\'s already past one.'),
+  get Remove() { return t('qBittorrent will remove this torrent without asking once a limit is reached, or right away if it\'s already past one. Its files are kept.') },
+  get RemoveWithContent() { return t('qBittorrent will remove this torrent and permanently delete its files without asking once a limit is reached, or right away if it\'s already past one.') },
 }
 
 // Values start from the torrent and don't follow refreshes, so typing isn't overwritten.

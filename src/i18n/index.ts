@@ -1,8 +1,9 @@
+import { useSyncExternalStore } from 'react'
 import { readStored, writeStored } from '@/lib/storage'
 
 // Translations. The English text is the key, so anything not translated yet shows in English.
-// The language is loaded once, before the app's modules, so text built when a module loads is
-// translated too. Changing it reloads the page.
+// The language is loaded before the app's modules. Text built outside the components is read when
+// it's shown (getters, perLanguage), so a change of language applies without reloading.
 export type Catalog = Record<string, string>
 
 // Each language by its own name, in the order the Settings list shows them.
@@ -93,9 +94,43 @@ export async function loadLanguage() {
   document.documentElement.dir = RIGHT_TO_LEFT.has(current) ? 'rtl' : 'ltr'
 }
 
-export function setLanguage(choice: LanguageChoice) {
+// A language picked in Settings applies at once: its catalog loads, then the pages are drawn
+// again (see useLanguage) and come back on Settings, at the language field.
+let version = 0
+const listeners = new Set<() => void>()
+let focusLanguageField = false
+
+export async function setLanguage(choice: LanguageChoice) {
   writeStored(STORAGE_KEY, choice === 'auto' ? null : choice)
-  window.location.reload()
+  await loadLanguage()
+  version++
+  focusLanguageField = true
+  for (const listener of listeners) listener()
+}
+
+// Changes with every new language, so whatever depends on it is drawn again.
+export function useLanguage(): number {
+  return useSyncExternalStore(listener => {
+    listeners.add(listener)
+    return () => { listeners.delete(listener) }
+  }, () => version)
+}
+
+// Whether the language field should get focus after a change. Asked once.
+export function changedLanguage(): boolean {
+  const was = focusLanguageField
+  focusLanguageField = false
+  return was
+}
+
+// A list with translated text, built once per language rather than when its module loads, so it
+// follows a change of language.
+export function perLanguage<T>(build: () => T): () => T {
+  let built: { version: number; value: T } | null = null
+  return () => {
+    if (built?.version !== version) built = { version, value: build() }
+    return built.value
+  }
 }
 
 // Text in the current language. {name} in it is replaced with vars.name.
@@ -109,4 +144,5 @@ export function t(text: string, vars?: Record<string, string | number | null | u
 export function setCatalogForTests(next: Catalog, code: LanguageCode = 'de') {
   catalog = next
   current = code
+  version++
 }

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Check, Folder, Plus, Power, Tag as TagIcon } from 'lucide-react'
+import { Check, FileCheck, Folder, Plus, Power, Tag as TagIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input, Textarea } from '@/components/ui/input'
@@ -25,9 +25,14 @@ const TITLES: Record<BulkPrompt, string> = {
   limits: 'Speed limits',
   shareLimits: 'Seeding limits',
   autoOn: 'Turn on automatic management?',
+  recheck: 'Recheck the data?',
   queuePosition: 'Set queue position',
   comment: 'Comment',
 }
+
+// Rechecking reads every file again, which takes long for big torrents, so it's asked first.
+export const recheckMessage = (count: number) =>
+  t('qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn\'t download or seed.', { count, noun: count === 1 ? t('torrent') : t('torrents') })
 
 const same = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
 
@@ -166,11 +171,15 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
       }
       case 'autoOn':
         return apply(() => qbitClient.setAutoManagement(hashes, true), t('Automatic management on'), t('Failed to change automatic management'))
+      case 'recheck':
+        return apply(() => qbitClient.recheckTorrents(hashes), t('Recheck started'), t('Failed to start recheck'))
     }
   }
 
   const description = prompt === 'queuePosition'
     ? t('1 is the top of the queue, {length} its end.', { length })
+    : prompt === 'recheck'
+    ? recheckMessage(count)
     : prompt === 'autoOn'
     ? t('qBittorrent will set the location of {count} {noun} from their categories, and may move their files.', { count, noun })
     : prompt === 'location'
@@ -240,8 +249,8 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
         )}
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose}>{t('Cancel')}</Button>
-          <Button type="submit" disabled={action.isPending}>{prompt === 'autoOn' ? <Power /> : <Check />}
-            {prompt === 'autoOn' ? t('Turn on') : t('Apply')}</Button>
+          <Button type="submit" disabled={action.isPending}>{prompt === 'autoOn' ? <Power /> : prompt === 'recheck' ? <FileCheck /> : <Check />}
+            {prompt === 'autoOn' ? t('Turn on') : prompt === 'recheck' ? t('Recheck') : t('Apply')}</Button>
         </DialogFooter>
       </form>
     </>

@@ -690,7 +690,6 @@
   "Wasted": "Boşa giden",
   "Yes": "Evet",
   "{part} of {whole}": "{part} / {whole}",
-  "More": "Daha fazla",
   "More actions": "Diğer eylemler",
   "Start": "Başlat",
   "{count} torrents": "{count} torrent",
@@ -736,7 +735,6 @@
   "1 torrent": "1 torrent",
   "Clear filters": "Süzgeçleri temizle",
   "Clear selection": "Seçimi temizle",
-  "Clear selection (Esc)": "Seçimi temizle (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Torrentler yüklenemedi. qBittorrent bağlantısını denetleyin.",
   "Delete (Del)": "Sil (Del)",
   "Loading torrents": "Torrent'ler yükleniyor",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Tümü okundu olarak işaretlensin mi?",
   "Every article in {name} is marked as read.": "{name} içindeki tüm makaleler okundu olarak işaretlenir.",
   "Add sections": "Ekleme bölümleri",
-  "{size} free": "{size} boş"
+  "{size} free": "{size} boş",
+  "Already added": "Zaten eklendi",
+  "Recheck the data?": "Veriler yeniden denetlensin mi?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent, denetlemek için {count} {noun} için indirilen tüm verileri yeniden okur. O zamana kadar indirmez ve paylaşmaz."
 }

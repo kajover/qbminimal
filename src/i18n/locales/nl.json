@@ -690,7 +690,6 @@
   "Wasted": "Verloren",
   "Yes": "Ja",
   "{part} of {whole}": "{part} van {whole}",
-  "More": "Meer",
   "More actions": "Meer acties",
   "Start": "Starten",
   "{count} torrents": "{count} torrents",
@@ -736,7 +735,6 @@
   "1 torrent": "1 torrent",
   "Clear filters": "Filters wissen",
   "Clear selection": "Selectie wissen",
-  "Clear selection (Esc)": "Selectie wissen (Esc)",
   "Couldn't load torrents. Check the connection to qBittorrent.": "Kan torrents niet laden. Controleer de verbinding met qBittorrent.",
   "Delete (Del)": "Verwijderen (Del)",
   "Loading torrents": "Torrents laden",
@@ -1413,5 +1411,8 @@
   "Mark all as read?": "Alles als gelezen markeren?",
   "Every article in {name} is marked as read.": "Alle artikelen in {name} worden als gelezen gemarkeerd.",
   "Add sections": "Onderdelen voor toevoegen",
-  "{size} free": "{size} vrij"
+  "{size} free": "{size} vrij",
+  "Already added": "Al toegevoegd",
+  "Recheck the data?": "Gegevens opnieuw controleren?",
+  "qBittorrent reads all the downloaded data of {count} {noun} again to check it. Until then it doesn't download or seed.": "qBittorrent leest alle gedownloade gegevens van {count} {noun} opnieuw om ze te controleren. Tot die tijd downloadt en deelt het niet."
 }
