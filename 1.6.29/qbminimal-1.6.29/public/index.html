@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>qBittorrent</title>
+    <!-- Built with a hash in the name, so a new icon shows at once, even though qBittorrent tells
+         browsers to keep images for a week. -->
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon-BsgGjm5W.svg" />
+    <link rel="icon" type="image/png" href="./assets/favicon-DwQx5Llf.png" />
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon-WEi7P1R1.png" />
+    <link rel="manifest" href="manifest.json" />
+    <!-- Added to a phone's home screen, it opens like an app. The status bar is opaque black, with the
+         page below it: since iOS 26 a see-through one (black-translucent) lays the app out a status
+         bar short, leaving a band at the bottom, and blurs the top of the page. iOS reads this only
+         when the app is added to the Home Screen. -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="qBittorrent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <!-- iPhone Safari would otherwise turn numbers such as peer addresses into phone links in its
+         own link color, which can be hard to read on the page. -->
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfdfd" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17181c" />
+    <!-- The theme before the first paint. The app's script sets it too, but only after the page has
+         been drawn once, so a reload in dark mode flashed light first. The colors match the
+         theme-color above; the style alone covers the device's setting if the script can't run. -->
+    <script>
+      try {
+        var theme = localStorage.getItem('theme')
+        var dark = theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.classList.toggle('dark', dark)
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+      } catch (e) {}
+    </script>
+    <style>html{background:#fdfdfd}html.dark{background:#17181c}@media (prefers-color-scheme:dark){html:not([style*=color-scheme]){background:#17181c}}</style>
+    <script type="module" crossorigin src="./assets/index-CpMOQ88G.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-JoK-4wF-.css">
+    <link rel="modulepreload" crossorigin href="./assets/App-Frre5CGi.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-C5BF4EWd.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-DJ4BliKn.js">
+    <link rel="modulepreload" crossorigin href="./assets/clipboard-CurHtj24.js">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
