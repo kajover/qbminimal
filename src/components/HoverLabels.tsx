@@ -127,7 +127,7 @@ export function HoverLabels() {
       ref={box}
       role="tooltip"
       style={position ?? { left: 0, top: 0, visibility: 'hidden' }}
-      className="pointer-events-none fixed z-[70] max-w-72 rounded-md bg-foreground px-2 py-1 text-xs text-balance text-background shadow-sm animate-in fade-in-0"
+      className="pointer-events-none fixed z-[70] max-w-72 rounded-md bg-foreground px-2 py-1 text-xs text-balance text-background animate-in fade-in-0"
     >
       {shown.text}
     </div>

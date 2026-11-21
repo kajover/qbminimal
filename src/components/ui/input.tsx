@@ -20,7 +20,7 @@ export function setFieldValue(field: HTMLInputElement | HTMLTextAreaElement, val
 // which can't be styled and differs in each browser.
 function InvalidNote({ message }: { message: string }) {
   return (
-    <span role="alert" className="absolute start-0 top-full z-20 mt-1 flex items-center gap-1 rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-sm">
+    <span role="alert" className="absolute start-0 top-full z-20 mt-1 flex items-center gap-1 rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground ">
       <CircleAlert className="size-3 shrink-0 text-destructive" aria-hidden />
       {message}
     </span>
@@ -96,7 +96,7 @@ function ClearButton({ onClear, className }: { onClear: () => void; className?: 
   )
 }
 
-const FIELD_CLASSES = "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input w-full min-w-0 rounded-md border bg-transparent shadow-xs transition-[color,box-shadow] outline-hidden disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
+const FIELD_CLASSES = "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input w-full min-w-0 rounded-md border bg-transparent transition-[color,box-shadow] outline-hidden disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
 
 // Options of the fields: `className` styles the field; `wrapperClassName` sizes the frame around it,
 // which holds the × and the note for a missing entry; `clearable={false}` leaves out the ×, for a
