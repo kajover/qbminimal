@@ -73,9 +73,8 @@ const TorrentCard = memo(function TorrentCard({ torrent, isSelected, isOpen, sho
       aria-current={isOpen ? 'true' : undefined}
       className={cn(
         'flex cursor-default touch-manipulation items-start gap-2 rounded-xl border bg-card px-2.5 py-2.5 outline-hidden select-none focus-visible:ring-2 focus-visible:ring-ring [-webkit-touch-callout:none]',
-        isSelected && 'border-primary ring-1 ring-primary',
-        isOpen && 'bg-primary/10 shadow-[inset_3px_0_0_var(--open-line)] rtl:shadow-[inset_-3px_0_0_var(--open-line)]',
-        isOpen && !isSelected && 'border-primary/50',
+        // Selected or open, a card only gets a stronger border all round, the same everywhere.
+        (isSelected || isOpen) && 'border-primary ring-1 ring-primary',
       )}
     >
       {showCheckboxes && (

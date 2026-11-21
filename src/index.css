@@ -154,9 +154,11 @@
 }
 
 /* The pixel-style "qBittorrent" title. Trimmed to its capital letters so it centres beside icons. */
+/* Only the letters of "qBittorrent", the one text it draws: 1.7 KB, which the build puts into
+   this stylesheet, so the login title shows with the rest of the form, not a moment later. */
 @font-face {
   font-family: 'Silkscreen';
-  src: url('./assets/fonts/Silkscreen-Regular.ttf') format('truetype');
+  src: url('./assets/fonts/Silkscreen-Title.ttf') format('truetype');
   font-display: block;
 }
 

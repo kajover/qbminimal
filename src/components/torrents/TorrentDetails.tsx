@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { FolderTree, Info, RadioTower, SlidersHorizontal, Users, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog as DialogPrimitive } from 'radix-ui'
@@ -212,14 +212,14 @@ function useDetailsPage(full: boolean) {
   }, [full])
 }
 
-// Following the finger: dragged up, the medium sheet grows from its bottom, so nothing shows below
-// it; dragged down, it moves down. Maximized, only down.
-function sheetStyle(large: boolean, top: number | undefined, offset: number | null): CSSProperties | undefined {
-  const up = offset !== null && offset < 0 ? offset : 0
-  const down = offset !== null && offset > 0 ? { translate: `0 ${offset}px` } : undefined
-  if (large) return down
-  if (top !== undefined) return { top: Math.max(top + up, 0), ...down }
-  return up ? { height: `calc(62dvh + ${-up}px)` } : down
+// The sheet's place, and while a finger drags it: dragged up, the medium sheet grows from its
+// bottom, so nothing shows below it; dragged down, it moves down. Maximized, it only moves down.
+function sheetStyle(large: boolean, top: number | undefined, offset = 0): CSSProperties {
+  const up = Math.min(offset, 0)
+  const translate = offset > 0 ? `0 ${offset}px` : ''
+  if (large) return { translate }
+  if (top !== undefined) return { top: `${Math.max(top + up, 0)}px`, height: '', translate }
+  return { top: '', height: up ? `calc(62dvh + ${-up}px)` : '', translate }
 }
 
 // Where the medium sheet's top goes: in the gap just above the third card, measured from the top
@@ -234,44 +234,66 @@ function measureSheetTop(): number | undefined {
 }
 
 export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProps) {
-  useBackButtonClose(onClose)
   const [detent, setDetent] = useState<Detent>('medium')
   const [sheetTop] = useState(measureSheetTop)
-  const [offset, setOffset] = useState<number | null>(null)
   const drag = useRef<{ y: number; time: number } | null>(null)
+  const sheet = useRef<HTMLDivElement>(null)
+  const large = detent === 'large'
 
+  // Closing slides the medium sheet down before it goes; maximized, it goes at once. Kept the same
+  // function, as the back button's handling follows it.
+  const latest = useRef({ onClose, large })
+  useLayoutEffect(() => { latest.current = { onClose, large } })
+  const close = useCallback(() => {
+    const element = sheet.current
+    if (!element || latest.current.large) return latest.current.onClose()
+    element.style.transition = 'translate 200ms ease-in'
+    element.style.translate = '0 100%'
+    window.setTimeout(() => latest.current.onClose(), 200)
+  }, [])
+  useBackButtonClose(close)
+
+  // While a finger drags the handle, the sheet follows it directly, without drawing the details
+  // again on every move, which made it lag; it's drawn once more when the finger lifts.
+  const follow = (offset?: number) => {
+    const element = sheet.current
+    if (!element) return
+    element.style.transition = offset === undefined ? '' : 'none'
+    Object.assign(element.style, sheetStyle(large, sheetTop, offset))
+  }
   const startDrag = (e: PointerEvent<HTMLButtonElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId)
     drag.current = { y: e.clientY, time: e.timeStamp }
-    setOffset(0)
+    follow(0)
   }
   const moveDrag = (e: PointerEvent<HTMLButtonElement>) => {
-    if (drag.current) setOffset(e.clientY - drag.current.y)
+    if (drag.current) follow(e.clientY - drag.current.y)
   }
   const endDrag = (e: PointerEvent<HTMLButtonElement>) => {
     const start = drag.current
     drag.current = null
-    setOffset(null)
     if (!start) return
     const distance = e.clientY - start.y
     const speed = distance / Math.max(e.timeStamp - start.time, 1)
+    const down = distance > DISMISS_DISTANCE || speed > FLICK_SPEED
+    // Let go to close, it slides on down from where it is; maximized and dragged only a little, it
+    // steps back to medium height.
+    if (down && !(large && distance < window.innerHeight * 0.45)) return close()
+    follow()
     // A tap toggles between the heights, for anyone who doesn't drag.
-    if (Math.abs(distance) < 6) setDetent(detent === 'medium' ? 'large' : 'medium')
+    if (Math.abs(distance) < 6) setDetent(large ? 'medium' : 'large')
     else if (distance < -40 || speed < -FLICK_SPEED) setDetent('large')
-    else if (distance > DISMISS_DISTANCE || speed > FLICK_SPEED) {
-      if (detent === 'large' && distance < window.innerHeight * 0.45) setDetent('medium')
-      else onClose()
-    }
+    else if (down) setDetent('medium')
   }
 
-  const large = detent === 'large'
   useDetailsPage(large)
   // Maximized, the handle and the tabs stay at the top while the page scrolls under them.
   const pinned = large && 'sticky z-10 bg-card'
   return (
-    <DialogPrimitive.Root open modal={false} onOpenChange={(open) => !open && onClose()}>
+    <DialogPrimitive.Root open modal={false} onOpenChange={(open) => !open && close()}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Content
+          ref={sheet}
           aria-describedby={undefined}
           onInteractOutside={keepOpenForList}
           data-keeps-swipes
@@ -288,9 +310,9 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
               // there is one), with only its top rounded and bordered: Safari paints its toolbar
               // strip below in the sheet's colour, so the two run on as one.
               : cn('fixed inset-x-0 bottom-[calc(var(--bottom-nav-height,0px)+var(--selection-bar-gap,0.25rem)-var(--nav-gap,4px))] overflow-hidden rounded-t-xl border-x-0 border-b-0', sheetTop === undefined && 'h-[62dvh]'),
-            offset === null && 'transition-[height,inset,border-radius,translate] duration-300 ease-out',
+            'transition-[height,inset,border-radius,translate] duration-300 ease-out',
           )}
-          style={sheetStyle(large, sheetTop, offset)}
+          style={sheetStyle(large, sheetTop)}
         >
           <button
             type="button"
@@ -298,7 +320,7 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
             onPointerDown={startDrag}
             onPointerMove={moveDrag}
             onPointerUp={endDrag}
-            onPointerCancel={() => { drag.current = null; setOffset(null) }}
+            onPointerCancel={() => { drag.current = null; follow() }}
             className={cn('flex h-6 w-full shrink-0 cursor-grab touch-none items-center justify-center rounded-t-xl outline-hidden active:cursor-grabbing focus-visible:[&>span]:bg-primary', pinned, large && 'top-0 h-[calc(1.5rem+env(safe-area-inset-top))] rounded-none pt-[env(safe-area-inset-top)]')}
           >
             <span className="h-1.5 w-10 rounded-full bg-muted-foreground/40" />

@@ -200,8 +200,10 @@ export function TorrentsView() {
     onPress: (event: MouseEvent, torrent, touch) => {
       const { hash } = torrent
       if (touch) {
-        // After a long press has started selecting, taps add and remove instead of opening.
+        // After a long press has started selecting, taps add and remove instead of opening. A
+        // tap on the torrent whose details are open closes them, as a click does on desktop.
         if (count > 0) selection.toggle(hash)
+        else if (detailsHash === hash) closeDetails()
         else setDetailsHash(hash)
         return
       }
