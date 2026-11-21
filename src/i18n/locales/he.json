@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "כבר קיימת תגית בשם {name}",
   "There is already a view called {name}": "כבר קיימת תצוגה בשם {name}",
   "View updated": "התצוגה עודכנה",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent מורידה את הגרסה החדשה מ-GitHub לתיקייה חדשה לצד הנוכחית, עוברת אליה ומסירה את הגרסה הקודמת.",
   "Add or remove": "הוספה או הסרה",
   "Filter sidebar": "סרגל צד של מסננים",
   "Show only these": "הצג רק אלה",
@@ -1401,7 +1400,6 @@
   "Set tags": "הגדרת תגיות",
   "No rules configured. Add one with +": "לא הוגדרו כללים. הוסף אחד באמצעות +",
   "Every key and click, also shown with ? on the torrent list.": "כל מקש ולחיצה, שמוצגים גם עם ? ברשימת הטורנטים.",
-  "Show keyboard shortcuts": "הצג קיצורי מקלדת",
   "Selection Bar": "סרגל הבחירה",
   "Pinned actions show as buttons in the bar.": "פעולות מוצמדות מוצגות כלחצנים בסרגל.",
   "In the bar": "בסרגל",
@@ -1411,5 +1409,7 @@
   "Update installed": "העדכון הותקן",
   "Reload to use it.": "טען מחדש כדי להשתמש בו.",
   "Reload to use it. The old version stays in {folder}.": "טען מחדש כדי להשתמש בו. הגרסה הישנה נשארת ב-{folder}.",
-  "Selection bar reset": "סרגל הבחירה אופס"
+  "Selection bar reset": "סרגל הבחירה אופס",
+  "Show shortcuts": "הצג קיצורים",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent מתקין את הגרסה החדשה מ-GitHub ומסיר את הישנה."
 }

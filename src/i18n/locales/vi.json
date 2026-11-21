@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "Đã có thẻ tên {name}",
   "There is already a view called {name}": "Đã có chế độ xem tên {name}",
   "View updated": "Đã cập nhật chế độ xem",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent tải phiên bản mới từ GitHub vào một thư mục mới cạnh thư mục hiện tại, chuyển sang đó và gỡ phiên bản trước.",
   "Add or remove": "Thêm hoặc gỡ",
   "Filter sidebar": "Thanh bên bộ lọc",
   "Show only these": "Chỉ hiện những mục này",
@@ -1401,7 +1400,6 @@
   "Set tags": "Đặt thẻ",
   "No rules configured. Add one with +": "Chưa cấu hình quy tắc nào. Thêm bằng dấu +",
   "Every key and click, also shown with ? on the torrent list.": "Mọi phím và cú nhấp, cũng hiện bằng ? trong danh sách torrent.",
-  "Show keyboard shortcuts": "Hiện phím tắt",
   "Selection Bar": "Thanh chọn",
   "Pinned actions show as buttons in the bar.": "Các tác vụ đã ghim hiển thị dưới dạng nút trên thanh.",
   "In the bar": "Trên thanh",
@@ -1411,5 +1409,7 @@
   "Update installed": "Đã cài bản cập nhật",
   "Reload to use it.": "Hãy tải lại để dùng.",
   "Reload to use it. The old version stays in {folder}.": "Hãy tải lại để dùng. Phiên bản cũ vẫn nằm trong {folder}.",
-  "Selection bar reset": "Đã đặt lại thanh chọn"
+  "Selection bar reset": "Đã đặt lại thanh chọn",
+  "Show shortcuts": "Hiện phím tắt",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent cài phiên bản mới từ GitHub và gỡ phiên bản cũ."
 }

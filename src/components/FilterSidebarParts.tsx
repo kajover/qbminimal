@@ -147,10 +147,10 @@ export function Section({ id, title, icon: Icon, chosen, onClear, folded, onFold
   )
 }
 
-// Where the list is on screen, for the sheet over it: from the list column's top to the bottom of
-// the table, or of the pages bar below the cards, and to their end edge, which on phones reach past
-// the column (`data-list-edge`). Kept below the header and above the tab bar and selection bar, and
-// followed while the page scrolls or resizes.
+// Where the list is on screen, for the sheet over it: from the list column's top down to where the
+// table ends at its largest (FILL_BOTTOM), however few rows or results there are, and to the end edge
+// of the table or cards, which on phones reach past the column (`data-list-edge`). Kept below the
+// header, and followed while the page scrolls or resizes.
 function useListBox(list: HTMLElement | null | undefined, open: boolean): CSSProperties | undefined {
   const [box, setBox] = useState<CSSProperties>()
   useLayoutEffect(() => {
@@ -158,14 +158,15 @@ function useListBox(list: HTMLElement | null | undefined, open: boolean): CSSPro
     const measure = () => {
       const column = list.getBoundingClientRect()
       const edges = [...list.querySelectorAll('[data-list-edge]')].map(edge => edge.getBoundingClientRect()).filter(edge => edge.height > 0)
-      const right = edges.length ? Math.max(...edges.map(edge => edge.right)) : column.right
-      const left = edges.length ? Math.min(...edges.map(edge => edge.left)) : column.left
-      const bottom = edges.length ? Math.max(...edges.map(edge => edge.bottom)) : column.bottom
+      // Without a table yet (no search results), where it would be: 8px past the column on phones.
+      const past = window.innerWidth < 640 ? 8 : 0
+      const right = edges.length ? Math.max(...edges.map(edge => edge.right)) : column.right + past
+      const left = edges.length ? Math.min(...edges.map(edge => edge.left)) : column.left - past
       const rtl = getComputedStyle(list).direction === 'rtl'
       setBox({
         top: `max(${column.top}px, var(--header-height, calc(3rem + 1px + env(safe-area-inset-top))))`,
-        // No lower than the table may reach (FILL_BOTTOM): above the tab bar and selection bar.
-        bottom: `max(${window.innerHeight - bottom}px, calc(var(--bottom-nav-height, 0px) + var(--selection-bar-gap, 0.25rem)))`,
+        // Where the table ends at its largest: above the tab bar and selection bar.
+        bottom: 'calc(var(--bottom-nav-height, 0px) + var(--selection-bar-gap, 0.25rem))',
         insetInlineEnd: rtl ? left : window.innerWidth - right,
       })
     }
@@ -181,7 +182,7 @@ function useListBox(list: HTMLElement | null | undefined, open: boolean): CSSPro
 }
 
 // On phones the sidebar slides in over the list, under the filter button, as tall as the list and
-// at its end edge, like the sidebar beside it on wider screens; at least 16rem, for an empty list.
+// at its end edge, like the sidebar beside it on wider screens.
 // As wide as the sidebar beside the list on wider screens (w-72), with no shadow, like the bars.
 export function FilterSheet({ open, onOpenChange, list, children }: { open: boolean; onOpenChange: (open: boolean) => void; list?: HTMLElement | null; children: ReactNode }) {
   const box = useListBox(list, open)
@@ -196,7 +197,7 @@ export function FilterSheet({ open, onOpenChange, list, children }: { open: bool
           onOpenAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={keepOpenForNotices}
           style={box}
-          className="fixed inset-y-0 end-0 z-50 min-h-64 w-72 max-w-[85vw] overflow-y-auto rounded-xl border bg-card p-3 outline-hidden data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right rtl:data-[state=open]:slide-in-from-left rtl:data-[state=closed]:slide-out-to-left"
+          className="fixed inset-y-0 end-0 z-50 w-72 max-w-[85vw] overflow-y-auto rounded-xl border bg-card p-3 outline-hidden data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right rtl:data-[state=open]:slide-in-from-left rtl:data-[state=closed]:slide-out-to-left"
         >
           <DialogPrimitive.Title className="sr-only">{t('Filters')}</DialogPrimitive.Title>
           {children}

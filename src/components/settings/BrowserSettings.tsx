@@ -76,7 +76,7 @@ export function BrowserSettings() {
         </Row>
         {/* In their own window, as on the torrent list with ?, so they don't make the page long. */}
         <Row icon={<Keyboard className="size-4" />} title={t('Keyboard and mouse')} description={t('Every key and click, also shown with ? on the torrent list.')}>
-          <Button variant="outline" size="sm" onClick={() => setShortcutsOpen(true)}><Keyboard />{t('Show keyboard shortcuts')}</Button>
+          <Button variant="outline" size="sm" onClick={() => setShortcutsOpen(true)}><Keyboard />{t('Show shortcuts')}</Button>
         </Row>
         <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
       </CardContent>

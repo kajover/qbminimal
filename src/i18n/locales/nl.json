@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "Er is al een label met de naam {name}",
   "There is already a view called {name}": "Er is al een weergave met de naam {name}",
   "View updated": "Weergave bijgewerkt",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent downloadt de nieuwe versie van GitHub naar een nieuwe map naast de huidige, schakelt erover en verwijdert de vorige versie.",
   "Add or remove": "Toevoegen of verwijderen",
   "Filter sidebar": "Filterzijbalk",
   "Show only these": "Alleen deze tonen",
@@ -1401,7 +1400,6 @@
   "Set tags": "Labels instellen",
   "No rules configured. Add one with +": "Geen regels ingesteld. Voeg er een toe met +",
   "Every key and click, also shown with ? on the torrent list.": "Alle toetsen en klikken, in de torrentlijst ook te zien met ?.",
-  "Show keyboard shortcuts": "Sneltoetsen weergeven",
   "Selection Bar": "Selectiebalk",
   "Pinned actions show as buttons in the bar.": "Vastgezette acties verschijnen als knoppen in de balk.",
   "In the bar": "In de balk",
@@ -1411,5 +1409,7 @@
   "Update installed": "Update geïnstalleerd",
   "Reload to use it.": "Laad opnieuw om het te gebruiken.",
   "Reload to use it. The old version stays in {folder}.": "Laad opnieuw om het te gebruiken. De oude versie blijft in {folder}.",
-  "Selection bar reset": "Selectiebalk hersteld"
+  "Selection bar reset": "Selectiebalk hersteld",
+  "Show shortcuts": "Sneltoetsen weergeven",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent installeert de nieuwe versie van GitHub en verwijdert de oude."
 }

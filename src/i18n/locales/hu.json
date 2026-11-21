@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "Már van {name} nevű címke",
   "There is already a view called {name}": "Már van {name} nevű nézet",
   "View updated": "Nézet frissítve",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "A qBittorrent letölti az új verziót a GitHubról egy új mappába az aktuális mellé, átvált rá, és eltávolítja az előző verziót.",
   "Add or remove": "Hozzáadás vagy eltávolítás",
   "Filter sidebar": "Szűrők oldalsávja",
   "Show only these": "Csak ezek megjelenítése",
@@ -1401,7 +1400,6 @@
   "Set tags": "Címkék beállítása",
   "No rules configured. Add one with +": "Nincsenek beállított szabályok. Adj hozzá egyet a + gombbal",
   "Every key and click, also shown with ? on the torrent list.": "Minden billentyű és kattintás, a torrentlistán a ? gombbal is látható.",
-  "Show keyboard shortcuts": "Billentyűparancsok megjelenítése",
   "Selection Bar": "Kijelölési sáv",
   "Pinned actions show as buttons in the bar.": "A rögzített műveletek gombként jelennek meg a sávban.",
   "In the bar": "A sávban",
@@ -1411,5 +1409,7 @@
   "Update installed": "A frissítés telepítve",
   "Reload to use it.": "Töltsd újra a használatához.",
   "Reload to use it. The old version stays in {folder}.": "Töltsd újra a használatához. A régi verzió a(z) {folder} mappában marad.",
-  "Selection bar reset": "Kijelölési sáv visszaállítva"
+  "Selection bar reset": "Kijelölési sáv visszaállítva",
+  "Show shortcuts": "Billentyűparancsok",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "A qBittorrent telepíti az új verziót a GitHubról, és eltávolítja a régit."
 }

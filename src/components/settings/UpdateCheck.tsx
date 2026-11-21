@@ -95,7 +95,7 @@ export function UpdateCheck() {
               safe
               label={t('Install update')}
               title={t('Install version {version}?', { version: latestVersion })}
-              message={t('qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.')}
+              message={t('qBittorrent installs the new version from GitHub and removes the old one.')}
               confirmLabel={t('Install')}
               buttonLabel={t('Install update')}
               buttonIcon={Download}

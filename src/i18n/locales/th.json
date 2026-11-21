@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "มีแท็กชื่อ {name} อยู่แล้ว",
   "There is already a view called {name}": "มีมุมมองชื่อ {name} อยู่แล้ว",
   "View updated": "อัปเดตมุมมองแล้ว",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent ดาวน์โหลดเวอร์ชันใหม่จาก GitHub ไปยังโฟลเดอร์ใหม่ข้างโฟลเดอร์ปัจจุบัน สลับไปใช้เวอร์ชันนั้น และลบเวอร์ชันก่อนหน้า",
   "Add or remove": "เพิ่มหรือลบ",
   "Filter sidebar": "แถบด้านข้างตัวกรอง",
   "Show only these": "แสดงเฉพาะรายการนี้",
@@ -1401,7 +1400,6 @@
   "Set tags": "ตั้งแท็ก",
   "No rules configured. Add one with +": "ยังไม่ได้ตั้งกฎ เพิ่มได้ด้วย +",
   "Every key and click, also shown with ? on the torrent list.": "ทุกปุ่มและการคลิก ซึ่งดูได้ด้วย ? ในรายการทอร์เรนต์ด้วย",
-  "Show keyboard shortcuts": "แสดงแป้นพิมพ์ลัด",
   "Selection Bar": "แถบการเลือก",
   "Pinned actions show as buttons in the bar.": "การดำเนินการที่ปักหมุดจะแสดงเป็นปุ่มในแถบ",
   "In the bar": "ในแถบ",
@@ -1411,5 +1409,7 @@
   "Update installed": "ติดตั้งการอัปเดตแล้ว",
   "Reload to use it.": "โหลดใหม่เพื่อใช้งาน",
   "Reload to use it. The old version stays in {folder}.": "โหลดใหม่เพื่อใช้งาน เวอร์ชันเก่ายังอยู่ใน {folder}",
-  "Selection bar reset": "รีเซ็ตแถบการเลือกแล้ว"
+  "Selection bar reset": "รีเซ็ตแถบการเลือกแล้ว",
+  "Show shortcuts": "แสดงทางลัด",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent ติดตั้งเวอร์ชันใหม่จาก GitHub และลบเวอร์ชันเก่าออก"
 }

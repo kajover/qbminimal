@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "已有名為 {name} 的標籤",
   "There is already a view called {name}": "已有名為 {name} 的檢視",
   "View updated": "檢視已更新",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent 會從 GitHub 把新版本下載到目前資料夾旁的新資料夾，切換過去，並移除上一版本。",
   "Add or remove": "新增或移除",
   "Filter sidebar": "篩選側欄",
   "Show only these": "只顯示這些",
@@ -1401,7 +1400,6 @@
   "Set tags": "設定標籤",
   "No rules configured. Add one with +": "尚未設定規則。請用 + 新增",
   "Every key and click, also shown with ? on the torrent list.": "所有按鍵與點擊操作，在種子列表中也可按 ? 查看。",
-  "Show keyboard shortcuts": "顯示鍵盤快速鍵",
   "Selection Bar": "選取列",
   "Pinned actions show as buttons in the bar.": "已釘選的動作會以按鈕形式顯示在列中。",
   "In the bar": "在列中",
@@ -1411,5 +1409,7 @@
   "Update installed": "更新已安裝",
   "Reload to use it.": "重新載入即可使用。",
   "Reload to use it. The old version stays in {folder}.": "重新載入即可使用。舊版本保留在 {folder} 中。",
-  "Selection bar reset": "選取列已重設"
+  "Selection bar reset": "選取列已重設",
+  "Show shortcuts": "顯示快速鍵",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent 會從 GitHub 安裝新版本並移除舊版本。"
 }

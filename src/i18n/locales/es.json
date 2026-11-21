@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "Ya existe una etiqueta llamada {name}",
   "There is already a view called {name}": "Ya existe una vista llamada {name}",
   "View updated": "Vista actualizada",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent descarga la nueva versión desde GitHub a una carpeta nueva junto a la actual, cambia a ella y elimina la versión anterior.",
   "Add or remove": "Añadir o quitar",
   "Filter sidebar": "Barra lateral de filtros",
   "Show only these": "Mostrar solo estos",
@@ -1401,7 +1400,6 @@
   "Set tags": "Asignar etiquetas",
   "No rules configured. Add one with +": "No hay reglas configuradas. Añade una con +",
   "Every key and click, also shown with ? on the torrent list.": "Todas las teclas y clics, que también se ven con ? en la lista de torrents.",
-  "Show keyboard shortcuts": "Mostrar atajos de teclado",
   "Selection Bar": "Barra de selección",
   "Pinned actions show as buttons in the bar.": "Las acciones fijadas aparecen como botones en la barra.",
   "In the bar": "En la barra",
@@ -1411,5 +1409,7 @@
   "Update installed": "Actualización instalada",
   "Reload to use it.": "Recarga para usarla.",
   "Reload to use it. The old version stays in {folder}.": "Recarga para usarla. La versión antigua queda en {folder}.",
-  "Selection bar reset": "Barra de selección restablecida"
+  "Selection bar reset": "Barra de selección restablecida",
+  "Show shortcuts": "Mostrar atajos",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent instala la nueva versión desde GitHub y elimina la antigua."
 }

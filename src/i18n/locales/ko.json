@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "{name} 태그가 이미 있습니다",
   "There is already a view called {name}": "{name} 보기가 이미 있습니다",
   "View updated": "보기를 업데이트했습니다",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent는 GitHub에서 새 버전을 현재 폴더 옆의 새 폴더로 내려받아 그쪽으로 전환하고 이전 버전을 삭제합니다.",
   "Add or remove": "추가 또는 제거",
   "Filter sidebar": "필터 사이드바",
   "Show only these": "이것만 표시",
@@ -1401,7 +1400,6 @@
   "Set tags": "태그 설정",
   "No rules configured. Add one with +": "설정된 규칙 없음. +로 추가하세요",
   "Every key and click, also shown with ? on the torrent list.": "모든 키와 클릭. 토렌트 목록에서 ?로도 볼 수 있습니다.",
-  "Show keyboard shortcuts": "키보드 단축키 표시",
   "Selection Bar": "선택 바",
   "Pinned actions show as buttons in the bar.": "고정한 동작은 바에 버튼으로 표시됩니다.",
   "In the bar": "바에 있음",
@@ -1411,5 +1409,7 @@
   "Update installed": "업데이트를 설치했습니다",
   "Reload to use it.": "사용하려면 새로고침하세요.",
   "Reload to use it. The old version stays in {folder}.": "사용하려면 새로고침하세요. 이전 버전은 {folder}에 남아 있습니다.",
-  "Selection bar reset": "선택 바를 초기화했습니다"
+  "Selection bar reset": "선택 바를 초기화했습니다",
+  "Show shortcuts": "단축키 표시",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent가 GitHub에서 새 버전을 설치하고 이전 버전을 삭제합니다."
 }

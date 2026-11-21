@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "Мітка {name} уже існує",
   "There is already a view called {name}": "Вигляд {name} уже існує",
   "View updated": "Вигляд оновлено",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent завантажує нову версію з GitHub у нову теку поруч із поточною, перемикається на неї та видаляє попередню версію.",
   "Add or remove": "Додати або вилучити",
   "Filter sidebar": "Бічна панель фільтрів",
   "Show only these": "Показати лише ці",
@@ -1401,7 +1400,6 @@
   "Set tags": "Задати мітки",
   "No rules configured. Add one with +": "Правил не налаштовано. Додайте правило за допомогою +",
   "Every key and click, also shown with ? on the torrent list.": "Усі клавіші й клацання, у списку торентів також за ?.",
-  "Show keyboard shortcuts": "Показати сполучення клавіш",
   "Selection Bar": "Панель вибору",
   "Pinned actions show as buttons in the bar.": "Закріплені дії показуються кнопками на панелі.",
   "In the bar": "На панелі",
@@ -1411,5 +1409,7 @@
   "Update installed": "Оновлення встановлено",
   "Reload to use it.": "Перезавантажте, щоб користуватися.",
   "Reload to use it. The old version stays in {folder}.": "Перезавантажте, щоб користуватися. Стара версія лишається в {folder}.",
-  "Selection bar reset": "Панель вибору скинуто"
+  "Selection bar reset": "Панель вибору скинуто",
+  "Show shortcuts": "Показати сполучення",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent встановлює нову версію з GitHub і видаляє стару."
 }

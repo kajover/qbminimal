@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "{name} adlı bir etiket zaten var",
   "There is already a view called {name}": "{name} adlı bir görünüm zaten var",
   "View updated": "Görünüm güncellendi",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent yeni sürümü GitHub'dan mevcut klasörün yanındaki yeni bir klasöre indirir, ona geçer ve önceki sürümü kaldırır.",
   "Add or remove": "Ekle veya kaldır",
   "Filter sidebar": "Filtre kenar çubuğu",
   "Show only these": "Yalnızca bunları göster",
@@ -1401,7 +1400,6 @@
   "Set tags": "Etiketleri ayarla",
   "No rules configured. Add one with +": "Yapılandırılmış kural yok. + ile bir tane ekleyin",
   "Every key and click, also shown with ? on the torrent list.": "Tüm tuşlar ve tıklamalar; torrent listesinde ? ile de görünür.",
-  "Show keyboard shortcuts": "Klavye kısayollarını göster",
   "Selection Bar": "Seçim çubuğu",
   "Pinned actions show as buttons in the bar.": "Sabitlenen eylemler çubukta düğme olarak görünür.",
   "In the bar": "Çubukta",
@@ -1411,5 +1409,7 @@
   "Update installed": "Güncelleme kuruldu",
   "Reload to use it.": "Kullanmak için yeniden yükle.",
   "Reload to use it. The old version stays in {folder}.": "Kullanmak için yeniden yükle. Eski sürüm {folder} içinde duruyor.",
-  "Selection bar reset": "Seçim çubuğu sıfırlandı"
+  "Selection bar reset": "Seçim çubuğu sıfırlandı",
+  "Show shortcuts": "Kısayolları göster",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent yeni sürümü GitHub'dan kurar ve eskisini kaldırır."
 }

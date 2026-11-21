@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "Există deja o etichetă numită {name}",
   "There is already a view called {name}": "Există deja o vizualizare numită {name}",
   "View updated": "Vizualizare actualizată",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent descarcă versiunea nouă de pe GitHub într-un dosar nou lângă cel curent, trece la ea și elimină versiunea anterioară.",
   "Add or remove": "Adaugă sau elimină",
   "Filter sidebar": "Bara laterală de filtre",
   "Show only these": "Arată doar acestea",
@@ -1401,7 +1400,6 @@
   "Set tags": "Setează marcajele",
   "No rules configured. Add one with +": "Nicio regulă configurată. Adaugă una cu +",
   "Every key and click, also shown with ? on the torrent list.": "Toate tastele și clicurile, afișate și cu ? în lista de torente.",
-  "Show keyboard shortcuts": "Arată scurtăturile de tastatură",
   "Selection Bar": "Bara de selecție",
   "Pinned actions show as buttons in the bar.": "Acțiunile fixate apar ca butoane în bară.",
   "In the bar": "În bară",
@@ -1411,5 +1409,7 @@
   "Update installed": "Actualizarea a fost instalată",
   "Reload to use it.": "Reîncarcă ca să o folosești.",
   "Reload to use it. The old version stays in {folder}.": "Reîncarcă ca să o folosești. Versiunea veche rămâne în {folder}.",
-  "Selection bar reset": "Bara de selecție a fost resetată"
+  "Selection bar reset": "Bara de selecție a fost resetată",
+  "Show shortcuts": "Arată scurtăturile",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent instalează versiunea nouă de pe GitHub și o elimină pe cea veche."
 }

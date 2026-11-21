@@ -342,7 +342,8 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
           ref={head}
           // Only the titles' own wheel: the right-click menu's bubbles here through React too.
           onWheel={(e) => { const dx = e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX; if (dx && scroller.current && e.currentTarget.contains(e.target as Node)) scroller.current.scrollLeft += dx }}
-          className="shrink-0 overflow-hidden rounded-t-xl border-b bg-card"
+          // Placed, so the hidden "Actions" title stays inside it, not in the page, which it would widen.
+          className="relative shrink-0 overflow-hidden rounded-t-xl border-b bg-card"
         >
           <table className="table-fixed text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
             {colgroup}

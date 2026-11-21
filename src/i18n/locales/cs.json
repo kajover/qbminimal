@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "Štítek s názvem {name} už existuje",
   "There is already a view called {name}": "Pohled s názvem {name} už existuje",
   "View updated": "Pohled aktualizován",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent stáhne novou verzi z GitHubu do nové složky vedle té současné, přepne se na ni a předchozí verzi odstraní.",
   "Add or remove": "Přidat nebo odebrat",
   "Filter sidebar": "Boční panel filtrů",
   "Show only these": "Zobrazit jen tyto",
@@ -1401,7 +1400,6 @@
   "Set tags": "Nastavit štítky",
   "No rules configured. Add one with +": "Nejsou nastavena žádná pravidla. Přidejte jedno pomocí +",
   "Every key and click, also shown with ? on the torrent list.": "Každá klávesa a kliknutí, v seznamu torrentů také pod ?.",
-  "Show keyboard shortcuts": "Ukázat klávesové zkratky",
   "Selection Bar": "Lišta výběru",
   "Pinned actions show as buttons in the bar.": "Připnuté akce se zobrazují jako tlačítka v liště.",
   "In the bar": "V liště",
@@ -1411,5 +1409,7 @@
   "Update installed": "Aktualizace je nainstalována",
   "Reload to use it.": "Načti znovu, ať ji můžeš používat.",
   "Reload to use it. The old version stays in {folder}.": "Načti znovu, ať ji můžeš používat. Stará verze zůstává ve složce {folder}.",
-  "Selection bar reset": "Lišta výběru obnovena"
+  "Selection bar reset": "Lišta výběru obnovena",
+  "Show shortcuts": "Ukázat zkratky",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent nainstaluje novou verzi z GitHubu a odstraní tu starou."
 }

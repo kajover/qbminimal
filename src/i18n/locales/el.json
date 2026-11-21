@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "Υπάρχει ήδη ετικέτα με όνομα {name}",
   "There is already a view called {name}": "Υπάρχει ήδη προβολή με όνομα {name}",
   "View updated": "Η προβολή ενημερώθηκε",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "Το qBittorrent κατεβάζει τη νέα έκδοση από το GitHub σε νέο φάκελο δίπλα στον τρέχοντα, μεταβαίνει σε αυτή και αφαιρεί την προηγούμενη έκδοση.",
   "Add or remove": "Προσθήκη ή αφαίρεση",
   "Filter sidebar": "Πλαϊνή στήλη φίλτρων",
   "Show only these": "Εμφάνιση μόνο αυτών",
@@ -1401,7 +1400,6 @@
   "Set tags": "Ορισμός ετικετών",
   "No rules configured. Add one with +": "Δεν έχουν οριστεί κανόνες. Προσθέστε έναν με το +",
   "Every key and click, also shown with ? on the torrent list.": "Κάθε πλήκτρο και κλικ, που εμφανίζονται και με το ? στη λίστα torrents.",
-  "Show keyboard shortcuts": "Εμφάνιση συντομεύσεων πληκτρολογίου",
   "Selection Bar": "Γραμμή επιλογής",
   "Pinned actions show as buttons in the bar.": "Οι καρφιτσωμένες ενέργειες εμφανίζονται ως κουμπιά στη γραμμή.",
   "In the bar": "Στη γραμμή",
@@ -1411,5 +1409,7 @@
   "Update installed": "Η ενημέρωση εγκαταστάθηκε",
   "Reload to use it.": "Φόρτωσε ξανά για να τη χρησιμοποιήσεις.",
   "Reload to use it. The old version stays in {folder}.": "Φόρτωσε ξανά για να τη χρησιμοποιήσεις. Η παλιά έκδοση μένει στο {folder}.",
-  "Selection bar reset": "Η γραμμή επιλογής επαναφέρθηκε"
+  "Selection bar reset": "Η γραμμή επιλογής επαναφέρθηκε",
+  "Show shortcuts": "Εμφάνιση συντομεύσεων",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "Το qBittorrent εγκαθιστά τη νέα έκδοση από το GitHub και αφαιρεί την παλιά."
 }

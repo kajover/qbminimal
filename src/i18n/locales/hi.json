@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "{name} नाम का टैग पहले से है",
   "There is already a view called {name}": "{name} नाम का दृश्य पहले से है",
   "View updated": "दृश्य अपडेट हुआ",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent नया संस्करण GitHub से मौजूदा संस्करण के बगल में एक नए फ़ोल्डर में डाउनलोड करता है, उस पर स्विच करता है और पिछला संस्करण हटा देता है।",
   "Add or remove": "जोड़ें या हटाएँ",
   "Filter sidebar": "फ़िल्टर साइडबार",
   "Show only these": "सिर्फ़ ये दिखाएँ",
@@ -1401,7 +1400,6 @@
   "Set tags": "उपनाम सेट करें",
   "No rules configured. Add one with +": "कोई नियम सेट नहीं है। + से एक जोड़ें",
   "Every key and click, also shown with ? on the torrent list.": "हर कुंजी और क्लिक, जो टोरेंट सूची में ? से भी दिखते हैं।",
-  "Show keyboard shortcuts": "कीबोर्ड शॉर्टकट दिखाएँ",
   "Selection Bar": "चयन बार",
   "Pinned actions show as buttons in the bar.": "पिन की गई क्रियाएँ बार में बटन के रूप में दिखती हैं।",
   "In the bar": "बार में",
@@ -1411,5 +1409,7 @@
   "Update installed": "अपडेट इंस्टॉल हो गया",
   "Reload to use it.": "इस्तेमाल करने के लिए फिर से लोड करें।",
   "Reload to use it. The old version stays in {folder}.": "इस्तेमाल करने के लिए फिर से लोड करें। पुराना संस्करण {folder} में रहेगा।",
-  "Selection bar reset": "चयन बार रीसेट हो गया"
+  "Selection bar reset": "चयन बार रीसेट हो गया",
+  "Show shortcuts": "शॉर्टकट दिखाएँ",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent GitHub से नया संस्करण इंस्टॉल करता है और पुराना हटा देता है।"
 }

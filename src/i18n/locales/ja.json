@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "{name} という名前のタグはすでにあります",
   "There is already a view called {name}": "{name} という名前のビューはすでにあります",
   "View updated": "ビューを更新しました",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent は GitHub から新しいバージョンを現在のフォルダーの隣の新しいフォルダーにダウンロードし、そちらに切り替えて、以前のバージョンを削除します。",
   "Add or remove": "追加または削除",
   "Filter sidebar": "フィルターのサイドバー",
   "Show only these": "これらだけ表示",
@@ -1401,7 +1400,6 @@
   "Set tags": "タグを設定",
   "No rules configured. Add one with +": "ルールは設定されていません。+ で追加してください",
   "Every key and click, also shown with ? on the torrent list.": "すべてのキーとクリック。トレント一覧では ? でも表示できます。",
-  "Show keyboard shortcuts": "キーボードショートカットを表示",
   "Selection Bar": "選択バー",
   "Pinned actions show as buttons in the bar.": "固定したアクションはバーにボタンとして表示されます。",
   "In the bar": "バー内",
@@ -1411,5 +1409,7 @@
   "Update installed": "アップデートをインストールしました",
   "Reload to use it.": "使うには再読み込みしてください。",
   "Reload to use it. The old version stays in {folder}.": "使うには再読み込みしてください。古いバージョンは {folder} に残っています。",
-  "Selection bar reset": "選択バーをリセットしました"
+  "Selection bar reset": "選択バーをリセットしました",
+  "Show shortcuts": "ショートカットを表示",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent が GitHub から新しいバージョンをインストールし、古いバージョンを削除します。"
 }

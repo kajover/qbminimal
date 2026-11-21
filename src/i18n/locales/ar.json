@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "يوجد وسم باسم {name} بالفعل",
   "There is already a view called {name}": "توجد طريقة عرض باسم {name} بالفعل",
   "View updated": "حُدّثت طريقة العرض",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "ينزّل qBittorrent الإصدار الجديد من GitHub إلى مجلد جديد بجانب المجلد الحالي، ثم ينتقل إليه ويزيل الإصدار السابق.",
   "Add or remove": "إضافة أو إزالة",
   "Filter sidebar": "الشريط الجانبي للتصفية",
   "Show only these": "عرض هذه فقط",
@@ -1401,7 +1400,6 @@
   "Set tags": "تعيين الوسوم",
   "No rules configured. Add one with +": "لا توجد قواعد معدّة. أضف واحدة باستخدام +",
   "Every key and click, also shown with ? on the torrent list.": "كل مفتاح ونقرة، وتظهر أيضًا بالضغط على ? في قائمة التورنتات.",
-  "Show keyboard shortcuts": "أظهر اختصارات لوحة المفاتيح",
   "Selection Bar": "شريط التحديد",
   "Pinned actions show as buttons in the bar.": "تظهر الإجراءات المثبتة كأزرار في الشريط.",
   "In the bar": "في الشريط",
@@ -1411,5 +1409,7 @@
   "Update installed": "تم تثبيت التحديث",
   "Reload to use it.": "أعد التحميل لاستخدامه.",
   "Reload to use it. The old version stays in {folder}.": "أعد التحميل لاستخدامه. يبقى الإصدار القديم في {folder}.",
-  "Selection bar reset": "أُعيد ضبط شريط التحديد"
+  "Selection bar reset": "أُعيد ضبط شريط التحديد",
+  "Show shortcuts": "أظهر الاختصارات",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "يثبّت qBittorrent الإصدار الجديد من GitHub ويزيل القديم."
 }

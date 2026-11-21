@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "Sudah ada tag bernama {name}",
   "There is already a view called {name}": "Sudah ada tampilan bernama {name}",
   "View updated": "Tampilan diperbarui",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent mengunduh versi baru dari GitHub ke folder baru di samping yang sekarang, beralih ke sana, lalu menghapus versi sebelumnya.",
   "Add or remove": "Tambah atau hapus",
   "Filter sidebar": "Bilah samping filter",
   "Show only these": "Tampilkan hanya ini",
@@ -1401,7 +1400,6 @@
   "Set tags": "Setel tag",
   "No rules configured. Add one with +": "Tidak ada aturan yang dikonfigurasi. Tambahkan dengan +",
   "Every key and click, also shown with ? on the torrent list.": "Setiap tombol dan klik, juga ditampilkan dengan ? di daftar torrent.",
-  "Show keyboard shortcuts": "Tampilkan pintasan keyboard",
   "Selection Bar": "Bilah pilihan",
   "Pinned actions show as buttons in the bar.": "Aksi yang disematkan tampil sebagai tombol di bilah.",
   "In the bar": "Di bilah",
@@ -1411,5 +1409,7 @@
   "Update installed": "Pembaruan terpasang",
   "Reload to use it.": "Muat ulang untuk menggunakannya.",
   "Reload to use it. The old version stays in {folder}.": "Muat ulang untuk menggunakannya. Versi lama tetap ada di {folder}.",
-  "Selection bar reset": "Bilah pilihan diatur ulang"
+  "Selection bar reset": "Bilah pilihan diatur ulang",
+  "Show shortcuts": "Tampilkan pintasan",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent memasang versi baru dari GitHub dan menghapus yang lama."
 }

@@ -1270,7 +1270,6 @@
   "There is already a tag called {name}": "برچسبی به نام {name} از قبل وجود دارد",
   "There is already a view called {name}": "نمایی به نام {name} از قبل وجود دارد",
   "View updated": "نما به‌روز شد",
-  "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent نسخه جدید را از GitHub در پوشه‌ای تازه کنار پوشه فعلی دانلود می‌کند، به آن می‌رود و نسخه قبلی را حذف می‌کند.",
   "Add or remove": "افزودن یا حذف",
   "Filter sidebar": "نوار کناری فیلترها",
   "Show only these": "فقط این‌ها را نشان بده",
@@ -1401,7 +1400,6 @@
   "Set tags": "تنظیم برچسب‌ها",
   "No rules configured. Add one with +": "هیچ قانونی تنظیم نشده است. با + یکی اضافه کنید",
   "Every key and click, also shown with ? on the torrent list.": "همهٔ کلیدها و کلیک‌ها، که در فهرست تورنت‌ها با ? هم نشان داده می‌شوند.",
-  "Show keyboard shortcuts": "نمایش میان‌برهای صفحه‌کلید",
   "Selection Bar": "نوار انتخاب",
   "Pinned actions show as buttons in the bar.": "اقدام‌های سنجاق‌شده به‌صورت دکمه در نوار نمایش داده می‌شوند.",
   "In the bar": "در نوار",
@@ -1411,5 +1409,7 @@
   "Update installed": "به‌روزرسانی نصب شد",
   "Reload to use it.": "برای استفاده، دوباره بارگذاری کن.",
   "Reload to use it. The old version stays in {folder}.": "برای استفاده، دوباره بارگذاری کن. نسخه قدیمی در {folder} می‌ماند.",
-  "Selection bar reset": "نوار انتخاب بازنشانی شد"
+  "Selection bar reset": "نوار انتخاب بازنشانی شد",
+  "Show shortcuts": "نمایش میان‌برها",
+  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent نسخه جدید را از GitHub نصب می‌کند و نسخه قدیمی را حذف می‌کند."
 }
