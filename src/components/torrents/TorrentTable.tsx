@@ -18,6 +18,7 @@ import { ColumnMenuItems } from '@/components/ColumnMenuItems'
 import { fittedWidth, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
 import { ColumnFilterButton, SidebarFilterButton, type FilterTarget } from '@/components/ColumnFilters'
 import type { ColumnFilter, ColumnFilters } from '@/lib/columnFilters'
+import { modKey, withKeys } from '@/lib/shortcutKeys'
 import { t } from '@/i18n'
 
 const SELECT_WIDTH = 40
@@ -222,7 +223,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
             <th className={cn('sticky start-0 z-10 h-10 bg-card px-2 text-start', LINKED_SCROLL && 'table-head-pinned')}>
               {/* With some selected (a dash), a click clears them; the next one selects all. Its label says which. */}
               {/* Wrapped, as the tooltip would put its own data-state on the box and hide the dash. */}
-              <Tooltip label={selectAllState === false ? t('Select all') : t('Clear selection')}>
+              <Tooltip label={selectAllState === false ? withKeys(t('Select all'), modKey('A')) : withKeys(t('Clear selection'), 'Esc')}>
                 <span className="inline-flex">
                   <Checkbox aria-label={selectAllState === false ? t('Select all') : t('Clear selection')} checked={selectAllState} onCheckedChange={(checked) => onSelectAll(selectAllState !== 'indeterminate' && checked === true)} />
                 </span>

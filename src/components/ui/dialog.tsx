@@ -4,6 +4,7 @@ import { t } from "@/i18n"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
+import { withKeys } from '@/lib/shortcutKeys'
 import { Button } from "@/components/ui/button"
 
 function Dialog({
@@ -24,6 +25,8 @@ function DialogPortal({
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
 }
 
+// The page behind a dialog stays as it is, not greyed out; the overlay only catches clicks
+// outside, which close the dialog. Dialogs open and close at once, without fading.
 function DialogOverlay({
   className,
   ...props
@@ -32,7 +35,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50 duration-100",
+        "fixed inset-0 z-50",
         className
       )}
       {...props}
@@ -90,7 +93,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-100 outline-hidden sm:max-w-lg",
+          "bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg outline-hidden sm:max-w-lg",
           className
         )}
         onKeyDown={(event) => { onKeyDown?.(event); acceptOnEnter(event) }}
@@ -104,6 +107,7 @@ function DialogContent({
             // Round, like the other close buttons.
             className="ring-offset-background focus-visible:ring-ring absolute top-3 end-3 flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
             aria-label={t('Close')}
+            title={withKeys(t('Close'), 'Esc')}
           >
             <XIcon />
           </DialogPrimitive.Close>

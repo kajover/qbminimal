@@ -78,4 +78,14 @@ describe('incognito file names', () => {
     expect(movie.name).toMatch(/Remux|Blender/)
     expect(fresh.disguiseFiles([{ name: 'whatever.mkv' }], 'movie')).toEqual([{ name: movie.name }])
   })
+
+  it('hides the real name in the magnet link, the paths, the comment and log messages', async () => {
+    vi.resetModules()
+    const { disguiseTorrents, disguiseText } = await import('./incognito')
+    const [torrent] = disguiseTorrents([{ hash: 'x', name: 'Secret Name', size: 1024 ** 3, save_path: '/data/', content_path: '/data/Secret Name', magnet_uri: 'magnet:?xt=urn:btih:x&dn=Secret%20Name&tr=t', comment: 'Secret Name page' }] as never[]) as { name: string; magnet_uri: string; content_path: string; comment: string }[]
+    expect(torrent.magnet_uri).toBe(`magnet:?xt=urn:btih:x&dn=${encodeURIComponent(torrent.name)}&tr=t`)
+    expect(torrent.content_path).toBe(`/data/${torrent.name}`)
+    expect(torrent.comment).toBe('')
+    expect(disguiseText('Torrent finished: "Secret Name".')).toBe(`Torrent finished: "${torrent.name}".`)
+  })
 })

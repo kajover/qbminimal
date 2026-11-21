@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { useQueryClient } from '@tanstack/react-query'
 import { SessionContext, type SessionStatus } from '@/hooks/useSession'
 import { qbitClient } from '@/lib/api'
+import { forgetShownSearch } from '@/hooks/useSearchJob'
 import { t } from '@/i18n'
 
 // Knows whether the browser holds a qBittorrent session, and signs in and out.
@@ -31,6 +32,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     await qbitClient.logout()
     queryClient.clear()
+    forgetShownSearch()
     setStatus('signedOut')
   }, [queryClient])
 

@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { inFrame, pageScroller, ROOM_FOR_TABLE, WIDE } from '@/lib/pageScroll'
 import { holdWheel } from '@/lib/holdWheel'
-import { PAGE_BAR_BELOW_TABLE, PAGE_BAR_IN_TABLE } from '@/lib/listSettings'
+import { loadSearchPageSize, PAGE_BAR_BELOW_TABLE, PAGE_BAR_IN_TABLE, PAGE_SIZES, saveSearchPageSize } from '@/lib/listSettings'
+import { NativeSelect } from '@/components/NativeSelect'
 import { createPortal } from 'react-dom'
 import { ArrowDown, ArrowUp, ArrowUpDown, CircleCheck, Columns3, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, LayoutList, Table2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -20,6 +21,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 import { formatBytes, formatDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { SearchResult } from '@/types'
+import { withKeys } from '@/lib/shortcutKeys'
 import { t } from '@/i18n'
 
 
@@ -33,8 +35,6 @@ const COLUMNS: { key: SortKey; label: string; numeric?: boolean; className?: str
   { key: 'pubDate', get label() { return t('Published') }, numeric: true, className: 'truncate text-muted-foreground', cell: r => formatDateTime(published(r)) },
 ]
 
-// As many as is useful at once; the table scrolls them.
-const PER_PAGE = 100
 const ACTIONS_WIDTH = 96
 // The name never fits into less than this, so narrow screens scroll the table instead.
 const MIN_NAME_WIDTH = 240
@@ -70,7 +70,7 @@ function AddedMark() {
   )
 }
 
-// Found torrents, sortable, 20 a page: a table on wide screens and a list on phones.
+// Found torrents, sortable, 50 a page unless chosen otherwise: a table on wide screens and a list on phones.
 
 export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSlot, filters, onFilterChange }: {
   // The search shown: another one starts again at the first page, sorted by seeds.
@@ -91,6 +91,8 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
   // first) before that, nor after a reset.
   const [sortShown, setSortShown] = useState(false)
   const [page, setPage] = useState(1)
+  const [perPage, setPerPageState] = useState(loadSearchPageSize)
+  const setPerPage = (size: number) => { saveSearchPageSize(size); setPerPageState(size); setPage(1) }
   // Reset here rather than by drawing the table anew, which made it flash between searches.
   const [shownSearch, setShownSearch] = useState(searchId)
   if (searchId !== shownSearch) {
@@ -199,9 +201,9 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
     })
   }, [results, sort, filters])
 
-  const pages = Math.max(1, Math.ceil(sorted.length / PER_PAGE))
+  const pages = Math.max(1, Math.ceil(sorted.length / perPage))
   const current = Math.min(page, pages)
-  const shown = sorted.slice((current - 1) * PER_PAGE, current * PER_PAGE)
+  const shown = sorted.slice((current - 1) * perPage, current * perPage)
   // Numbers start with the largest first, text from A.
   // A first pick of the default column, while its order isn't shown yet, shows it as it is.
   const sortBy = (key: SortKey) => {
@@ -291,7 +293,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
           </DropdownMenuContent>
         </DropdownMenu>
         </div>
-        <Button variant="outline" size="icon" className="size-8" aria-label={showTable ? t('Card view') : t('Table view')} title={showTable ? t('Card view') : t('Table view')} onClick={switchView}>
+        <Button variant="outline" size="icon" className="size-8" aria-label={showTable ? t('Card view') : t('Table view')} title={withKeys(showTable ? t('Card view') : t('Table view'), 'V')} data-key="v" onClick={switchView}>
           {showTable ? <LayoutList className="size-4" /> : <Table2 className="size-4" />}
         </Button>
     </>
@@ -299,11 +301,17 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
 
   // Its text and arrows line up with the first column's text: in the table, in the cards (12px in
   // from their border), or below them, past the border.
-  // The count and pages, always in view below the results: below what scrolls in the frame, at the
+  // The page size and pages, always in view below the results: below what scrolls in the frame, at the
   // bottom of the table, or kept above the tab bar below the cards.
   const pageBar = sorted.length > 0 ? (
     <div className="flex items-center justify-between gap-2 text-xs">
-      <span className="text-muted-foreground">{t('{from}-{to} of {total}', { from: (current - 1) * PER_PAGE + 1, to: Math.min(current * PER_PAGE, sorted.length), total: sorted.length })}</span>
+      <label className="flex items-center gap-2 text-muted-foreground">
+        {t('Show')}
+        <NativeSelect className="h-7 text-xs text-foreground" value={perPage} onChange={(e) => setPerPage(Number(e.target.value))}>
+          {PAGE_SIZES.map(size => <option key={size} value={size}>{size}</option>)}
+        </NativeSelect>
+        {t('per page')}
+      </label>
       {pages > 1 && (
         <span className="flex items-center gap-2">
           <Button variant="outline" size="icon-xs" className="size-7 shadow-none" aria-label={t('Previous page')} disabled={current === 1} onClick={() => setPage(current - 1)}><ChevronLeft className="size-3.5 rtl:rotate-180" /></Button>

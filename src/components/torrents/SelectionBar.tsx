@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/ui/tooltip'
 import type { MenuEntry } from './bulkActions'
+import { altKey, withKeys } from '@/lib/shortcutKeys'
 import { t } from '@/i18n'
 
 // The bar of actions for the selected torrents. Phones: where a thumb reaches, just above the tab
@@ -89,16 +90,16 @@ export function SelectionBar({ count, total, pinned, inHeader, centered = true, 
         <span className="sr-only">{t('{selected}/{total} selected', { selected: count, total })}</span>
       </span>
       {/* Icons only, like the other buttons, so the bar is as wide in every language. */}
-      <Tooltip label={t('Start')}>
+      <Tooltip label={withKeys(t('Start'), altKey('S'))}>
         <Button variant="ghost" size="icon" className={cn('size-8 shrink-0', !inHeader && 'ms-auto')} aria-label={t('Start')} onClick={onStart}><Play className="size-4" /></Button>
       </Tooltip>
-      <Tooltip label={t('Stop')}>
+      <Tooltip label={withKeys(t('Stop'), altKey('P'))}>
         <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Stop')} onClick={onStop}><Pause className="size-4" /></Button>
       </Tooltip>
       {visible.map(entry => {
         const Icon = entry.icon
         return Icon && (
-          <Tooltip key={entry.id} label={entry.label}>
+          <Tooltip key={entry.id} label={entry.keys ? withKeys(entry.label, entry.keys) : entry.label}>
             <Button variant={entry.pressed || entry.checked ? 'secondary' : 'ghost'} size="icon" className="size-8 shrink-0" aria-label={entry.label} aria-pressed={entry.pressed ?? entry.checked} onClick={entry.onSelect}>
               <Icon className="size-4" />
             </Button>
@@ -106,7 +107,7 @@ export function SelectionBar({ count, total, pinned, inHeader, centered = true, 
         )
       })}
       {more}
-      <Tooltip label={t('Delete (Del)')}>
+      <Tooltip label={withKeys(t('Delete'), `${altKey('D')}, Del`)}>
         <Button variant="ghost" size="icon" className="size-8 shrink-0 text-destructive hover:text-destructive" aria-label={t('Delete')} onClick={onDelete}><Trash2 className="size-4" /></Button>
       </Tooltip>
     </div>

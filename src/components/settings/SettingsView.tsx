@@ -19,7 +19,6 @@ import { PreferenceField } from './PreferenceField'
 import { PageHeader } from '@/components/PageHeader'
 import { NativeSelect } from '@/components/NativeSelect'
 import { BrowserSettings } from './BrowserSettings'
-import { ShortcutsList } from '@/components/torrents/ShortcutsDialog'
 import { Switch } from '@/components/ui/switch'
 import { setDisplayOption, useDisplayOption, type DisplayOption } from '@/lib/displayOptions'
 import { chosenTextSize, setTextSize, TEXT_SIZES, type TextSize } from '@/lib/textSize'
@@ -232,16 +231,6 @@ function AppSection() {
 
       <BrowserSettings />
 
-      {/* The keys and clicks of the torrent list, also shown there with ?. */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('Keyboard and mouse')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <ShortcutsList />
-        </CardContent>
-      </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>{t('About')}</CardTitle>
@@ -347,6 +336,7 @@ function PreferencesSection({ sectionId, edits, setEdits }: { sectionId: string;
     </div>
   )
 }
+
 
 export function SettingsView() {
   const [sectionId, setSectionId] = useState('app')

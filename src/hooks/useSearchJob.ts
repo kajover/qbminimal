@@ -22,8 +22,9 @@ interface Job {
 // keeps its time limit.
 let shown: { job: Job; pattern: string; category: string } | null = null
 const startTimes = new Map<number, number>()
-// For tests, which each start without a search shown.
-export const forgetShownSearch = () => { shown = null }
+// Signing out forgets the search shown, its text and its results, as do tests, which each start
+// without one.
+export const forgetShownSearch = () => { shown = null; startTimes.clear() }
 
 // Runs a qBittorrent search: starts it and polls its results every second until it finishes or
 // times out. Plugin errors aren't repeated here: qBittorrent writes them to its log.

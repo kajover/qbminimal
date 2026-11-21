@@ -12,6 +12,7 @@ import { RuleMenu } from './RuleExtras'
 import { SearchInput } from '@/components/SearchInput'
 import { RSS_LIST, RSS_SEARCH, RSS_TOOLS } from './rssActions'
 import { exportRules, parseRulesFile } from '@/lib/rssRulesFile'
+import { withKeys } from '@/lib/shortcutKeys'
 import { t } from '@/i18n'
 
 const EMPTY_RULE: RSSRule = { enabled: true, mustContain: '', mustNotContain: '', useRegex: false, affectedFeeds: [], assignedCategory: '', savePath: '' }
@@ -121,7 +122,7 @@ export function RSSRules() {
     // The page's rules section: a toolbar and the list, as on the Logs page.
     <>
       <div className="flex items-center gap-1">
-        <SearchInput className={RSS_SEARCH} aria-label={t('Filter rules')} placeholder={t('Search')} value={search} onValueChange={setSearch} />
+        <SearchInput className={RSS_SEARCH} aria-label={t('Filter rules')} placeholder={t('Search')} title={withKeys(t('Search'), 'S')} data-key="s" value={search} onValueChange={setSearch} />
         <input ref={importInput} type="file" accept=".json,application/json" className="hidden" onChange={importFile} />
         <div className={RSS_TOOLS}>
         <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Import rules')} title={t('Import rules from a file')} disabled={importing} onClick={() => importInput.current?.click()}>
@@ -130,7 +131,7 @@ export function RSSRules() {
         <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Export rules')} title={t('Export rules to a file')} disabled={!rules || Object.keys(rules).length === 0} onClick={download}>
           <Download />
         </Button>
-        <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Add rule')} title={t('Add rule')} onClick={() => open({ name: '', isNew: true, rule: EMPTY_RULE })}>
+        <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Add rule')} title={withKeys(t('Add rule'), 'N')} data-key="n" onClick={() => open({ name: '', isNew: true, rule: EMPTY_RULE })}>
           <Plus />
         </Button>
         </div>
@@ -138,7 +139,7 @@ export function RSSRules() {
 
       <div className={RSS_LIST}>
       {Object.keys(rules ?? {}).length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted-foreground">{t('No rules configured')}</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{t('No rules configured. Add one with +')}</p>
       ) : shownRules.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">{t('No matching entries')}</p>
       ) : (

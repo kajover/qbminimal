@@ -4,6 +4,7 @@ import { toast } from '@/hooks/use-toast'
 import { getTorrentExportUrl, qbitClient } from '@/lib/api'
 import { copyText } from '@/lib/clipboard'
 import type { Torrent } from '@/types'
+import { altKey } from '@/lib/shortcutKeys'
 import { t } from '@/i18n'
 
 // Actions that need a value first open a small dialog.
@@ -13,6 +14,8 @@ export interface MenuEntry {
   // Stable, for remembering which actions are pinned to the selection bar.
   id: string
   label: string
+  // Its keyboard shortcut, shown at the end of its menu item.
+  keys?: string
   onSelect: () => void
   icon?: LucideIcon
   // For an entry that turns something off again, shown pressed in a row of icons.
@@ -42,6 +45,22 @@ function exportTorrents(torrents: Torrent[]) {
   }
 }
 
+// Every action's key, pressed with Option or Alt and torrents selected (S, P and D start, stop and
+// delete). A letter from its name where one is free; the queue moves with the arrows, Home and End.
+export const ACTION_KEYS: Record<string, string> = {
+  forceStart: 'F', recheck: 'R', reannounce: 'A',
+  category: 'C', setTags: 'T', location: 'L', limits: 'E', shareLimits: 'W', comment: 'M',
+  queueTop: 'Home', queueUp: '↑', queueDown: '↓', queueBottom: 'End', queuePosition: 'Q',
+  sequential: 'U', firstLast: 'I', superSeeding: 'B', auto: 'O',
+  copyName: 'N', copyHash: 'H', copyMagnet: 'G', export: 'X',
+}
+
+// The name ACTION_KEYS gives a pressed key, by its place on the keyboard.
+export function actionKeyName(code: string): string | null {
+  if (/^Key[A-Z]$/.test(code)) return code.slice(3)
+  return ({ ArrowUp: '↑', ArrowDown: '↓', Home: 'Home', End: 'End' } as Record<string, string>)[code] ?? null
+}
+
 // Everything that can be done to a set of torrents besides starting, stopping, and deleting them.
 export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) => void): MenuGroup[] {
   const action = useTorrentAction()
@@ -52,7 +71,7 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
   const run = (id: string, label: string, work: (hashes: string[]) => Promise<unknown>, done: string, failed: string, icon?: LucideIcon): MenuEntry => ({
     id,
     label,
-    icon,
+        icon,
     onSelect: () => void action.mutateAsync({ work: () => work(hashes), failed }).then(() => toast.success(done), () => undefined),
   })
   const prompt = (id: string, label: string, kind: BulkPrompt, icon?: LucideIcon): MenuEntry => ({ id, label, icon, onSelect: () => ask(kind) })
@@ -80,7 +99,7 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
     }
   }
 
-  return [
+  const groups: MenuGroup[] = [
     {
       name: 'Transfer',
       icons: true,
@@ -94,9 +113,9 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
     {
       name: 'Organize',
       entries: [
-        prompt('category', t('Set category'), 'category', Folder),
-        prompt('setTags', t('Set tags'), 'setTags', Tag),
-        prompt('location', t('Move files'), 'location', FolderInput),
+        prompt('category', t('Category'), 'category', Folder),
+        prompt('setTags', t('Tags'), 'setTags', Tag),
+        prompt('location', t('Location'), 'location', FolderInput),
         prompt('limits', t('Speed limits'), 'limits', Gauge),
         prompt('shareLimits', t('Seeding limits'), 'shareLimits', Sprout),
         // qBittorrent 5.2 and newer can change a comment.
@@ -139,4 +158,5 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
       ],
     },
   ]
+  return groups.map(group => ({ ...group, entries: group.entries.map(entry => (ACTION_KEYS[entry.id] ? { ...entry, keys: altKey(ACTION_KEYS[entry.id]) } : entry)) }))
 }

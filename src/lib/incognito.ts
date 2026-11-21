@@ -43,6 +43,7 @@ const VIDEO = /\.(mkv|mp4|m4v|avi|mov|webm|ts)$|\b(720p|1080p|2160p|4k|x264|x265
 
 const listeners = new Set<() => void>()
 const read = () => readStored(KEY) === 'on'
+export const incognitoOn = read
 
 export function setIncognito(on: boolean) {
   writeStored(KEY, on ? 'on' : null)
@@ -89,10 +90,39 @@ export function incognitoName(hash: string, size = 0, realName = ''): string {
   return name
 }
 
-// Torrents in hash order, so a page that loads the same torrents gives them the same names.
+// The real names behind the stand-ins, so other text that mentions a torrent can hide it too.
+const real = new Map<string, string>()
+
+// The magnet link names the torrent in its dn part; the stand-in takes its place. Some
+// qBittorrent versions leave the link out.
+const disguiseMagnet = (magnet: string, name: string) =>
+  magnet?.replace(/([?&]dn=)[^&]*/, (_, part) => part + encodeURIComponent(name))
+
+// Torrents in hash order, so a page that loads the same torrents gives them the same names. The
+// magnet link, the content path and the comment would show the real name, so they change too.
 export function disguiseTorrents(torrents: Torrent[]): Torrent[] {
-  for (const torrent of [...torrents].sort((a, b) => (a.hash < b.hash ? -1 : 1))) incognitoName(torrent.hash, torrent.size, torrent.name)
-  return torrents.map(torrent => ({ ...torrent, name: given.get(torrent.hash)! }))
+  for (const torrent of [...torrents].sort((a, b) => (a.hash < b.hash ? -1 : 1))) {
+    incognitoName(torrent.hash, torrent.size, torrent.name)
+    if (torrent.name) real.set(torrent.hash, torrent.name)
+  }
+  return torrents.map(torrent => {
+    const name = given.get(torrent.hash)!
+    return {
+      ...torrent,
+      name,
+      magnet_uri: disguiseMagnet(torrent.magnet_uri, name),
+      content_path: torrent.content_path && `${torrent.save_path.replace(/[\\/]+$/, '')}/${name}`,
+      comment: torrent.comment && '',
+    }
+  })
+}
+
+// Text such as a log message with every known torrent's real name replaced by its stand-in.
+// Longer names go first, so a name that contains another is replaced whole.
+export function disguiseText(text: string): string {
+  const pairs = [...real].map(([hash, name]) => [name, given.get(hash)!] as const).sort((a, b) => b[0].length - a[0].length)
+  for (const [name, stand] of pairs) if (name.length > 3 && text.includes(name)) text = text.split(name).join(stand)
+  return text
 }
 
 // A torrent's files under made-up names, each part of a path replaced the same way wherever it

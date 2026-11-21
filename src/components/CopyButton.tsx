@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
 
 // A small copy button beside a value, such as a torrent's name or hash. It shows a tick for a
-// moment once copied.
+// moment once copied. Its icon has the text colour, like the rename and delete buttons beside it.
 // `iconClassName` sizes the icon, to match the buttons beside it.
 export function CopyButton({ text, label, className, iconClassName = 'size-3.5' }: { text: string; label: string; className?: string; iconClassName?: string }) {
   const [copied, setCopied] = useState(false)
@@ -29,7 +29,7 @@ export function CopyButton({ text, label, className, iconClassName = 'size-3.5' 
   }
   return (
     <Tooltip label={name}>
-      <Button type="button" variant="ghost" size="icon" className={cn('size-7 shrink-0 text-muted-foreground hover:text-foreground', className)} aria-label={name} onClick={copy}>
+      <Button type="button" variant="ghost" size="icon" className={cn('size-7 shrink-0', className)} aria-label={name} onClick={copy}>
         {copied ? <Check className={iconClassName} /> : <Copy className={iconClassName} />}
       </Button>
     </Tooltip>

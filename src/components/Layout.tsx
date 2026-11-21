@@ -16,6 +16,7 @@ import { checkForUpdatesIfDue } from '@/lib/updateNotice'
 import { readStored, writeStored } from '@/lib/storage'
 import { cn } from '@/lib/utils'
 import { PAGE_SCROLL_ID, pageScroller, WIDE } from '@/lib/pageScroll'
+import { pageKeys, withKeys } from '@/lib/shortcutKeys'
 import { t } from '@/i18n'
 
 interface LayoutProps {
@@ -37,7 +38,8 @@ function PageItem({ id, label, icon: Icon, page, onNavigate }: (typeof MAIN_PAGE
   )
 }
 
-// The menu button: the pages and the way out. Settings can add a sidebar or tab bar beside it.
+// The menu button: the pages and the way out. A little room between the items keeps the open
+// page's background apart from the one hovered next to it. Settings can add a sidebar or tab bar beside it.
 function PagesMenu({ page, onNavigate }: { page: PageId; onNavigate: (page: PageId) => void }) {
   const { signOut } = useSession()
   // Closing gives focus back to the button, which browsers then ring as if reached by keyboard.
@@ -48,14 +50,14 @@ function PagesMenu({ page, onNavigate }: { page: PageId; onNavigate: (page: Page
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative narrow:size-8" aria-label={notes.length ? `${t('Menu')}: ${notes.map(note => note.label).join(', ')}` : t('Menu')} title={t('Menu')} onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }}>
+        <Button variant="ghost" size="icon" className="relative size-8" aria-label={notes.length ? `${t('Menu')}: ${notes.map(note => note.label).join(', ')}` : t('Menu')} title={t('Menu')} onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }}>
           {/* A pixel lower: its middle line then meets the middle of the title's lowercase letters, not
               of its capitals, so the two read as one line. */}
           <Menu className="size-5 translate-y-px" />
           {notes[0] && <span aria-hidden className={cn('absolute end-0.5 top-0.5 size-2.5 rounded-full ring-2 ring-background', notes[0].dot)} />}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-52" onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }} onCloseAutoFocus={(e) => { if (byPointer.current) e.preventDefault() }}>
+      <DropdownMenuContent align="start" className="flex w-52 flex-col gap-0.5" onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }} onCloseAutoFocus={(e) => { if (byPointer.current) e.preventDefault() }}>
         {MAIN_PAGES.map(item => <PageItem key={item.id} {...item} page={page} onNavigate={onNavigate} />)}
         <DropdownMenuSeparator />
         {EXTRA_PAGES.map(item => <PageItem key={item.id} {...item} page={page} onNavigate={onNavigate} />)}
@@ -220,6 +222,18 @@ const StatisticsDialog = lazy(() => import('@/components/torrents/TorrentStats')
 
 // G and then a page's number, 1 to 7 in the menu's order, goes to that page. Not while typing or
 // with a window or menu open.
+// The same letters on every page: S goes to the page's search field, N adds, F shows or hides the
+// filters, V switches the view. A page marks what each letter works with `data-key`, and the first
+// one in view is used. The torrent list handles its own, with more to do.
+function pressPageKey(key: string, event: KeyboardEvent) {
+  if (!/^[snfv]$/.test(key)) return
+  const target = [...document.querySelectorAll<HTMLElement>(`[data-key="${key}"]`)].find(element => element.getClientRects().length > 0)
+  if (!target) return
+  event.preventDefault()
+  if (target.matches('input, textarea')) target.focus()
+  else target.click()
+}
+
 function usePageKeys(onNavigate: (page: PageId) => void) {
   const navigate = useRef(onNavigate)
   useEffect(() => { navigate.current = onNavigate })
@@ -236,7 +250,10 @@ function usePageKeys(onNavigate: (page: PageId) => void) {
           event.preventDefault()
           navigate.current(next.id)
         }
-      } else armed = key === 'g' && !event.shiftKey ? Date.now() : 0
+      } else {
+        armed = key === 'g' && !event.shiftKey ? Date.now() : 0
+        if (!armed && !event.shiftKey && !event.defaultPrevented) pressPageKey(key, event)
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -264,7 +281,7 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
 
   const notes = usePageNotes()
   const navButton = ({ id, label, icon: Icon }: (typeof MAIN_PAGES)[number]) => (
-    <Button key={id} variant={page === id ? 'secondary' : 'ghost'} className="justify-start gap-2 overflow-hidden" title={label} aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
+    <Button key={id} variant={page === id ? 'secondary' : 'ghost'} className="justify-start gap-2 overflow-hidden" title={withKeys(label, pageKeys(MENU_PAGES.findIndex(item => item.id === id) + 1))} aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
       {/* 14px labels like the tab bar's, with 16px icons beside them, as on the other buttons. */}
       <Icon className="size-4" />
       <span className="truncate">{label}</span>
@@ -297,8 +314,8 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
             {/* Left out for room; screen readers still hear it. */}
             <h1 className="sr-only">{t('qBittorrent')}</h1>
           </div>
-          {/* Room before the title only, so the last button ends where the list does. */}
-          <div ref={setSlot} className="flex min-w-0 flex-1 items-center wide:ps-2" />
+          {/* The title sits as far from the menu icon at every width. */}
+          <div ref={setSlot} className="flex min-w-0 flex-1 items-center" />
           <GlobalSpeeds onOpen={() => setStatsOpen(true)} />
         </div>
         <ConnectionBanner />

@@ -11,12 +11,14 @@ import { Switch } from '@/components/ui/switch'
 import { SearchInput } from '@/components/SearchInput'
 import { LogBadge, LogEntryDialog, type LogRow } from '@/components/logs/LogEntryDialog'
 import { textWidth } from '@/components/TableColumns'
-import { useLogs, usePeerLog } from '@/hooks/useApi'
+import { useLogs, usePeerLog, useTorrents } from '@/hooks/useApi'
+import { disguiseText, useIncognito } from '@/lib/incognito'
 import { t } from '@/i18n'
 import { parseLogMessage } from '@/lib/logDetails'
 import { buildLogText, formatLogTime, logFileName } from '@/lib/logExport'
 import { FILL_BOTTOM, pageScroller } from '@/lib/pageScroll'
 import { readStored, writeStored } from '@/lib/storage'
+import { withKeys } from '@/lib/shortcutKeys'
 import { textScale } from '@/lib/textSize'
 
 // qBittorrent's log levels. The badge always carries the word, so colour never says it alone.
@@ -288,11 +290,16 @@ export function LogsView() {
   }
 
   // Each general entry read once, as the log only grows.
+  // In incognito mode torrent names in the messages show as their stand-ins; reading the torrents
+  // gives each one its stand-in first.
+  const incognito = useIncognito()
+  const { data: torrents } = useTorrents()
   const mainRows = useMemo<LogRow[]>(() => (main.data ?? []).map(log => {
     const level = LEVELS.find(l => l.type === log.type) ?? LEVELS[0]
-    const { summary, fields } = parseLogMessage(log.message)
-    return { key: `m${log.id}`, id: log.id, timestamp: log.timestamp, label: level.label, level: level.key, badge: level.badge, message: log.message, summary, fields, hideKey: summary || log.message }
-  }), [main.data])
+    const text = incognito && torrents ? disguiseText(log.message) : log.message
+    const { summary, fields } = parseLogMessage(text)
+    return { key: `m${log.id}`, id: log.id, timestamp: log.timestamp, label: level.label, level: level.key, badge: level.badge, message: text, summary, fields, hideKey: summary || text }
+  }), [main.data, incognito, torrents])
 
   // Both logs in one list, newest first. The peer log is searched by address and reason.
   const rows = useMemo<LogRow[]>(() => {
@@ -351,7 +358,7 @@ export function LogsView() {
         <CardContent className="space-y-3">
           <div className="flex items-center gap-1">
             {/* The search keeps room to type in; on a phone the filter's label is cut short first. */}
-            <SearchInput className="me-1 min-w-32 flex-1" aria-label={t('Filter log messages')} placeholder={t('Search')} value={search} onValueChange={setSearch} />
+            <SearchInput className="me-1 min-w-32 flex-1" aria-label={t('Filter log messages')} placeholder={t('Search')} title={withKeys(t('Search'), 'S')} data-key="s" value={search} onValueChange={setSearch} />
             <LogFilter shown={shown} onShownChange={setShown} counts={counts} peerCount={peers.data?.length} hidden={hidden} onHiddenChange={changeHidden} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

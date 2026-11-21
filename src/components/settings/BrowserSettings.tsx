@@ -1,11 +1,12 @@
 import { useState, type ReactNode } from 'react'
-import { Bell, Magnet } from 'lucide-react'
+import { Bell, Keyboard, Magnet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from '@/hooks/use-toast'
 import { magnetHandlerUrl } from '@/lib/incoming'
 import { finishNoticesOn, needsHomeScreen, notificationsSupported, setFinishNotices } from '@/lib/notify'
+import { ShortcutsDialog } from '@/components/torrents/ShortcutsDialog'
 import { t } from '@/i18n'
 
 // Browsers only let secure pages handle magnet links, and Safari doesn't let pages do it at all.
@@ -48,6 +49,7 @@ export function BrowserSettings() {
     }
   }
 
+  const [shortcutsOpen, setShortcutsOpen] = useState(false)
   return (
     <Card>
       <CardHeader>
@@ -72,6 +74,11 @@ export function BrowserSettings() {
         >
           <Button variant="outline" size="sm" disabled={!canHandleMagnets()} onClick={registerMagnets}><Magnet />{t('Open them here')}</Button>
         </Row>
+        {/* In their own window, as on the torrent list with ?, so they don't make the page long. */}
+        <Row icon={<Keyboard className="size-4" />} title={t('Keyboard and mouse')} description={t('Every key and click, also shown with ? on the torrent list.')}>
+          <Button variant="outline" size="sm" onClick={() => setShortcutsOpen(true)}><Keyboard />{t('Show keyboard shortcuts')}</Button>
+        </Row>
+        <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
       </CardContent>
     </Card>
   )

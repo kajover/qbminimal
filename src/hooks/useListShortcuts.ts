@@ -23,32 +23,41 @@ export interface ListShortcuts {
   showShortcuts: () => void
   toggleFilters: () => void
   toggleView: () => void
+  // A key's code, pressed with Option or Alt: runs the action ACTION_KEYS gives it on the
+  // selection, telling whether there was one.
+  runAction: (code: string) => boolean
 }
 
-// Ctrl or Cmd + A selects every matching torrent and with Shift none, + I swaps the selected and
-// unselected ones, + S starts and + P stops the selection, and + O opens Add, as in qBittorrent.
-// Delete asks to delete the selection, Escape closes the details and then clears the selection,
-// / or S opens the search, F the filters, N adds torrents, V switches between table and cards, and ?
-// lists all of these.
+// Ctrl or ⌘ + A selects every matching torrent and with Shift none, + I swaps the selected and
+// unselected ones. With torrents selected, Option or Alt + S starts, + P stops, + D (or Delete)
+// asks to delete them, and + the letters in ACTION_KEYS run the other actions. Escape closes the
+// details and then clears the selection; S opens the search, F the filters, N adds torrents, V
+// switches between table and cards, and ? lists all of these.
 export function useListShortcuts(keys: ListShortcuts) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (!isListShortcut(event)) return
       const mod = event.metaKey || event.ctrlKey
+      const plain = !mod && !event.altKey && !event.shiftKey
+      // Actions on the selection take Option or Alt, so no key alone runs one by accident. Read
+      // by the key's place, as Option with a letter types another character on a Mac.
+      const alt = event.altKey && !mod && !event.shiftKey && keys.hasSelection
       const key = event.key.toLowerCase()
       const take = (run: () => void) => { event.preventDefault(); run() }
       if (mod && key === 'a') take(event.shiftKey ? keys.selectNone : keys.selectAll)
       else if (mod && key === 'i') take(keys.invertSelection)
-      else if (mod && (key === 's' || key === 'p') && !event.shiftKey && keys.hasSelection) take(key === 's' ? keys.start : keys.stop)
-      else if (mod && key === 'o') take(keys.add)
-      else if ((event.key === 'Delete' || event.key === 'Backspace') && keys.hasSelection) take(keys.deleteSelection)
       else if (event.key === 'Escape') keys.escape()
-      // S as well as /, which needs Shift on many keyboards, such as German ones.
-      else if (event.key === '/' || (key === 's' && !mod && !event.altKey && !event.shiftKey)) take(keys.search)
+      else if (alt && event.code === 'KeyS') take(keys.start)
+      else if (alt && event.code === 'KeyP') take(keys.stop)
+      else if (alt && event.code === 'KeyD') take(keys.deleteSelection)
+      // Delete too, and Backspace, which a Mac's delete key sends: deleting asks first.
+      else if (keys.hasSelection && !mod && !event.altKey && (event.key === 'Delete' || event.key === 'Backspace')) take(keys.deleteSelection)
+      else if (alt && keys.runAction(event.code)) event.preventDefault()
       else if (event.key === '?') take(keys.showShortcuts)
-      else if (!mod && !event.altKey && !event.shiftKey && key === 'f') take(keys.toggleFilters)
-      else if (!mod && !event.altKey && !event.shiftKey && key === 'n') take(keys.add)
-      else if (!mod && !event.altKey && !event.shiftKey && key === 'v') take(keys.toggleView)
+      else if (plain && key === 's') take(keys.search)
+      else if (plain && key === 'f') take(keys.toggleFilters)
+      else if (plain && key === 'n') take(keys.add)
+      else if (plain && key === 'v') take(keys.toggleView)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)

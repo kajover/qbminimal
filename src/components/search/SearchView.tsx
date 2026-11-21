@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { Eraser, Loader2, PanelRight, Plus, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -22,6 +22,7 @@ import { SearchPluginsDialog } from './SearchPluginsDialog'
 import { SearchResults } from './SearchResults'
 import { SearchSidebar } from './SearchSidebar'
 import { t } from '@/i18n'
+import { withKeys } from '@/lib/shortcutKeys'
 import { ROOM_FOR_SIDEBAR } from '@/lib/pageScroll'
 
 // Whether the sidebar was left open beside the results, kept on this device.
@@ -48,31 +49,12 @@ export function SearchView() {
     setSidebarPref(open ? 'open' : null)
     writeStored(SIDEBAR_KEY, open ? 'open' : null)
   }
-  // For the F key, which is set up once.
-  const toggleSidebar = useRef(() => {})
-  useEffect(() => { toggleSidebar.current = () => setSidebarOpen(!sidebarOpen) })
   const [pluginsOpen, setPluginsOpen] = useState(false)
   const [toolbarSlot, setToolbarSlot] = useState<HTMLDivElement | null>(null)
   const [pageBarSlot, setPageBarSlot] = useState<HTMLDivElement | null>(null)
   const [adding, setAdding] = useState<SearchResult | null>(null)
   const [addBusy, setAddBusy] = useState(false)
 
-  // S or / goes to the search field, as on the torrent list. Not while typing or in a window.
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement
-      if (event.metaKey || event.ctrlKey || event.altKey || target.closest?.('input, textarea, select, [contenteditable="true"]') || document.querySelector('[role="dialog"], [role="menu"]')) return
-      if (event.key === '/' || event.key.toLowerCase() === 's') {
-        event.preventDefault()
-        document.getElementById('search-pattern')?.focus()
-      } else if (event.key.toLowerCase() === 'f' && !event.shiftKey) {
-        event.preventDefault()
-        toggleSidebar.current()
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
 
   const enabled = (plugins ?? []).filter(plugin => plugin.enabled)
   const setPattern = (text: string) => setPatternState(text)
@@ -153,7 +135,7 @@ export function SearchView() {
         actions={(
           <>
             <div ref={setToolbarSlot} className="flex items-center gap-1" />
-            <Button variant={sidebarOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={sidebarLabel} title={sidebarLabel} aria-expanded={sidebarOpen} aria-controls="search-sidebar" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            <Button variant={sidebarOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={sidebarLabel} title={withKeys(sidebarLabel, 'F')} data-key="f" aria-expanded={sidebarOpen} aria-controls="search-sidebar" onClick={() => setSidebarOpen(!sidebarOpen)}>
               <PanelRight className="size-4" />
               {narrowed && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
             </Button>
@@ -164,7 +146,7 @@ export function SearchView() {
       {/* A short field: the plugins and category are in the sidebar. Above it, so the sidebar
           starts where the results do. */}
       <form onSubmit={submit} className="flex max-w-xl shrink-0 items-center gap-2">
-        <SearchInput id="search-pattern" aria-label={t('Search for')} placeholder={t('Search')} value={pattern} onValueChange={setPattern} required={!search.running} className="min-w-0 flex-1" />
+        <SearchInput id="search-pattern" aria-label={t('Search for')} placeholder={t('Search')} title={withKeys(t('Search'), 'S')} data-key="s" value={pattern} onValueChange={setPattern} required={!search.running} className="min-w-0 flex-1" />
         {/* While searching, the spinner turns into a stop button under the pointer. It stops the
             search even with the field emptied: the field is only required to start one. */}
         <Button type="submit" className="group" aria-label={search.running ? t('Stop search') : t('Search')} title={search.running ? t('Stop search') : t('Search')}>

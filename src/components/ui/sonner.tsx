@@ -11,6 +11,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme}
       className="toaster group"
       style={{ '--normal-bg': 'var(--popover)', '--normal-text': 'var(--popover-foreground)', '--normal-border': 'var(--border)' } as CSSProperties}
+      // A swipe to either side or down sends a notification away, wherever it shows.
+      swipeDirections={['left', 'right', 'bottom']}
       toastOptions={{ classNames: { title: 'text-sm font-medium', description: 'text-xs text-muted-foreground' } }}
       {...props}
     />

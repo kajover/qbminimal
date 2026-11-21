@@ -25,6 +25,7 @@ const api = vi.hoisted(() => ({
   deleteTorrents: vi.fn(async () => undefined),
   pauseTorrents: vi.fn(async () => undefined),
   resumeTorrents: vi.fn(async () => undefined),
+  reannounceTorrents: vi.fn(async () => undefined),
 }))
 
 // Anything else the page asks for answers with an empty list.
@@ -49,6 +50,7 @@ describe('the torrent list', () => {
     api.deleteTorrents.mockClear()
     api.pauseTorrents.mockClear()
     api.resumeTorrents.mockClear()
+    api.reannounceTorrents.mockClear()
   })
 
   it('selects a clicked row and opens its details', async () => {
@@ -115,15 +117,33 @@ describe('the torrent list', () => {
     expect(selectedNames()).toEqual([])
   })
 
-  it('starts with Ctrl+S, stops with Ctrl+P, and opens Add with Ctrl+O', async () => {
+  it('runs the bar actions by Alt and their letters with torrents selected, never by a letter alone', async () => {
+    await renderView()
+    const user = userEvent.setup()
+    await user.keyboard('{Alt>}a{/Alt}')
+    expect(api.reannounceTorrents).not.toHaveBeenCalled()
+    await user.click(row('bravo'))
+    await user.keyboard('a')
+    expect(api.reannounceTorrents).not.toHaveBeenCalled()
+    await user.keyboard('{Alt>}a{/Alt}')
+    expect(api.reannounceTorrents).toHaveBeenCalledWith(['h1'])
+    await user.keyboard('{Alt>}c{/Alt}')
+    expect(await screen.findByRole('dialog', { name: 'Set category' })).toBeInTheDocument()
+  })
+
+  it('starts with Alt+S, stops with Alt+P, and opens Add with N only', async () => {
     await renderView()
     const user = userEvent.setup()
     await user.click(row('bravo'))
     await user.keyboard('{Control>}s{/Control}')
+    expect(api.resumeTorrents).not.toHaveBeenCalled()
+    await user.keyboard('{Alt>}s{/Alt}')
     expect(api.resumeTorrents).toHaveBeenCalledWith(['h1'])
-    await user.keyboard('{Control>}p{/Control}')
+    await user.keyboard('{Alt>}p{/Alt}')
     expect(api.pauseTorrents).toHaveBeenCalledWith(['h1'])
     await user.keyboard('{Control>}o{/Control}')
+    expect(screen.queryByRole('dialog')).toBeNull()
+    await user.keyboard('n')
     expect(await screen.findByRole('dialog')).toBeInTheDocument()
   })
 
@@ -174,7 +194,7 @@ describe('the torrent list', () => {
     await renderView()
     const user = userEvent.setup()
     await user.click(row('alpha'))
-    await user.keyboard('{Delete}')
+    await user.keyboard('{Alt>}d{/Alt}')
     const dialog = await screen.findByRole('dialog')
     await user.click(within(dialog).getByRole('checkbox', { name: 'Also delete the downloaded files' }))
     await user.click(within(dialog).getByRole('button', { name: 'Remember this choice' }))

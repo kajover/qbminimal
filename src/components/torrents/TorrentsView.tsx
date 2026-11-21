@@ -24,7 +24,7 @@ import { getColumn, loadColumnLayout, saveColumnLayout, TORRENT_FILTER_COLUMNS, 
 import { choiceOptions, NONE } from '@/lib/columnFilters'
 import { type FilterTarget } from '@/components/ColumnFilters'
 import type { Torrent } from '@/types'
-import { useBulkActions, type BulkPrompt } from './bulkActions'
+import { ACTION_KEYS, actionKeyName, useBulkActions, type BulkPrompt } from './bulkActions'
 import { BulkPromptDialog } from './BulkPromptDialog'
 import { ActionBarDialog } from './ActionBarDialog'
 import { DeleteTorrentsDialog } from './DeleteTorrentsDialog'
@@ -284,6 +284,12 @@ export function TorrentsView() {
     showShortcuts: () => setShortcutsOpen(true),
     toggleFilters: () => setFiltersOpen(open => !open),
     toggleView: () => list.showAsTable(!list.showTable),
+    runAction: (code) => {
+      const name = actionKeyName(code)
+      const entry = name ? entries.find(entry => ACTION_KEYS[entry.id] === name && !entry.disabled) : undefined
+      entry?.onSelect()
+      return !!entry
+    },
   })
 
   const matchingSelected = list.matching.filter(t => selection.selected.has(t.hash)).length

@@ -1,4 +1,5 @@
 import { COLUMN_IDS, type ColumnId } from './torrentColumns'
+import { readStored, writeStored } from './storage'
 
 // The torrent list's sort, view, and page size, kept per device so the list opens the way it was left.
 // Its filters aren't kept: each visit starts with every torrent showing, so none can hide unnoticed.
@@ -16,12 +17,14 @@ export interface ListSettings {
 }
 
 // Sorted by queue position (#), as qBittorrent sorts its list until you choose otherwise.
-// 20 at a time, a screenful, with the pages bar below.
-export const DEFAULT_LIST_SETTINGS: ListSettings = { sortField: 'priority', sortDirection: 'asc', view: 'auto', pageSize: 20 }
+// 50 at a time, with the pages bar below; the search results show as many.
+export const DEFAULT_PAGE_SIZE = 50
+export const DEFAULT_LIST_SETTINGS: ListSettings = { sortField: 'priority', sortDirection: 'asc', view: 'auto', pageSize: DEFAULT_PAGE_SIZE }
 
 const STORAGE_KEY = 'qbminimal.torrentList'
 // Settings saved before version 2 kept the old default sort by name, so that one is left behind.
-const SETTINGS_VERSION = 2
+// Before version 3 every list saved the old default of 20 a page, so that one is too.
+const SETTINGS_VERSION = 3
 
 // Anything unreadable or out of date falls back to the defaults, one value at a time.
 export function parseListSettings(raw: string | null): ListSettings {
@@ -32,14 +35,23 @@ export function parseListSettings(raw: string | null): ListSettings {
   } catch {
     return DEFAULT_LIST_SETTINGS
   }
-  const current = saved.version === SETTINGS_VERSION
+  const current = saved.version === SETTINGS_VERSION || saved.version === 2
+  const pageSize = saved.version === 2 && saved.pageSize === 20 ? DEFAULT_PAGE_SIZE : saved.pageSize
   return {
     sortField: current && COLUMN_IDS.includes(saved.sortField as SortField) ? saved.sortField as SortField : DEFAULT_LIST_SETTINGS.sortField,
     sortDirection: current && saved.sortDirection === 'desc' ? 'desc' : 'asc',
     view: saved.view === 'table' || saved.view === 'cards' ? saved.view : 'auto',
-    pageSize: PAGE_SIZES.includes(saved.pageSize as typeof PAGE_SIZES[number]) ? saved.pageSize as number : DEFAULT_LIST_SETTINGS.pageSize,
+    pageSize: PAGE_SIZES.includes(pageSize as typeof PAGE_SIZES[number]) ? pageSize as number : DEFAULT_PAGE_SIZE,
   }
 }
+
+// The search results' page size, kept on this device.
+const SEARCH_PAGE_SIZE_KEY = 'qbminimal.searchPageSize'
+export function loadSearchPageSize(): number {
+  const saved = Number(readStored(SEARCH_PAGE_SIZE_KEY))
+  return PAGE_SIZES.includes(saved as typeof PAGE_SIZES[number]) ? saved : DEFAULT_PAGE_SIZE
+}
+export const saveSearchPageSize = (size: number) => writeStored(SEARCH_PAGE_SIZE_KEY, size === DEFAULT_PAGE_SIZE ? null : String(size))
 
 export function loadListSettings(): ListSettings {
   try {

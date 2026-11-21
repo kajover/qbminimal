@@ -32,7 +32,7 @@ function Identity({ label, value, wide, full, empty, extra }: { label: string; v
         {value ? (
           <>
             <span className={cn('truncate', wide ? 'text-sm font-medium' : 'font-mono text-xs')} dir={wide ? 'auto' : 'ltr'} title={value}>{value}</span>
-            <CopyButton text={value} label={label} className="size-6" />
+            <CopyButton text={value} label={label} className="size-6" iconClassName="size-3" />
             {extra && <span className="shrink-0 max-sm:hidden">{extra}</span>}
           </>
         ) : <span className="text-xs text-muted-foreground">{empty}</span>}
@@ -72,11 +72,11 @@ export function TorrentInfoTab({ torrent: x }: { torrent: Torrent }) {
   const pair = (a: number, b: number) => `${Math.max(a, 0)} / ${Math.max(b, 0)}`
   const exportButton = x.has_metadata === false ? (
     <span className="inline-flex cursor-not-allowed" title={t('Available once qBittorrent has this torrent\'s metadata')}>
-      <Button size="sm" variant="ghost" className="h-6 shrink-0 px-2 text-xs text-muted-foreground" disabled><Download />{t('Export .torrent')}</Button>
+      <Button size="sm" variant="ghost" className="h-6 shrink-0 px-2 text-xs" disabled><Download className="size-3" />{t('Export .torrent')}</Button>
     </span>
   ) : (
-    <Button size="sm" variant="ghost" className="h-6 shrink-0 px-2 text-xs text-muted-foreground" asChild>
-      <a href={getTorrentExportUrl(x.hash)} download={`${x.name}.torrent`}><Download />{t('Export .torrent')}</a>
+    <Button size="sm" variant="ghost" className="h-6 shrink-0 px-2 text-xs" asChild>
+      <a href={getTorrentExportUrl(x.hash)} download={`${x.name}.torrent`}><Download className="size-3" />{t('Export .torrent')}</a>
     </Button>
   )
 

@@ -17,6 +17,12 @@ describe('parseListSettings', () => {
     expect(older).toMatchObject({ sortField: 'priority', sortDirection: 'asc', view: 'cards' })
   })
 
+  it('shows 50 a page, also where the old default of 20 was saved, keeping a size chosen since', () => {
+    expect(DEFAULT_LIST_SETTINGS.pageSize).toBe(50)
+    expect(parseListSettings(JSON.stringify({ pageSize: 20, version: 2 })).pageSize).toBe(50)
+    expect(parseListSettings(JSON.stringify({ pageSize: 20, version: 3 })).pageSize).toBe(20)
+  })
+
   it('uses defaults for missing, broken, or unknown values', () => {
     expect(parseListSettings(null)).toEqual(DEFAULT_LIST_SETTINGS)
     expect(parseListSettings('not json')).toEqual(DEFAULT_LIST_SETTINGS)

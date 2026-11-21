@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
 import { hasStatus, qbitClient, type LogLevels } from '@/lib/api'
-import { disguiseTorrents, useIncognito } from '@/lib/incognito'
+import { disguiseTorrents, incognitoName, incognitoOn, useIncognito } from '@/lib/incognito'
 import { supportsFeature, type ApiFeature } from '@/lib/apiVersion'
 import { parseBannedPeers, removeBannedPeer } from '@/lib/bannedPeers'
 import { findFinished } from '@/lib/finished'
@@ -71,7 +71,9 @@ const MAIN_DATA: QueryKey = ['torrents', 'maindata']
 // A notification outside the page when it's in the background, a message on it otherwise.
 function announceFinished(torrents: Torrent[]) {
   for (const torrent of torrents) {
-    if (!notifyInBackground(t('Download finished'), torrent.name)) toast.success(t('Download finished'), { description: torrent.name })
+    // In incognito mode the notice names the torrent's stand-in.
+    const name = incognitoOn() ? incognitoName(torrent.hash, torrent.size, torrent.name) : torrent.name
+    if (!notifyInBackground(t('Download finished'), name)) toast.success(t('Download finished'), { description: name })
   }
 }
 

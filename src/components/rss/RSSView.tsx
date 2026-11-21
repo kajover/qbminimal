@@ -16,6 +16,7 @@ import { FeedTree } from './FeedTree'
 import { RSSPromptDialog } from './RSSPromptDialog'
 import { RSS_LIST, RSS_SEARCH, RSS_TOOLS, rssName, useRSSAction, type Prompt } from './rssActions'
 import { RSSRules } from './RSSRules'
+import { withKeys } from '@/lib/shortcutKeys'
 import { t } from '@/i18n'
 
 type Section = 'articles' | 'feeds' | 'rules'
@@ -82,7 +83,7 @@ export function RSSView() {
           {section === 'articles' && (
             <>
               <div className="flex items-center gap-1">
-                <SearchInput className={RSS_SEARCH} aria-label={t('Filter articles')} placeholder={t('Search')} value={articleSearch} onValueChange={setArticleSearch} />
+                <SearchInput className={RSS_SEARCH} aria-label={t('Filter articles')} placeholder={t('Search')} title={withKeys(t('Search'), 'S')} data-key="s" value={articleSearch} onValueChange={setArticleSearch} />
                 <div className={RSS_TOOLS}>
                 <NativeSelect className="min-w-0 flex-1 sm:w-56 sm:flex-none" aria-label={t('Feed')} value={feed?.uid ?? ''} disabled={feeds.length === 0} onChange={(e) => setChosenFeed(e.target.value)}>
                   {feeds.map(f => <option key={f.uid} value={f.uid}>{f.unreadCount > 0 ? `${f.title} (${f.unreadCount})` : f.title}</option>)}
@@ -103,11 +104,11 @@ export function RSSView() {
           {section === 'feeds' && (
             <>
               <div className="flex items-center gap-1">
-                <SearchInput className={RSS_SEARCH} aria-label={t('Filter feeds')} placeholder={t('Search')} value={feedSearch} onValueChange={setFeedSearch} />
+                <SearchInput className={RSS_SEARCH} aria-label={t('Filter feeds')} placeholder={t('Search')} title={withKeys(t('Search'), 'S')} data-key="s" value={feedSearch} onValueChange={setFeedSearch} />
                 <div className={RSS_TOOLS}>
                 <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Refresh all feeds')} title={t('Refresh all feeds')} disabled={feeds.length === 0} onClick={() => refresh('', t('Refreshing all feeds'))}><RefreshCw /></Button>
                 <Button variant="outline" size="icon" className="shrink-0" aria-label={t('New folder')} title={t('New folder')} onClick={() => setPrompt({ kind: 'addFolder' })}><FolderPlus /></Button>
-                <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Add feed')} title={t('Add feed')} onClick={() => setPrompt({ kind: 'addFeed' })}><Plus /></Button>
+                <Button variant="outline" size="icon" className="shrink-0" aria-label={t('Add feed')} title={withKeys(t('Add feed'), 'N')} data-key="n" onClick={() => setPrompt({ kind: 'addFeed' })}><Plus /></Button>
                 </div>
               </div>
               <div className={RSS_LIST}>

@@ -8,6 +8,7 @@ import type { SortField } from '@/lib/listSettings'
 import { DEFAULT_COLUMN_LAYOUT, getColumn, isDefaultLayout, moveColumn, toggleColumn, type ColumnLayout } from '@/lib/torrentColumns'
 import { ColumnMenuItems } from '@/components/ColumnMenuItems'
 import { t } from '@/i18n'
+import { withKeys } from '@/lib/shortcutKeys'
 import { ROOM_FOR_HEADER_SEARCH } from '@/lib/pageScroll'
 
 // What a card shows, or matters most, for sorting cards. The table sorts from its headers.
@@ -28,7 +29,7 @@ interface TorrentToolbarProps {
 // Opens the add form over the list, without leaving it.
 export function AddTorrentButton({ onAdd }: { onAdd: () => void }) {
   return (
-    <Button variant="outline" size="icon" className="size-8" aria-label={t('Add torrents')} title={t('Add torrents')} onClick={onAdd}>
+    <Button variant="outline" size="icon" className="size-8" aria-label={t('Add torrents')} title={withKeys(t('Add torrents'), 'N')} onClick={onAdd}>
       <Plus className="size-4" />
     </Button>
   )
@@ -44,7 +45,7 @@ export function QuickSearchField({ list, wide, onClose }: { list: TorrentList; w
       autoFocus={!wide}
       aria-label={t('Search')}
       placeholder={t('Search')}
-      title={t('Searches names, categories, tags and trackers. With a wildcard the whole name must match: * stands for any text and ? for any one character, as in *.mkv.')}
+      title={`${withKeys(t('Search'), 'S')}\n\n${t('Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).')}`}
       value={list.draft}
       onValueChange={(text) => (text ? list.setDraft(text) : list.setQuery(''))}
       onKeyDown={(e) => {
@@ -62,7 +63,7 @@ function QuickSearch({ list, open, onOpenChange }: { list: TorrentList; open: bo
   const roomy = useMediaQuery(ROOM_FOR_HEADER_SEARCH)
   if (roomy) return <QuickSearchField list={list} wide />
   return (
-    <Button variant={open ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={t('Search')} title={t('Search')} aria-expanded={open} aria-controls="torrent-search" onClick={() => onOpenChange(!open)}>
+    <Button variant={open ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={t('Search')} title={withKeys(t('Search'), 'S')} aria-expanded={open} aria-controls="torrent-search" onClick={() => onOpenChange(!open)}>
       <Search className="size-4" />
       {list.searched && <span aria-hidden className="absolute -end-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />}
     </Button>
@@ -119,11 +120,11 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen,
       )}
 
       {/* One button that switches to the other view, showing that view's icon. */}
-      <Button variant="outline" size="icon" className="size-8" aria-label={list.showTable ? t('Card view') : t('Table view')} title={list.showTable ? t('Card view') : t('Table view')} onClick={() => list.showAsTable(!list.showTable)}>
+      <Button variant="outline" size="icon" className="size-8" aria-label={list.showTable ? t('Card view') : t('Table view')} title={withKeys(list.showTable ? t('Card view') : t('Table view'), 'V')} onClick={() => list.showAsTable(!list.showTable)}>
         {list.showTable ? <LayoutList className="size-4" /> : <Table2 className="size-4" />}
       </Button>
       {/* Last, at the edge where the filter sidebar opens. */}
-      <Button variant={filtersOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={list.narrowed ? t('Search and filter (filters on)') : t('Search and filter')} title={list.narrowed ? t('Search and filter (filters on)') : t('Search and filter')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
+      <Button variant={filtersOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={list.narrowed ? t('Search and filter (filters on)') : t('Search and filter')} title={withKeys(list.narrowed ? t('Search and filter (filters on)') : t('Search and filter'), 'F')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
         {/* Opens the filter sidebar. */}
         <PanelRight className="size-4" />
         {/* A dot while any filter hides torrents, as the chips above the list may be out of view. */}
