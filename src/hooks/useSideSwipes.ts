@@ -1,7 +1,7 @@
 import { useEffect, type RefObject } from 'react'
 
 // Swipes that start here are left alone: they belong to what's under the finger or pointer.
-const OWN_SWIPES = '[role="dialog"], [role="menu"], [data-keeps-swipes], input, textarea, select'
+const OWN_SWIPES = '[role="dialog"], [role="menu"], [data-keeps-swipes], [data-sonner-toast], input, textarea, select'
 
 // Whether a swipe starting at this element should move the table: not when it starts on the
 // table itself (which scrolls natively), in something else that scrolls sideways, or in a

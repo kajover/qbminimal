@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Ya existe una etiqueta llamada {name}",
   "There is already a view called {name}": "Ya existe una vista llamada {name}",
   "View updated": "Vista actualizada",
-  "Update installed and the previous version removed.": "Actualización instalada y versión anterior eliminada.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Actualización instalada. La versión anterior queda en {folder} y puedes borrarla.",
-  "Reload the page to use it.": "Recarga la página para usarla.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent descarga la nueva versión desde GitHub a una carpeta nueva junto a la actual, cambia a ella y elimina la versión anterior.",
   "Add or remove": "Añadir o quitar",
   "Filter sidebar": "Barra lateral de filtros",
@@ -1410,5 +1407,9 @@
   "In the bar": "En la barra",
   "Add torrents, a feed or a rule": "Añadir torrents, un feed o una regla",
   "Location": "Ubicación",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Encuentra los torrents que contienen cada palabra en el nombre, la categoría, las etiquetas o el tracker. * vale por cualquier texto y ? por un solo carácter (p. ej., *file?.mkv encuentra myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Encuentra los torrents que contienen cada palabra en el nombre, la categoría, las etiquetas o el tracker. * vale por cualquier texto y ? por un solo carácter (p. ej., *file?.mkv encuentra myfile1.mkv).",
+  "Update installed": "Actualización instalada",
+  "Reload to use it.": "Recarga para usarla.",
+  "Reload to use it. The old version stays in {folder}.": "Recarga para usarla. La versión antigua queda en {folder}.",
+  "Selection bar reset": "Barra de selección restablecida"
 }

@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Υπάρχει ήδη ετικέτα με όνομα {name}",
   "There is already a view called {name}": "Υπάρχει ήδη προβολή με όνομα {name}",
   "View updated": "Η προβολή ενημερώθηκε",
-  "Update installed and the previous version removed.": "Η ενημέρωση εγκαταστάθηκε και η προηγούμενη έκδοση αφαιρέθηκε.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Η ενημέρωση εγκαταστάθηκε. Η προηγούμενη έκδοση μένει στο {folder} και μπορείς να τη διαγράψεις.",
-  "Reload the page to use it.": "Φόρτωσε ξανά τη σελίδα για να τη χρησιμοποιήσεις.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "Το qBittorrent κατεβάζει τη νέα έκδοση από το GitHub σε νέο φάκελο δίπλα στον τρέχοντα, μεταβαίνει σε αυτή και αφαιρεί την προηγούμενη έκδοση.",
   "Add or remove": "Προσθήκη ή αφαίρεση",
   "Filter sidebar": "Πλαϊνή στήλη φίλτρων",
@@ -1410,5 +1407,9 @@
   "In the bar": "Στη γραμμή",
   "Add torrents, a feed or a rule": "Προσθήκη torrents, ροής ή κανόνα",
   "Location": "Τοποθεσία",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Βρίσκει τα torrents που περιέχουν κάθε λέξη στο όνομα, την κατηγορία, τις ετικέτες ή τον tracker. Το * αντιστοιχεί σε οποιοδήποτε κείμενο και το ? σε έναν χαρακτήρα (π.χ. το *file?.mkv βρίσκει το myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Βρίσκει τα torrents που περιέχουν κάθε λέξη στο όνομα, την κατηγορία, τις ετικέτες ή τον tracker. Το * αντιστοιχεί σε οποιοδήποτε κείμενο και το ? σε έναν χαρακτήρα (π.χ. το *file?.mkv βρίσκει το myfile1.mkv).",
+  "Update installed": "Η ενημέρωση εγκαταστάθηκε",
+  "Reload to use it.": "Φόρτωσε ξανά για να τη χρησιμοποιήσεις.",
+  "Reload to use it. The old version stays in {folder}.": "Φόρτωσε ξανά για να τη χρησιμοποιήσεις. Η παλιά έκδοση μένει στο {folder}.",
+  "Selection bar reset": "Η γραμμή επιλογής επαναφέρθηκε"
 }

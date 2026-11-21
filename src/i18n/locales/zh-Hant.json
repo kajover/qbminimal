@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "已有名為 {name} 的標籤",
   "There is already a view called {name}": "已有名為 {name} 的檢視",
   "View updated": "檢視已更新",
-  "Update installed and the previous version removed.": "更新已安裝，上一版本已移除。",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "更新已安裝。上一版本保留在 {folder} 中，可以刪除。",
-  "Reload the page to use it.": "重新載入頁面即可使用。",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent 會從 GitHub 把新版本下載到目前資料夾旁的新資料夾，切換過去，並移除上一版本。",
   "Add or remove": "新增或移除",
   "Filter sidebar": "篩選側欄",
@@ -1410,5 +1407,9 @@
   "In the bar": "在列中",
   "Add torrents, a feed or a rule": "新增種子、訂閱源或規則",
   "Location": "位置",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "尋找名稱、分類、標籤或 Tracker 中包含每個詞的種子。* 代表任意文字，? 代表一個字元（例如 *file?.mkv 可找到 myfile1.mkv）。"
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "尋找名稱、分類、標籤或 Tracker 中包含每個詞的種子。* 代表任意文字，? 代表一個字元（例如 *file?.mkv 可找到 myfile1.mkv）。",
+  "Update installed": "更新已安裝",
+  "Reload to use it.": "重新載入即可使用。",
+  "Reload to use it. The old version stays in {folder}.": "重新載入即可使用。舊版本保留在 {folder} 中。",
+  "Selection bar reset": "選取列已重設"
 }

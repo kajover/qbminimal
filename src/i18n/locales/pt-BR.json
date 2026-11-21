@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Já existe uma etiqueta chamada {name}",
   "There is already a view called {name}": "Já existe uma visualização chamada {name}",
   "View updated": "Visualização atualizada",
-  "Update installed and the previous version removed.": "Atualização instalada e versão anterior removida.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Atualização instalada. A versão anterior continua em {folder} e pode ser excluída.",
-  "Reload the page to use it.": "Recarregue a página para usá-la.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "O qBittorrent baixa a nova versão do GitHub para uma pasta nova ao lado da atual, troca para ela e remove a versão anterior.",
   "Add or remove": "Adicionar ou remover",
   "Filter sidebar": "Barra lateral de filtros",
@@ -1410,5 +1407,9 @@
   "In the bar": "Na barra",
   "Add torrents, a feed or a rule": "Adicionar torrents, um feed ou uma regra",
   "Location": "Local",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Encontra torrents que contêm cada palavra no nome, categoria, tags ou tracker. * vale por qualquer texto e ? por um único caractere (ex.: *file?.mkv encontra myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Encontra torrents que contêm cada palavra no nome, categoria, tags ou tracker. * vale por qualquer texto e ? por um único caractere (ex.: *file?.mkv encontra myfile1.mkv).",
+  "Update installed": "Atualização instalada",
+  "Reload to use it.": "Recarregue para usá-la.",
+  "Reload to use it. The old version stays in {folder}.": "Recarregue para usá-la. A versão antiga continua em {folder}.",
+  "Selection bar reset": "Barra de seleção redefinida"
 }

@@ -337,7 +337,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
 
       {/* Outside the frame as tall as the screen below the search box (2.25rem and its 1rem gap),
           down to where the torrent table ends, so only the rows scroll. */}
-      <div ref={frame} className={cn('flex min-h-0 flex-col rounded-xl border bg-card max-sm:-mx-2 window-scroll:-mb-[calc(1rem-var(--selection-bar-gap,0.25rem))] window-scroll:max-h-[calc(100dvh-var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))-var(--bottom-nav-height,0px)-var(--selection-bar-gap,0.25rem)-4.25rem)]', (!showTable || sorted.length === 0) && 'hidden')}>
+      <div ref={frame} data-list-edge className={cn('flex min-h-0 flex-col rounded-xl border bg-card max-sm:-mx-2 window-scroll:-mb-[calc(1rem-var(--selection-bar-gap,0.25rem))] window-scroll:max-h-[calc(100dvh-var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))-var(--bottom-nav-height,0px)-var(--selection-bar-gap,0.25rem)-4.25rem)]', (!showTable || sorted.length === 0) && 'hidden')}>
         <div
           ref={head}
           // Only the titles' own wheel: the right-click menu's bubbles here through React too.
@@ -410,10 +410,10 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
       </div>
 
       {/* Laid out like the torrent cards: a grid on wide screens. */}
-      {/* Scrolled on their own in the frame, with room for the cards' shadows. Placed, so hidden
+      {/* Scrolled on their own in the frame, with room for a card's focus ring. Placed, so hidden
           labels in the cards are placed in it, not in the page, which they'd make scroll. */}
       <div className={cn('relative frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1', showTable && 'hidden')}>
-      <ul className="grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3">
+      <ul data-list-edge className="grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3">
         {shown.map(result => (
           <li key={`${result.fileUrl}|${result.descrLink}`} className="flex items-start gap-2 rounded-xl border bg-card px-3 py-2.5">
             <button type="button" className="min-w-0 flex-1 text-start" onClick={() => result.fileUrl && onAdd(result)}>
@@ -431,7 +431,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
       {/* At the window's bottom even below a short list, level with the sidebar's Logout. */}
       {framed && pageBar && placed(<div ref={holdWheel} className={cn('mt-auto shrink-0', showTable ? PAGE_BAR_BELOW_TABLE : 'px-[calc(0.75rem+1px)]')}>{pageBar}</div>)}
       {/* After the last result, outside the frame, as wide as the cards. */}
-      {!framed && !showTable && pageBar && <div className="glass-bar mb-[var(--toolbar-room,0px)] rounded-xl border px-3 py-1.5 max-sm:-mx-2">{pageBar}</div>}
+      {!framed && !showTable && pageBar && <div data-list-edge className="glass-bar mb-[var(--toolbar-room,0px)] rounded-xl border px-3 py-1.5 max-sm:-mx-2">{pageBar}</div>}
 
     </div>
   )

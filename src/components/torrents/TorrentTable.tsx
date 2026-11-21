@@ -207,7 +207,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
   return (
     // Outside the frame it reaches as far down as the selection bar, which then covers its pages
     // bar; it sits into the page's bottom padding, so the page itself doesn't scroll.
-    <div ref={frame} className="flex min-h-0 flex-col rounded-xl border bg-card max-sm:-mx-2 window-scroll:-mb-[calc(1rem-var(--selection-bar-gap,0.25rem))] window-scroll:max-h-[calc(100dvh-var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))-var(--bottom-nav-height,0px)-var(--selection-bar-gap,0.25rem)-1rem)]" style={LINKED_SCROLL ? { timelineScope: '--table-x', '--table-scroll': `${scrollRange}px` } as CSSProperties : undefined}>
+    <div ref={frame} data-list-edge className="flex min-h-0 flex-col rounded-xl border bg-card max-sm:-mx-2 window-scroll:-mb-[calc(1rem-var(--selection-bar-gap,0.25rem))] window-scroll:max-h-[calc(100dvh-var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))-var(--bottom-nav-height,0px)-var(--selection-bar-gap,0.25rem)-1rem)]" style={LINKED_SCROLL ? { timelineScope: '--table-x', '--table-scroll': `${scrollRange}px` } as CSSProperties : undefined}>
       <div
         ref={head}
         // Only the titles' own wheel: the right-click menu's bubbles here through React too.
@@ -297,11 +297,11 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
                   className={cn(
                     'group cursor-default border-b outline-hidden select-none last:border-0 hover:bg-muted/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary [-webkit-touch-callout:none]',
                     isSelected && 'bg-muted',
-                    openHash === torrent.hash && 'bg-primary/10 hover:bg-primary/15 shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]',
+                    openHash === torrent.hash && 'bg-primary/10 hover:bg-primary/15 shadow-[inset_3px_0_0_var(--open-line)] rtl:shadow-[inset_-3px_0_0_var(--open-line)]',
                   )}
                 >
                   {/* The whole cell toggles the tick box, without opening the details. */}
-                  <td data-row-select onClick={(e) => { if (!(e.target as HTMLElement).closest('[role="checkbox"]')) onToggle(torrent.hash, e.shiftKey) }} className={cn('cursor-pointer px-2 py-1.5', PINNED_LEFT, isSelected && PINNED_SELECTED, openHash === torrent.hash && !isSelected && 'bg-[color-mix(in_oklab,var(--primary)_10%,var(--card))] group-hover:bg-[color-mix(in_oklab,var(--primary)_15%,var(--card))]', openHash === torrent.hash && 'shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]')}>
+                  <td data-row-select onClick={(e) => { if (!(e.target as HTMLElement).closest('[role="checkbox"]')) onToggle(torrent.hash, e.shiftKey) }} className={cn('cursor-pointer px-2 py-1.5', PINNED_LEFT, isSelected && PINNED_SELECTED, openHash === torrent.hash && !isSelected && 'bg-[color-mix(in_oklab,var(--primary)_10%,var(--card))] group-hover:bg-[color-mix(in_oklab,var(--primary)_15%,var(--card))]', openHash === torrent.hash && 'shadow-[inset_3px_0_0_var(--open-line)] rtl:shadow-[inset_-3px_0_0_var(--open-line)]')}>
                     <Checkbox
                       aria-label={t('Select {name}', { name: torrent.name })}
                       checked={isSelected}

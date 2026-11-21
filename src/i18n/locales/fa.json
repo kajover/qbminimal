@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "برچسبی به نام {name} از قبل وجود دارد",
   "There is already a view called {name}": "نمایی به نام {name} از قبل وجود دارد",
   "View updated": "نما به‌روز شد",
-  "Update installed and the previous version removed.": "به‌روزرسانی نصب شد و نسخه قبلی حذف شد.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "به‌روزرسانی نصب شد. نسخه قبلی در {folder} می‌ماند و می‌توانی آن را حذف کنی.",
-  "Reload the page to use it.": "برای استفاده از آن، صفحه را دوباره بارگذاری کن.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent نسخه جدید را از GitHub در پوشه‌ای تازه کنار پوشه فعلی دانلود می‌کند، به آن می‌رود و نسخه قبلی را حذف می‌کند.",
   "Add or remove": "افزودن یا حذف",
   "Filter sidebar": "نوار کناری فیلترها",
@@ -1410,5 +1407,9 @@
   "In the bar": "در نوار",
   "Add torrents, a feed or a rule": "افزودن تورنت، فید یا قانون",
   "Location": "مکان",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "تورنت‌هایی را می‌یابد که همهٔ کلمه‌ها را در نام، دسته، برچسب‌ها یا ردیاب دارند. * یعنی هر متنی و ? یعنی یک نویسه (مثلاً *file?.mkv فایل myfile1.mkv را می‌یابد)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "تورنت‌هایی را می‌یابد که همهٔ کلمه‌ها را در نام، دسته، برچسب‌ها یا ردیاب دارند. * یعنی هر متنی و ? یعنی یک نویسه (مثلاً *file?.mkv فایل myfile1.mkv را می‌یابد).",
+  "Update installed": "به‌روزرسانی نصب شد",
+  "Reload to use it.": "برای استفاده، دوباره بارگذاری کن.",
+  "Reload to use it. The old version stays in {folder}.": "برای استفاده، دوباره بارگذاری کن. نسخه قدیمی در {folder} می‌ماند.",
+  "Selection bar reset": "نوار انتخاب بازنشانی شد"
 }

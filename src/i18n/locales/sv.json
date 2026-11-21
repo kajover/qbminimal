@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Det finns redan en tagg som heter {name}",
   "There is already a view called {name}": "Det finns redan en vy som heter {name}",
   "View updated": "Vyn har uppdaterats",
-  "Update installed and the previous version removed.": "Uppdateringen är installerad och den tidigare versionen borttagen.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Uppdateringen är installerad. Den tidigare versionen ligger kvar i {folder} och kan tas bort.",
-  "Reload the page to use it.": "Läs in sidan igen för att använda den.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent laddar ner den nya versionen från GitHub till en ny mapp bredvid den nuvarande, byter till den och tar bort den tidigare versionen.",
   "Add or remove": "Lägg till eller ta bort",
   "Filter sidebar": "Filtersidofält",
@@ -1410,5 +1407,9 @@
   "In the bar": "I fältet",
   "Add torrents, a feed or a rule": "Lägg till torrenter, ett flöde eller en regel",
   "Location": "Plats",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Hittar torrenter som innehåller varje ord i namnet, kategorin, taggarna eller trackern. * står för valfri text och ? för ett tecken (t.ex. hittar *file?.mkv myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Hittar torrenter som innehåller varje ord i namnet, kategorin, taggarna eller trackern. * står för valfri text och ? för ett tecken (t.ex. hittar *file?.mkv myfile1.mkv).",
+  "Update installed": "Uppdateringen är installerad",
+  "Reload to use it.": "Läs in igen för att använda den.",
+  "Reload to use it. The old version stays in {folder}.": "Läs in igen för att använda den. Den gamla versionen ligger kvar i {folder}.",
+  "Selection bar reset": "Markeringsfältet återställt"
 }

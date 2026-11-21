@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label'
 import { DEFAULT_BAR_ACTIONS, toggleBarAction, type BarKind } from '@/lib/actionBar'
 import type { MenuEntry, MenuGroup } from './bulkActions'
+import { toast } from '@/hooks/use-toast'
 import { t } from '@/i18n'
 
 // One action with its checkbox; pinned ones also have arrows to move them along the bar.
@@ -47,6 +48,12 @@ export function ActionBarDialog({ kind, open, onOpenChange, groups, pinned, onCh
     onChange(ids)
   }
   const toggle = (id: string) => onChange(toggleBarAction(pinned, id))
+  const defaults = DEFAULT_BAR_ACTIONS[kind]
+  const isDefault = pinned.length === defaults.length && pinned.every((id, i) => id === defaults[i])
+  const reset = () => {
+    onChange(defaults)
+    toast.success(t('Selection bar reset'))
+  }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto">
@@ -77,7 +84,8 @@ export function ActionBarDialog({ kind, open, onOpenChange, groups, pinned, onCh
           })}
         </div>
         <DialogFooter>
-          <Button type="button" variant="ghost" onClick={() => onChange(DEFAULT_BAR_ACTIONS[kind])}>{t('Reset')}</Button>
+          {/* Only when the bar differs from the default, the order included. */}
+          <Button type="button" variant="ghost" disabled={isDefault} onClick={reset}>{t('Reset')}</Button>
           <Button type="button" onClick={() => onOpenChange(false)}>{t('Done')}</Button>
         </DialogFooter>
       </DialogContent>

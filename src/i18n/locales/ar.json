@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "يوجد وسم باسم {name} بالفعل",
   "There is already a view called {name}": "توجد طريقة عرض باسم {name} بالفعل",
   "View updated": "حُدّثت طريقة العرض",
-  "Update installed and the previous version removed.": "تم تثبيت التحديث وإزالة الإصدار السابق.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "تم تثبيت التحديث. يبقى الإصدار السابق في {folder} ويمكنك حذفه.",
-  "Reload the page to use it.": "أعد تحميل الصفحة لاستخدامه.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "ينزّل qBittorrent الإصدار الجديد من GitHub إلى مجلد جديد بجانب المجلد الحالي، ثم ينتقل إليه ويزيل الإصدار السابق.",
   "Add or remove": "إضافة أو إزالة",
   "Filter sidebar": "الشريط الجانبي للتصفية",
@@ -1410,5 +1407,9 @@
   "In the bar": "في الشريط",
   "Add torrents, a feed or a rule": "إضافة تورنتات أو خلاصة أو قاعدة",
   "Location": "الموقع",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "يجد التورنتات التي تحتوي على كل كلمة في الاسم أو الفئة أو الوسوم أو المتتبع. استخدم * لمطابقة أي نص و? لحرف واحد (مثلًا *file?.mkv يجد myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "يجد التورنتات التي تحتوي على كل كلمة في الاسم أو الفئة أو الوسوم أو المتتبع. استخدم * لمطابقة أي نص و? لحرف واحد (مثلًا *file?.mkv يجد myfile1.mkv).",
+  "Update installed": "تم تثبيت التحديث",
+  "Reload to use it.": "أعد التحميل لاستخدامه.",
+  "Reload to use it. The old version stays in {folder}.": "أعد التحميل لاستخدامه. يبقى الإصدار القديم في {folder}.",
+  "Selection bar reset": "أُعيد ضبط شريط التحديد"
 }

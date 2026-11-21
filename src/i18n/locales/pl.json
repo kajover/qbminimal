@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Tag o nazwie {name} już istnieje",
   "There is already a view called {name}": "Widok o nazwie {name} już istnieje",
   "View updated": "Zaktualizowano widok",
-  "Update installed and the previous version removed.": "Aktualizacja zainstalowana, a poprzednia wersja usunięta.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Aktualizacja zainstalowana. Poprzednia wersja zostaje w {folder} i możesz ją usunąć.",
-  "Reload the page to use it.": "Wczytaj stronę ponownie, aby jej używać.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent pobiera nową wersję z GitHuba do nowego folderu obok obecnego, przełącza się na nią i usuwa poprzednią wersję.",
   "Add or remove": "Dodaj lub usuń",
   "Filter sidebar": "Pasek boczny filtrów",
@@ -1410,5 +1407,9 @@
   "In the bar": "Na pasku",
   "Add torrents, a feed or a rule": "Dodaj torrenty, kanał lub regułę",
   "Location": "Lokalizacja",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Znajduje torrenty zawierające każde słowo w nazwie, kategorii, znacznikach lub trackerze. * oznacza dowolny tekst, a ? jeden znak (np. *file?.mkv znajduje myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Znajduje torrenty zawierające każde słowo w nazwie, kategorii, znacznikach lub trackerze. * oznacza dowolny tekst, a ? jeden znak (np. *file?.mkv znajduje myfile1.mkv).",
+  "Update installed": "Aktualizacja zainstalowana",
+  "Reload to use it.": "Wczytaj ponownie, aby jej używać.",
+  "Reload to use it. The old version stays in {folder}.": "Wczytaj ponownie, aby jej używać. Stara wersja zostaje w {folder}.",
+  "Selection bar reset": "Pasek zaznaczenia zresetowany"
 }

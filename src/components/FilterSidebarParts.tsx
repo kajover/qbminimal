@@ -1,4 +1,4 @@
-import { type MouseEvent, type ReactNode } from 'react'
+import { useLayoutEffect, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
 import { Check, ChevronDown, ChevronRight, Minus, MoreHorizontal, Plus, X, type LucideIcon } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { Button } from '@/components/ui/button'
@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { SearchInput } from '@/components/SearchInput'
 import { useLongPress } from '@/hooks/useLongPress'
 import { cn } from '@/lib/utils'
+import { keepOpenForNotices } from '@/lib/notices'
 import { t } from '@/i18n'
 
 // The parts both filter sidebars are built from, on the torrent list and the Search page: folding
@@ -146,17 +147,56 @@ export function Section({ id, title, icon: Icon, chosen, onClear, folded, onFold
   )
 }
 
-// On phones the sidebar slides in from the end edge, under the filter button, over the list.
-export function FilterSheet({ open, onOpenChange, children }: { open: boolean; onOpenChange: (open: boolean) => void; children: ReactNode }) {
+// Where the list is on screen, for the sheet over it: from the list column's top to the bottom of
+// the table, or of the pages bar below the cards, and to their end edge, which on phones reach past
+// the column (`data-list-edge`). Kept below the header and above the tab bar and selection bar, and
+// followed while the page scrolls or resizes.
+function useListBox(list: HTMLElement | null | undefined, open: boolean): CSSProperties | undefined {
+  const [box, setBox] = useState<CSSProperties>()
+  useLayoutEffect(() => {
+    if (!open || !list) return
+    const measure = () => {
+      const column = list.getBoundingClientRect()
+      const edges = [...list.querySelectorAll('[data-list-edge]')].map(edge => edge.getBoundingClientRect()).filter(edge => edge.height > 0)
+      const right = edges.length ? Math.max(...edges.map(edge => edge.right)) : column.right
+      const left = edges.length ? Math.min(...edges.map(edge => edge.left)) : column.left
+      const bottom = edges.length ? Math.max(...edges.map(edge => edge.bottom)) : column.bottom
+      const rtl = getComputedStyle(list).direction === 'rtl'
+      setBox({
+        top: `max(${column.top}px, var(--header-height, calc(3rem + 1px + env(safe-area-inset-top))))`,
+        // No lower than the table may reach (FILL_BOTTOM): above the tab bar and selection bar.
+        bottom: `max(${window.innerHeight - bottom}px, calc(var(--bottom-nav-height, 0px) + var(--selection-bar-gap, 0.25rem)))`,
+        insetInlineEnd: rtl ? left : window.innerWidth - right,
+      })
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    window.addEventListener('scroll', measure, true)
+    return () => {
+      window.removeEventListener('resize', measure)
+      window.removeEventListener('scroll', measure, true)
+    }
+  }, [list, open])
+  return box
+}
+
+// On phones the sidebar slides in over the list, under the filter button, as tall as the list and
+// at its end edge, like the sidebar beside it on wider screens; at least 16rem, for an empty list.
+// As wide as the sidebar beside the list on wider screens (w-72), with no shadow, like the bars.
+export function FilterSheet({ open, onOpenChange, list, children }: { open: boolean; onOpenChange: (open: boolean) => void; list?: HTMLElement | null; children: ReactNode }) {
+  const box = useListBox(list, open)
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+        {/* Not greyed out behind: the overlay only catches taps outside, which close it. */}
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
           // The search field takes focus only where there's a keyboard.
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className="fixed inset-y-0 end-0 z-50 w-80 max-w-[85vw] overflow-y-auto border-s bg-background p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] shadow-lg outline-hidden data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right rtl:data-[state=open]:slide-in-from-left rtl:data-[state=closed]:slide-out-to-left"
+          onInteractOutside={keepOpenForNotices}
+          style={box}
+          className="fixed inset-y-0 end-0 z-50 min-h-64 w-72 max-w-[85vw] overflow-y-auto rounded-xl border bg-card p-3 outline-hidden data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right rtl:data-[state=open]:slide-in-from-left rtl:data-[state=closed]:slide-out-to-left"
         >
           <DialogPrimitive.Title className="sr-only">{t('Filters')}</DialogPrimitive.Title>
           {children}

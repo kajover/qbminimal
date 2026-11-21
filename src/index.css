@@ -460,7 +460,10 @@
 
 /* Notifications never block what's under them: with a mouse, clicks pass through to the page,
    except on the notification's own buttons. Touch screens keep them catching taps, so they can
-   still be swiped away. */
+   still be swiped away, also over an open sheet, which turns the pointer off for the rest. */
+[data-sonner-toast] {
+  pointer-events: auto;
+}
 @media (pointer: fine) {
   [data-sonner-toast] {
     pointer-events: none;
@@ -491,4 +494,14 @@ select:not([multiple]):not([size]) {
 :root[data-drag-cursor] * {
   cursor: var(--drag-cursor) !important;
   user-select: none;
+}
+
+/* Maximized torrent details on phones are the page; the list steps aside until they're smaller. */
+:root[data-details-full] main {
+  display: none;
+}
+
+/* The line at the start of the open torrent's row or card: the colour of a ticked checkbox. */
+:root {
+  --open-line: var(--primary);
 }

@@ -54,7 +54,7 @@ function Speed({ icon, bytes, color, label }: { icon: ComponentType<{ className?
 export function TorrentCards({ torrents, selected, showCheckboxes, onToggle, openHash, rowProps, wrapList }: TorrentCardsProps) {
   return wrapList(
     // One column that may shrink, so a card with its checkbox stays within a phone's width.
-    <ul className="grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3">
+    <ul data-list-edge className="grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3">
       {torrents.map(torrent => {
         const isSelected = selected.has(torrent.hash)
         return (
@@ -64,9 +64,9 @@ export function TorrentCards({ torrents, selected, showCheckboxes, onToggle, ope
             aria-selected={isSelected}
             aria-current={openHash === torrent.hash ? 'true' : undefined}
             className={cn(
-              'flex cursor-default items-start gap-2 rounded-xl border bg-card px-2.5 py-2.5 shadow-sm transition-[transform,border-color] outline-hidden select-none focus-visible:ring-2 focus-visible:ring-ring [-webkit-touch-callout:none] active:scale-[0.99]',
+              'flex cursor-default items-start gap-2 rounded-xl border bg-card px-2.5 py-2.5 transition-[transform,border-color] outline-hidden select-none focus-visible:ring-2 focus-visible:ring-ring [-webkit-touch-callout:none] active:scale-[0.99]',
               isSelected && 'border-primary ring-1 ring-primary',
-              openHash === torrent.hash && 'bg-primary/10 shadow-[inset_3px_0_0_var(--color-primary)] rtl:shadow-[inset_-3px_0_0_var(--color-primary)]',
+              openHash === torrent.hash && 'bg-primary/10 shadow-[inset_3px_0_0_var(--open-line)] rtl:shadow-[inset_-3px_0_0_var(--open-line)]',
               openHash === torrent.hash && !isSelected && 'border-primary/50',
             )}
           >

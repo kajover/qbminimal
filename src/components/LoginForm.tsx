@@ -26,7 +26,7 @@ export function LoginForm() {
 
   return (
     <main className="grid min-h-dvh place-items-center bg-background px-4">
-      <form onSubmit={submit} method="post" className="w-full max-w-sm space-y-5 rounded-xl border bg-card p-6 shadow-sm">
+      <form onSubmit={submit} method="post" className="w-full max-w-sm space-y-5 rounded-xl border bg-card p-6">
         <h1 className="brand-title text-center text-2xl">{t('qBittorrent')}</h1>
         <div className="space-y-2">
           <Label htmlFor="login-username">{t('Username')}</Label>

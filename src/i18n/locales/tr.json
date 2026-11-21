@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "{name} adlı bir etiket zaten var",
   "There is already a view called {name}": "{name} adlı bir görünüm zaten var",
   "View updated": "Görünüm güncellendi",
-  "Update installed and the previous version removed.": "Güncelleme kuruldu ve önceki sürüm kaldırıldı.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Güncelleme kuruldu. Önceki sürüm {folder} içinde duruyor ve silinebilir.",
-  "Reload the page to use it.": "Kullanmak için sayfayı yeniden yükle.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent yeni sürümü GitHub'dan mevcut klasörün yanındaki yeni bir klasöre indirir, ona geçer ve önceki sürümü kaldırır.",
   "Add or remove": "Ekle veya kaldır",
   "Filter sidebar": "Filtre kenar çubuğu",
@@ -1410,5 +1407,9 @@
   "In the bar": "Çubukta",
   "Add torrents, a feed or a rule": "Torrent, besleme veya kural ekle",
   "Location": "Konum",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Adında, kategorisinde, etiketlerinde veya izleyicisinde her kelimeyi içeren torrentleri bulur. * herhangi bir metin, ? tek bir karakter yerine geçer (örn. *file?.mkv, myfile1.mkv'yi bulur)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Adında, kategorisinde, etiketlerinde veya izleyicisinde her kelimeyi içeren torrentleri bulur. * herhangi bir metin, ? tek bir karakter yerine geçer (örn. *file?.mkv, myfile1.mkv'yi bulur).",
+  "Update installed": "Güncelleme kuruldu",
+  "Reload to use it.": "Kullanmak için yeniden yükle.",
+  "Reload to use it. The old version stays in {folder}.": "Kullanmak için yeniden yükle. Eski sürüm {folder} içinde duruyor.",
+  "Selection bar reset": "Seçim çubuğu sıfırlandı"
 }

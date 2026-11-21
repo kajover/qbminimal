@@ -79,6 +79,8 @@ export function TorrentsView() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [prompt, setPrompt] = useState<BulkPrompt | null>(null)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  // The list's column, which the phone filter sheet lines up with.
+  const [listColumn, setListColumn] = useState<HTMLDivElement | null>(null)
   const [addOpen, setAddOpen] = useState(false)
   const [views, setViews] = useState<FilterView[]>(loadFilterViews)
   // The row that Tab reaches and the arrow keys move from.
@@ -399,8 +401,8 @@ export function TorrentsView() {
 
       {/* The filters open on the list's end side: beside it where it fits, over it on phones. */}
       <div className={cn('frame:flex frame:min-h-0 frame:flex-1', filtersOpen && sideBySide && 'flex items-start gap-4 frame:items-stretch')}>
-        {!sideBySide && <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}>{sidebar}</FilterSheet>}
-        <div className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0">
+        {!sideBySide && <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen} list={listColumn}>{sidebar}</FilterSheet>}
+        <div ref={setListColumn} className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0">
           {searchOpen && !headerSearch && <QuickSearchField list={list} wide={false} onClose={() => setSearchOpen(false)} />}
 
         {list.matching.length === 0 ? (
@@ -436,7 +438,7 @@ export function TorrentsView() {
             footer={framed ? null : <div className={PAGE_BAR_IN_TABLE}>{pageBar}</div>}
           />
         ) : (
-          // Scrolled on their own in the frame, with room for the cards' shadows. Placed, so the
+          // Scrolled on their own in the frame, with room for a card's focus ring. Placed, so the
           // cards' hidden labels are placed in it, not in the page, which they'd make scroll.
           <div className="relative frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1">
             <TorrentCards
@@ -451,7 +453,7 @@ export function TorrentsView() {
           </div>
         )}
         {/* After the last card, outside the frame, as wide as the cards. */}
-        {!framed && !list.showTable && pageBar && <div className="glass-bar mb-[var(--toolbar-room,0px)] rounded-xl border px-[calc(0.625rem+1px)] py-1.5 max-sm:-mx-2">{pageBar}</div>}
+        {!framed && !list.showTable && pageBar && <div data-list-edge className="glass-bar mb-[var(--toolbar-room,0px)] rounded-xl border px-[calc(0.625rem+1px)] py-1.5 max-sm:-mx-2">{pageBar}</div>}
 
         </div>
         {filtersOpen && sideBySide && (

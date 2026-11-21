@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "{name} 태그가 이미 있습니다",
   "There is already a view called {name}": "{name} 보기가 이미 있습니다",
   "View updated": "보기를 업데이트했습니다",
-  "Update installed and the previous version removed.": "업데이트를 설치했고 이전 버전을 삭제했습니다.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "업데이트를 설치했습니다. 이전 버전은 {folder}에 남아 있으며 삭제해도 됩니다.",
-  "Reload the page to use it.": "사용하려면 페이지를 새로고침하세요.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent는 GitHub에서 새 버전을 현재 폴더 옆의 새 폴더로 내려받아 그쪽으로 전환하고 이전 버전을 삭제합니다.",
   "Add or remove": "추가 또는 제거",
   "Filter sidebar": "필터 사이드바",
@@ -1410,5 +1407,9 @@
   "In the bar": "바에 있음",
   "Add torrents, a feed or a rule": "토렌트, 피드 또는 규칙 추가",
   "Location": "위치",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "이름, 카테고리, 태그 또는 트래커에 모든 단어가 들어 있는 토렌트를 찾습니다. *는 아무 텍스트, ?는 한 글자와 일치합니다 (예: *file?.mkv는 myfile1.mkv를 찾음)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "이름, 카테고리, 태그 또는 트래커에 모든 단어가 들어 있는 토렌트를 찾습니다. *는 아무 텍스트, ?는 한 글자와 일치합니다 (예: *file?.mkv는 myfile1.mkv를 찾음).",
+  "Update installed": "업데이트를 설치했습니다",
+  "Reload to use it.": "사용하려면 새로고침하세요.",
+  "Reload to use it. The old version stays in {folder}.": "사용하려면 새로고침하세요. 이전 버전은 {folder}에 남아 있습니다.",
+  "Selection bar reset": "선택 바를 초기화했습니다"
 }

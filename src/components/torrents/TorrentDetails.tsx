@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { FolderTree, Info, RadioTower, SlidersHorizontal, Users, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog as DialogPrimitive } from 'radix-ui'
@@ -17,6 +17,7 @@ import { TorrentActions } from './TorrentActions'
 import { TorrentContentTab } from './TorrentContentTab'
 import { TorrentInfoTab } from './TorrentInfoTab'
 import { TrackersTab } from './TrackersTab'
+import { keepOpenForNotices } from '@/lib/notices'
 import { t } from '@/i18n'
 
 const TABS = [
@@ -50,7 +51,7 @@ function initialHeight() {
 // their width whichever tab is open.
 const openTabWidth = () => Math.ceil(Math.max(...TABS.map(tab => textWidth(tab.label, 12 * textScale()))) + 14 + 4 + 16 + 4)
 
-function DetailsTabs({ torrent, listClassName, end, onDelete }: { torrent: Torrent; listClassName?: string; end?: ReactNode; onDelete?: () => void }) {
+function DetailsTabs({ torrent, listClassName, barClassName, end, onDelete }: { torrent: Torrent; listClassName?: string; barClassName?: string; end?: ReactNode; onDelete?: () => void }) {
   // Its speeds are recorded while the details are open, whichever tab shows, for the Details graph.
   useEffect(() => watchTorrentSpeeds(torrent.hash), [torrent.hash])
   usePrefetchDetails(torrent.hash)
@@ -66,7 +67,7 @@ function DetailsTabs({ torrent, listClassName, end, onDelete }: { torrent: Torre
   return (
     <Tabs value={tab} onValueChange={choose} className="min-h-0 flex-1">
       {/* The tabs take the row's whole width, apart from a gap before the close button. */}
-      <div className="flex items-center gap-3">
+      <div className={cn('flex items-center gap-3', barClassName)}>
         <TabsList className={cn('flex min-w-0 flex-1', listClassName)} style={{ '--open-tab': `${openTabWidth()}px` } as CSSProperties}>
           {/* Icons and names where there's room. On phones five names don't fit in every language,
               so the tabs show their icons and the open one its name too; the others' names are
@@ -82,11 +83,11 @@ function DetailsTabs({ torrent, listClassName, end, onDelete }: { torrent: Torre
         </TabsList>
         {end && <div className="ms-auto shrink-0">{end}</div>}
       </div>
-      <TabsContent value="details" className="overflow-y-auto"><TorrentInfoTab torrent={torrent} /></TabsContent>
+      <TabsContent value="details" className="overflow-y-auto pb-(--details-end,0px)"><TorrentInfoTab torrent={torrent} /></TabsContent>
       <TabsContent value="content" className="flex min-h-0 flex-col overflow-hidden"><TorrentContentTab key={torrent.hash} hash={torrent.hash} savePath={torrent.save_path} /></TabsContent>
-      <TabsContent value="actions" className="overflow-y-auto"><TorrentActions key={torrent.hash} torrent={torrent} onDelete={onDelete} /></TabsContent>
-      <TabsContent value="trackers" className="overflow-y-auto"><TrackersTab key={torrent.hash} hash={torrent.hash} /></TabsContent>
-      <TabsContent value="peers" className="overflow-y-auto"><PeersTab key={torrent.hash} hash={torrent.hash} /></TabsContent>
+      <TabsContent value="actions" className="overflow-y-auto pb-(--details-end,0px)"><TorrentActions key={torrent.hash} torrent={torrent} onDelete={onDelete} /></TabsContent>
+      <TabsContent value="trackers" className="overflow-y-auto pb-(--details-end,0px)"><TrackersTab key={torrent.hash} hash={torrent.hash} /></TabsContent>
+      <TabsContent value="peers" className="overflow-y-auto pb-(--details-end,0px)"><PeersTab key={torrent.hash} hash={torrent.hash} /></TabsContent>
     </Tabs>
   )
 }
@@ -140,7 +141,7 @@ export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps
       <section
         aria-label={t('Torrent details')}
         data-keeps-swipes
-        className="fixed bottom-0 z-30 flex flex-col border-t bg-card shadow-[0_-6px_16px_-8px_rgb(0_0_0/0.15)]"
+        className="fixed bottom-0 z-30 flex flex-col border-t bg-card"
         style={{ height, insetInlineStart: 'var(--sidebar-width, 0px)', insetInlineEnd: 'var(--page-scrollbar, 0px)' }}
       >
         <div
@@ -177,12 +178,39 @@ export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps
   )
 }
 
-// Phones: a sheet from the bottom, as in iOS. It opens at medium height, floating clear of the
-// screen's edges; dragging its handle up, or tapping it, gives the whole screen, and dragging down
-// steps back or closes it. The back button and Esc close it too.
+// Phones: a sheet from the bottom, as in iOS. It opens at medium height across the screen's width;
+// dragging its handle up, or tapping it, gives the whole screen, and dragging down steps back or
+// closes it. The back button and Esc close it too. It doesn't hold the page: the torrents go on
+// behind it, scroll, and a tap on another one shows that one's details. No shadow, the table's
+// corners. Safari clips a fixed panel at its window's bottom edge, so only the maximized sheet,
+// which is part of the page, scrolls on behind Safari's toolbar.
 type Detent = 'medium' | 'large'
 const DISMISS_DISTANCE = 90
 const FLICK_SPEED = 0.6 // px per ms
+
+// A tap on the list switches the details; on a notification it leaves them open; elsewhere it
+// closes them.
+function keepOpenForList(event: { target: EventTarget | null; preventDefault: () => void }) {
+  if (event.target instanceof Element && event.target.closest('[data-list-edge]')) event.preventDefault()
+  else keepOpenForNotices(event)
+}
+
+// Maximized, the details are the page: the list steps aside (index.css hides <main>), so the
+// browser scrolls the details as it does the cards, under its own bars. Back at medium height the
+// list returns where it was.
+function useDetailsPage(full: boolean) {
+  useLayoutEffect(() => {
+    if (!full) return
+    const root = document.documentElement
+    const y = window.scrollY
+    root.dataset.detailsFull = ''
+    window.scrollTo(0, 0)
+    return () => {
+      delete root.dataset.detailsFull
+      window.scrollTo(0, y)
+    }
+  }, [full])
+}
 
 export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProps) {
   useBackButtonClose(onClose)
@@ -215,18 +243,29 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
   }
 
   const large = detent === 'large'
+  useDetailsPage(large)
+  // Maximized, the handle and the tabs stay at the top while the page scrolls under them.
+  const pinned = large && 'sticky z-10 bg-card'
   return (
-    <DialogPrimitive.Root open onOpenChange={(open) => !open && onClose()}>
+    <DialogPrimitive.Root open modal={false} onOpenChange={(open) => !open && onClose()}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/30 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
+          onInteractOutside={keepOpenForList}
           data-keeps-swipes
           className={cn(
-            'fixed z-50 flex flex-col overflow-hidden border bg-card shadow-2xl outline-hidden data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom',
+            'z-50 flex flex-col border bg-card outline-hidden data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom',
             large
-              ? 'inset-x-0 bottom-0 h-[calc(100dvh-env(safe-area-inset-top)-0.5rem)] rounded-t-[1.75rem] border-b-0 pb-[env(safe-area-inset-bottom)]'
-              : 'inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] h-[62dvh] rounded-[2rem]',
+              // Part of the page, from the screen's top edge down, as long as its contents: they
+              // scroll with the window to the screen's bottom edge, with room at their end
+              // (--details-end). The handle keeps clear of the status bar. Safari paints the strips
+              // under its status bar and toolbar in the colour of the pinned handle and tabs, so
+              // all of it stays the card's colour, with no border.
+              ? 'absolute inset-x-0 top-0 min-h-dvh rounded-none border-0 [--details-end:calc(env(safe-area-inset-bottom)+0.75rem)] [&_[role=tabpanel]]:overflow-visible [&_[role=tabpanel]_.overflow-y-auto]:overflow-visible'
+              // The screen's whole width, down to the window's bottom edge (above the tab bar where
+              // there is one), with only its top rounded and bordered: Safari paints its toolbar
+              // strip below in the sheet's colour, so the two run on as one.
+              : 'fixed inset-x-0 bottom-[calc(var(--bottom-nav-height,0px)+var(--selection-bar-gap,0.25rem)-var(--nav-gap,4px))] h-[62dvh] overflow-hidden rounded-t-xl border-x-0 border-b-0',
             offset === null && 'transition-[height,inset,border-radius,translate] duration-300 ease-out',
           )}
           // Following the finger, a little stiffer upwards.
@@ -239,15 +278,16 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
             onPointerMove={moveDrag}
             onPointerUp={endDrag}
             onPointerCancel={() => { drag.current = null; setOffset(null) }}
-            className="flex h-6 w-full shrink-0 cursor-grab touch-none items-center justify-center outline-hidden active:cursor-grabbing focus-visible:[&>span]:bg-primary"
+            className={cn('flex h-6 w-full shrink-0 cursor-grab touch-none items-center justify-center rounded-t-xl outline-hidden active:cursor-grabbing focus-visible:[&>span]:bg-primary', pinned, large && 'top-0 h-[calc(1.5rem+env(safe-area-inset-top))] rounded-none pt-[env(safe-area-inset-top)]')}
           >
             <span className="h-1.5 w-10 rounded-full bg-muted-foreground/40" />
           </button>
-          <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 pb-3">
+          <div className={cn('flex min-h-0 flex-1 flex-col gap-2 px-4', !large && 'pb-3')}>
             <DialogPrimitive.Title className="sr-only">{torrent.name}</DialogPrimitive.Title>
             <DetailsTabs
               onDelete={onDelete}
               torrent={torrent}
+              barClassName={cn(pinned, large && '-mx-4 top-[calc(env(safe-area-inset-top)+1.5rem)] px-4 pb-2')}
               end={(
                 <DialogPrimitive.Close asChild>
                   <Button variant="ghost" size="icon" className="size-8 rounded-full bg-muted hover:bg-accent" aria-label={t('Close details')} title={t('Close')}>

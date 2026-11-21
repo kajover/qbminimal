@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Már van {name} nevű címke",
   "There is already a view called {name}": "Már van {name} nevű nézet",
   "View updated": "Nézet frissítve",
-  "Update installed and the previous version removed.": "A frissítés telepítve, az előző verzió eltávolítva.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "A frissítés telepítve. Az előző verzió a(z) {folder} mappában marad, és törölhető.",
-  "Reload the page to use it.": "Töltsd újra az oldalt a használatához.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "A qBittorrent letölti az új verziót a GitHubról egy új mappába az aktuális mellé, átvált rá, és eltávolítja az előző verziót.",
   "Add or remove": "Hozzáadás vagy eltávolítás",
   "Filter sidebar": "Szűrők oldalsávja",
@@ -1410,5 +1407,9 @@
   "In the bar": "A sávban",
   "Add torrents, a feed or a rule": "Torrentek, hírcsatorna vagy szabály hozzáadása",
   "Location": "Hely",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Azokat a torrenteket találja meg, amelyek nevében, kategóriájában, címkéiben vagy trackerében minden szó szerepel. A * bármilyen szöveget, a ? egyetlen karaktert jelent (pl. a *file?.mkv megtalálja a myfile1.mkv-t)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Azokat a torrenteket találja meg, amelyek nevében, kategóriájában, címkéiben vagy trackerében minden szó szerepel. A * bármilyen szöveget, a ? egyetlen karaktert jelent (pl. a *file?.mkv megtalálja a myfile1.mkv-t).",
+  "Update installed": "A frissítés telepítve",
+  "Reload to use it.": "Töltsd újra a használatához.",
+  "Reload to use it. The old version stays in {folder}.": "Töltsd újra a használatához. A régi verzió a(z) {folder} mappában marad.",
+  "Selection bar reset": "Kijelölési sáv visszaállítva"
 }

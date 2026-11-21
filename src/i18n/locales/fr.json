@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Une étiquette nommée {name} existe déjà",
   "There is already a view called {name}": "Une vue nommée {name} existe déjà",
   "View updated": "Vue mise à jour",
-  "Update installed and the previous version removed.": "Mise à jour installée et version précédente supprimée.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Mise à jour installée. La version précédente reste dans {folder} et peut être supprimée.",
-  "Reload the page to use it.": "Recharge la page pour l'utiliser.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent télécharge la nouvelle version depuis GitHub dans un nouveau dossier à côté de l'actuel, bascule dessus et supprime la version précédente.",
   "Add or remove": "Ajouter ou retirer",
   "Filter sidebar": "Barre latérale des filtres",
@@ -1410,5 +1407,9 @@
   "In the bar": "Dans la barre",
   "Add torrents, a feed or a rule": "Ajouter des torrents, un flux ou une règle",
   "Location": "Emplacement",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Trouve les torrents contenant chaque mot dans le nom, la catégorie, les étiquettes ou le tracker. * remplace n'importe quel texte et ? un seul caractère (p. ex. *file?.mkv trouve myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Trouve les torrents contenant chaque mot dans le nom, la catégorie, les étiquettes ou le tracker. * remplace n'importe quel texte et ? un seul caractère (p. ex. *file?.mkv trouve myfile1.mkv).",
+  "Update installed": "Mise à jour installée",
+  "Reload to use it.": "Recharge pour l'utiliser.",
+  "Reload to use it. The old version stays in {folder}.": "Recharge pour l'utiliser. L'ancienne version reste dans {folder}.",
+  "Selection bar reset": "Barre de sélection réinitialisée"
 }

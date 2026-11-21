@@ -43,6 +43,8 @@ export function SearchView() {
   const sideBySide = useMediaQuery(ROOM_FOR_SIDEBAR)
   const [sidebarPref, setSidebarPref] = useState(() => readStored(SIDEBAR_KEY))
   const [sheetOpen, setSheetOpen] = useState(false)
+  // The results' column, which the phone filter sheet lines up with.
+  const [resultsColumn, setResultsColumn] = useState<HTMLDivElement | null>(null)
   const sidebarOpen = sideBySide ? sidebarPref === 'open' : sheetOpen
   const setSidebarOpen = (open: boolean) => {
     if (!sideBySide) return setSheetOpen(open)
@@ -166,8 +168,8 @@ export function SearchView() {
 
       {/* Beside the results where it fits, over them on phones, as on the torrent list. */}
       <div className={cn('frame:flex frame:min-h-0 frame:flex-1', sidebarOpen && sideBySide && 'flex items-start gap-4 frame:items-stretch')}>
-        {!sideBySide && <FilterSheet open={sheetOpen} onOpenChange={setSheetOpen}>{sidebar}</FilterSheet>}
-        <div className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0">
+        {!sideBySide && <FilterSheet open={sheetOpen} onOpenChange={setSheetOpen} list={resultsColumn}>{sidebar}</FilterSheet>}
+        <div ref={setResultsColumn} className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0">
           {/* Keyed by search, so each starts on its first page. */}
           <SearchResults searchId={search.jobId ?? null} results={search.results} onAdd={setAdding} toolbarSlot={toolbarSlot} pageBarSlot={pageBarSlot} filters={filters} onFilterChange={setFilter} />
           {search.results.length === 0 && search.searched && !search.running && <p className="py-8 text-center text-sm text-muted-foreground">{t('Nothing found')}</p>}

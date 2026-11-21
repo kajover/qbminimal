@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Вече има етикет с име {name}",
   "There is already a view called {name}": "Вече има изглед с име {name}",
   "View updated": "Изгледът е обновен",
-  "Update installed and the previous version removed.": "Обновлението е инсталирано и предишната версия е премахната.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Обновлението е инсталирано. Предишната версия остава в {folder} и може да се изтрие.",
-  "Reload the page to use it.": "Презаредете страницата, за да го използвате.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent изтегля новата версия от GitHub в нова папка до текущата, превключва към нея и премахва предишната версия.",
   "Add or remove": "Добавяне или премахване",
   "Filter sidebar": "Странична лента с филтри",
@@ -1410,5 +1407,9 @@
   "In the bar": "В лентата",
   "Add torrents, a feed or a rule": "Добавяне на торенти, емисия или правило",
   "Location": "Местоположение",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Намира торентите, съдържащи всяка дума в името, категорията, етикетите или тракера. Използвайте * за произволен текст и ? за един знак (напр. *file?.mkv намира myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Намира торентите, съдържащи всяка дума в името, категорията, етикетите или тракера. Използвайте * за произволен текст и ? за един знак (напр. *file?.mkv намира myfile1.mkv).",
+  "Update installed": "Обновлението е инсталирано",
+  "Reload to use it.": "Презаредете, за да го използвате.",
+  "Reload to use it. The old version stays in {folder}.": "Презаредете, за да го използвате. Старата версия остава в {folder}.",
+  "Selection bar reset": "Лентата за избор е нулирана"
 }

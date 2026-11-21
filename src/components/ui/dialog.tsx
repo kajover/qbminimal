@@ -5,6 +5,7 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 import { withKeys } from '@/lib/shortcutKeys'
+import { keepOpenForNotices } from '@/lib/notices'
 import { Button } from "@/components/ui/button"
 
 function Dialog({
@@ -83,6 +84,7 @@ function DialogContent({
   showCloseButton = true,
   onKeyDown,
   onOpenAutoFocus,
+  onInteractOutside,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
@@ -98,6 +100,7 @@ function DialogContent({
         )}
         onKeyDown={(event) => { onKeyDown?.(event); acceptOnEnter(event) }}
         onOpenAutoFocus={(event) => { onOpenAutoFocus?.(event); if (!event.defaultPrevented) focusOnOpen(event) }}
+        onInteractOutside={(event) => { onInteractOutside?.(event); keepOpenForNotices(event) }}
         {...props}
       >
         {children}

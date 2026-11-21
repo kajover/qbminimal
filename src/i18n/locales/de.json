@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Es gibt bereits ein Label namens {name}",
   "There is already a view called {name}": "Es gibt bereits eine Ansicht namens {name}",
   "View updated": "Ansicht aktualisiert",
-  "Update installed and the previous version removed.": "Update installiert und die vorherige Version entfernt.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Update installiert. Die vorherige Version bleibt in {folder} und kann gelöscht werden.",
-  "Reload the page to use it.": "Lade die Seite neu, um es zu verwenden.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent lädt die neue Version von GitHub in einen neuen Ordner neben dem aktuellen herunter, wechselt dorthin und entfernt die vorherige Version.",
   "Add or remove": "Hinzufügen oder entfernen",
   "Filter sidebar": "Filter-Seitenleiste",
@@ -1410,5 +1407,9 @@
   "In the bar": "In der Leiste",
   "Add torrents, a feed or a rule": "Torrents, einen Feed oder eine Regel hinzufügen",
   "Location": "Speicherort",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Findet Torrents, die jedes Wort im Namen, in der Kategorie, den Labels oder dem Tracker enthalten. * steht für beliebigen Text und ? für ein einzelnes Zeichen (z. B. findet *file?.mkv myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Findet Torrents, die jedes Wort im Namen, in der Kategorie, den Labels oder dem Tracker enthalten. * steht für beliebigen Text und ? für ein einzelnes Zeichen (z. B. findet *file?.mkv myfile1.mkv).",
+  "Update installed": "Update installiert",
+  "Reload to use it.": "Neu laden, um es zu verwenden.",
+  "Reload to use it. The old version stays in {folder}.": "Neu laden, um es zu verwenden. Die alte Version bleibt in {folder}.",
+  "Selection bar reset": "Auswahlleiste zurückgesetzt"
 }

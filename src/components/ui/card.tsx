@@ -8,7 +8,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card"
       className={cn(
         // On phones cards reach 8px from the screen's edges, like the torrent cards.
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm max-sm:-mx-2",
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 max-sm:-mx-2",
         className
       )}
       {...props}

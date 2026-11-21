@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Sudah ada tag bernama {name}",
   "There is already a view called {name}": "Sudah ada tampilan bernama {name}",
   "View updated": "Tampilan diperbarui",
-  "Update installed and the previous version removed.": "Pembaruan terpasang dan versi sebelumnya dihapus.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Pembaruan terpasang. Versi sebelumnya tetap ada di {folder} dan bisa dihapus.",
-  "Reload the page to use it.": "Muat ulang halaman untuk menggunakannya.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent mengunduh versi baru dari GitHub ke folder baru di samping yang sekarang, beralih ke sana, lalu menghapus versi sebelumnya.",
   "Add or remove": "Tambah atau hapus",
   "Filter sidebar": "Bilah samping filter",
@@ -1410,5 +1407,9 @@
   "In the bar": "Di bilah",
   "Add torrents, a feed or a rule": "Tambahkan torrent, feed, atau aturan",
   "Location": "Lokasi",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Menemukan torrent yang memuat setiap kata di nama, kategori, tag, atau tracker. * cocok dengan teks apa pun dan ? dengan satu karakter (mis. *file?.mkv menemukan myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Menemukan torrent yang memuat setiap kata di nama, kategori, tag, atau tracker. * cocok dengan teks apa pun dan ? dengan satu karakter (mis. *file?.mkv menemukan myfile1.mkv).",
+  "Update installed": "Pembaruan terpasang",
+  "Reload to use it.": "Muat ulang untuk menggunakannya.",
+  "Reload to use it. The old version stays in {folder}.": "Muat ulang untuk menggunakannya. Versi lama tetap ada di {folder}.",
+  "Selection bar reset": "Bilah pilihan diatur ulang"
 }

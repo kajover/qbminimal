@@ -43,9 +43,9 @@ export function UpdateCheck() {
       setInstalling(null)
       setInstalled(true)
       // Stays until it's answered, so nothing typed elsewhere is lost to a reload.
-      toast.success(oldRemoved ? t('Update installed and the previous version removed.')
-        : t('Update installed. The previous version stays in {folder} and can be deleted.', { folder: oldPath }), {
-        description: t('Reload the page to use it.'),
+      // Short: only where the old version stays is worth saying.
+      toast.success(t('Update installed'), {
+        description: oldRemoved ? t('Reload to use it.') : t('Reload to use it. The old version stays in {folder}.', { folder: oldPath }),
         duration: Infinity,
         action: { label: t('Reload'), onClick: pageActions.reload },
       })

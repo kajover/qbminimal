@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Există deja o etichetă numită {name}",
   "There is already a view called {name}": "Există deja o vizualizare numită {name}",
   "View updated": "Vizualizare actualizată",
-  "Update installed and the previous version removed.": "Actualizarea a fost instalată, iar versiunea anterioară a fost eliminată.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Actualizarea a fost instalată. Versiunea anterioară rămâne în {folder} și poate fi ștearsă.",
-  "Reload the page to use it.": "Reîncarcă pagina ca să o folosești.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent descarcă versiunea nouă de pe GitHub într-un dosar nou lângă cel curent, trece la ea și elimină versiunea anterioară.",
   "Add or remove": "Adaugă sau elimină",
   "Filter sidebar": "Bara laterală de filtre",
@@ -1410,5 +1407,9 @@
   "In the bar": "În bară",
   "Add torrents, a feed or a rule": "Adaugă torente, un flux sau o regulă",
   "Location": "Locație",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Găsește torentele care conțin fiecare cuvânt în nume, categorie, etichete sau tracker. * înseamnă orice text, iar ? un singur caracter (de ex. *file?.mkv găsește myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Găsește torentele care conțin fiecare cuvânt în nume, categorie, etichete sau tracker. * înseamnă orice text, iar ? un singur caracter (de ex. *file?.mkv găsește myfile1.mkv).",
+  "Update installed": "Actualizarea a fost instalată",
+  "Reload to use it.": "Reîncarcă ca să o folosești.",
+  "Reload to use it. The old version stays in {folder}.": "Reîncarcă ca să o folosești. Versiunea veche rămâne în {folder}.",
+  "Selection bar reset": "Bara de selecție a fost resetată"
 }

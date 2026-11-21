@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Метка {name} уже существует",
   "There is already a view called {name}": "Вид {name} уже существует",
   "View updated": "Вид обновлён",
-  "Update installed and the previous version removed.": "Обновление установлено, предыдущая версия удалена.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Обновление установлено. Предыдущая версия осталась в {folder}, её можно удалить.",
-  "Reload the page to use it.": "Перезагрузите страницу, чтобы использовать её.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent скачивает новую версию с GitHub в новую папку рядом с текущей, переключается на неё и удаляет предыдущую версию.",
   "Add or remove": "Добавить или убрать",
   "Filter sidebar": "Боковая панель фильтров",
@@ -1410,5 +1407,9 @@
   "In the bar": "На панели",
   "Add torrents, a feed or a rule": "Добавить торренты, ленту или правило",
   "Location": "Расположение",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Находит торренты, у которых каждое слово есть в имени, категории, метках или трекере. * означает любой текст, а ? — один символ (например, *file?.mkv находит myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Находит торренты, у которых каждое слово есть в имени, категории, метках или трекере. * означает любой текст, а ? — один символ (например, *file?.mkv находит myfile1.mkv).",
+  "Update installed": "Обновление установлено",
+  "Reload to use it.": "Перезагрузите, чтобы использовать.",
+  "Reload to use it. The old version stays in {folder}.": "Перезагрузите, чтобы использовать. Старая версия осталась в {folder}.",
+  "Selection bar reset": "Панель выбора сброшена"
 }

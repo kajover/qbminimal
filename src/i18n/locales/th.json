@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "มีแท็กชื่อ {name} อยู่แล้ว",
   "There is already a view called {name}": "มีมุมมองชื่อ {name} อยู่แล้ว",
   "View updated": "อัปเดตมุมมองแล้ว",
-  "Update installed and the previous version removed.": "ติดตั้งการอัปเดตแล้วและลบเวอร์ชันก่อนหน้าแล้ว",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "ติดตั้งการอัปเดตแล้ว เวอร์ชันก่อนหน้ายังอยู่ใน {folder} และลบได้",
-  "Reload the page to use it.": "โหลดหน้านี้ใหม่เพื่อใช้งาน",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent ดาวน์โหลดเวอร์ชันใหม่จาก GitHub ไปยังโฟลเดอร์ใหม่ข้างโฟลเดอร์ปัจจุบัน สลับไปใช้เวอร์ชันนั้น และลบเวอร์ชันก่อนหน้า",
   "Add or remove": "เพิ่มหรือลบ",
   "Filter sidebar": "แถบด้านข้างตัวกรอง",
@@ -1410,5 +1407,9 @@
   "In the bar": "ในแถบ",
   "Add torrents, a feed or a rule": "เพิ่มทอร์เรนต์ ฟีด หรือกฎ",
   "Location": "ตำแหน่ง",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "ค้นหาทอร์เรนต์ที่มีทุกคำในชื่อ หมวดหมู่ แท็ก หรือแทรกเกอร์ * แทนข้อความใดก็ได้ และ ? แทนหนึ่งอักขระ (เช่น *file?.mkv พบ myfile1.mkv)"
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "ค้นหาทอร์เรนต์ที่มีทุกคำในชื่อ หมวดหมู่ แท็ก หรือแทรกเกอร์ * แทนข้อความใดก็ได้ และ ? แทนหนึ่งอักขระ (เช่น *file?.mkv พบ myfile1.mkv)",
+  "Update installed": "ติดตั้งการอัปเดตแล้ว",
+  "Reload to use it.": "โหลดใหม่เพื่อใช้งาน",
+  "Reload to use it. The old version stays in {folder}.": "โหลดใหม่เพื่อใช้งาน เวอร์ชันเก่ายังอยู่ใน {folder}",
+  "Selection bar reset": "รีเซ็ตแถบการเลือกแล้ว"
 }

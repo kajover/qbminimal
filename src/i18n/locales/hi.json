@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "{name} नाम का टैग पहले से है",
   "There is already a view called {name}": "{name} नाम का दृश्य पहले से है",
   "View updated": "दृश्य अपडेट हुआ",
-  "Update installed and the previous version removed.": "अपडेट इंस्टॉल हो गया और पिछला संस्करण हटा दिया गया।",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "अपडेट इंस्टॉल हो गया। पिछला संस्करण {folder} में रहेगा और उसे डिलीट किया जा सकता है।",
-  "Reload the page to use it.": "इसे इस्तेमाल करने के लिए पेज फिर से लोड करें।",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent नया संस्करण GitHub से मौजूदा संस्करण के बगल में एक नए फ़ोल्डर में डाउनलोड करता है, उस पर स्विच करता है और पिछला संस्करण हटा देता है।",
   "Add or remove": "जोड़ें या हटाएँ",
   "Filter sidebar": "फ़िल्टर साइडबार",
@@ -1410,5 +1407,9 @@
   "In the bar": "बार में",
   "Add torrents, a feed or a rule": "टोरेंट, फ़ीड या नियम जोड़ें",
   "Location": "स्थान",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "ऐसे टोरेंट ढूँढता है जिनके नाम, श्रेणी, टैग या ट्रैकर में हर शब्द हो। * किसी भी पाठ के लिए और ? एक अक्षर के लिए (जैसे *file?.mkv से myfile1.mkv मिलता है)।"
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "ऐसे टोरेंट ढूँढता है जिनके नाम, श्रेणी, टैग या ट्रैकर में हर शब्द हो। * किसी भी पाठ के लिए और ? एक अक्षर के लिए (जैसे *file?.mkv से myfile1.mkv मिलता है)।",
+  "Update installed": "अपडेट इंस्टॉल हो गया",
+  "Reload to use it.": "इस्तेमाल करने के लिए फिर से लोड करें।",
+  "Reload to use it. The old version stays in {folder}.": "इस्तेमाल करने के लिए फिर से लोड करें। पुराना संस्करण {folder} में रहेगा।",
+  "Selection bar reset": "चयन बार रीसेट हो गया"
 }

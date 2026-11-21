@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "{name} という名前のタグはすでにあります",
   "There is already a view called {name}": "{name} という名前のビューはすでにあります",
   "View updated": "ビューを更新しました",
-  "Update installed and the previous version removed.": "アップデートをインストールし、以前のバージョンを削除しました。",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "アップデートをインストールしました。以前のバージョンは {folder} に残っており、削除できます。",
-  "Reload the page to use it.": "使うにはページを再読み込みしてください。",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent は GitHub から新しいバージョンを現在のフォルダーの隣の新しいフォルダーにダウンロードし、そちらに切り替えて、以前のバージョンを削除します。",
   "Add or remove": "追加または削除",
   "Filter sidebar": "フィルターのサイドバー",
@@ -1410,5 +1407,9 @@
   "In the bar": "バー内",
   "Add torrents, a feed or a rule": "トレント、フィード、ルールを追加",
   "Location": "場所",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "名前、カテゴリー、タグ、トラッカーにすべての語を含むトレントを探します。* は任意の文字列、? は任意の1文字です (例: *file?.mkv は myfile1.mkv に一致)。"
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "名前、カテゴリー、タグ、トラッカーにすべての語を含むトレントを探します。* は任意の文字列、? は任意の1文字です (例: *file?.mkv は myfile1.mkv に一致)。",
+  "Update installed": "アップデートをインストールしました",
+  "Reload to use it.": "使うには再読み込みしてください。",
+  "Reload to use it. The old version stays in {folder}.": "使うには再読み込みしてください。古いバージョンは {folder} に残っています。",
+  "Selection bar reset": "選択バーをリセットしました"
 }

@@ -326,7 +326,7 @@ export function TorrentContentTab({ hash, savePath }: { hash: string; savePath?:
         <span className={cn(SIZE_COL, titleCell)}><SortTitle field="size" sort={picked ?? noSort} onSort={sortBy}>{t('Size')}</SortTitle></span>
         <span className={cn(PRIORITY_COL, titleCell, 'max-sm:hidden')}><SortTitle field="priority" sort={picked ?? noSort} onSort={sortBy}>{t('Priority')}</SortTitle></span>
       </div>
-      <div className="flex-1 overflow-y-auto pb-1">
+      <div className="flex-1 overflow-y-auto pb-[calc(0.25rem+var(--details-end,0px))]">
         {isLoading ? <p className="py-8 text-center text-xs text-muted-foreground">{t('Loading files...')}</p>
           : fullTree.length === 0 ? <p className="py-8 text-center text-xs text-muted-foreground">{t('No files yet')}</p>
           : tree.length === 0 ? <p className="py-8 text-center text-xs text-muted-foreground">{t('Nothing matches')}</p>

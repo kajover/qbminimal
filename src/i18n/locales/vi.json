@@ -1270,9 +1270,6 @@
   "There is already a tag called {name}": "Đã có thẻ tên {name}",
   "There is already a view called {name}": "Đã có chế độ xem tên {name}",
   "View updated": "Đã cập nhật chế độ xem",
-  "Update installed and the previous version removed.": "Đã cài bản cập nhật và gỡ phiên bản trước.",
-  "Update installed. The previous version stays in {folder} and can be deleted.": "Đã cài bản cập nhật. Phiên bản trước vẫn nằm trong {folder} và có thể xóa.",
-  "Reload the page to use it.": "Hãy tải lại trang để dùng.",
   "qBittorrent downloads the new version from GitHub into a new folder next to the current one, switches to it, and removes the previous version.": "qBittorrent tải phiên bản mới từ GitHub vào một thư mục mới cạnh thư mục hiện tại, chuyển sang đó và gỡ phiên bản trước.",
   "Add or remove": "Thêm hoặc gỡ",
   "Filter sidebar": "Thanh bên bộ lọc",
@@ -1410,5 +1407,9 @@
   "In the bar": "Trên thanh",
   "Add torrents, a feed or a rule": "Thêm torrent, nguồn cấp hoặc quy tắc",
   "Location": "Vị trí",
-  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Tìm các torrent chứa mọi từ trong tên, danh mục, thẻ hoặc tracker. * khớp với văn bản bất kỳ và ? với một ký tự (ví dụ *file?.mkv tìm thấy myfile1.mkv)."
+  "Finds torrents containing every word in the name, category, tags, or tracker. Use * to match any text and ? for a single character (e.g. *file?.mkv finds myfile1.mkv).": "Tìm các torrent chứa mọi từ trong tên, danh mục, thẻ hoặc tracker. * khớp với văn bản bất kỳ và ? với một ký tự (ví dụ *file?.mkv tìm thấy myfile1.mkv).",
+  "Update installed": "Đã cài bản cập nhật",
+  "Reload to use it.": "Hãy tải lại để dùng.",
+  "Reload to use it. The old version stays in {folder}.": "Hãy tải lại để dùng. Phiên bản cũ vẫn nằm trong {folder}.",
+  "Selection bar reset": "Đã đặt lại thanh chọn"
 }
