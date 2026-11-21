@@ -388,13 +388,14 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
       {/* Laid out like the torrent cards: a grid on wide screens. */}
       {/* Scrolled on their own in the frame, with room for a card's focus ring. Placed, so hidden
           labels in the cards are placed in it, not in the page, which they'd make scroll. */}
-      <div className={cn('relative mb-[var(--toolbar-room,0px)] frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1', showTable && 'hidden')}>
+      <div className={cn('relative mb-[var(--toolbar-room,0px)] frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1 frame:pb-2 frame:[clip-path:inset(0_0_4px_0)]', showTable && 'hidden')}>
       <ul data-list-edge className="grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3">
         {(showTable ? [] : growing.shown).map(result => (
           <li key={`${result.fileUrl}|${result.descrLink}`} className="flex items-start gap-2 rounded-xl border bg-card px-3 py-2.5">
             <button type="button" className="min-w-0 flex-1 text-start" onClick={() => result.fileUrl && onAdd(result)}>
               <span className="block text-xs text-muted-foreground">{t('{seeds} seeds · {leeches} leeches', { seeds: result.nbSeeders, leeches: result.nbLeechers })}</span>
-              <span className="block text-sm wrap-anywhere">{isAdded(result) && <AddedMark />}{result.fileName}</span>
+              {/* One line, clipped; hovering, or the add prompt a tap opens, gives the whole name. */}
+              <span className="block truncate text-sm" title={result.fileName}>{isAdded(result) && <AddedMark />}{result.fileName}</span>
               <span className="block truncate text-xs text-muted-foreground">
                 {[shows('fileSize') && formatBytes(result.fileSize), shows('engineName') && result.engineName, shows('pubDate') && published(result) > 0 && formatDateTime(published(result))].filter(Boolean).join(' · ')}
               </span>

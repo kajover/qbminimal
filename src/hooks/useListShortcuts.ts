@@ -1,10 +1,14 @@
 import { useEffect } from 'react'
 
+// Dialogs and menus that take the keys while open. Not the torrent details on phones and tablets
+// (data-keeps-swipes): they leave the list usable, as the details panel on desktop does.
+export const KEY_TAKING_LAYERS = '[role="dialog"]:not([data-keeps-swipes]), [role="menu"]'
+
 // Keys typed into a field, or pressed while a dialog or menu is open, aren't list shortcuts.
 export function isListShortcut(event: KeyboardEvent) {
   const target = event.target as HTMLElement
   if (target.closest?.('input, textarea, select, [contenteditable="true"]')) return false
-  return !document.querySelector('[role="dialog"], [role="menu"]')
+  return !document.querySelector(KEY_TAKING_LAYERS)
 }
 
 // What the torrent list's keys do. Each runs with the list as it is when the key is pressed.

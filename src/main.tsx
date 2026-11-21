@@ -39,6 +39,12 @@ startTheme()
 applyTextSize()
 applyDisplayOptions()
 
+// Focus rings show only while the keyboard moves the focus: a pointer hides them (index.css,
+// the focus-visible variant), and Tab or an arrow key shows them again.
+const FOCUS_KEYS = new Set(['Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'])
+addEventListener('pointerdown', () => { document.documentElement.dataset.pointer = '' }, { capture: true, passive: true })
+addEventListener('keydown', (event) => { if (FOCUS_KEYS.has(event.key)) delete document.documentElement.dataset.pointer }, { capture: true })
+
 const root = document.getElementById('root')
 if (!root) throw new Error('index.html needs a #root element')
 

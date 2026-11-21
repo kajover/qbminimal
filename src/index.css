@@ -3,6 +3,10 @@
 
 /* The theme switcher puts .dark on <html>. */
 @custom-variant dark (&:is(.dark *));
+/* Focus rings only for the keyboard. A tap or click can still leave a focus that counts as
+   visible (Safari, or focus moved by code, as the details tabs do), so after a pointer is used
+   (data-pointer, main.tsx) they stay hidden until a key is pressed. */
+@custom-variant focus-visible (&:focus-visible:where(:root:not([data-pointer]) *));
 /* The desktop layout (menu sidebar, docked details, the selection bar in the header): from 1200px,
    and on a tablet held sideways from 1024px, like an iPad. `narrow` is everything else, with the
    tab bar. Keep both in step with WIDE in src/lib/pageScroll.ts. */
@@ -111,6 +115,15 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  /* No grey box from iPhone Safari around what's tapped, and no browser focus outline after a
+     tap or click (see the focus-visible variant). */
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  :root[data-pointer] :focus-visible {
+    outline: none;
   }
 
   /* iPhone Safari can still turn numbers such as peer addresses into links, and styles them
@@ -322,7 +335,7 @@
 :root:not(.native-switch)[dir='rtl'] .switch:checked::before {
   translate: -1.125rem 0;
 }
-.switch:focus-visible {
+:root:not([data-pointer]) .switch:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }

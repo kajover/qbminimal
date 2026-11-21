@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useEffectEvent, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { PageBoundary } from '@/components/PageBoundary'
@@ -80,12 +80,40 @@ export function TorrentsView() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   // The list's column, which the phone filter sheet lines up with.
   const [listColumn, setListColumn] = useState<HTMLDivElement | null>(null)
+  // The details panel lines up with the list, leaving the same room at its sides as the table,
+  // and not covering the filters beside it. Measured from the window's edges.
+  const [listEdges, setListEdges] = useState<{ start: number; end: number; top: number }>()
+  useLayoutEffect(() => {
+    if (!wide || !listColumn) return
+    const measure = () => {
+      const box = listColumn.getBoundingClientRect()
+      const fromLeft = Math.round(box.left)
+      const fromRight = Math.round(document.documentElement.clientWidth - box.right)
+      const rtl = getComputedStyle(listColumn).direction === 'rtl'
+      setListEdges(current => {
+        const top = Math.round(box.top)
+        const next = rtl ? { start: fromRight, end: fromLeft, top } : { start: fromLeft, end: fromRight, top }
+        return current?.start === next.start && current.end === next.end && current.top === next.top ? current : next
+      })
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(listColumn)
+    addEventListener('resize', measure)
+    return () => {
+      observer.disconnect()
+      removeEventListener('resize', measure)
+    }
+  }, [wide, listColumn, filtersOpen])
   const [addOpen, setAddOpen] = useState(false)
   const [views, setViews] = useState<FilterView[]>(loadFilterViews)
   // The row that Tab reaches and the arrow keys move from.
   const [focusHash, setFocusHash] = useState<string | null>(null)
 
   // Looked up on every refresh, so open details stay current. Torrents deleted elsewhere drop out.
+  // A search or filter that hides the open torrent closes its details, so they never show a
+  // torrent that isn't in the list. Done while drawing, so they don't show for a moment first.
+  if (detailsHash && !list.matching.some(t => t.hash === detailsHash)) setDetailsHash(null)
   const detailsTorrent = torrents.find(t => t.hash === detailsHash)
   const selectedTorrents = torrents.filter(t => selection.selected.has(t.hash))
   const count = selectedTorrents.length
@@ -383,7 +411,7 @@ export function TorrentsView() {
       {/* The filters open on the list's end side: beside it where it fits, over it on phones. */}
       <div className={cn('frame:flex frame:min-h-0 frame:flex-1', filtersOpen && sideBySide && 'flex items-start gap-4 frame:items-stretch')}>
         {!sideBySide && <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen} list={listColumn}>{sidebar}</FilterSheet>}
-        <div ref={setListColumn} className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0">
+        <div ref={setListColumn} className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0 frame:pb-(--details-room)">
           {searchOpen && !headerSearch && <QuickSearchField list={list} wide={false} onClose={() => setSearchOpen(false)} />}
 
         {list.matching.length === 0 ? (
@@ -420,8 +448,10 @@ export function TorrentsView() {
         ) : (
           // Scrolled on their own in the frame, with room for a card's focus ring. Placed, so the
           // cards' hidden labels are placed in it, not in the page, which they'd make scroll.
-          // Below the last card, room for Safari's toolbar, which grows at the end of the page.
-          <div className="relative mb-[var(--toolbar-room,0px)] frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1">
+          // Below the last card, room for Safari's toolbar, which grows at the end of the page. In the
+          // frame the box reaches 4px past the column for the cards' focus rings, but is cut off
+          // level with the filters sidebar, with room inside so the last card's border shows.
+          <div className="relative mb-[var(--toolbar-room,0px)] frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1 frame:pb-2 frame:[clip-path:inset(0_0_4px_0)]">
             <TorrentCards
               torrents={rows}
               selected={selection.selected}
@@ -459,7 +489,7 @@ export function TorrentsView() {
       {detailsTorrent && (
         <PageBoundary loading={null}>
           {wide
-            ? <TorrentDetailsPanel torrent={detailsTorrent} onClose={closeDetails} onDelete={() => askToDelete([detailsTorrent])} />
+            ? <TorrentDetailsPanel torrent={detailsTorrent} onClose={closeDetails} onDelete={() => askToDelete([detailsTorrent])} edges={listEdges} />
             : <TorrentDetailsDialog torrent={detailsTorrent} onClose={closeDetails} onDelete={() => askToDelete([detailsTorrent])} />}
         </PageBoundary>
       )}

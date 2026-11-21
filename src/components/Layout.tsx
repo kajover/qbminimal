@@ -1,3 +1,4 @@
+import { KEY_TAKING_LAYERS } from '@/hooks/useListShortcuts'
 import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { ChevronLeft, ChevronRight, LogOut, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -241,7 +242,7 @@ function usePageKeys(onNavigate: (page: PageId) => void) {
     let armed = 0
     const onKey = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement
-      if (event.metaKey || event.ctrlKey || event.altKey || target.closest('input, textarea, select, [contenteditable="true"]') || document.querySelector('[role="dialog"], [role="menu"]')) return
+      if (event.metaKey || event.ctrlKey || event.altKey || target.closest?.('input, textarea, select, [contenteditable="true"]') || document.querySelector(KEY_TAKING_LAYERS)) return
       const key = event.key.toLowerCase()
       if (armed && Date.now() - armed < 1500 && /^[1-9]$/.test(key)) {
         const next = MENU_PAGES[Number(key) - 1]

@@ -99,12 +99,25 @@ interface DetailsProps {
   onDelete?: () => void
 }
 
+interface PanelProps extends DetailsProps {
+  // How far from the window's edges the panel starts and ends: where the list does, so it has
+  // the table's room at its sides and leaves the filters beside it in view. Maximized, it reaches
+  // up to the list's top.
+  edges?: { start: number; end: number; top: number }
+}
+
 // Wide screens: a panel along the bottom of the window, below the list, with an edge to drag
 // for its height. Picking another torrent in the list shows that one instead.
-export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps) {
+export function TorrentDetailsPanel({ torrent, onClose, onDelete, edges }: PanelProps) {
   const [height, setHeight] = useState(initialHeight)
-  const drag = useRef<{ y: number; height: number } | null>(null)
+  const drag = useRef<{ y: number; height: number; wasFull: boolean; moved: boolean; raw: number } | null>(null)
   const release = useRef<(() => void) | null>(null)
+  // Maximized, the panel covers the whole list, from its top down. As on phones, a click on its
+  // pill, or dragging it to the top, maximizes it; a click or a drag down steps back.
+  const [full, setFull] = useState(false)
+  const section = useRef<HTMLElement>(null)
+  // Dragged below its lowest height, it slides down with the pointer, showing it will close.
+  const [sink, setSink] = useState(0)
 
 
   const commit = (next: number) => {
@@ -115,34 +128,72 @@ export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps
   const startDrag = (e: PointerEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.currentTarget.setPointerCapture(e.pointerId)
-    drag.current = { y: e.clientY, height }
+    // Maximized, a drag starts from the height it has on screen.
+    const start = full ? clampHeight(section.current?.offsetHeight ?? height) : height
+    drag.current = { y: e.clientY, height: start, wasFull: full, moved: false, raw: start }
     release.current = holdCursor('row-resize')
   }
   const moveDrag = (e: PointerEvent<HTMLDivElement>) => {
-    if (drag.current) setHeight(clampHeight(drag.current.height + drag.current.y - e.clientY))
+    const current = drag.current
+    if (!current) return
+    const moved = current.y - e.clientY
+    // A few pixels still count as a click.
+    if (!current.moved && Math.abs(moved) < 4) return
+    current.moved = true
+    current.raw = current.height + moved
+    if (full) setFull(false)
+    setHeight(clampHeight(current.raw))
+    setSink(Math.max(0, MIN_HEIGHT - current.raw))
   }
   const endDrag = () => {
-    if (drag.current) commit(height)
+    const current = drag.current
     drag.current = null
     release.current?.()
     release.current = null
+    if (!current) return
+    setSink(0)
+    if (!current.moved) return setFull(!current.wasFull)
+    // Dragged past the highest it goes, it maximizes, keeping its height for stepping back.
+    if (current.raw >= window.innerHeight - LIST_ROOM) return setFull(true)
+    // Dragged on down well past the lowest it goes, it closes, as on phones, keeping its height.
+    if (current.raw < MIN_HEIGHT - 60) return onClose()
+    commit(current.raw)
   }
   const onEdgeKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      return setFull(!full)
+    }
     if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
     e.preventDefault()
+    setFull(false)
     commit(height + (e.key === 'ArrowUp' ? 32 : -32))
   }
+
+  // In the frame the list ends 16px above the panel (--details-room), as it does beside the
+  // filters, so no rows or cards show behind or below it.
+  useLayoutEffect(() => {
+    // Maximized, it lies over the list, which keeps its place behind it.
+    if (!edges || full) return
+    const root = document.documentElement
+    // While it slides down to close, the list grows behind it, so no torrents are cut off.
+    root.style.setProperty('--details-room', `${Math.max(height + 16 - sink, 0)}px`)
+    return () => { root.style.removeProperty('--details-room') }
+  }, [edges, height, full, sink])
 
   return (
     <>
       {/* Room at the end of the page, so the last rows can scroll above the panel. Not in the
-          frame, where the panel lies over the list and its pages bar. */}
+          frame, where the list makes room for it (--details-room). */}
       <div aria-hidden className="frame:hidden" style={{ height }} />
       <section
         aria-label={t('Torrent details')}
         data-keeps-swipes
-        className="fixed bottom-0 z-30 flex flex-col border-t bg-card"
-        style={{ height, insetInlineStart: 'var(--sidebar-width, 0px)', insetInlineEnd: 'var(--page-scrollbar, 0px)' }}
+        // Lined up with the list, it also ends 16px above the window's bottom, as the lists and the
+        // filters sidebar do.
+        ref={section}
+        className={cn('fixed z-30 flex flex-col bg-card', edges ? 'bottom-4 overflow-hidden rounded-xl border' : 'bottom-0 border-t')}
+        style={{ ...(full ? { top: edges ? `${edges.top}px` : 0 } : { height }), translate: sink ? `0 ${sink}px` : undefined, insetInlineStart: edges ? `${edges.start}px` : 'var(--sidebar-width, 0px)', insetInlineEnd: edges ? `${edges.end}px` : 'var(--page-scrollbar, 0px)' }}
       >
         <div
           role="separator"
@@ -384,6 +435,15 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
   }
 
   useDetailsPage(large)
+  // Back at medium height from the whole screen, the details start again at their top, not
+  // where they were scrolled before.
+  const wasLarge = useRef(large)
+  useLayoutEffect(() => {
+    if (wasLarge.current && !large) {
+      sheet.current?.querySelectorAll('[role=tabpanel], .overflow-y-auto, .overflow-auto').forEach((box) => { box.scrollTop = 0 })
+    }
+    wasLarge.current = large
+  }, [large])
   useSwipeDown(sheet, large, { start: begin, move: (y) => { if (drag.current) follow(y - drag.current.y) }, end: endDrag })
   // Maximized, the handle and the tabs stay at the top while the page scrolls under them.
   const pinned = large && 'sticky z-10 bg-card'
@@ -404,9 +464,10 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
               // under its status bar and toolbar in the colour of the pinned handle and tabs, so
               // all of it stays the card's colour, with no border.
               ? 'absolute top-0 left-[env(safe-area-inset-left)] right-[env(safe-area-inset-right)] min-h-dvh rounded-none border-0 [--details-end:calc(env(safe-area-inset-bottom)+0.75rem)] [&_[role=tabpanel]]:overflow-visible [&_[role=tabpanel]_.overflow-y-auto]:overflow-visible'
-              // As wide as the page (inside the notch's side held sideways), down to the window's bottom edge (above the tab bar where
-              // there is one), with only its top rounded and bordered: Safari paints its toolbar
-              // strip below in the sheet's colour, so the two run on as one.
+              // As wide as the page (inside the notch's side held sideways), down to the window's
+              // bottom edge (above the tab bar where there is one), with only its top rounded and
+              // bordered: Safari paints its toolbar strip below in the sheet's colour, so the two
+              // run on as one.
               : cn('fixed left-[env(safe-area-inset-left)] right-[env(safe-area-inset-right)] bottom-[calc(var(--bottom-nav-height,0px)+var(--selection-bar-gap,0.25rem)-var(--nav-gap,4px))] overflow-hidden rounded-t-xl border-x-0 border-b-0', sheetTop === undefined && 'h-[62dvh]'),
             'transition-[height,inset,border-radius,translate] duration-300 ease-out',
           )}
