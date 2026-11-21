@@ -97,7 +97,8 @@ const TorrentCard = memo(function TorrentCard({ torrent, isSelected, isOpen, sho
           </span>
           <span className="text-muted-foreground tabular-nums">{Math.round(torrent.progress * 100)}%</span>
         </div>
-        <p className="text-sm wrap-anywhere">{torrent.name}</p>
+        {/* One line, clipped; hovering or the details give the whole name. */}
+        <p className="truncate text-sm" title={torrent.name}>{torrent.name}</p>
         {/* One line of facts, each with an icon. Hovering or a screen reader gives the words. */}
         {/* One line, packed from the start with one even gap: 12px where there's room, down to 2px
             on small phones, so the five facts (about 20rem) fit from about 360px wide. Every fact

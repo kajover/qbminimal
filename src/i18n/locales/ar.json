@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "أعد التحميل لاستخدامه. يبقى الإصدار القديم في {folder}.",
   "Selection bar reset": "أُعيد ضبط شريط التحديد",
   "Show shortcuts": "أظهر الاختصارات",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "يثبّت qBittorrent الإصدار الجديد من GitHub ويزيل القديم."
+  "Installs it from GitHub, replacing this one.": "يثبّتها من GitHub بدلًا من هذه النسخة."
 }

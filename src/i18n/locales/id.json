@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "Muat ulang untuk menggunakannya. Versi lama tetap ada di {folder}.",
   "Selection bar reset": "Bilah pilihan diatur ulang",
   "Show shortcuts": "Tampilkan pintasan",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent memasang versi baru dari GitHub dan menghapus yang lama."
+  "Installs it from GitHub, replacing this one.": "Menginstalnya dari GitHub, menggantikan versi ini."
 }

@@ -498,6 +498,12 @@ select:not([multiple]):not([size]) {
 }
 
 /* Maximized torrent details on phones are the page; the list steps aside until they're smaller. */
+/* Pulling the maximized details down moves them, so Safari doesn't reload the page then. */
+:root[data-details-full],
+:root[data-details-full] body {
+  overscroll-behavior-y: none;
+}
+
 :root[data-details-full] main {
   display: none;
 }

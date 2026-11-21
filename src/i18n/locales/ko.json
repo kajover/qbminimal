@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "사용하려면 새로고침하세요. 이전 버전은 {folder}에 남아 있습니다.",
   "Selection bar reset": "선택 바를 초기화했습니다",
   "Show shortcuts": "단축키 표시",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent가 GitHub에서 새 버전을 설치하고 이전 버전을 삭제합니다."
+  "Installs it from GitHub, replacing this one.": "GitHub에서 설치하여 이 버전을 대체합니다."
 }

@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "Recharge pour l'utiliser. L'ancienne version reste dans {folder}.",
   "Selection bar reset": "Barre de sélection réinitialisée",
   "Show shortcuts": "Afficher les raccourcis",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent installe la nouvelle version depuis GitHub et supprime l'ancienne."
+  "Installs it from GitHub, replacing this one.": "L'installe depuis GitHub à la place de celle-ci."
 }

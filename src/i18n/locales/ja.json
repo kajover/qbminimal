@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "使うには再読み込みしてください。古いバージョンは {folder} に残っています。",
   "Selection bar reset": "選択バーをリセットしました",
   "Show shortcuts": "ショートカットを表示",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent が GitHub から新しいバージョンをインストールし、古いバージョンを削除します。"
+  "Installs it from GitHub, replacing this one.": "GitHub からインストールし、このバージョンと置き換えます。"
 }

@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "Hãy tải lại để dùng. Phiên bản cũ vẫn nằm trong {folder}.",
   "Selection bar reset": "Đã đặt lại thanh chọn",
   "Show shortcuts": "Hiện phím tắt",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent cài phiên bản mới từ GitHub và gỡ phiên bản cũ."
+  "Installs it from GitHub, replacing this one.": "Cài đặt từ GitHub, thay thế phiên bản này."
 }

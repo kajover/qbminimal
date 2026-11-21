@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "Φόρτωσε ξανά για να τη χρησιμοποιήσεις. Η παλιά έκδοση μένει στο {folder}.",
   "Selection bar reset": "Η γραμμή επιλογής επαναφέρθηκε",
   "Show shortcuts": "Εμφάνιση συντομεύσεων",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "Το qBittorrent εγκαθιστά τη νέα έκδοση από το GitHub και αφαιρεί την παλιά."
+  "Installs it from GitHub, replacing this one.": "Την εγκαθιστά από το GitHub στη θέση αυτής."
 }

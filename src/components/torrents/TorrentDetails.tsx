@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode, type RefObject } from 'react'
 import { FolderTree, Info, RadioTower, SlidersHorizontal, Users, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog as DialogPrimitive } from 'radix-ui'
@@ -178,11 +178,11 @@ export function TorrentDetailsPanel({ torrent, onClose, onDelete }: DetailsProps
   )
 }
 
-// Phones: a sheet from the bottom, as in iOS. It opens at medium height across the screen's width;
-// dragging its handle up, or tapping it, gives the whole screen, and dragging down steps back or
-// closes it. The back button and Esc close it too. It doesn't hold the page: the torrents go on
-// behind it, scroll, and a tap on another one shows that one's details. No shadow, the table's
-// corners. Safari clips a fixed panel at its window's bottom edge, so only the maximized sheet,
+// Phones: a sheet from the bottom, as in iOS. It opens at medium height, as wide as the page;
+// dragging its handle up, or tapping it, gives the whole screen, and dragging it down (or the
+// details, from their top) steps back or closes it. The back button and Esc close it too. It
+// doesn't hold the page: the torrents go on behind it, scroll, and a tap on another one shows
+// that one's details. No shadow, the table's corners. Safari clips a fixed panel at its window's bottom edge, so only the maximized sheet,
 // which is part of the page, scrolls on behind Safari's toolbar.
 type Detent = 'medium' | 'large'
 const DISMISS_DISTANCE = 90
@@ -210,6 +210,63 @@ function useDetailsPage(full: boolean) {
       window.scrollTo(0, y)
     }
   }, [full])
+}
+
+// A finger pulling the details down where they can't scroll further up moves the sheet, as its
+// handle does, from anywhere in it. Touch events, as only a cancelled first move keeps the list
+// from scrolling (and, maximized, Safari from reloading the page). Sideways or upward moves scroll.
+type SwipeCalls = { start: (y: number, time: number) => void; move: (y: number) => void; end: (e: { clientY: number; timeStamp: number }) => void }
+function scrolledDown(target: EventTarget | null, sheet: HTMLElement, large: boolean) {
+  if (large && window.scrollY > 0) return true
+  for (let el = target instanceof Element ? target : null; el && el !== sheet; el = el.parentElement) {
+    if (el.scrollTop > 0 && /auto|scroll/.test(getComputedStyle(el).overflowY)) return true
+  }
+  return false
+}
+function useSwipeDown(sheet: RefObject<HTMLDivElement | null>, large: boolean, calls: SwipeCalls) {
+  const latest = useRef(calls)
+  useLayoutEffect(() => { latest.current = calls })
+  // On the document: the sheet's portal draws it after this effect first runs.
+  useEffect(() => {
+    // 'pending' until the first move decides between pulling the sheet and scrolling.
+    let state: 'off' | 'pending' | 'pulling' = 'off'
+    let x = 0, y = 0, time = 0
+    const down = (e: TouchEvent) => {
+      const touch = e.touches[0]
+      const element = sheet.current
+      if (!element || !(e.target instanceof Node) || !element.contains(e.target)) { state = 'off'; return }
+      // The handle drags by itself; a second finger is a pinch.
+      if (e.touches.length > 1 || !touch || (e.target instanceof Element && e.target.closest('[data-sheet-handle]'))) { state = 'off'; return }
+      state = scrolledDown(e.target, element, large) ? 'off' : 'pending'
+      x = touch.clientX; y = touch.clientY; time = e.timeStamp
+    }
+    const move = (e: TouchEvent) => {
+      const touch = e.touches[0]
+      if (state === 'off' || !touch) return
+      if (state === 'pending') {
+        const dx = touch.clientX - x, dy = touch.clientY - y
+        if (dy <= 0 || Math.abs(dx) > dy) { if (dx || dy) state = 'off'; return }
+        state = 'pulling'
+        latest.current.start(y, time)
+      }
+      e.preventDefault()
+      latest.current.move(touch.clientY)
+    }
+    const up = (e: TouchEvent) => {
+      if (state === 'pulling') latest.current.end({ clientY: e.changedTouches[0]?.clientY ?? y, timeStamp: e.timeStamp })
+      state = 'off'
+    }
+    document.addEventListener('touchstart', down, { passive: true })
+    document.addEventListener('touchmove', move, { passive: false })
+    document.addEventListener('touchend', up)
+    document.addEventListener('touchcancel', up)
+    return () => {
+      document.removeEventListener('touchstart', down)
+      document.removeEventListener('touchmove', move)
+      document.removeEventListener('touchend', up)
+      document.removeEventListener('touchcancel', up)
+    }
+  }, [sheet, large])
 }
 
 // The sheet's place, and while a finger drags it: dragged up, the medium sheet grows from its
@@ -269,7 +326,7 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
   const moveDrag = (e: PointerEvent<HTMLButtonElement>) => {
     if (drag.current) follow(e.clientY - drag.current.y)
   }
-  const endDrag = (e: PointerEvent<HTMLButtonElement>) => {
+  const endDrag = (e: { clientY: number; timeStamp: number }) => {
     const start = drag.current
     drag.current = null
     if (!start) return
@@ -287,6 +344,7 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
   }
 
   useDetailsPage(large)
+  useSwipeDown(sheet, large, { start: (y, time) => { drag.current = { y, time }; follow(0) }, move: (y) => { if (drag.current) follow(y - drag.current.y) }, end: endDrag })
   // Maximized, the handle and the tabs stay at the top while the page scrolls under them.
   const pinned = large && 'sticky z-10 bg-card'
   return (
@@ -300,22 +358,23 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
           className={cn(
             'z-50 flex flex-col border bg-card outline-hidden data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom',
             large
-              // Part of the page, from the screen's top edge down, as long as its contents: they
+              // Part of the page, as wide as it, from the screen's top edge down, as long as its contents: they
               // scroll with the window to the screen's bottom edge, with room at their end
               // (--details-end). The handle keeps clear of the status bar. Safari paints the strips
               // under its status bar and toolbar in the colour of the pinned handle and tabs, so
               // all of it stays the card's colour, with no border.
-              ? 'absolute inset-x-0 top-0 min-h-dvh rounded-none border-0 [--details-end:calc(env(safe-area-inset-bottom)+0.75rem)] [&_[role=tabpanel]]:overflow-visible [&_[role=tabpanel]_.overflow-y-auto]:overflow-visible'
-              // The screen's whole width, down to the window's bottom edge (above the tab bar where
+              ? 'absolute top-0 left-[env(safe-area-inset-left)] right-[env(safe-area-inset-right)] min-h-dvh rounded-none border-0 [--details-end:calc(env(safe-area-inset-bottom)+0.75rem)] [&_[role=tabpanel]]:overflow-visible [&_[role=tabpanel]_.overflow-y-auto]:overflow-visible'
+              // As wide as the page (inside the notch's side held sideways), down to the window's bottom edge (above the tab bar where
               // there is one), with only its top rounded and bordered: Safari paints its toolbar
               // strip below in the sheet's colour, so the two run on as one.
-              : cn('fixed inset-x-0 bottom-[calc(var(--bottom-nav-height,0px)+var(--selection-bar-gap,0.25rem)-var(--nav-gap,4px))] overflow-hidden rounded-t-xl border-x-0 border-b-0', sheetTop === undefined && 'h-[62dvh]'),
+              : cn('fixed left-[env(safe-area-inset-left)] right-[env(safe-area-inset-right)] bottom-[calc(var(--bottom-nav-height,0px)+var(--selection-bar-gap,0.25rem)-var(--nav-gap,4px))] overflow-hidden rounded-t-xl border-x-0 border-b-0', sheetTop === undefined && 'h-[62dvh]'),
             'transition-[height,inset,border-radius,translate] duration-300 ease-out',
           )}
           style={sheetStyle(large, sheetTop)}
         >
           <button
             type="button"
+            data-sheet-handle
             aria-label={large ? t('Make the details smaller') : t('Make the details larger')}
             onPointerDown={startDrag}
             onPointerMove={moveDrag}

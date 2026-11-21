@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "重新載入即可使用。舊版本保留在 {folder} 中。",
   "Selection bar reset": "選取列已重設",
   "Show shortcuts": "顯示快速鍵",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent 會從 GitHub 安裝新版本並移除舊版本。"
+  "Installs it from GitHub, replacing this one.": "從 GitHub 安裝，取代目前版本。"
 }

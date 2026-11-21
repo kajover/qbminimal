@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "Töltsd újra a használatához. A régi verzió a(z) {folder} mappában marad.",
   "Selection bar reset": "Kijelölési sáv visszaállítva",
   "Show shortcuts": "Billentyűparancsok",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "A qBittorrent telepíti az új verziót a GitHubról, és eltávolítja a régit."
+  "Installs it from GitHub, replacing this one.": "Telepíti a GitHubról, a jelenlegi helyére."
 }

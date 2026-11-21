@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "Kullanmak için yeniden yükle. Eski sürüm {folder} içinde duruyor.",
   "Selection bar reset": "Seçim çubuğu sıfırlandı",
   "Show shortcuts": "Kısayolları göster",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent yeni sürümü GitHub'dan kurar ve eskisini kaldırır."
+  "Installs it from GitHub, replacing this one.": "GitHub'dan kurar ve bu sürümün yerini alır."
 }

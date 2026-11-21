@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import { Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CopyButton } from '@/components/CopyButton'
@@ -23,15 +23,21 @@ const shown = (value: Value) => value !== undefined && value !== false && value 
 // the magnet link. `empty` is shown, without a copy button, when there's no value. `extra` follows
 // the copy button, such as Export .torrent beside the magnet link; on phones it goes below, so the
 // value keeps the row.
+// Names often run without spaces: let them break after dots and underscores, not mid-word.
+function breakable(text: string) {
+  return text.split(/(?<=[._])/).map((part, i) => <Fragment key={i}>{i > 0 && <wbr />}{part}</Fragment>)
+}
+
 function Identity({ label, value, wide, full, empty, extra }: { label: string; value: string | undefined; wide?: boolean; full?: boolean; empty?: string; extra?: ReactNode }) {
   if (!value && !empty) return null
   return (
     <div className={cn('min-w-0', (wide || full) && 'sm:col-span-2')}>
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="flex min-h-6 min-w-0 items-center gap-1">
+      {/* The name wraps, so it's always whole, with the copy button beside its first line. */}
+      <dd className={cn('flex min-h-6 min-w-0 gap-1', wide ? 'items-start' : 'items-center')}>
         {value ? (
           <>
-            <span className={cn('truncate', wide ? 'text-sm font-medium' : 'font-mono text-xs')} dir={wide ? 'auto' : 'ltr'} title={value}>{value}</span>
+            <span className={cn('min-w-0', wide ? 'py-0.5 text-sm font-medium wrap-anywhere' : 'truncate font-mono text-xs')} dir={wide ? 'auto' : 'ltr'} title={value}>{wide ? breakable(value) : value}</span>
             <CopyButton text={value} label={label} className="size-6" iconClassName="size-3" />
             {extra && <span className="shrink-0 max-sm:hidden">{extra}</span>}
           </>

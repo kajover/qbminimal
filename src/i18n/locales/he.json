@@ -1411,5 +1411,5 @@
   "Reload to use it. The old version stays in {folder}.": "טען מחדש כדי להשתמש בו. הגרסה הישנה נשארת ב-{folder}.",
   "Selection bar reset": "סרגל הבחירה אופס",
   "Show shortcuts": "הצג קיצורים",
-  "qBittorrent installs the new version from GitHub and removes the old one.": "qBittorrent מתקין את הגרסה החדשה מ-GitHub ומסיר את הישנה."
+  "Installs it from GitHub, replacing this one.": "מתקין אותה מ-GitHub במקום הגרסה הזו."
 }
