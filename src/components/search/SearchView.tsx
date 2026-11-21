@@ -53,7 +53,6 @@ export function SearchView() {
   }
   const [pluginsOpen, setPluginsOpen] = useState(false)
   const [toolbarSlot, setToolbarSlot] = useState<HTMLDivElement | null>(null)
-  const [pageBarSlot, setPageBarSlot] = useState<HTMLDivElement | null>(null)
   const [adding, setAdding] = useState<SearchResult | null>(null)
   const [addBusy, setAddBusy] = useState(false)
 
@@ -170,8 +169,7 @@ export function SearchView() {
       <div className={cn('frame:flex frame:min-h-0 frame:flex-1', sidebarOpen && sideBySide && 'flex items-start gap-4 frame:items-stretch')}>
         {!sideBySide && <FilterSheet open={sheetOpen} onOpenChange={setSheetOpen} list={resultsColumn}>{sidebar}</FilterSheet>}
         <div ref={setResultsColumn} className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0">
-          {/* Keyed by search, so each starts on its first page. */}
-          <SearchResults searchId={search.jobId ?? null} results={search.results} onAdd={setAdding} toolbarSlot={toolbarSlot} pageBarSlot={pageBarSlot} filters={filters} onFilterChange={setFilter} />
+          <SearchResults searchId={search.jobId ?? null} results={search.results} onAdd={setAdding} toolbarSlot={toolbarSlot} filters={filters} onFilterChange={setFilter} />
           {search.results.length === 0 && search.searched && !search.running && <p className="py-8 text-center text-sm text-muted-foreground">{t('Nothing found')}</p>}
         </div>
         {sidebarOpen && sideBySide && (
@@ -183,9 +181,6 @@ export function SearchView() {
           </aside>
         )}
       </div>
-
-      {/* The results' pages bar, below the sidebar too, as on the torrent list. */}
-      <div ref={setPageBarSlot} className="mt-auto shrink-0 empty:hidden" />
 
       <SearchPluginsDialog open={pluginsOpen} onOpenChange={setPluginsOpen} />
 

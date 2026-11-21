@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { NativeSelect } from '@/components/NativeSelect'
 import { PageBoundary } from '@/components/PageBoundary'
 import { PageHeader } from '@/components/PageHeader'
 import { useCategories, useDeleteTorrents, usePauseTorrents, useResumeTorrents, useSessionPausedWarning, useTags, useTorrents, useTrackerMap } from '@/hooks/useApi'
@@ -11,13 +9,11 @@ import { useRowPress, type RowProps } from '@/hooks/useRowPress'
 import { revealRow } from '@/hooks/useRowWindow'
 import { useSelection } from '@/hooks/useSelection'
 import { useTorrentList } from '@/hooks/useTorrentList'
-import { PAGE_SIZES } from '@/lib/listSettings'
+import { useGrowingList } from '@/hooks/useGrowingList'
 import { chosenCount, SIDEBAR_COLUMNS } from '@/lib/torrentFilters'
 import { loadFilterViews, type FilterView } from '@/lib/filterViews'
 import { announce } from '@/lib/announce'
 import { inFrame, pageScroller, ROOM_FOR_HEADER_SEARCH, ROOM_FOR_SIDEBAR, WIDE } from '@/lib/pageScroll'
-import { holdWheel } from '@/lib/holdWheel'
-import { PAGE_BAR_BELOW_TABLE, PAGE_BAR_IN_TABLE } from '@/lib/listSettings'
 import { loadBarActions, saveBarActions } from '@/lib/actionBar'
 import { toast } from '@/hooks/use-toast'
 import { getColumn, loadColumnLayout, saveColumnLayout, TORRENT_FILTER_COLUMNS, type ColumnLayout } from '@/lib/torrentColumns'
@@ -68,7 +64,10 @@ export function TorrentsView() {
   useEffect(() => { if (!framed && list.showTable) pageScroller().scrollTo(0, 0) }, [framed, list.showTable])
   const mouse = useMediaQuery('(pointer: fine)')
 
-  const selection = useSelection(list.rows.map(t => t.hash))
+  const selection = useSelection(list.matching.map(t => t.hash))
+  // The table draws only the rows in view; the cards draw in batches as the list scrolls.
+  const growing = useGrowingList(list.matching, list.restarts)
+  const rows = list.showTable ? list.matching : growing.shown
   const [filtersOpen, setFiltersOpen] = useState(false)
   // The search bar over the list on phones.
   const [searchOpen, setSearchOpen] = useState(false)
@@ -227,17 +226,19 @@ export function TorrentsView() {
   const toggleBox = (hash: string, range: boolean) => (range ? selection.extendTo(hash) : selection.toggle(hash))
 
   // Only one row is a Tab stop; the arrow keys move between rows, like in a file manager.
-  const tabStop = list.rows.some(t => t.hash === focusHash) ? focusHash : list.rows[0]?.hash
+  const tabStop = rows.some(t => t.hash === focusHash) ? focusHash : rows[0]?.hash
   const onRowKey = (event: ReactKeyboardEvent<HTMLElement>, torrent: Torrent) => {
     if (event.target !== event.currentTarget) return
-    const index = list.rows.findIndex(t => t.hash === torrent.hash)
-    const moves: Record<string, number> = { ArrowDown: index + 1, ArrowUp: index - 1, Home: 0, End: list.rows.length - 1 }
+    const index = rows.findIndex(t => t.hash === torrent.hash)
+    const moves: Record<string, number> = { ArrowDown: index + 1, ArrowUp: index - 1, Home: 0, End: list.matching.length - 1 }
     if (event.key in moves) {
       event.preventDefault()
-      const next = list.rows[Math.max(0, Math.min(list.rows.length - 1, moves[event.key]))]
+      const target = Math.max(0, Math.min(list.matching.length - 1, moves[event.key]))
+      if (!list.showTable) growing.showUpTo(target)
+      const next = list.matching[target]
       if (!next) return
       // A long list may not have drawn that row yet (Home, End).
-      revealRow(list.rows.indexOf(next), next.hash, row => row.focus())
+      revealRow(target, next.hash, row => row.focus())
       // Shift extends the selection, Ctrl or Cmd only moves, and a plain arrow selects the row,
       // following with the details when they're open.
       if (event.shiftKey) selection.extendTo(next.hash)
@@ -372,28 +373,6 @@ export function TorrentsView() {
   )
 
 
-  // Its text starts at the inside of the checkboxes' border, and its arrows end as far from the
-  // other side: in the table, in the cards (10px in from their border), or below them.
-  // The page size and pages, always in view below the list: below the cards or rows that scroll in
-  // the frame, at the bottom of the table, or kept above the tab bar below the cards.
-  const pageBar = list.matching.length > 0 ? (
-    <div className="flex items-center justify-between gap-2">
-      <label className="flex items-center gap-2 text-xs text-muted-foreground">
-        {t('Show')}
-        <NativeSelect className="h-7 text-xs text-foreground" value={list.pageSize} onChange={(e) => list.setPageSize(Number(e.target.value))}>
-          {PAGE_SIZES.map(size => <option key={size} value={size}>{size}</option>)}
-        </NativeSelect>
-        {t('per page')}
-      </label>
-      {list.pageCount > 1 && (
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon-xs" className="size-7 shadow-none" aria-label={t('Previous page')} disabled={list.page === 1} onClick={() => list.setPage(list.page - 1)}><ChevronLeft className="size-3.5 rtl:rotate-180" /></Button>
-          <span className="text-xs tabular-nums">{list.page} / {list.pageCount}</span>
-          <Button variant="outline" size="icon-xs" className="size-7 shadow-none" aria-label={t('Next page')} disabled={list.page === list.pageCount} onClick={() => list.setPage(list.page + 1)}><ChevronRight className="size-3.5 rtl:rotate-180" /></Button>
-        </div>
-      )}
-    </div>
-  ) : null
 
   return (
     // In the frame (wide screens) the page fills the window above the details panel: only the
@@ -414,7 +393,7 @@ export function TorrentsView() {
           </div>
         ) : list.showTable ? (
           <TorrentTable
-            torrents={list.rows}
+            torrents={rows}
             layout={columns}
             onLayoutChange={changeColumns}
             onResetSort={list.resetSort}
@@ -437,14 +416,14 @@ export function TorrentsView() {
               choices: (id) => <FilterChoices list={list} listKey={SIDEBAR_COLUMNS[id]} categories={categories ?? {}} tags={tags ?? []} />,
             }}
             onColumnFilter={list.setColumnFilter}
-            footer={framed ? null : <div className={PAGE_BAR_IN_TABLE}>{pageBar}</div>}
           />
         ) : (
           // Scrolled on their own in the frame, with room for a card's focus ring. Placed, so the
           // cards' hidden labels are placed in it, not in the page, which they'd make scroll.
-          <div className="relative frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1">
+          // Below the last card, room for Safari's toolbar, which grows at the end of the page.
+          <div className="relative mb-[var(--toolbar-room,0px)] frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1">
             <TorrentCards
-              torrents={list.rows}
+              torrents={rows}
               selected={selection.selected}
               showCheckboxes={mouse || count > 0}
               onToggle={toggleBox}
@@ -452,10 +431,9 @@ export function TorrentsView() {
               rowProps={rowProps}
               wrapList={withMenu}
             />
+            {growing.endMarker}
           </div>
         )}
-        {/* After the last card, outside the frame, as wide as the cards. */}
-        {!framed && !list.showTable && pageBar && <div data-list-edge className="glass-bar mb-[var(--toolbar-room,0px)] rounded-xl border px-[calc(0.625rem+1px)] py-1.5 max-sm:-mx-2">{pageBar}</div>}
 
         </div>
         {filtersOpen && sideBySide && (
@@ -468,10 +446,6 @@ export function TorrentsView() {
         )}
       </div>
 
-      {/* At the window's bottom even below a short list, level with the sidebar's Logout. Below the
-          filters too, so its arrows stay at the page's end with the filters open, and the filters
-          end where the list does. */}
-      {framed && pageBar && <div ref={holdWheel} className={cn('mt-auto shrink-0', list.showTable ? PAGE_BAR_BELOW_TABLE : 'px-[calc(0.625rem+2px)]')}>{pageBar}</div>}
 
       {/* Keeps the last cards clear of the selection bar at the bottom; the table goes under it. */}
       {phoneBar && !list.showTable && <div aria-hidden className="h-14" />}

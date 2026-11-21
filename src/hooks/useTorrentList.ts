@@ -7,13 +7,10 @@ import { activeCount, applyColumnFilters, loadColumnFilters, saveColumnFilters, 
 import { countFilterOptions, cycleChoice, excludeChoice, filterTorrents, searchTorrents, withoutSidebarColumns, groupTrackersByHost, hasSidebarFilters, NO_FILTERS, type FilterList, type TorrentFilters } from '@/lib/torrentFilters'
 import type { Torrent } from '@/types'
 
-// Matches --breakpoint-md in index.css.
-
-
 const COLUMN_FILTERS_TABLE = 'torrents'
 
-// Everything about how the torrent list is narrowed, ordered, split into pages, and shown.
-// The sort, view, page size, and column filters, which show as chips, are remembered on this device;
+// Everything about how the torrent list is narrowed, ordered, and shown.
+// The sort, view, and column filters, which show as chips, are remembered on this device;
 // the other filters start cleared on each visit.
 export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, string[]> | undefined) {
   const [saved] = useState(loadListSettings)
@@ -27,8 +24,9 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
   // but not on first load in the default order or after a reset.
   const [sortShown, setSortShown] = useState(saved.sortField !== DEFAULT_LIST_SETTINGS.sortField || saved.sortDirection !== DEFAULT_LIST_SETTINGS.sortDirection)
   const [view, setView] = useState<ListView>(saved.view)
-  const [pageSize, setPageSize] = useState(saved.pageSize)
-  const [requestedPage, setRequestedPage] = useState(1)
+  // Counts each new filter, search or sort, so a long list of cards starts again from its top.
+  const [restarts, setRestarts] = useState(0)
+  const restart = () => setRestarts(n => n + 1)
   const roomy = useMediaQuery(ROOM_FOR_TABLE)
 
   // The draft becomes the search after a pause in typing.
@@ -36,14 +34,14 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
     if (draft === query) return
     const timer = setTimeout(() => {
       setQuery(draft)
-      setRequestedPage(1)
+      setRestarts(n => n + 1)
     }, 500)
     return () => clearTimeout(timer)
   }, [draft, query])
 
   useEffect(() => {
-    saveListSettings({ sortField: sort.field, sortDirection: sort.direction, view, pageSize })
-  }, [sort, view, pageSize])
+    saveListSettings({ sortField: sort.field, sortDirection: sort.direction, view })
+  }, [sort, view])
   useEffect(() => { saveColumnFilters(COLUMN_FILTERS_TABLE, filters.columns ?? {}) }, [filters.columns])
 
   const hosts = useMemo(() => groupTrackersByHost(trackerMap ?? {}), [trackerMap])
@@ -56,10 +54,6 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
       sign * (compareTorrents(a, b, sort.field) || compareTorrents(a, b, 'name')))
   }, [torrents, filters, query, hosts, sort])
 
-  const pageCount = Math.max(1, Math.ceil(matching.length / pageSize))
-  // The list can shrink under a later page, for example after deleting.
-  const page = Math.min(requestedPage, pageCount)
-
   return {
     filters,
     query,
@@ -68,51 +62,51 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
     // Searches for what's typed now, without waiting for the pause.
     searchNow: () => {
       setQuery(draft)
-      setRequestedPage(1)
+      restart()
     },
     // Sets both at once, for emptying the search.
     setQuery: (text: string) => {
       setDraft(text)
       setQuery(text)
-      setRequestedPage(1)
+      restart()
     },
     setFilter: <K extends keyof TorrentFilters>(key: K, value: TorrentFilters[K]) => {
       setFilters(current => ({ ...current, [key]: value }))
-      setRequestedPage(1)
+      restart()
     },
     // Picks a choice in the sidebar, or lets it go again.
     toggleFilter: (key: FilterList, value: string) => {
       setFilters(current => cycleChoice(current, key, value))
-      setRequestedPage(1)
+      restart()
     },
     // Hides the torrents a choice matches, or stops hiding them.
     excludeFilter: (key: FilterList, value: string) => {
       setFilters(current => excludeChoice(current, key, value))
-      setRequestedPage(1)
+      restart()
     },
     setColumnFilter: (id: string, filter: ColumnFilter | null) => {
       setFilters(current => ({ ...current, columns: withFilter(current.columns ?? {}, id, filter) }))
-      setRequestedPage(1)
+      restart()
     },
     // A saved view sets them all at once.
     applyFilters: (next: TorrentFilters) => {
       setFilters({ ...NO_FILTERS, ...next, columns: withoutSidebarColumns(next.columns) })
-      setRequestedPage(1)
+      restart()
     },
     clearFilters: () => {
       setDraft('')
       setQuery('')
       setFilters(NO_FILTERS)
-      setRequestedPage(1)
+      restart()
     },
     // The sidebar's choices only, keeping the column filters.
     clearSidebarFilters: () => {
       setFilters(current => ({ ...NO_FILTERS, columns: current.columns }))
-      setRequestedPage(1)
+      restart()
     },
     clearColumnFilters: () => {
       setFilters(current => ({ ...current, columns: {} }))
-      setRequestedPage(1)
+      restart()
     },
     sidebarFiltered: hasSidebarFilters(filters),
     columnFiltered: activeCount(filters.columns) > 0,
@@ -129,27 +123,19 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
     sortBy: (field: SortField) => {
       setSort(current => (!sortShown && current.field === field ? current : { field, direction: current.field === field && current.direction === 'asc' ? 'desc' : 'asc' }))
       setSortShown(true)
-      setRequestedPage(1)
+      restart()
     },
     // Back to qBittorrent's queue order, as on first use.
     resetSort: () => {
       setSort({ field: DEFAULT_LIST_SETTINGS.sortField, direction: DEFAULT_LIST_SETTINGS.sortDirection })
       setSortShown(false)
-      setRequestedPage(1)
+      restart()
     },
     // 'auto' follows the screen: the table where it fits, cards on phones.
     showTable: view === 'table' || (view === 'auto' && roomy),
     showAsTable: (table: boolean) => setView(table === roomy ? 'auto' : table ? 'table' : 'cards'),
     matching,
-    rows: matching.slice((page - 1) * pageSize, page * pageSize),
-    page,
-    pageCount,
-    setPage: setRequestedPage,
-    pageSize,
-    setPageSize: (size: number) => {
-      setPageSize(size)
-      setRequestedPage(1)
-    },
+    restarts,
   }
 }
 

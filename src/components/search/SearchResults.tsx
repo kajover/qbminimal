@@ -1,10 +1,9 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { inFrame, pageScroller, ROOM_FOR_TABLE, WIDE } from '@/lib/pageScroll'
-import { holdWheel } from '@/lib/holdWheel'
-import { loadSearchPageSize, PAGE_BAR_BELOW_TABLE, PAGE_BAR_IN_TABLE, PAGE_SIZES, saveSearchPageSize } from '@/lib/listSettings'
-import { NativeSelect } from '@/components/NativeSelect'
+import { useGrowingList } from '@/hooks/useGrowingList'
+import { useRowWindow } from '@/hooks/useRowWindow'
 import { createPortal } from 'react-dom'
-import { ArrowDown, ArrowUp, ArrowUpDown, CircleCheck, Columns3, RotateCcw, ChevronLeft, ChevronRight, Download, ExternalLink, LayoutList, Table2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, CircleCheck, Columns3, RotateCcw, Download, ExternalLink, LayoutList, Table2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ColumnFilterButton, type FilterTarget } from '@/components/ColumnFilters'
@@ -72,8 +71,8 @@ function AddedMark() {
 
 // Found torrents, sortable, 50 a page unless chosen otherwise: a table on wide screens and a list on phones.
 
-export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSlot, filters, onFilterChange }: {
-  // The search shown: another one starts again at the first page, sorted by seeds.
+export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, onFilterChange }: {
+  // The search shown: another one starts again at the top, sorted by seeds.
   searchId: number | null
   results: SearchResult[]
   onAdd: (result: SearchResult) => void
@@ -82,24 +81,22 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
   onFilterChange: (id: string, filter: ColumnFilter | null) => void
   // Where the filter, columns or sort, and view buttons go: the page header's button row.
   toolbarSlot?: HTMLElement | null
-  // Where the pages bar goes in the frame: below the sidebar too, so its arrows stay at the page's end.
-  pageBarSlot?: HTMLElement | null
 }) {
   // Each search starts with the most seeds first; a sort picked here lasts for this search.
   const [sort, setSort] = useState<SearchSort>(DEFAULT_SEARCH_SORT)
   // The sort shows in the titles once one is picked, but not in the default order (most seeds
   // first) before that, nor after a reset.
   const [sortShown, setSortShown] = useState(false)
-  const [page, setPage] = useState(1)
-  const [perPage, setPerPageState] = useState(loadSearchPageSize)
-  const setPerPage = (size: number) => { saveSearchPageSize(size); setPerPageState(size); setPage(1) }
+  // Counts each new search, sort or filter, so the cards start again from their top.
+  const [restarts, setRestarts] = useState(0)
+  const restart = () => setRestarts(n => n + 1)
   // Reset here rather than by drawing the table anew, which made it flash between searches.
   const [shownSearch, setShownSearch] = useState(searchId)
   if (searchId !== shownSearch) {
     setShownSearch(searchId)
     setSort(DEFAULT_SEARCH_SORT)
     setSortShown(false)
-    setPage(1)
+    restart()
   }
   const [widths, setWidths] = useState(loadSearchWidths)
   const [hidden, setHiddenState] = useState(loadSearchHidden)
@@ -187,7 +184,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
   )
   const setFilter = (id: string, filter: ColumnFilter | null) => {
     onFilterChange(id, filter)
-    setPage(1)
+    restart()
   }
   const targets = useMemo(() => new Map(searchFilterTargets(results).map((target): [string, FilterTarget] => [target.id, target])), [results])
 
@@ -201,17 +198,17 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
     })
   }, [results, sort, filters])
 
-  const pages = Math.max(1, Math.ceil(sorted.length / perPage))
-  const current = Math.min(page, pages)
-  const shown = sorted.slice((current - 1) * perPage, current * perPage)
+  // The table draws only the rows in view; the cards draw in batches as the list scrolls.
+  const rows = useRowWindow(scroller, showTable ? sorted.length : 0)
+  const growing = useGrowingList(sorted, restarts)
   // Numbers start with the largest first, text from A.
   // A first pick of the default column, while its order isn't shown yet, shows it as it is.
   const sortBy = (key: SortKey) => {
     if (sortShown || sort.key !== key) setSort({ key, desc: sort.key === key ? !sort.desc : COLUMNS.find(c => c.key === key)?.numeric ?? false })
     setSortShown(true)
-    setPage(1)
+    restart()
   }
-  const resetSort = () => { setSort(DEFAULT_SEARCH_SORT); setSortShown(false); setPage(1) }
+  const resetSort = () => { setSort(DEFAULT_SEARCH_SORT); setSortShown(false); restart() }
   const marked = (key: SortKey) => sortShown && sort.key === key
 
   const sortLabel = COLUMNS.find(c => c.key === sort.key)?.label ?? ''
@@ -299,30 +296,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
     </>
   )
 
-  // Its text and arrows line up with the first column's text: in the table, in the cards (12px in
-  // from their border), or below them, past the border.
-  // The page size and pages, always in view below the results: below what scrolls in the frame, at the
-  // bottom of the table, or kept above the tab bar below the cards.
-  const pageBar = sorted.length > 0 ? (
-    <div className="flex items-center justify-between gap-2 text-xs">
-      <label className="flex items-center gap-2 text-muted-foreground">
-        {t('Show')}
-        <NativeSelect className="h-7 text-xs text-foreground" value={perPage} onChange={(e) => setPerPage(Number(e.target.value))}>
-          {PAGE_SIZES.map(size => <option key={size} value={size}>{size}</option>)}
-        </NativeSelect>
-        {t('per page')}
-      </label>
-      {pages > 1 && (
-        <span className="flex items-center gap-2">
-          <Button variant="outline" size="icon-xs" className="size-7 shadow-none" aria-label={t('Previous page')} disabled={current === 1} onClick={() => setPage(current - 1)}><ChevronLeft className="size-3.5 rtl:rotate-180" /></Button>
-          <span className="tabular-nums">{current} / {pages}</span>
-          <Button variant="outline" size="icon-xs" className="size-7 shadow-none" aria-label={t('Next page')} disabled={current === pages} onClick={() => setPage(current + 1)}><ChevronRight className="size-3.5 rtl:rotate-180" /></Button>
-        </span>
-      )}
-    </div>
-  ) : null
 
-  const placed = (bar: ReactNode) => (pageBarSlot ? createPortal(bar, pageBarSlot) : bar)
   const placedToolbar = toolbarSlot ? createPortal(toolbar, toolbarSlot) : <div className="flex justify-end gap-1">{toolbar}</div>
   // Before a search, only the buttons.
   if (results.length === 0) return placedToolbar
@@ -389,7 +363,9 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
           <table className="table-fixed text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
             {colgroup}
             <tbody>
-              {shown.map(result => (
+              {/* Space for the rows above and below those drawn, so the scrollbar is as for all of them. */}
+              {rows.before > 0 && <tr aria-hidden style={{ height: rows.before }} />}
+              {sorted.slice(rows.start, rows.end).map(result => (
                 // Only its add button asks to add it, so a click to read or select a name doesn't.
                 <tr key={`${result.fileUrl}|${result.descrLink}`} className="border-b last:border-0 hover:bg-muted/50">
                   {visible.map(c => (
@@ -403,19 +379,18 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
                   <td aria-hidden />
                 </tr>
               ))}
+              {rows.after > 0 && <tr aria-hidden style={{ height: rows.after }} />}
             </tbody>
           </table>
         </div>
-        {/* Below the rows, so it stays in view while they scroll. */}
-        {!framed && pageBar && <div className={cn('shrink-0 border-t', PAGE_BAR_IN_TABLE)}>{pageBar}</div>}
       </div>
 
       {/* Laid out like the torrent cards: a grid on wide screens. */}
       {/* Scrolled on their own in the frame, with room for a card's focus ring. Placed, so hidden
           labels in the cards are placed in it, not in the page, which they'd make scroll. */}
-      <div className={cn('relative frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1', showTable && 'hidden')}>
+      <div className={cn('relative mb-[var(--toolbar-room,0px)] frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1', showTable && 'hidden')}>
       <ul data-list-edge className="grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3">
-        {shown.map(result => (
+        {(showTable ? [] : growing.shown).map(result => (
           <li key={`${result.fileUrl}|${result.descrLink}`} className="flex items-start gap-2 rounded-xl border bg-card px-3 py-2.5">
             <button type="button" className="min-w-0 flex-1 text-start" onClick={() => result.fileUrl && onAdd(result)}>
               <span className="block text-xs text-muted-foreground">{t('{seeds} seeds · {leeches} leeches', { seeds: result.nbSeeders, leeches: result.nbLeechers })}</span>
@@ -428,11 +403,8 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
           </li>
         ))}
       </ul>
+      {!showTable && growing.endMarker}
       </div>
-      {/* At the window's bottom even below a short list, level with the sidebar's Logout. */}
-      {framed && pageBar && placed(<div ref={holdWheel} className={cn('mt-auto shrink-0', showTable ? PAGE_BAR_BELOW_TABLE : 'px-[calc(0.75rem+1px)]')}>{pageBar}</div>)}
-      {/* After the last result, outside the frame, as wide as the cards. */}
-      {!framed && !showTable && pageBar && <div data-list-edge className="glass-bar mb-[var(--toolbar-room,0px)] rounded-xl border px-3 py-1.5 max-sm:-mx-2">{pageBar}</div>}
 
     </div>
   )

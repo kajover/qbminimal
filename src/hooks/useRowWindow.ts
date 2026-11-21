@@ -17,7 +17,7 @@ export function useRowWindow(scroller: RefObject<HTMLElement | null>, count: num
     if (!box || !windowed) return
     const measure = () => {
       // A drawn row, not the space standing in for the rows above.
-      const row = box.querySelector('tbody tr[data-hash]')?.getBoundingClientRect().height || ROW_HEIGHT
+      const row = box.querySelector('tbody tr:not([aria-hidden])')?.getBoundingClientRect().height || ROW_HEIGHT
       // Kept in whole rows, so scrolling within a row draws nothing again.
       setView(current => {
         const next = { top: Math.floor(box.scrollTop / row) * row, height: box.clientHeight, row }
@@ -42,13 +42,14 @@ export function useRowWindow(scroller: RefObject<HTMLElement | null>, count: num
 }
 
 // Brings a row that may not be drawn yet into view, then hands it over once it is.
-export function revealRow(index: number, hash: string, then: (row: HTMLElement) => void) {
+export function revealRow(index: number, hash: string, then: (row: HTMLElement) => void): void {
   const found = () => document.querySelector<HTMLElement>(`[data-hash="${hash}"]`)
   const row = found()
   if (row) return then(row)
   const box = document.querySelector<HTMLElement>('[data-row-scroller]')
   const height = document.querySelector('tbody tr[data-hash]')?.getBoundingClientRect().height || ROW_HEIGHT
-  if (!box) return
+  // Cards have no row window: they're drawn in a moment when the list grows to them.
+  if (!box) { requestAnimationFrame(() => requestAnimationFrame(() => { const next = found(); if (next) then(next) })); return }
   box.scrollTop = index * height
   // Drawn after the scroll has been measured and the rows redrawn.
   requestAnimationFrame(() => requestAnimationFrame(() => { const next = found(); if (next) then(next) }))

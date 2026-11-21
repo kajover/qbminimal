@@ -327,13 +327,13 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
           <div ref={sidebarBox} className={cn('relative z-35 hidden h-full shrink-0', menuBar && 'wide:flex')}>
             {/* The header's room at the start, so the pages line up under the menu button. */}
             {sidebarShown && (
-              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto pt-2 pe-2 pb-3 ps-[calc(1rem+var(--page-scrollbar,0px))]">
+              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto pt-2 pe-2 pb-4 ps-[calc(1rem+var(--page-scrollbar,0px))]">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{MAIN_PAGES.map(navButton)}</nav>
                 <div className="mt-2 flex flex-col gap-1 border-t pt-2">
                   {EXTRA_PAGES.map(navButton)}
                 </div>
-                {/* At the bottom and quieter, apart from the pages. The sidebar's bottom room puts its
-                    text on the same line as that of the pages bar below Torrents and Search. */}
+                {/* At the bottom and quieter, apart from the pages. The sidebar's bottom room, the page's,
+                    puts its bottom edge level with the end of the lists on Torrents and Search. */}
                 <Button variant="ghost" className="mt-auto w-full justify-start gap-2 overflow-hidden text-muted-foreground" onClick={() => void signOut()}>
                   <LogOut className="size-4" />
                   <span className="truncate">{t('Logout')}</span>

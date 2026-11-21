@@ -3,7 +3,7 @@ import { DEFAULT_LIST_SETTINGS, parseListSettings } from './listSettings'
 
 describe('parseListSettings', () => {
   it('reads saved settings', () => {
-    const saved = { sortField: 'added_on', sortDirection: 'desc', view: 'table', pageSize: 100 }
+    const saved = { sortField: 'added_on', sortDirection: 'desc', view: 'table' }
     expect(parseListSettings(JSON.stringify({ ...saved, version: 2 }))).toEqual(saved)
   })
 
@@ -15,12 +15,6 @@ describe('parseListSettings', () => {
     expect(DEFAULT_LIST_SETTINGS.sortField).toBe('priority')
     const older = parseListSettings(JSON.stringify({ sortField: 'name', sortDirection: 'desc', view: 'cards' }))
     expect(older).toMatchObject({ sortField: 'priority', sortDirection: 'asc', view: 'cards' })
-  })
-
-  it('shows 50 a page, also where the old default of 20 was saved, keeping a size chosen since', () => {
-    expect(DEFAULT_LIST_SETTINGS.pageSize).toBe(50)
-    expect(parseListSettings(JSON.stringify({ pageSize: 20, version: 2 })).pageSize).toBe(50)
-    expect(parseListSettings(JSON.stringify({ pageSize: 20, version: 3 })).pageSize).toBe(20)
   })
 
   it('uses defaults for missing, broken, or unknown values', () => {
