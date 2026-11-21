@@ -96,7 +96,7 @@ export function RSSView() {
                   : !feed ? note(t('No feeds yet. Add one with +.'))
                   : articlesQuery.isLoading ? note(t('Loading articles...'))
                   : articles.length === 0 ? note(needle ? t('No matching entries') : t('No articles'))
-                  : <ArticleList articles={articles} onOpened={a => { if (!a.isRead) void markRead(feed.path, a.id) }} onDownload={addTorrent} />}
+                  : <ArticleList articles={articles} feedNames={[feed.title, feed.path.split('\\').at(-1) ?? '']} onOpened={a => { if (!a.isRead) void markRead(feed.path, a.id) }} onDownload={addTorrent} />}
               </div>
             </>
           )}

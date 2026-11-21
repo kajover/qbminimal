@@ -15,7 +15,7 @@ import { useLogs, usePeerLog } from '@/hooks/useApi'
 import { t } from '@/i18n'
 import { parseLogMessage } from '@/lib/logDetails'
 import { buildLogText, formatLogTime, logFileName } from '@/lib/logExport'
-import { pageScroller } from '@/lib/pageScroll'
+import { FILL_BOTTOM, pageScroller } from '@/lib/pageScroll'
 import { readStored, writeStored } from '@/lib/storage'
 import { textScale } from '@/lib/textSize'
 
@@ -80,7 +80,8 @@ function useFitToScreen(box: RefObject<HTMLElement | null>): CSSProperties | und
     const measure = () => {
       // From the top of the page, wherever it's scrolled to, so scrolling doesn't change it.
       const top = el.getBoundingClientRect().top + pageScroller().scrollTop
-      const below = card.getBoundingClientRect().bottom - el.getBoundingClientRect().bottom + parseFloat(getComputedStyle(main).paddingBottom)
+      // The card reaches into the page's bottom padding as far as its (negative) margin says.
+      const below = card.getBoundingClientRect().bottom - el.getBoundingClientRect().bottom + parseFloat(getComputedStyle(main).paddingBottom) + parseFloat(getComputedStyle(card).marginBottom)
       setRoom(Math.ceil(top + below))
     }
     measure()
@@ -345,7 +346,8 @@ export function LogsView() {
   return (
     <div className="space-y-4">
       <PageHeader title={t('Logs')} />
-      <Card>
+      {/* It ends where the torrent table does on phones (see FILL_BOTTOM). */}
+      <Card className={FILL_BOTTOM}>
         <CardContent className="space-y-3">
           <div className="flex items-center gap-1">
             {/* The search keeps room to type in; on a phone the filter's label is cut short first. */}

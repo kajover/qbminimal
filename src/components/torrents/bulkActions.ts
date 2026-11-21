@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowDownToLine, ArrowLeftRight, ArrowUp, ArrowUpToLine, FileCheck, FileDown, Fingerprint, Folder, FolderInput, Gauge, List, ListOrdered, Magnet, Megaphone, MessageSquare, Rocket, Sprout, Tag, TagX, Type, WandSparkles, Zap, type LucideIcon } from 'lucide-react'
+import { ArrowDown, ArrowDownToLine, ArrowLeftRight, ArrowUp, ArrowUpToLine, FileCheck, FileDown, Fingerprint, Folder, FolderInput, Gauge, List, ListOrdered, Magnet, Megaphone, MessageSquare, Rocket, Sprout, Tag, Type, WandSparkles, Zap, type LucideIcon } from 'lucide-react'
 import { useApiFeature, useTorrentAction } from '@/hooks/useApi'
 import { toast } from '@/hooks/use-toast'
 import { getTorrentExportUrl, qbitClient } from '@/lib/api'
@@ -7,7 +7,7 @@ import type { Torrent } from '@/types'
 import { t } from '@/i18n'
 
 // Actions that need a value first open a small dialog.
-export type BulkPrompt = 'category' | 'addTags' | 'removeTags' | 'location' | 'limits' | 'shareLimits' | 'autoOn' | 'recheck' | 'queuePosition' | 'comment'
+export type BulkPrompt = 'category' | 'setTags' | 'location' | 'limits' | 'shareLimits' | 'autoOn' | 'recheck' | 'queuePosition' | 'comment'
 
 export interface MenuEntry {
   // Stable, for remembering which actions are pinned to the selection bar.
@@ -95,8 +95,7 @@ export function useBulkActions(torrents: Torrent[], ask: (prompt: BulkPrompt) =>
       name: 'Organize',
       entries: [
         prompt('category', t('Set category'), 'category', Folder),
-        prompt('addTags', t('Add tags'), 'addTags', Tag),
-        prompt('removeTags', t('Remove tags'), 'removeTags', TagX),
+        prompt('setTags', t('Set tags'), 'setTags', Tag),
         prompt('location', t('Move files'), 'location', FolderInput),
         prompt('limits', t('Speed limits'), 'limits', Gauge),
         prompt('shareLimits', t('Seeding limits'), 'shareLimits', Sprout),

@@ -24,7 +24,6 @@ import { Switch } from '@/components/ui/switch'
 import { setDisplayOption, useDisplayOption, type DisplayOption } from '@/lib/displayOptions'
 import { chosenTextSize, setTextSize, TEXT_SIZES, type TextSize } from '@/lib/textSize'
 import { changedLanguage, chosenLanguage, LANGUAGES, setLanguage, t, type LanguageChoice } from '@/i18n'
-import { FILL_PAGE } from '@/lib/pageScroll'
 
 // System is the default, so it comes first.
 const themeOptions: { value: Theme; label: string; icon: typeof Monitor }[] = [
@@ -227,7 +226,7 @@ function AppSection() {
           <OptionSwitch option="headerSpeeds" icon={Gauge} label={t('Speeds in the header')} />
           <OptionSwitch option="menuBar" icon={PanelLeft} label={t('Menu bar')} />
           {/* The tab bar is only on phones, and only with the menu bar, so the choice is too. */}
-          <OptionSwitch option="tabLabels" icon={Captions} label={t('Tab bar labels')} className={cn('md:hidden', !menuBar && 'hidden')} />
+          <OptionSwitch option="tabLabels" icon={Captions} label={t('Tab bar labels')} className={cn('wide:hidden', !menuBar && 'hidden')} />
         </CardContent>
       </Card>
 
@@ -336,7 +335,8 @@ function PreferencesSection({ sectionId, edits, setEdits }: { sectionId: string;
       ))}
 
       {(changeCount > 0 || invalid.length > 0) && (
-        <div className="glass sticky bottom-1 z-10 flex items-center justify-between gap-2 rounded-2xl p-3">
+        // Kept in view above the tab bar while the page scrolls.
+        <div className="glass sticky bottom-[calc(var(--bottom-nav-height,0px)+0.25rem)] z-10 flex items-center justify-between gap-2 rounded-2xl p-3">
           <span className="text-sm">{changeCount === 1 ? t('1 unsaved change') : t('{changeCount} unsaved changes', { changeCount })}</span>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setEdits(() => ({}))}><Undo2 />{t('Discard')}</Button>
@@ -353,7 +353,8 @@ export function SettingsView() {
   const [edits, setEdits] = useState<Record<string, unknown>>({})
 
   return (
-    <div className={FILL_PAGE}>
+    // The whole page scrolls, like the torrent cards, rather than a box that stops at the screen's bottom.
+    <div className="flex flex-col gap-4">
       <PageHeader title={t('Settings')} />
       {/* Narrow enough that all nine fit in two rows on a phone. */}
       <nav aria-label={t('Settings sections')} className="flex flex-wrap gap-0.5">
@@ -363,9 +364,7 @@ export function SettingsView() {
           </Button>
         ))}
       </nav>
-      {/* The section stops at the bottom of the screen and scrolls on its own, with room for the
-          cards' shadows and, on phones, their wider edges. */}
-      <div className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1 pb-1 max-sm:-mx-2 max-sm:px-2">
+      <div>
         {sectionId === 'app' ? <AppSection /> : <PreferencesSection sectionId={sectionId} edits={edits} setEdits={setEdits} />}
       </div>
     </div>

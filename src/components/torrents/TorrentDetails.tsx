@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { FolderTree, Info, RadioTower, SlidersHorizontal, Users, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog as DialogPrimitive } from 'radix-ui'
@@ -9,6 +9,8 @@ import { holdCursor } from '@/lib/dragCursor'
 import { readStored, writeStored } from '@/lib/storage'
 import { watchTorrentSpeeds } from '@/lib/speedHistory'
 import { cn } from '@/lib/utils'
+import { textWidth } from '@/components/TableColumns'
+import { textScale } from '@/lib/textSize'
 import type { Torrent } from '@/types'
 import { PeersTab } from './PeersTab'
 import { TorrentActions } from './TorrentActions'
@@ -43,6 +45,11 @@ function initialHeight() {
 // Everything about one torrent. The open tab is remembered, also for the next time details open,
 // and each tab's key is the hash, so its content starts fresh for another torrent.
 // `end` sits at the end of the tabs' row, for the close button.
+// On phones the open tab is as wide as the longest tab name needs (12px text, the 14px icon and its
+// 4px gap, 8px padding each side, a margin), so the others share the rest of the bar evenly and keep
+// their width whichever tab is open.
+const openTabWidth = () => Math.ceil(Math.max(...TABS.map(tab => textWidth(tab.label, 12 * textScale()))) + 14 + 4 + 16 + 4)
+
 function DetailsTabs({ torrent, listClassName, end, onDelete }: { torrent: Torrent; listClassName?: string; end?: ReactNode; onDelete?: () => void }) {
   // Its speeds are recorded while the details are open, whichever tab shows, for the Details graph.
   useEffect(() => watchTorrentSpeeds(torrent.hash), [torrent.hash])
@@ -60,12 +67,14 @@ function DetailsTabs({ torrent, listClassName, end, onDelete }: { torrent: Torre
     <Tabs value={tab} onValueChange={choose} className="min-h-0 flex-1">
       {/* The tabs take the row's whole width, apart from a gap before the close button. */}
       <div className="flex items-center gap-3">
-        <TabsList className={cn('flex min-w-0 flex-1', listClassName)}>
+        <TabsList className={cn('flex min-w-0 flex-1', listClassName)} style={{ '--open-tab': `${openTabWidth()}px` } as CSSProperties}>
           {/* Icons and names where there's room. On phones five names don't fit in every language,
-              so the tabs show their icons and only the open one its name too; the others' names
-              are still read out. */}
+              so the tabs show their icons and the open one its name too; the others' names are
+              still read out. There the open tab has one width for every tab, and the others share
+              the rest of the bar, which always reaches the close button: nothing changes size on a
+              switch. */}
           {TABS.map(({ id, label, icon: Icon }) => (
-            <TabsTrigger key={id} value={id} className="gap-1 px-2 text-xs transition-none max-sm:flex-auto sm:px-3">
+            <TabsTrigger key={id} value={id} className="gap-1 px-2 text-xs transition-none max-sm:data-[state=active]:w-(--open-tab) max-sm:data-[state=active]:flex-none sm:px-3">
               <Icon className="size-3.5" />
               <span className="max-sm:in-data-[state=inactive]:sr-only">{label}</span>
             </TabsTrigger>

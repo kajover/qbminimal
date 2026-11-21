@@ -1,13 +1,13 @@
 import { readStored, writeStored } from './storage'
 
 // The actions shown in the selection bar besides Start, Stop, More, and Delete, by their ids in
-// components/torrents/bulkActions, chosen apart for wide screens and phones, the same by default:
-// with icons only they fit a phone's bar too. Remembered on this device.
+// components/torrents/bulkActions, chosen apart for wide screens and phones, the same by default.
+// Those that don't fit where the bar is wait in More. Remembered on this device.
 export type BarKind = 'wide' | 'phone'
 
 export const DEFAULT_BAR_ACTIONS: Record<BarKind, string[]> = {
-  wide: ['forceStart', 'recheck', 'reannounce', 'category', 'addTags'],
-  phone: ['forceStart', 'recheck', 'reannounce', 'category', 'addTags'],
+  wide: ['forceStart', 'recheck', 'reannounce', 'category', 'setTags', 'limits', 'shareLimits', 'queueUp', 'queueDown'],
+  phone: ['forceStart', 'recheck', 'reannounce', 'category', 'setTags', 'limits', 'shareLimits', 'queueUp', 'queueDown'],
 }
 
 const storageKey = (kind: BarKind) => (kind === 'wide' ? 'qbminimal.actionBar' : 'qbminimal.actionBar.phone')
@@ -15,7 +15,8 @@ const storageKey = (kind: BarKind) => (kind === 'wide' ? 'qbminimal.actionBar' :
 export function loadBarActions(kind: BarKind): string[] {
   try {
     const parsed: unknown = JSON.parse(readStored(storageKey(kind)) ?? 'null')
-    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : DEFAULT_BAR_ACTIONS[kind]
+    // Add tags and Remove tags became one Set tags, in the place of the first of them.
+    return Array.isArray(parsed) ? [...new Set(parsed.filter((id): id is string => typeof id === 'string').map(id => (id === 'addTags' || id === 'removeTags' ? 'setTags' : id)))] : DEFAULT_BAR_ACTIONS[kind]
   } catch {
     return DEFAULT_BAR_ACTIONS[kind]
   }

@@ -3,11 +3,24 @@
 
 /* The theme switcher puts .dark on <html>. */
 @custom-variant dark (&:is(.dark *));
+/* The desktop layout (menu sidebar, docked details, the selection bar in the header): from 1200px,
+   and on a tablet held sideways from 1024px, like an iPad. `narrow` is everything else, with the
+   tab bar. Keep both in step with WIDE in src/lib/pageScroll.ts. */
+@custom-variant wide {
+  @media (min-width: 1200px), (min-width: 1024px) and (orientation: landscape) {
+    @slot;
+  }
+}
+@custom-variant narrow {
+  @media (max-width: 1023.98px), (max-width: 1199.98px) and (orientation: portrait) {
+    @slot;
+  }
+}
 /* The page's frame: the header on top, and only the area below it scrolling. On wide screens, and
    at any width where scrollbars take room (main.tsx marks the page), so the header always spans
    the window and its scrollbar starts below it. Phones keep scrolling the window (see Layout). */
 @custom-variant frame {
-  @media (min-width: 1200px) {
+  @media (min-width: 1200px), (min-width: 1024px) and (orientation: landscape) {
     @slot;
   }
   &:where(:root[data-scrollbars='room'] *) {
@@ -18,7 +31,7 @@
 /* The opposite of the frame: phones and narrow windows whose scrollbars take no room, where the
    window scrolls the page. */
 @custom-variant window-scroll {
-  @media (max-width: 1199.98px) {
+  @media (max-width: 1023.98px), (max-width: 1199.98px) and (orientation: portrait) {
     &:where(:root:not([data-scrollbars='room']) *) {
       @slot;
     }
@@ -69,8 +82,6 @@
 }
 
 @theme inline {
-  /* "md:" means 1200px and up: below that the phone layout with the tab bar is used. */
-  --breakpoint-md: 1200px;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -349,23 +360,12 @@
 .dark .glass-bar {
   background-color: color-mix(in oklab, var(--background) 62%, transparent);
 }
+/* Bars have no shadow, only the lit top edge. */
 .glass {
   border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.45),
-    0 10px 30px -12px rgb(0 0 0 / 0.35);
-}
-.dark .glass {
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.09),
-    0 10px 30px -12px rgb(0 0 0 / 0.7);
-}
-
-/* The tab bar keeps only the lit top edge, without a shadow below it. */
-.glass.glass-flat {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45);
 }
-.dark .glass.glass-flat {
+.dark .glass {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09);
 }
 
@@ -375,16 +375,6 @@
 .bottom-bar {
   position: fixed;
   bottom: var(--bar-bottom, 0px);
-}
-
-/* The phone's selection bar sits where the tab bar does, flat like it, without a shadow. */
-@media (max-width: 1199.98px) {
-  .glass.glass-flat-phone {
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45);
-  }
-  .dark .glass.glass-flat-phone {
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09);
-  }
 }
 
 /* Reduce Transparency, or more contrast, in the system settings: solid bars. */
@@ -423,14 +413,14 @@
     }
   }
 }
-@media (min-width: 1200px) { /* --breakpoint-md */
+@media (min-width: 1200px), (min-width: 1024px) and (orientation: landscape) { /* wide */
   :root {
     --bottom-nav-height: 0px;
   }
 }
 /* Phones without the tab bar (Settings > Menu bar off): the selection bar and the table's
    scrollbar take its place, as far from the screen's edge as the tab bar would be. */
-@media (max-width: 1199.98px) {
+@media (max-width: 1023.98px), (max-width: 1199.98px) and (orientation: portrait) {
   :root:not([data-menu-bar='on']) {
     --bottom-nav-height: var(--bottom-edge);
     --selection-bar-gap: 0px;

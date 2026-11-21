@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 export function PageHeader({ title, middle, middleWidth, actions, className, ref }: {
   title: ReactNode
   // Placed by the header: a function gets whether it went into the header bar.
-  middle?: ReactNode | ((inHeader: boolean) => ReactNode)
+  middle?: ReactNode | ((inHeader: boolean, centered: boolean) => ReactNode)
   // How wide `middle` needs to be. Below wide screens it goes into the header bar when that much
   // room is left between the title and the buttons.
   middleWidth?: number
@@ -26,6 +26,9 @@ export function PageHeader({ title, middle, middleWidth, actions, className, ref
   const [crowded, setCrowded] = useState(false)
   // The room between the title and the buttons, for `middle`.
   const [free, setFree] = useState(0)
+  // Whether `middle`, centred on the header bar, keeps clear of the title and the buttons. When it
+  // wouldn't, it's centred in the room between them instead.
+  const [centered, setCentered] = useState(true)
   useLayoutEffect(() => {
     const box = row.current
     const title = heading.current
@@ -36,6 +39,17 @@ export function PageHeader({ title, middle, middleWidth, actions, className, ref
       const room = box.clientWidth - (buttons.current?.offsetWidth ?? 0) - 2 * gap
       setCrowded(title.scrollWidth > room)
       setFree(room - title.scrollWidth)
+      const header = box.closest('header')?.getBoundingClientRect()
+      // The room left between the title and the buttons, from the title's end.
+      const start = title.getBoundingClientRect()
+      const end = buttons.current?.getBoundingClientRect()
+      if (header && middleWidth !== undefined) {
+        const rtl = getComputedStyle(box).direction === 'rtl'
+        const left = (rtl ? end?.right : start.right) ?? header.left
+        const right = (rtl ? start.left : end?.left) ?? header.right
+        const center = header.left + header.width / 2
+        setCentered(center - middleWidth / 2 >= left + gap && center + middleWidth / 2 <= right - gap)
+      }
     }
     // Again on the next frame, once the buttons have settled after a jump in the window's width.
     let frame = 0
@@ -47,14 +61,14 @@ export function PageHeader({ title, middle, middleWidth, actions, className, ref
     window.addEventListener('resize', remeasure)
     measure()
     return () => { observer.disconnect(); window.removeEventListener('resize', remeasure); cancelAnimationFrame(frame) }
-  }, [slot, title])
+  }, [slot, title, middleWidth])
   const setRow = (node: HTMLDivElement | null) => {
     row.current = node
     if (typeof ref === 'function') ref(node)
     else if (ref) (ref as { current: HTMLDivElement | null }).current = node
   }
   const inHeader = !!slot && (slot.whole || (middleWidth !== undefined && middleWidth <= free))
-  const place = (inBar: boolean) => (typeof middle === 'function' ? middle(inBar) : middle)
+  const place = (inBar: boolean) => (typeof middle === 'function' ? middle(inBar, centered) : middle)
   if (slot) {
     // Compact mode: the row goes up into the header bar, a little tighter. Where `middle` doesn't fit
     // there it stays in the page, since it places itself (the selection bar above the screen's
@@ -63,7 +77,7 @@ export function PageHeader({ title, middle, middleWidth, actions, className, ref
       <>
         {createPortal(
           // Tighter on phones, so the title keeps room beside the buttons.
-          <div ref={setRow} className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
+          <div ref={setRow} className="flex min-w-0 flex-1 items-center gap-2 wide:gap-3">
             {/* Just the title: the header has no room for a line below it. */}
             <h2 ref={heading} className={cn('min-w-0 shrink truncate text-lg font-semibold leading-tight', crowded && 'sr-only')}>{title}</h2>
             <div className="flex min-w-0 flex-1 justify-center">{inHeader && place(true)}</div>
@@ -83,7 +97,7 @@ export function PageHeader({ title, middle, middleWidth, actions, className, ref
       </div>
       {/* On phones its content places itself (for example fixed above the tab bar), so the wrapper
           takes no room in the row. */}
-      {middle && <div className="flex min-w-0 max-md:contents md:flex-1 md:justify-center">{place(false)}</div>}
+      {middle && <div className="flex min-w-0 narrow:contents wide:flex-1 wide:justify-center">{place(false)}</div>}
       {actions && <div className="flex shrink-0 items-center gap-1">{actions}</div>}
     </div>
   )

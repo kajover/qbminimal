@@ -17,8 +17,10 @@ export const NothingMatches = () => <li className="px-2 py-1 text-sm text-muted-
 
 // One choice: a tick box, its name and how many torrents it has, and for categories and tags a menu
 // to change or delete it. The menu shows on hover with a mouse, and always on touch screens.
-export function FilterItem({ label, icon: Icon, count, checked, excluded, onToggle, onExclude, muted, menu, single }: {
+export function FilterItem({ label, icon: Icon, count, checked, mixed, excluded, onToggle, onExclude, muted, menu, single }: {
   label: string; icon: LucideIcon; count?: number; checked: boolean; onToggle: (event: MouseEvent) => void; muted?: boolean; menu?: ReactNode
+  // Some of the torrents have it, not all: a dash, left as it is.
+  mixed?: boolean
   // Hidden: the torrents it matches are left out. Set with Ctrl or Cmd and a click, or a long press.
   excluded?: boolean
   onExclude?: () => void
@@ -30,16 +32,16 @@ export function FilterItem({ label, icon: Icon, count, checked, excluded, onTogg
   return (
     <li className={cn('group flex items-center rounded-md hover:bg-accent/60', single && checked && 'bg-secondary')}>
       <button
-        type="button" role={single ? undefined : 'checkbox'} aria-checked={single ? undefined : checked} aria-pressed={single ? checked : undefined}
+        type="button" role={single ? undefined : 'checkbox'} aria-checked={single ? undefined : mixed ? 'mixed' : checked} aria-pressed={single ? checked : undefined}
         title={onExclude ? t('Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.') : undefined}
         onClick={(e) => { if (!press.wasHeld()) onToggle(e) }}
         {...press.handlers}
         className="flex min-w-0 flex-1 touch-manipulation items-center gap-2 rounded-md px-2 py-1 text-start text-sm outline-hidden select-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         {!single && (
-          <span aria-hidden className={cn('flex size-4 shrink-0 items-center justify-center rounded-[4px] border', checked && 'border-primary bg-primary text-primary-foreground', excluded && 'border-destructive bg-destructive text-white')}>
+          <span aria-hidden className={cn('flex size-4 shrink-0 items-center justify-center rounded-[4px] border', (checked || mixed) && 'border-primary bg-primary text-primary-foreground', excluded && 'border-destructive bg-destructive text-white')}>
             {checked && <Check className="size-3" />}
-            {excluded && <Minus className="size-3" />}
+            {(excluded || mixed) && <Minus className="size-3" />}
           </span>
         )}
         <Icon aria-hidden className="size-4 shrink-0 text-muted-foreground" />

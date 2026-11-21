@@ -1,4 +1,5 @@
 import { Fragment, useState, type ComponentType, type ReactNode } from 'react'
+import { WIDE } from '@/lib/pageScroll'
 import { Check, CheckCheck, ChevronDown, ChevronRight, Copy, Eye, ListOrdered, MoreHorizontal, Pause, Pin, Play, Settings2, Trash2, X, type LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuTrigger } from '@/components/ui/context-menu'
@@ -128,7 +129,7 @@ function MenuBody({ kit, torrents, groups, onDetails, detailsHash, onStart, onSt
 // On the cards, which have no title row with a select-all box, it selects all or none too.
 export function MoreMenu({ onCustomize, cards, ...actions }: MenuActions & { onCustomize?: () => void; cards?: { onSelectAll?: () => void; onClear: () => void } }) {
   // On phones the menu rises from the selection bar, with a gap so the two don't run together.
-  const wide = useMediaQuery('(min-width: 1200px)')
+  const wide = useMediaQuery(WIDE)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

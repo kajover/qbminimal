@@ -19,8 +19,7 @@ import { t } from '@/i18n'
 
 const TITLES: Record<BulkPrompt, string> = {
   category: 'Set category',
-  addTags: 'Add tags',
-  removeTags: 'Remove tags',
+  setTags: 'Set tags',
   location: 'Move files',
   limits: 'Speed limits',
   shareLimits: 'Seeding limits',
@@ -38,9 +37,11 @@ const same = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivi
 
 // A searchable list to pick from: one choice for a category, any number for tags. A name typed
 // that isn't there yet can be created from the list's last row.
-function PickList({ options, picked, multiple, onPick, query, onQuery, createLabel, counts }: {
+function PickList({ options, picked, mixed = [], multiple, onPick, query, onQuery, createLabel, counts }: {
   options: { value: string; label: string }[]
   picked: string[]
+  // Choices some of the torrents have, left as they are: shown with a dash.
+  mixed?: string[]
   multiple?: boolean
   onPick: (value: string) => void
   query: string
@@ -58,7 +59,7 @@ function PickList({ options, picked, multiple, onPick, query, onQuery, createLab
       <SearchInput aria-label={t('Search')} placeholder={createLabel ? t('Search or type a new name') : t('Search')} autoFocus value={query} onValueChange={onQuery} />
       <ul className="max-h-64 space-y-px overflow-y-auto rounded-md border p-1">
         {shown.map(option => (
-          <FilterItem key={option.value} single={!multiple} icon={multiple ? TagIcon : Folder} label={option.label} muted={option.value === ''} count={counts?.get(option.value)} checked={picked.includes(option.value)} onToggle={() => onPick(option.value)} />
+          <FilterItem key={option.value} single={!multiple} icon={multiple ? TagIcon : Folder} label={option.label} muted={option.value === ''} count={counts?.get(option.value)} checked={picked.includes(option.value)} mixed={mixed.includes(option.value)} onToggle={() => onPick(option.value)} />
         ))}
         {canCreate && <FilterItem single icon={Plus} label={createLabel(wanted)} checked={false} onToggle={() => { onPick(wanted); onQuery('') }} />}
         {!shown.length && !canCreate && <li className="px-2 py-1 text-sm text-muted-foreground">{t('Nothing matches')}</li>}
@@ -92,12 +93,26 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
   const { data: categories } = useCategories()
   const { data: allTags } = useTags()
   const [query, setQuery] = useState('')
-  // Tags start empty; a category starts from the torrents' own when they share one.
-  const [picked, setPicked] = useState<string[]>(() => (prompt === 'category' && torrents.every(t => t.category === torrents[0]?.category) ? [torrents[0]?.category ?? ''] : []))
-  const pick = (value: string) => setPicked(prompt === 'category' ? [value] : picked.includes(value) ? picked.filter(v => v !== value) : [...picked, value])
-  // How many of the torrents have each tag, for removing them.
+  // How many of the torrents have each tag.
   const tagCounts = new Map<string, number>()
   for (const torrent of torrents) for (const tag of parseTags(torrent.tags)) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1)
+  // Tags start ticked where every torrent has them and with a dash where only some do; a category
+  // starts from the torrents' own when they share one.
+  const [picked, setPicked] = useState<string[]>(() => (prompt === 'category'
+    ? (torrents.every(t => t.category === torrents[0]?.category) ? [torrents[0]?.category ?? ''] : [])
+    : [...tagCounts].filter(([, n]) => n === torrents.length).map(([tag]) => tag)))
+  const [someHave] = useState(() => [...tagCounts].filter(([, n]) => n < torrents.length).map(([tag]) => tag))
+  const [mixed, setMixed] = useState(someHave)
+  // A dashed tag goes to all of them, then none, then back to as it was.
+  const pick = (value: string) => {
+    if (prompt === 'category') return setPicked([value])
+    if (mixed.includes(value)) {
+      setMixed(mixed.filter(v => v !== value))
+      setPicked([...picked, value])
+    } else if (picked.includes(value)) setPicked(picked.filter(v => v !== value))
+    else if (someHave.includes(value)) setMixed([...mixed, value])
+    else setPicked([...picked, value])
+  }
   const { data: allTorrents } = useTorrents()
   const queued = torrents.filter(torrent => torrent.priority > 0).sort((a, b) => a.priority - b.priority)
   const length = queueLength(allTorrents ?? [])
@@ -133,15 +148,17 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
           await qbitClient.setCategory(hashes, category)
         }, isNew ? t('Category created and set') : t('Category set'), t('Failed to set category'))
       }
-      case 'addTags':
-      case 'removeTags': {
-        // Names typed but not picked from the list count too.
-        const typed = prompt === 'addTags' ? parseTags(query) : parseTags(query).filter(tag => tagCounts.has(tag))
-        const tags = [...new Set([...picked, ...typed])]
-        if (!tags.length) return toast.error(prompt === 'addTags' ? t('Enter at least one tag') : t('Pick at least one tag'))
-        return prompt === 'addTags'
-          ? apply(() => qbitClient.addTags(hashes, tags), t('Tags added'), t('Failed to add tags'))
-          : apply(() => qbitClient.removeTags(hashes, tags), t('Tags removed'), t('Failed to remove tags'))
+      case 'setTags': {
+        // Names typed but not picked from the list count too. Ticked tags go on every torrent,
+        // unticked ones come off, and dashed ones stay as they are.
+        const wanted = [...new Set([...picked, ...parseTags(query)])]
+        const added = wanted.filter(tag => tagCounts.get(tag) !== torrents.length)
+        const removed = [...tagCounts.keys()].filter(tag => !wanted.includes(tag) && !mixed.includes(tag))
+        if (!added.length && !removed.length) return onClose()
+        return apply(async () => {
+          if (added.length) await qbitClient.addTags(hashes, added)
+          if (removed.length) await qbitClient.removeTags(hashes, removed)
+        }, t('Tags saved'), t('Failed to save tags'))
       }
       case 'comment':
         return apply(() => qbitClient.setComment(hashes, value.trim()), t('Comment saved'), t('Failed to save comment'))
@@ -200,20 +217,13 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
             createLabel={name => t('New category: {name}', { name })}
           />
         )}
-        {prompt === 'addTags' && (
+        {prompt === 'setTags' && (
+          // Every tag, with how many of these torrents have it.
           <PickList
             multiple
-            options={[...(allTags ?? [])].sort((a, b) => a.localeCompare(b)).map(name => ({ value: name, label: name }))}
-            picked={picked} onPick={pick} query={query} onQuery={setQuery} counts={tagCounts}
+            options={[...new Set([...(allTags ?? []), ...tagCounts.keys()])].sort((a, b) => a.localeCompare(b)).map(name => ({ value: name, label: name }))}
+            picked={picked} mixed={mixed} onPick={pick} query={query} onQuery={setQuery} counts={tagCounts}
             createLabel={name => t('New tag: {name}', { name })}
-          />
-        )}
-        {prompt === 'removeTags' && (
-          // Only the tags these torrents have, with how many of them have each.
-          <PickList
-            multiple
-            options={[...tagCounts.keys()].sort((a, b) => a.localeCompare(b)).map(name => ({ value: name, label: name }))}
-            picked={picked} onPick={pick} query={query} onQuery={setQuery} counts={tagCounts}
           />
         )}
         {prompt === 'comment' && <Textarea aria-label={t('Comment')} rows={6} autoFocus value={value} onChange={(e) => setValue(e.target.value)} className="text-sm" />}

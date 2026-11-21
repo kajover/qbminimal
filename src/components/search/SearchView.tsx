@@ -164,8 +164,9 @@ export function SearchView() {
       {/* A short field: the plugins and category are in the sidebar. Above it, so the sidebar
           starts where the results do. */}
       <form onSubmit={submit} className="flex max-w-xl shrink-0 items-center gap-2">
-        <SearchInput id="search-pattern" aria-label={t('Search for')} placeholder={t('Search')} value={pattern} onValueChange={setPattern} required className="min-w-0 flex-1" />
-        {/* While searching, the spinner turns into a stop button under the pointer. */}
+        <SearchInput id="search-pattern" aria-label={t('Search for')} placeholder={t('Search')} value={pattern} onValueChange={setPattern} required={!search.running} className="min-w-0 flex-1" />
+        {/* While searching, the spinner turns into a stop button under the pointer. It stops the
+            search even with the field emptied: the field is only required to start one. */}
         <Button type="submit" className="group" aria-label={search.running ? t('Stop search') : t('Search')} title={search.running ? t('Stop search') : t('Search')}>
           {search.running ? (
             <>

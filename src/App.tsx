@@ -13,7 +13,7 @@ import { useSession } from '@/hooks/useSession'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { hasIncoming, onIncoming } from '@/lib/incoming'
 import { registerServiceWorker } from '@/lib/notify'
-import { pageScroller } from '@/lib/pageScroll'
+import { pageScroller, WIDE } from '@/lib/pageScroll'
 import { t, useLanguage } from '@/i18n'
 
 // The torrent list and the Add page (whose form the list's + button opens too) ship in the main
@@ -88,7 +88,7 @@ function Screens({ onSettings }: { onSettings: boolean }) {
 }
 
 export default function App() {
-  const wide = useMediaQuery('(min-width: 1200px)')
+  const wide = useMediaQuery(WIDE)
   useEffect(registerServiceWorker, [])
   // A new language draws the pages again, without signing in again; they open on Settings, where
   // it was changed.

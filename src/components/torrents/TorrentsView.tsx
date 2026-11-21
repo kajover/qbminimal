@@ -15,7 +15,7 @@ import { PAGE_SIZES } from '@/lib/listSettings'
 import { chosenCount, SIDEBAR_COLUMNS } from '@/lib/torrentFilters'
 import { loadFilterViews, type FilterView } from '@/lib/filterViews'
 import { announce } from '@/lib/announce'
-import { inFrame, pageScroller, ROOM_FOR_HEADER_SEARCH, ROOM_FOR_SIDEBAR } from '@/lib/pageScroll'
+import { inFrame, pageScroller, ROOM_FOR_HEADER_SEARCH, ROOM_FOR_SIDEBAR, WIDE } from '@/lib/pageScroll'
 import { holdWheel } from '@/lib/holdWheel'
 import { PAGE_BAR_BELOW_TABLE, PAGE_BAR_IN_TABLE } from '@/lib/listSettings'
 import { loadBarActions, saveBarActions } from '@/lib/actionBar'
@@ -58,7 +58,7 @@ export function TorrentsView() {
   const resume = useResumeTorrents()
   const warnIfPaused = useSessionPausedWarning()
   const remove = useDeleteTorrents()
-  const wide = useMediaQuery('(min-width: 1200px)')
+  const wide = useMediaQuery(WIDE)
   // The filters beside the list, and the quick search in the header, wherever they fit.
   const sideBySide = useMediaQuery(ROOM_FOR_SIDEBAR)
   const headerSearch = useMediaQuery(ROOM_FOR_HEADER_SEARCH)
@@ -287,9 +287,10 @@ export function TorrentsView() {
   })
 
   const matchingSelected = list.matching.filter(t => selection.selected.has(t.hash)).length
-  const selectionBar = (inHeader: boolean) => count > 0 && (
+  const selectionBar = (inHeader: boolean, centered: boolean) => count > 0 && (
     <SelectionBar
       inHeader={inHeader}
+      centered={centered}
       onWidth={setBarWidth}
       onPlace={setBarInHeader}
       count={count}

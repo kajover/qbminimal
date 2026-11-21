@@ -137,6 +137,17 @@ describe('search', () => {
     expect(api.startSearch).toHaveBeenCalledTimes(1)
   })
 
+  it('stops a running search from the button after its text was deleted', async () => {
+    api.state.status = 'Running'
+    renderView()
+    await search()
+    const stop = await within(field().closest('form')!).findByRole('button', { name: 'Stop search' })
+    await userEvent.clear(field())
+    expect(field()).toBeValid()
+    await userEvent.click(stop)
+    expect(api.stopSearch).toHaveBeenCalledWith(1)
+  })
+
   it('stops a running search with Enter in the field', async () => {
     api.state.status = 'Running'
     renderView()

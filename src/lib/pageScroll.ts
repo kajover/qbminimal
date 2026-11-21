@@ -15,12 +15,17 @@ export function inFrame(wide: boolean): boolean {
 
 // A page as tall as the screen below the header, so its lists stop at the bottom and scroll on
 // their own instead of the page: the frame's height on wide screens, the window's below the
-// header and above the tab bar on phones.
-export const FILL_PAGE = 'flex flex-col gap-4 frame:h-full window-scroll:h-[calc(100dvh-var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))-var(--bottom-nav-height,0px)-2rem)]'
+// header on phones. There it ends where the torrent table does: just above the tab bar, or as far
+// from the screen's edge as the tab bar would be, reaching into the page's bottom padding.
+export const FILL_BOTTOM = 'window-scroll:-mb-[calc(1rem-var(--selection-bar-gap,0.25rem))]'
+export const FILL_PAGE = `flex flex-col gap-4 frame:h-full window-scroll:h-[calc(100dvh-var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))-var(--bottom-nav-height,0px)-var(--selection-bar-gap,0.25rem)-1rem)] ${FILL_BOTTOM}`
 
 // Desktop layouts wherever they fit, not only on wide screens: these parts span the page, so the
 // window's width tells their room. A table from a tablet up; the filters beside the list while it
 // keeps about 550px; the quick search field in the header where it fits beside the buttons.
+// The desktop layout: from 1200px, and on a tablet held sideways from 1024px. The same as the
+// `wide` variant in index.css.
+export const WIDE = '(min-width: 1200px), (min-width: 1024px) and (orientation: landscape)'
 export const ROOM_FOR_TABLE = '(min-width: 768px)'
 export const ROOM_FOR_SIDEBAR = '(min-width: 900px)'
 export const ROOM_FOR_HEADER_SEARCH = '(min-width: 768px)'

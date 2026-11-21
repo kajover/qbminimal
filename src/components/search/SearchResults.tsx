@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { inFrame, pageScroller, ROOM_FOR_TABLE } from '@/lib/pageScroll'
+import { inFrame, pageScroller, ROOM_FOR_TABLE, WIDE } from '@/lib/pageScroll'
 import { holdWheel } from '@/lib/holdWheel'
 import { PAGE_BAR_BELOW_TABLE, PAGE_BAR_IN_TABLE } from '@/lib/listSettings'
 import { createPortal } from 'react-dom'
@@ -110,7 +110,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, pageBarSl
   const shows = (key: ResizableKey) => !hidden.includes(key)
 
   // Like the torrent list: the table where it fits and cards on phones, unless one is picked.
-  const wide = useMediaQuery('(min-width: 1200px)')
+  const wide = useMediaQuery(WIDE)
   const roomy = useMediaQuery(ROOM_FOR_TABLE)
   const framed = inFrame(wide)
   const [view, setViewState] = useState(loadSearchView)
