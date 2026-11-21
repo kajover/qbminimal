@@ -212,9 +212,31 @@ function useDetailsPage(full: boolean) {
   }, [full])
 }
 
+// Following the finger: dragged up, the medium sheet grows from its bottom, so nothing shows below
+// it; dragged down, it moves down. Maximized, only down.
+function sheetStyle(large: boolean, top: number | undefined, offset: number | null): CSSProperties | undefined {
+  const up = offset !== null && offset < 0 ? offset : 0
+  const down = offset !== null && offset > 0 ? { translate: `0 ${offset}px` } : undefined
+  if (large) return down
+  if (top !== undefined) return { top: Math.max(top + up, 0), ...down }
+  return up ? { height: `calc(62dvh + ${-up}px)` } : down
+}
+
+// Where the medium sheet's top goes: in the gap just above the third card, measured from the top
+// of the page, so the first two cards show above it. Kept for the table view, which has no cards
+// to measure; without either, the sheet is 62% of the screen.
+let cardsTop: number | undefined
+function measureSheetTop(): number | undefined {
+  const third = document.querySelector('ul[data-list-edge] > li:nth-child(3)')
+  if (third) cardsTop = third.getBoundingClientRect().top + window.scrollY - 4
+  // Never so low that the sheet would be smaller than a third of the screen.
+  return cardsTop !== undefined && cardsTop < window.innerHeight * 0.66 ? cardsTop : undefined
+}
+
 export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProps) {
   useBackButtonClose(onClose)
   const [detent, setDetent] = useState<Detent>('medium')
+  const [sheetTop] = useState(measureSheetTop)
   const [offset, setOffset] = useState<number | null>(null)
   const drag = useRef<{ y: number; time: number } | null>(null)
 
@@ -265,11 +287,10 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
               // The screen's whole width, down to the window's bottom edge (above the tab bar where
               // there is one), with only its top rounded and bordered: Safari paints its toolbar
               // strip below in the sheet's colour, so the two run on as one.
-              : 'fixed inset-x-0 bottom-[calc(var(--bottom-nav-height,0px)+var(--selection-bar-gap,0.25rem)-var(--nav-gap,4px))] h-[62dvh] overflow-hidden rounded-t-xl border-x-0 border-b-0',
+              : cn('fixed inset-x-0 bottom-[calc(var(--bottom-nav-height,0px)+var(--selection-bar-gap,0.25rem)-var(--nav-gap,4px))] overflow-hidden rounded-t-xl border-x-0 border-b-0', sheetTop === undefined && 'h-[62dvh]'),
             offset === null && 'transition-[height,inset,border-radius,translate] duration-300 ease-out',
           )}
-          // Following the finger, a little stiffer upwards.
-          style={offset === null ? undefined : { translate: `0 ${offset > 0 ? offset : offset / 3}px` }}
+          style={sheetStyle(large, sheetTop, offset)}
         >
           <button
             type="button"
