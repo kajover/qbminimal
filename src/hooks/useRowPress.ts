@@ -20,6 +20,9 @@ export function useRowPress<T>({ onPress, onLongPress, onMenu }: RowPressHandler
   const press = useRef<{ timer: number; x: number; y: number } | null>(null)
   const touch = useRef(false)
   const held = useRef(false)
+  // A finger's tap acts when it lifts, not on the click Safari sends after it (which can lag while
+  // it waits for a double tap); that click is then skipped.
+  const tapped = useRef(false)
 
   const cancel = () => {
     if (press.current) window.clearTimeout(press.current.timer)
@@ -32,6 +35,7 @@ export function useRowPress<T>({ onPress, onLongPress, onMenu }: RowPressHandler
       cancel()
       touch.current = event.pointerType !== 'mouse'
       held.current = false
+      tapped.current = false
       if (!touch.current || (event.target as HTMLElement).closest(CONTROLS)) return
       // Keeps the context menu's own long-press from opening: on phones a hold selects instead.
       event.preventDefault()
@@ -47,10 +51,21 @@ export function useRowPress<T>({ onPress, onLongPress, onMenu }: RowPressHandler
       const start = press.current
       if (start && Math.hypot(event.clientX - start.x, event.clientY - start.y) > MOVE_TOLERANCE) cancel()
     },
-    onPointerUp: cancel,
+    onPointerUp: (event: PointerEvent) => {
+      // Still a tap: no hold, no scrolling, not on a control of its own.
+      const tap = !!press.current && touch.current
+      cancel()
+      if (!tap) return
+      tapped.current = true
+      onPress(event, item, true)
+    },
     onPointerCancel: cancel,
     onClick: (event: MouseEvent) => {
-      // The tap that ends a long press already did its work.
+      // The tap that ends a long press, or a finger's tap, already did its work.
+      if (tapped.current) {
+        tapped.current = false
+        return
+      }
       if (held.current) {
         held.current = false
         return
