@@ -198,18 +198,30 @@ function keepOpenForList(event: { target: EventTarget | null; preventDefault: ()
 // Maximized, the details are the page: the list steps aside (index.css hides <main>), so the
 // browser scrolls the details as it does the cards, under its own bars. Back at medium height the
 // list returns where it was.
+let listY = 0
 function useDetailsPage(full: boolean) {
   useLayoutEffect(() => {
     if (!full) return
     const root = document.documentElement
-    const y = window.scrollY
+    listY = window.scrollY
     root.dataset.detailsFull = ''
     window.scrollTo(0, 0)
     return () => {
+      showListBehind(false)
       delete root.dataset.detailsFull
-      window.scrollTo(0, y)
+      window.scrollTo(0, listY)
     }
   }, [full])
+}
+
+// While the maximized details are dragged down, the list shows again behind them where it was
+// left, moved by the window's scroll in the details, so nothing else moves.
+function showListBehind(show: boolean) {
+  const root = document.documentElement
+  const main = document.querySelector('main')
+  if (show) root.dataset.detailsPeek = ''
+  else delete root.dataset.detailsPeek
+  if (main) main.style.translate = show ? `0 ${window.scrollY - listY}px` : ''
 }
 
 // A finger pulling the details down where they can't scroll further up moves the sheet, as its
@@ -269,14 +281,19 @@ function useSwipeDown(sheet: RefObject<HTMLDivElement | null>, large: boolean, c
   }, [sheet, large])
 }
 
-// The sheet's place, and while a finger drags it: dragged up, the medium sheet grows from its
-// bottom, so nothing shows below it; dragged down, it moves down. Maximized, it only moves down.
-function sheetStyle(large: boolean, top: number | undefined, offset = 0): CSSProperties {
-  const up = Math.min(offset, 0)
-  const translate = offset > 0 ? `0 ${offset}px` : ''
-  if (large) return { translate }
-  if (top !== undefined) return { top: `${Math.max(top + up, 0)}px`, height: '', translate }
-  return { top: '', height: up ? `calc(62dvh + ${-up}px)` : '', translate }
+// The sheet's place at rest.
+function sheetStyle(large: boolean, top: number | undefined): CSSProperties {
+  if (large) return { top: '', height: '', translate: '', willChange: '' }
+  return { top: top === undefined ? '' : `${top}px`, height: '', translate: '', willChange: '' }
+}
+
+// While a finger drags it, the sheet only moves (translate), which the browser does without
+// laying out the details again. For that the medium sheet is made as tall as the screen at the
+// start, and moved down to where it was: dragged up, it shows more of itself from its bottom,
+// so nothing shows below it. Maximized, it only moves down.
+function dragStyle(large: boolean, from: number, offset: number): CSSProperties {
+  if (large) return { translate: `0 ${Math.max(offset, 0)}px`, willChange: 'translate' }
+  return { top: '0px', height: 'auto', translate: `0 ${Math.max(from + offset, 0)}px`, willChange: 'translate' }
 }
 
 // Where the medium sheet's top goes: in the gap just above the third card, measured from the top
@@ -293,7 +310,7 @@ function measureSheetTop(): number | undefined {
 export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProps) {
   const [detent, setDetent] = useState<Detent>('medium')
   const [sheetTop] = useState(measureSheetTop)
-  const drag = useRef<{ y: number; time: number } | null>(null)
+  const drag = useRef<{ y: number; time: number; from: number } | null>(null)
   const sheet = useRef<HTMLDivElement>(null)
   const large = detent === 'large'
 
@@ -312,16 +329,36 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
 
   // While a finger drags the handle, the sheet follows it directly, without drawing the details
   // again on every move, which made it lag; it's drawn once more when the finger lifts.
+  // Moves come faster than the screen draws; only the last one in each frame is applied.
+  const frame = useRef(0)
   const follow = (offset?: number) => {
     const element = sheet.current
+    cancelAnimationFrame(frame.current)
     if (!element) return
-    element.style.transition = offset === undefined ? '' : 'none'
-    Object.assign(element.style, sheetStyle(large, sheetTop, offset))
+    if (offset === undefined) {
+      element.style.transition = ''
+      Object.assign(element.style, sheetStyle(large, sheetTop))
+      return
+    }
+    const from = drag.current?.from ?? 0
+    frame.current = requestAnimationFrame(() => Object.assign(element.style, dragStyle(large, from, offset)))
+  }
+  const begin = (y: number, time: number) => {
+    const element = sheet.current
+    if (!element) return
+    drag.current = { y, time, from: element.getBoundingClientRect().top }
+    element.style.transition = 'none'
+    if (large) showListBehind(true)
+    Object.assign(element.style, dragStyle(large, drag.current.from, 0))
+  }
+  const cancelDrag = () => {
+    drag.current = null
+    if (large) showListBehind(false)
+    follow()
   }
   const startDrag = (e: PointerEvent<HTMLButtonElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId)
-    drag.current = { y: e.clientY, time: e.timeStamp }
-    follow(0)
+    begin(e.clientY, e.timeStamp)
   }
   const moveDrag = (e: PointerEvent<HTMLButtonElement>) => {
     if (drag.current) follow(e.clientY - drag.current.y)
@@ -330,12 +367,15 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
     const start = drag.current
     drag.current = null
     if (!start) return
+    cancelAnimationFrame(frame.current)
     const distance = e.clientY - start.y
     const speed = distance / Math.max(e.timeStamp - start.time, 1)
     const down = distance > DISMISS_DISTANCE || speed > FLICK_SPEED
     // Let go to close, it slides on down from where it is; maximized and dragged only a little, it
     // steps back to medium height.
     if (down && !(large && distance < window.innerHeight * 0.45)) return close()
+    // Staying maximized, the list hides again; going to medium height, the page puts it back.
+    if (large && !down) showListBehind(false)
     follow()
     // A tap toggles between the heights, for anyone who doesn't drag.
     if (Math.abs(distance) < 6) setDetent(large ? 'medium' : 'large')
@@ -344,7 +384,7 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
   }
 
   useDetailsPage(large)
-  useSwipeDown(sheet, large, { start: (y, time) => { drag.current = { y, time }; follow(0) }, move: (y) => { if (drag.current) follow(y - drag.current.y) }, end: endDrag })
+  useSwipeDown(sheet, large, { start: begin, move: (y) => { if (drag.current) follow(y - drag.current.y) }, end: endDrag })
   // Maximized, the handle and the tabs stay at the top while the page scrolls under them.
   const pinned = large && 'sticky z-10 bg-card'
   return (
@@ -379,7 +419,7 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
             onPointerDown={startDrag}
             onPointerMove={moveDrag}
             onPointerUp={endDrag}
-            onPointerCancel={() => { drag.current = null; follow() }}
+            onPointerCancel={cancelDrag}
             className={cn('flex h-6 w-full shrink-0 cursor-grab touch-none items-center justify-center rounded-t-xl outline-hidden active:cursor-grabbing focus-visible:[&>span]:bg-primary', pinned, large && 'top-0 h-[calc(1.5rem+env(safe-area-inset-top))] rounded-none pt-[env(safe-area-inset-top)]')}
           >
             <span className="h-1.5 w-10 rounded-full bg-muted-foreground/40" />

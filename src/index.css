@@ -504,7 +504,8 @@ select:not([multiple]):not([size]) {
   overscroll-behavior-y: none;
 }
 
-:root[data-details-full] main {
+/* Back behind the details while they're dragged down (data-details-peek). */
+:root[data-details-full]:not([data-details-peek]) main {
   display: none;
 }
 
