@@ -67,7 +67,10 @@ jobs:
           git fetch -q --depth 1 origin updates
           mkdir -p "$RUNNER_TEMP/update"
           git archive FETCH_HEAD "$version" | tar -x -C "$RUNNER_TEMP/update"
-          node scripts/make-update-torrent.mjs "$RUNNER_TEMP/update/$version/qbminimal-$version" "qbminimal-$version" "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/updates/$version/" "$RUNNER_TEMP/update.torrent"
+          raw="https://raw.githubusercontent.com/$GITHUB_REPOSITORY"
+          sha="$(git rev-parse FETCH_HEAD)"
+          node scripts/make-update-torrent.mjs "$RUNNER_TEMP/update/$version/qbminimal-$version" "qbminimal-$version" "$RUNNER_TEMP/update.torrent" \
+            "$raw/updates/$version/" "$raw/$sha/$version/" "$raw/refs/heads/updates/$version/"
           echo "QBT_UPDATE_VERSION=$version" >> "$GITHUB_ENV"
           echo "QBT_UPDATE_TORRENT=$RUNNER_TEMP/update.torrent" >> "$GITHUB_ENV"
       - name: Check qbminimal against qBittorrent

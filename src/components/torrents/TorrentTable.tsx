@@ -280,7 +280,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
         </ContextMenu>
       </table>
       </div>
-      {/* Its own scrollbar is hidden: the one at the bottom of the screen stands in for it. */}
+      {/* Rows scroll here, both ways; the titles above follow sideways. */}
       <div ref={scroller} data-row-scroller onScroll={() => syncScroll(scroller.current, head.current)} style={LINKED_SCROLL ? { scrollTimeline: '--table-x inline' } as CSSProperties : undefined} className="min-h-0 overflow-auto overscroll-x-none rounded-b-xl">
       {/* Compact: the rows lose most of their padding (about 25px instead of 37px, as qui's dense
           rows), so more fit in the same height. */}

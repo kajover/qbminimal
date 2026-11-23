@@ -30,7 +30,7 @@ describe('update torrent', () => {
 
   it('lists files in order and cuts the joined data into pieces', () => {
     const torrent = decode(buildTorrent({
-      name: 'qbminimal-1.2.3', webSeed: 'https://example.org/1.2.3/', pieceLength: 4, sha1,
+      name: 'qbminimal-1.2.3', webSeeds: ['https://example.org/1.2.3/'], pieceLength: 4, sha1,
       files: [{ path: 'public/b.js', data: bytes(3, 2) }, { path: 'LICENSE', data: bytes(3, 1) }],
     }))
     expect(torrent).toContain('d10:created by9:qbminimal4:infod5:filesld6:lengthi3e4:pathl7:LICENSEeed6:lengthi3e4:pathl6:public4:b.jseee')
@@ -41,6 +41,6 @@ describe('update torrent', () => {
   })
 
   it('needs the web seed address to end with a slash', () => {
-    expect(() => buildTorrent({ name: 'x', files: [], webSeed: 'https://example.org', sha1 })).toThrow()
+    expect(() => buildTorrent({ name: 'x', files: [], webSeeds: ['https://example.org'], sha1 })).toThrow()
   })
 })

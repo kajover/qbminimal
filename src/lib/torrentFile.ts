@@ -44,15 +44,16 @@ export interface TorrentFileInput {
 export interface TorrentOptions {
   name: string
   files: TorrentFileInput[]
-  // A BEP 19 web seed address ending in a slash. A client asks for <address><name>/<path>.
-  webSeed: string
+  // BEP 19 web seed addresses, each ending in a slash. A client asks for <address><name>/<path>,
+  // and downloads from several at once.
+  webSeeds: string[]
   pieceLength?: number
   sha1: (data: Uint8Array) => Uint8Array
 }
 
-// A multi-file torrent with no trackers: clients get the data from the web seed alone.
-export function buildTorrent({ name, files, webSeed, pieceLength = 64 * 1024, sha1 }: TorrentOptions): Uint8Array {
-  if (!webSeed.endsWith('/')) throw new Error('The web seed address has to end with a slash')
+// A multi-file torrent with no trackers: clients get the data from the web seeds alone.
+export function buildTorrent({ name, files, webSeeds, pieceLength = 64 * 1024, sha1 }: TorrentOptions): Uint8Array {
+  if (!webSeeds.length || webSeeds.some(seed => !seed.endsWith('/'))) throw new Error('Each web seed address has to end with a slash')
   const sorted = [...files].sort((a, b) => compare(text.encode(a.path), text.encode(b.path)))
   const all = join(sorted.map(file => file.data))
   const pieces: Uint8Array[] = []
@@ -65,6 +66,6 @@ export function buildTorrent({ name, files, webSeed, pieceLength = 64 * 1024, sh
       pieces: join(pieces),
       files: sorted.map(file => ({ length: file.data.length, path: file.path.split('/') })),
     },
-    'url-list': [webSeed],
+    'url-list': webSeeds,
   })
 }

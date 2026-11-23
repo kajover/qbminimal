@@ -46,6 +46,7 @@ function fakeClient(progress: number[], state = 'downloading') {
     }),
     setPreferences: vi.fn(async () => undefined),
     deleteTorrents: vi.fn(async () => undefined),
+    setForceStart: vi.fn(async () => undefined),
     deleteTags: vi.fn(async () => undefined),
   } satisfies UpdateClient
   return client
@@ -70,6 +71,9 @@ describe('install update', () => {
     expect(percents).toEqual([0, 40, 100])
     expect(client.setPreferences).toHaveBeenCalledWith({ alternative_webui_path: '/opt/qbminimal-1.2.3' })
     expect(client.deleteTorrents).toHaveBeenCalledWith(['abc'], false)
+    // Force-started once, so a full queue doesn't hold it back.
+    expect(client.setForceStart).toHaveBeenCalledTimes(1)
+    expect(client.setForceStart).toHaveBeenCalledWith(['abc'], true)
   })
 
   it('reports a refused add', async () => {

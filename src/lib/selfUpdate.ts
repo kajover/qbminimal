@@ -63,6 +63,7 @@ export interface UpdateClient {
   deleteTags(tags: string[]): Promise<unknown>
   setPreferences(changes: Record<string, unknown>): Promise<unknown>
   deleteTorrents(hashes: string[], deleteFiles?: boolean): Promise<unknown>
+  setForceStart?(hashes: string[], value: boolean): Promise<unknown>
 }
 
 export interface InstallOptions {
@@ -162,6 +163,7 @@ export async function installUpdate({ client, torrentUrl, version, currentPath, 
   }
 
   let hash = ''
+  let forced = false
   let best = 0
   let lastMoved = Date.now()
   onProgress(0)
@@ -173,6 +175,11 @@ export async function installUpdate({ client, torrentUrl, version, currentPath, 
     const found = (await mine().catch(() => []))[0]
     if (found) {
       hash = found.hash
+      // Force-started, so qBittorrent's queue never holds the update back behind other downloads.
+      if (!forced) {
+        forced = true
+        await client.setForceStart?.([hash], true).catch(() => undefined)
+      }
       if (found.state === 'error' || found.state === 'missingFiles') {
         await removeAll(true)
         throw new UpdateError('failed')

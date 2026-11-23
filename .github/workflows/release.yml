@@ -60,21 +60,29 @@ jobs:
           git -C "$branch" add -A
           git -C "$branch" diff --cached --quiet || git -C "$branch" commit -q -m "Files of qbminimal $version"
           git -C "$branch" push origin HEAD:refs/heads/updates
+          # The commit's own address never changes, and is one of the torrent's web seeds.
+          echo "UPDATES_SHA=$(git -C "$branch" rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Build the update torrent
         run: |
           version="${GITHUB_REF_NAME#v}"
-          node scripts/make-update-torrent.mjs ".pkg/qbminimal-$version" "qbminimal-$version" "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/updates/$version/" qbminimal-update.torrent
-      # The web seed has to answer for the new files, or the update would fail on every install.
-      - name: Check the web seed serves the files
+          # Three addresses of the same files, which qBittorrent downloads from at once.
+          raw="https://raw.githubusercontent.com/$GITHUB_REPOSITORY"
+          node scripts/make-update-torrent.mjs ".pkg/qbminimal-$version" "qbminimal-$version" qbminimal-update.torrent \
+            "$raw/updates/$version/" "$raw/$UPDATES_SHA/$version/" "$raw/refs/heads/updates/$version/"
+      # Every web seed has to answer for the new files, or the update would fail on every install.
+      - name: Check the web seeds serve the files
         run: |
           version="${GITHUB_REF_NAME#v}"
-          url="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/updates/$version/qbminimal-$version/LICENSE"
-          for attempt in 1 2 3 4 5; do
-            if curl -fsS "$url" | cmp -s - ".pkg/qbminimal-$version/LICENSE"; then exit 0; fi
-            sleep 10
+          raw="https://raw.githubusercontent.com/$GITHUB_REPOSITORY"
+          for base in "$raw/updates" "$raw/$UPDATES_SHA" "$raw/refs/heads/updates"; do
+            url="$base/$version/qbminimal-$version/LICENSE"
+            ok=""
+            for attempt in 1 2 3 4 5; do
+              if curl -fsS "$url" | cmp -s - ".pkg/qbminimal-$version/LICENSE"; then ok=1; break; fi
+              sleep 10
+            done
+            if [ -z "$ok" ]; then echo "$url doesn't serve the packaged file" >&2; exit 1; fi
           done
-          echo "$url doesn't serve the packaged file" >&2
-          exit 1
       # A tag moved to a newer commit replaces the files of its existing release.
       - name: Publish the release
         env:
