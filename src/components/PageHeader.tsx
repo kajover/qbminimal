@@ -78,8 +78,9 @@ export function PageHeader({ title, middle, middleWidth, actions, className, ref
         {createPortal(
           // Tighter on phones, so the title keeps room beside the buttons.
           <div ref={setRow} className="flex min-w-0 flex-1 items-center gap-2 wide:gap-3">
-            {/* Just the title: the header has no room for a line below it. */}
-            <h2 ref={heading} className={cn('min-w-0 shrink truncate text-lg font-semibold leading-tight', crowded && 'sr-only')}>{title}</h2>
+            {/* Just the title: the header has no room for a line below it. 1px lower, as the menu
+                button is, so its letters are centred on the menu's lines. */}
+            <h2 ref={heading} className={cn('min-w-0 shrink translate-y-px truncate text-lg font-semibold leading-tight', crowded && 'sr-only')}>{title}</h2>
             <div className="flex min-w-0 flex-1 justify-center">{inHeader && place(true)}</div>
             {/* As close together as the buttons above the search results. */}
             {actions && <div ref={buttons} className="flex shrink-0 items-center gap-1">{actions}</div>}
