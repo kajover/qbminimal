@@ -1,5 +1,7 @@
 // Checks GitHub for newer releases of qbminimal and qBittorrent. Only runs when asked to.
 
+import { readStored, writeStored } from '@/lib/storage'
+
 export const QBMINIMAL_RELEASES = 'https://github.com/kajover/qbminimal/releases/latest'
 export const QBITTORRENT_DOWNLOADS = 'https://www.qbittorrent.org/download'
 
@@ -41,11 +43,55 @@ export const RELEASE_ZIP_ASSET = 'qbminimal-release.zip'
 // downloaded once as well, and thrown away, so its count shows every install, by hand or in the
 // app, and the .torrent's count shows how many came through the app. Not waited for, so the update
 // is no slower, and failing here changes nothing.
+// A count that doesn't get through (a blocker, a page the phone paused, no connection) is kept on
+// this device and tried again a few times, and again each time the app opens, until GitHub answers.
+const PENDING_COUNTS_KEY = 'qbminimal.pendingCounts'
+const COUNT_RETRY_MS = 60_000
+const COUNT_TRIES = 4
+const sendingCounts = new Set<string>()
+
+function pendingCounts(): string[] {
+  try {
+    const saved: unknown = JSON.parse(readStored(PENDING_COUNTS_KEY) ?? '[]')
+    return Array.isArray(saved) ? saved.filter((tag): tag is string => typeof tag === 'string' && !!parseVersion(tag)) : []
+  } catch {
+    return []
+  }
+}
+
+function setPendingCounts(tags: string[]) {
+  // A few at most: a blocker that never lets one through shouldn't make the list grow.
+  writeStored(PENDING_COUNTS_KEY, tags.length ? JSON.stringify(tags.slice(-5)) : null)
+}
+
+function sendCount(tag: string, tries = 1) {
+  if (sendingCounts.has(tag)) return
+  sendingCounts.add(tag)
+  const stop = new AbortController()
+  fetch(`https://github.com/kajover/qbminimal/releases/download/v${tag}/${RELEASE_ZIP_ASSET}`, { mode: 'no-cors', cache: 'no-store', credentials: 'omit', signal: stop.signal })
+    .then(() => {
+      // GitHub answered, so it counted; the zip itself isn't needed.
+      stop.abort()
+      sendingCounts.delete(tag)
+      setPendingCounts(pendingCounts().filter(pending => pending !== tag))
+    }, () => {
+      sendingCounts.delete(tag)
+      if (tries < COUNT_TRIES) setTimeout(() => sendCount(tag, tries + 1), COUNT_RETRY_MS * tries)
+    })
+}
+
 export function countReleaseDownload(version: string) {
   const parsed = parseVersion(version)
   if (!parsed || typeof fetch !== 'function') return
-  fetch(`https://github.com/kajover/qbminimal/releases/download/v${parsed.join('.')}/${RELEASE_ZIP_ASSET}`, { mode: 'no-cors', cache: 'no-store', credentials: 'omit' })
-    .catch(() => undefined)
+  const tag = parsed.join('.')
+  setPendingCounts([...pendingCounts().filter(pending => pending !== tag), tag])
+  sendCount(tag)
+}
+
+// Counts that didn't get through before, tried again when the app opens.
+export function sendPendingCounts() {
+  if (typeof fetch !== 'function') return
+  for (const tag of pendingCounts()) sendCount(tag)
 }
 
 // The newest qbminimal release, and where its update torrent is, if it has one.

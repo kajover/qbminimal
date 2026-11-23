@@ -14,6 +14,7 @@ import { useSession } from '@/hooks/useSession'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useDisplayOption } from '@/lib/displayOptions'
 import { checkForUpdatesIfDue } from '@/lib/updateNotice'
+import { sendPendingCounts } from '@/lib/updates'
 import { readStored, writeStored } from '@/lib/storage'
 import { cn } from '@/lib/utils'
 import { PAGE_SCROLL_ID, pageScroller, WIDE } from '@/lib/pageScroll'
@@ -249,7 +250,9 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
   const menuBar = useDisplayOption('menuBar')
   // Signed in now, so look for updates in the background, unless that was done lately.
   useEffect(() => {
-    if (!__DEMO__) checkForUpdatesIfDue()
+    if (__DEMO__) return
+    checkForUpdatesIfDue()
+    sendPendingCounts()
   }, [])
   const wide = useMediaQuery(WIDE)
   const [statsOpen, setStatsOpen] = useState(false)

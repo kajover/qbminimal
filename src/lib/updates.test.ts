@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from 'vitest'
-import { countReleaseDownload, isNewer, newestRelease, parseVersion } from './updates'
+// @vitest-environment jsdom
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { countReleaseDownload, isNewer, newestRelease, parseVersion, sendPendingCounts } from './updates'
 
 describe('update check', () => {
   it('reads version numbers in their usual spellings', () => {
@@ -23,17 +24,41 @@ describe('update check', () => {
 })
 
 describe('counting an update on the zip', () => {
-  it('asks for the release zip once, without waiting for it or failing', async () => {
-    const fetch = vi.fn(() => Promise.reject(new Error('offline')))
+  const URL_1617 = 'https://github.com/kajover/qbminimal/releases/download/v1.6.17/qbminimal-release.zip'
+  beforeEach(() => {
+    localStorage.clear()
+    vi.useFakeTimers()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.unstubAllGlobals()
+  })
+
+  it('asks for the release zip once, without waiting for it, and forgets it once GitHub answers', async () => {
+    const fetch = vi.fn(() => Promise.resolve(new Response(null)))
     vi.stubGlobal('fetch', fetch)
-    try {
-      expect(countReleaseDownload('1.6.17')).toBeUndefined()
-      expect(fetch).toHaveBeenCalledExactlyOnceWith('https://github.com/kajover/qbminimal/releases/download/v1.6.17/qbminimal-release.zip', expect.objectContaining({ mode: 'no-cors' }))
-      countReleaseDownload('not a version')
-      expect(fetch).toHaveBeenCalledOnce()
-      await Promise.resolve()
-    } finally {
-      vi.unstubAllGlobals()
-    }
+    expect(countReleaseDownload('1.6.17')).toBeUndefined()
+    expect(fetch).toHaveBeenCalledExactlyOnceWith(URL_1617, expect.objectContaining({ mode: 'no-cors' }))
+    countReleaseDownload('not a version')
+    expect(fetch).toHaveBeenCalledOnce()
+    await vi.runAllTimersAsync()
+    expect(localStorage.getItem('qbminimal.pendingCounts')).toBeNull()
+    sendPendingCounts()
+    expect(fetch).toHaveBeenCalledOnce()
+  })
+
+  it('tries a blocked count again later, and when the app opens next', async () => {
+    const fetch = vi.fn((): Promise<Response> => Promise.reject(new Error('blocked')))
+    vi.stubGlobal('fetch', fetch)
+    countReleaseDownload('1.6.17')
+    await vi.runAllTimersAsync()
+    expect(fetch).toHaveBeenCalledTimes(4)
+    expect(localStorage.getItem('qbminimal.pendingCounts')).toBe('["1.6.17"]')
+
+    fetch.mockImplementation(() => Promise.resolve(new Response(null)))
+    sendPendingCounts()
+    await vi.runAllTimersAsync()
+    expect(fetch).toHaveBeenCalledTimes(5)
+    expect(localStorage.getItem('qbminimal.pendingCounts')).toBeNull()
   })
 })
