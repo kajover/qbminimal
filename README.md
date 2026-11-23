@@ -40,6 +40,13 @@ On a phone, as cards and as a table, without and with the tab bar:
   <img src="docs/screenshots/mobile-table-menubar.png" alt="The torrent table on a phone with the tab bar" width="200">
 </p>
 
+With the filter sidebar open beside the table and a torrent's details below it, in light and dark mode:
+
+<p>
+  <img src="docs/screenshots/desktop-table-filters.png" alt="The torrent table on a desktop with the filter sidebar beside it and the selected torrent's details below it" width="49%">
+  <img src="docs/screenshots/desktop-table-filters-dark.png" alt="The torrent table in dark mode on a desktop with the filter sidebar beside it and the selected torrent's details below it" width="49%">
+</p>
+
 In dark mode, on a desktop and on a phone:
 
 <p>
