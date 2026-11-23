@@ -118,12 +118,17 @@
     @apply border-border outline-ring/50;
   }
 
-  /* Scrollbars as qui has them: thin, with no track, only a light thumb that darkens under the
-     pointer, and only where a box has more than it shows (overflow: auto). The standard properties
-     for Chrome, Edge and Firefox; the webkit ones for Safari, which draws the thumb 6px wide
-     inside a 12px bar. */
+  /* Scrollbars as qui has them: thin, with no track, and only while the pointer is over the box
+     that scrolls (or it holds the focus); they fade out 0.2s after it leaves. The same both ways,
+     so a table's sideways scrollbar too. Standard properties for Chrome, Edge and Firefox; the
+     webkit ones for Safari, which draws the thumb 6px wide inside a 12px bar. */
   * {
     scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.2s;
+  }
+  :hover,
+  :focus-within {
     scrollbar-color: var(--border) transparent;
   }
   ::-webkit-scrollbar {
@@ -137,8 +142,12 @@
   ::-webkit-scrollbar-thumb {
     border: 3px solid transparent;
     border-radius: var(--radius);
-    background-color: var(--border);
+    background-color: transparent;
     background-clip: content-box;
+  }
+  :hover::-webkit-scrollbar-thumb,
+  :focus-within::-webkit-scrollbar-thumb {
+    background-color: var(--border);
   }
   ::-webkit-scrollbar-thumb:hover {
     background-color: var(--muted-foreground);
