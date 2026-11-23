@@ -557,13 +557,20 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
   // again on every move, which made it lag; it's drawn once more when the finger lifts.
   // Moves come faster than the screen draws; only the last one in each frame is applied.
   const frame = useRef(0)
-  const follow = (offset?: number, top = sheetTop) => {
+  const follow = (offset?: number, top = sheetTop, still = false) => {
     const element = sheet.current
     cancelAnimationFrame(frame.current)
     if (!element) return
     if (offset === undefined) {
-      element.style.transition = ''
+      // Let go after resizing it, it stays where the finger left it. While dragged it's placed by
+      // translate from the top; animating back to its own top made it jump away and back.
+      element.style.transition = still ? 'none' : ''
       Object.assign(element.style, sheetStyle(large, top))
+      if (still) {
+        // Drawn in place first, so turning the transition back on animates nothing.
+        void element.offsetHeight
+        element.style.transition = ''
+      }
       return
     }
     // At medium height, dragged down past the Hash row, it closes at once, without waiting for
@@ -625,7 +632,7 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
     // Ratio row; let go higher than that, or flicked up, it maximizes.
     if (!large && Math.abs(distance) >= 6 && !(distance < 0 && (-distance > start.growTo || speed < -FLICK_SPEED))) {
       const top = Math.round(start.from + distance)
-      follow(undefined, top)
+      follow(undefined, top, true)
       return setSheetTop(top)
     }
     // Staying maximized, the list hides again; going to medium height, the page puts it back.
