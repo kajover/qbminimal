@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { Download, ExternalLink, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ConfirmAction } from '@/components/ConfirmAction'
@@ -8,6 +8,7 @@ import { useUpdateNotice } from '@/hooks/useUpdateNotice'
 import { qbitClient } from '@/lib/api'
 import { canInstall, installUpdate, pageActions, UpdateError, type UpdateFailure } from '@/lib/selfUpdate'
 import { checkForUpdates } from '@/lib/updateNotice'
+import { cancelInstall, getInstallState, setInstallState, startInstallControl, subscribeInstall } from '@/lib/updateInstall'
 import { countReleaseDownload, QBITTORRENT_DOWNLOADS, QBMINIMAL_RELEASES } from '@/lib/updates'
 import { t } from '@/i18n'
 
@@ -18,30 +19,25 @@ export function UpdateCheck() {
   const notice = useUpdateNotice()
   const { data: prefs } = usePreferences()
   const [checking, setChecking] = useState(false)
-  // The percent downloaded while an update installs, null otherwise.
-  const [installing, setInstalling] = useState<number | null>(null)
-  const stop = useRef<AbortController | null>(null)
-  // Set once qBittorrent serves the new version; the page reloads when asked, not by itself.
-  const [installed, setInstalled] = useState(false)
+  // Outside this component: the install carries on while other pages are open.
+  const { percent: installing, installed } = useSyncExternalStore(subscribeInstall, getInstallState)
 
   const torrentUrl = notice.latest?.qbminimalTorrent
   const latestVersion = notice.latest?.qbminimal
   const installable = notice.qbminimalNewer && canInstall(prefs, torrentUrl) && !!latestVersion
 
   const install = async () => {
-    if (!installable || !torrentUrl || !latestVersion) return
-    const control = new AbortController()
-    stop.current = control
-    setInstalling(0)
+    if (!installable || !torrentUrl || !latestVersion || getInstallState().percent !== null) return
+    const control = startInstallControl()
+    setInstallState({ percent: 0 })
     try {
       const oldPath = String(prefs?.alternative_webui_path)
       const { oldRemoved } = await installUpdate({
         client: qbitClient, torrentUrl, version: latestVersion, currentPath: oldPath,
-        onProgress: setInstalling, signal: control.signal, currentVersion: __APP_VERSION__,
+        onProgress: percent => setInstallState({ percent }), signal: control.signal, currentVersion: __APP_VERSION__,
         onAdded: () => countReleaseDownload(latestVersion),
       })
-      setInstalling(null)
-      setInstalled(true)
+      setInstallState({ percent: null, installed: true })
       // Stays until it's answered, so nothing typed elsewhere is lost to a reload.
       // Short: only where the old version stays is worth saying.
       toast.success(t('Update installed'), {
@@ -61,7 +57,7 @@ export function UpdateCheck() {
       const reason = error instanceof UpdateError ? error.reason : 'add'
       if (reason === 'canceled') toast(messages.canceled)
       else toast.error(messages[reason])
-      setInstalling(null)
+      setInstallState({ percent: null })
     }
   }
 
@@ -88,7 +84,7 @@ export function UpdateCheck() {
           ) : installing !== null ? (
             <>
               <span role="status" className="text-sm">{t('Downloading update... {percent}%', { percent: installing })}</span>
-              <Button variant="outline" size="sm" onClick={() => stop.current?.abort()}>{t('Cancel')}</Button>
+              <Button variant="outline" size="sm" onClick={cancelInstall}>{t('Cancel')}</Button>
             </>
           ) : installable && (
             <ConfirmAction

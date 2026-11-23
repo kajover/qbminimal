@@ -9,3 +9,14 @@ export function holdCursor(cursor: string): () => void {
     root.style.removeProperty('--drag-cursor')
   }
 }
+
+// After a drag the browser may still send a click to whatever now lies under the pointer, as the
+// panel moved or closed: a card or row there would be selected. That one click is dropped.
+export function swallowClick() {
+  const drop = (event: MouseEvent) => {
+    event.stopPropagation()
+    event.preventDefault()
+  }
+  window.addEventListener('click', drop, { capture: true, once: true })
+  window.setTimeout(() => window.removeEventListener('click', drop, { capture: true }), 400)
+}

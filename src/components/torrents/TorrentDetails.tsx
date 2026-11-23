@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { usePrefetchDetails } from '@/hooks/useApi'
-import { holdCursor } from '@/lib/dragCursor'
+import { holdCursor, swallowClick } from '@/lib/dragCursor'
 import { isRemembered, useRemembered } from '@/hooks/useRemembered'
 import { PAGE_SCROLL_ID } from '@/lib/pageScroll'
 import { watchTorrentSpeeds } from '@/lib/speedHistory'
@@ -208,6 +208,7 @@ export function TorrentDetailsPanel({ torrent, onClose, onDelete, edges }: Panel
     if (!current) return
     setSink(0)
     if (!current.moved) return setFull(!current.wasFull)
+    swallowClick()
     // Dragged past the highest it goes, it maximizes, keeping its height for stepping back.
     if (current.raw >= window.innerHeight - LIST_ROOM) return setFull(true)
     // Dragged on down well past the lowest it goes, it closes, as on phones, keeping its height.
@@ -569,6 +570,7 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
     // the finger to lift.
     if (!large && drag.current && offset > drag.current.closeAt) {
       drag.current = null
+      endHold()
       return close()
     }
     const from = drag.current?.from ?? 0
@@ -578,16 +580,28 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
     const element = sheet.current
     if (!element) return
     drag.current = { y, time, from: element.getBoundingClientRect().top, closeAt: closeDistance(element), growTo: growDistance(element) }
+    // Only the sheet moves: no text in it or in the cards behind gets selected on the way.
+    window.getSelection()?.removeAllRanges()
+    hold.current = holdCursor('grabbing')
     element.style.transition = 'none'
     if (large) showListBehind(true)
     Object.assign(element.style, dragStyle(large, drag.current.from, 0))
   }
+  const hold = useRef<(() => void) | null>(null)
+  const endHold = () => {
+    hold.current?.()
+    hold.current = null
+    swallowClick()
+  }
   const cancelDrag = () => {
     drag.current = null
+    endHold()
     if (large) showListBehind(false)
     follow()
   }
   const startDrag = (e: PointerEvent<HTMLButtonElement>) => {
+    // Pressing the handle starts no text selection.
+    e.preventDefault()
     e.currentTarget.setPointerCapture(e.pointerId)
     begin(e.clientY, e.timeStamp)
   }
@@ -598,6 +612,7 @@ export function TorrentDetailsDialog({ torrent, onClose, onDelete }: DetailsProp
     const start = drag.current
     drag.current = null
     if (!start) return
+    endHold()
     cancelAnimationFrame(frame.current)
     const distance = e.clientY - start.y
     const speed = distance / Math.max(e.timeStamp - start.time, 1)

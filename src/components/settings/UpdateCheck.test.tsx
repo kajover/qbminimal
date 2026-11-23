@@ -35,10 +35,11 @@ vi.mock('@/hooks/useUpdateNotice', () => ({
 const { UpdateCheck } = await import('./UpdateCheck')
 const { pageActions } = await import('@/lib/selfUpdate')
 const { countReleaseDownload } = await import('@/lib/updates')
+const { resetInstallState } = await import('@/lib/updateInstall')
 
 function renderIt() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  render(<QueryClientProvider client={client}><UpdateCheck /></QueryClientProvider>)
+  return render(<QueryClientProvider client={client}><UpdateCheck /></QueryClientProvider>)
 }
 
 describe('install update', () => {
@@ -47,6 +48,7 @@ describe('install update', () => {
     api.state.progress = 0
     for (const mock of [api.addTorrents, api.setPreferences, api.deleteTorrents]) mock.mockClear()
     pageActions.reload = vi.fn()
+    resetInstallState()
   })
 
   it('asks first, then downloads, switches the Web UI, and reloads only when asked', async () => {
@@ -64,6 +66,19 @@ describe('install update', () => {
     expect(pageActions.reload).not.toHaveBeenCalled()
     await userEvent.click(reload)
     expect(pageActions.reload).toHaveBeenCalled()
+  })
+
+  it('still shows the install after leaving Settings and coming back', async () => {
+    const settings = renderIt()
+    await userEvent.click(await screen.findByRole('button', { name: 'Install update' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Install' }))
+    await screen.findByRole('status')
+    // Another page opens, then Settings again.
+    settings.unmount()
+    renderIt()
+    expect(await screen.findByRole('status')).toHaveTextContent(/Downloading update/)
+    expect(screen.queryByRole('button', { name: 'Install update' })).toBeNull()
+    await screen.findByRole('button', { name: 'Reload' }, { timeout: 5000 })
   })
 
   it('offers no install without an alternative Web UI', async () => {
