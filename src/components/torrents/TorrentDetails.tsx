@@ -257,7 +257,7 @@ export function TorrentDetailsPanel({ torrent, onClose, onDelete, edges }: Panel
         // filters sidebar do.
         ref={section}
         className={cn('fixed z-30 flex flex-col bg-card', edges ? 'bottom-4 overflow-hidden rounded-xl border' : 'bottom-0 border-t')}
-        style={{ ...(full ? { top: edges ? `${edges.top}px` : 0 } : { height }), translate: sink ? `0 ${sink}px` : undefined, insetInlineStart: edges ? `${edges.start}px` : 'var(--sidebar-width, 0px)', insetInlineEnd: edges ? `${edges.end}px` : 'var(--page-scrollbar, 0px)' }}
+        style={{ ...(full ? { top: edges ? `${edges.top}px` : 0 } : { height }), translate: sink ? `0 ${sink}px` : undefined, insetInlineStart: edges ? `${edges.start}px` : 'var(--sidebar-width, 0px)', insetInlineEnd: edges ? `${edges.end}px` : 0 }}
       >
         <div
           role="separator"

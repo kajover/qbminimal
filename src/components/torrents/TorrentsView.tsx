@@ -14,7 +14,7 @@ import { useGrowingList } from '@/hooks/useGrowingList'
 import { chosenCount, SIDEBAR_COLUMNS } from '@/lib/torrentFilters'
 import { loadFilterViews, type FilterView } from '@/lib/filterViews'
 import { announce } from '@/lib/announce'
-import { inFrame, pageScroller, ROOM_FOR_HEADER_SEARCH, ROOM_FOR_SIDEBAR, WIDE } from '@/lib/pageScroll'
+import { pageScroller, ROOM_FOR_HEADER_SEARCH, ROOM_FOR_SIDEBAR, WIDE } from '@/lib/pageScroll'
 import { loadBarActions, saveBarActions } from '@/lib/actionBar'
 import { toast } from '@/hooks/use-toast'
 import { getColumn, loadColumnLayout, saveColumnLayout, TORRENT_FILTER_COLUMNS, type ColumnLayout } from '@/lib/torrentColumns'
@@ -60,7 +60,8 @@ export function TorrentsView() {
   // The filters beside the list, and the quick search in the header, wherever they fit.
   const sideBySide = useMediaQuery(ROOM_FOR_SIDEBAR)
   const headerSearch = useMediaQuery(ROOM_FOR_HEADER_SEARCH)
-  const framed = inFrame(wide)
+  // In the frame (wide), only the list scrolls; elsewhere the window does.
+  const framed = wide
   // Outside the frame the table fills the screen and scrolls on its own, so the page starts at its
   // top: the cards' scroll would otherwise leave the column titles above the screen.
   useEffect(() => { if (!framed && list.showTable) pageScroller().scrollTo(0, 0) }, [framed, list.showTable])

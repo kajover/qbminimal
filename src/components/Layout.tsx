@@ -50,11 +50,12 @@ function PagesMenu({ page, onNavigate }: { page: PageId; onNavigate: (page: Page
   const notes = usePageNotes().all
   return (
     <DropdownMenu>
+      {/* The button sits a pixel lower: its middle line then meets the middle of the title's
+          lowercase letters, not of its capitals, so the two read as one line. The lines stay
+          centred in the highlight behind them. */}
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative size-8" aria-label={notes.length ? `${t('Menu')}: ${notes.map(note => note.label).join(', ')}` : t('Menu')} title={t('Menu')} onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }}>
-          {/* A pixel lower: its middle line then meets the middle of the title's lowercase letters, not
-              of its capitals, so the two read as one line. */}
-          <Menu className="size-5 translate-y-px" />
+        <Button variant="ghost" size="icon" className="relative size-8 translate-y-px" aria-label={notes.length ? `${t('Menu')}: ${notes.map(note => note.label).join(', ')}` : t('Menu')} title={t('Menu')} onPointerDown={() => { byPointer.current = true }} onKeyDown={() => { byPointer.current = false }}>
+          <Menu className="size-5" />
           {notes[0] && <span aria-hidden className={cn('absolute end-0.5 top-0.5 size-2.5 rounded-full ring-2 ring-background', notes[0].dot)} />}
         </Button>
       </DropdownMenuTrigger>
@@ -125,26 +126,6 @@ function usePageScrollKeys() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
-}
-
-// The width the page's scrollbar takes, as --page-scrollbar, so panels fixed to the window's end
-// stop beside it rather than over it. Overlay scrollbars take none.
-function useScrollbarWidth() {
-  useEffect(() => {
-    const area = document.getElementById(PAGE_SCROLL_ID)
-    if (typeof ResizeObserver === 'undefined' || !area) return
-    const root = document.documentElement.style
-    const observer = new ResizeObserver(() => {
-      const style = getComputedStyle(area)
-      const width = area.offsetWidth - area.clientWidth - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth)
-      root.setProperty('--page-scrollbar', `${pageScroller() === area ? Math.max(0, width) : 0}px`)
-    })
-    observer.observe(area)
-    return () => {
-      observer.disconnect()
-      root.removeProperty('--page-scrollbar')
-    }
   }, [])
 }
 
@@ -271,12 +252,9 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
     if (!__DEMO__) checkForUpdatesIfDue()
   }, [])
   const wide = useMediaQuery(WIDE)
-  // The pages' sidebar, open beside the content.
-  const sidebarOpen = menuBar && wide && sidebarShown
   const [statsOpen, setStatsOpen] = useState(false)
   usePageKeys(onNavigate)
   usePageScrollKeys()
-  useScrollbarWidth()
   // Where each page's title row goes; on phones without the selection bar.
   const [slot, setSlot] = useState<HTMLDivElement | null>(null)
 
@@ -296,9 +274,8 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
     // window lets iPhone Safari show the page on behind its address bar; a fixed frame stops at it
     // and leaves a blank strip. Nothing may make the page wider than the screen: iPhone Safari would
     // then widen the whole layout, open it zoomed in, and push the tab bar out of sight.
-    // In the frame (from the md width, or wherever scrollbars take room) the window holds still:
-    // the header spans it on top and only the area below scrolls, so its scrollbar starts under the
-    // header and never changes the header's width.
+    // In the frame (the wide layout) the window holds still: the header spans it on top and only
+    // the area below scrolls.
     <div style={{ '--sidebar-width': `${sidebarMeasured}px` } as CSSProperties} className="min-h-dvh bg-background narrow:overflow-x-clip frame:flex frame:h-dvh frame:min-h-0 frame:flex-col frame:overflow-hidden">
       {/* Fixed where the window scrolls: iPhone Safari stops drawing a sticky header while the page
           is pulled past its end, leaving an empty strip. The page leaves its height free at the
@@ -306,10 +283,8 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
       <header ref={headerRef} className="glass-bar sticky top-0 z-40 border-b pt-[env(safe-area-inset-top)] window-scroll:fixed window-scroll:inset-x-0 frame:shrink-0">
         {/* The same side room as the content below, so the menu button lines up with the list's
             start and the last button with its end: on phones the cards and table reach 0.5rem
-            past the page's 1rem margin. In the frame both ends also leave the room the page's
-            scrollbar takes below (none for overlay scrollbars): at its end to line up with the
-            content, and at the start the same again, so both sides are even. */}
-        <div className="flex h-12 items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(1rem,env(safe-area-inset-right))] frame:pl-[calc(max(1rem,env(safe-area-inset-left))+var(--page-scrollbar,0px))] frame:pr-[calc(max(1rem,env(safe-area-inset-right))+var(--page-scrollbar,0px))]">
+            past the page's 1rem margin. */}
+        <div className="flex h-12 items-center justify-between gap-2 pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] sm:pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(1rem,env(safe-area-inset-right))]">
           <div className="flex shrink-0 items-center gap-2">
             <PagesMenu page={page} onNavigate={onNavigate} />
             {/* Left out for room; screen readers still hear it. */}
@@ -328,7 +303,7 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
           <div ref={sidebarBox} className={cn('relative z-35 hidden h-full shrink-0', menuBar && 'wide:flex')}>
             {/* The header's room at the start, so the pages line up under the menu button. */}
             {sidebarShown && (
-              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto pt-2 pe-2 pb-4 ps-[calc(1rem+var(--page-scrollbar,0px))]">
+              <aside style={sidebarWidth ? { width: sidebarWidth } : undefined} className="flex w-max min-w-38 flex-col overflow-x-hidden overflow-y-auto pt-2 pe-2 pb-4 ps-4">
                 <nav aria-label={t('Pages')} className="flex flex-col gap-1">{MAIN_PAGES.map(navButton)}</nav>
                 <div className="mt-2 flex flex-col gap-1 border-t pt-2">
                   {EXTRA_PAGES.map(navButton)}
@@ -359,10 +334,7 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
               </Button>
             </div>
           </div>
-          {/* Room for a scrollbar is kept, so pages that scroll and pages that don't are as wide.
-              Without the sidebar, the start has as much room again, like the header. The
-              scrollbar is on the left right to left. */}
-          <main id={PAGE_SCROLL_ID} className={cn('min-w-0 flex-1 frame:h-full frame:overflow-y-auto frame:[scrollbar-gutter:stable] pt-4 window-scroll:pt-[calc(var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))+1rem)] pb-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] narrow:pb-[calc(var(--bottom-nav-height,5rem)+1rem)]', !sidebarOpen && 'frame:ltr:pl-[calc(max(1rem,env(safe-area-inset-left))+var(--page-scrollbar,0px))] frame:rtl:pr-[calc(max(1rem,env(safe-area-inset-right))+var(--page-scrollbar,0px))]')}>
+          <main id={PAGE_SCROLL_ID} className={cn('min-w-0 flex-1 frame:h-full frame:overflow-y-auto pt-4 window-scroll:pt-[calc(var(--header-height,calc(3rem+1px+env(safe-area-inset-top)))+1rem)] pb-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] narrow:pb-[calc(var(--bottom-nav-height,5rem)+1rem)]')}>
             {/* The torrent list and search results take the whole width; the other pages are easier to read narrower. */}
             {/* Sized for the page on screen, which can trail the tapped tab by a few frames. Some fill
                 the frame's height, so only their lists scroll. */}

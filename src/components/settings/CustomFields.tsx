@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { NO_AUTOFILL } from '@/lib/noAutofill'
 import { Copy, Plus, Save, Send, Trash2 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { ConfirmAction } from '@/components/ConfirmAction'
@@ -30,7 +31,7 @@ export function ScanDirsEditor({ value, onChange, disabled }: { value: unknown; 
       {rows.map(([path, target], i) => (
         <div key={i} className="space-y-1 rounded-md border p-2">
           <div className="flex gap-2">
-            <Input aria-label={t('Watched folder')} placeholder={t('Folder to watch')} value={path} disabled={disabled} onChange={(e) => update(rows.map((row, j) => (j === i ? [e.target.value, row[1]] : row)))} className="h-8 text-sm" />
+            <Input {...NO_AUTOFILL} aria-label={t('Watched folder')} placeholder={t('Folder to watch')} value={path} disabled={disabled} onChange={(e) => update(rows.map((row, j) => (j === i ? [e.target.value, row[1]] : row)))} className="h-8 text-sm" />
             <Button type="button" size="icon" variant="ghost" className="size-8 shrink-0" aria-label={t('Remove watched folder')} disabled={disabled} onClick={() => update(rows.filter((_, j) => j !== i))}>
               <Trash2 className="size-4" />
             </Button>
@@ -47,7 +48,7 @@ export function ScanDirsEditor({ value, onChange, disabled }: { value: unknown; 
             <option value="other">{t('Save to another folder')}</option>
           </select>
           {typeof target === 'string' && (
-            <Input aria-label={t('Save folder')} placeholder={t('Save folder')} value={target} disabled={disabled} onChange={(e) => update(rows.map((row, j) => (j === i ? [row[0], e.target.value] : row)))} className="h-8 text-sm" />
+            <Input {...NO_AUTOFILL} aria-label={t('Save folder')} placeholder={t('Save folder')} value={target} disabled={disabled} onChange={(e) => update(rows.map((row, j) => (j === i ? [row[0], e.target.value] : row)))} className="h-8 text-sm" />
           )}
         </div>
       ))}
@@ -207,11 +208,11 @@ export function CookiesEditor() {
       {rows.length === 0 && <p className="text-xs text-muted-foreground">{t('No cookies')}</p>}
       {rows.map((row, i) => (
         <div key={i} className="grid grid-cols-2 gap-2 rounded-md border p-2">
-          <Input aria-label={t('Cookie domain')} placeholder={t('Domain')} value={row.domain} onChange={(e) => update(i, { domain: e.target.value })} className="h-8 text-sm" />
-          <Input aria-label={t('Cookie path')} placeholder={t('Path')} value={row.path} onChange={(e) => update(i, { path: e.target.value })} className="h-8 text-sm" />
-          <Input aria-label={t('Cookie name')} placeholder={t('Name')} value={row.name} onChange={(e) => update(i, { name: e.target.value })} className="h-8 text-sm" />
-          <Input aria-label={t('Cookie value')} placeholder={t('Value')} value={row.value} onChange={(e) => update(i, { value: e.target.value })} className="h-8 text-sm" />
-          <Input
+          <Input {...NO_AUTOFILL} aria-label={t('Cookie domain')} placeholder={t('Domain')} value={row.domain} onChange={(e) => update(i, { domain: e.target.value })} className="h-8 text-sm" />
+          <Input {...NO_AUTOFILL} aria-label={t('Cookie path')} placeholder={t('Path')} value={row.path} onChange={(e) => update(i, { path: e.target.value })} className="h-8 text-sm" />
+          <Input {...NO_AUTOFILL} aria-label={t('Cookie name')} placeholder={t('Name')} value={row.name} onChange={(e) => update(i, { name: e.target.value })} className="h-8 text-sm" />
+          <Input {...NO_AUTOFILL} aria-label={t('Cookie value')} placeholder={t('Value')} value={row.value} onChange={(e) => update(i, { value: e.target.value })} className="h-8 text-sm" />
+          <Input {...NO_AUTOFILL}
             aria-label={t('Cookie expiry date')}
             type="date"
             value={new Date(row.expirationDate * 1000).toISOString().slice(0, 10)}

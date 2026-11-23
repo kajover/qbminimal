@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { NO_AUTOFILL } from '@/lib/noAutofill'
 import { FolderOpen } from 'lucide-react'
 import { BannedPeers } from '@/components/BannedPeers'
 import { Button } from '@/components/ui/button'
@@ -65,7 +66,7 @@ export function PreferenceField({ def, value, getValue, onChange, disabled, hasU
     case 'file':
       control = (
         <div className="flex gap-2">
-          <Input id={id} value={String(value ?? '')} disabled={disabled} onChange={(e) => onChange(e.target.value)} className="h-9" />
+          <Input id={id} {...NO_AUTOFILL} value={String(value ?? '')} disabled={disabled} onChange={(e) => onChange(e.target.value)} className="h-9" />
           <Button type="button" size="icon" variant="outline" className="size-9 shrink-0" aria-label={t('Browse for {label}', { label: def.label })} title={t('Browse')} disabled={disabled} onClick={() => setPicking(true)}>
             <FolderOpen className="size-4" />
           </Button>
@@ -81,7 +82,7 @@ export function PreferenceField({ def, value, getValue, onChange, disabled, hasU
           control = <ScanDirsEditor value={value} onChange={onChange} disabled={disabled} />
           break
         case 'webUiPassword':
-          control = <Input id={id} type="password" autoComplete="new-password" placeholder={t('Leave blank to keep the current one')} value={String(value ?? '')} disabled={disabled} onChange={(e) => onChange(e.target.value)} className="h-9" />
+          control = <Input id={id} type="password" {...NO_AUTOFILL} autoComplete="new-password" placeholder={t('Leave blank to keep the current one')} value={String(value ?? '')} disabled={disabled} onChange={(e) => onChange(e.target.value)} className="h-9" />
           break
         case 'apiKey':
           control = <ApiKeyField value={value} />
@@ -112,6 +113,8 @@ export function PreferenceField({ def, value, getValue, onChange, disabled, hasU
         <Input
           id={id}
           type={def.type === 'password' ? 'password' : def.type === 'int' || def.type === 'number' ? 'number' : 'text'}
+          {...NO_AUTOFILL}
+          autoComplete={def.type === 'password' ? 'new-password' : 'off'}
           step={def.type === 'number' || def.scale ? 'any' : def.type === 'int' ? 1 : undefined}
           value={value === undefined || value === null ? '' : String(value)}
           disabled={disabled}

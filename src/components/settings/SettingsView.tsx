@@ -8,12 +8,10 @@ import { setIncognito, useIncognito } from '@/lib/incognito'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { useQuery } from '@tanstack/react-query'
 import { UpdateCheck } from './UpdateCheck'
-import { useAppVersion, usePreferences, useSavePreferences, useWebApiVersion } from '@/hooks/useApi'
+import { useAppVersion, useBuildInfo, usePreferences, useProcessInfo, useSavePreferences, useWebApiVersion } from '@/hooks/useApi'
 import { formatDuration } from '@/lib/format'
 import { toast } from '@/hooks/use-toast'
-import { qbitClient } from '@/lib/api'
 import { PREFERENCE_SECTIONS, getChangedPreferences, getSupportedPrefs, toFormValue, type PrefDef } from '@/lib/preferences'
 import { PreferenceField } from './PreferenceField'
 import { PageHeader } from '@/components/PageHeader'
@@ -151,8 +149,8 @@ function AppSection() {
   const [textSize, setTextSizeState] = useState(chosenTextSize)
   const { data: qbittorrentVersion } = useAppVersion()
   const { data: webApiVersion } = useWebApiVersion()
-  const { data: build } = useQuery({ queryKey: ['app', 'buildInfo'], queryFn: () => qbitClient.getBuildInfo() })
-  const { data: process } = useQuery({ queryKey: ['app', 'processInfo'], queryFn: () => qbitClient.getProcessInfo() })
+  const { data: build } = useBuildInfo()
+  const { data: process } = useProcessInfo()
   // Read once when the page opens, which is precise enough for an uptime.
   const [now] = useState(() => Math.floor(Date.now() / 1000))
 

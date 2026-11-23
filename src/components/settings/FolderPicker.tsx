@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { NO_AUTOFILL } from '@/lib/noAutofill'
 import { ArrowRight, ChevronUp, File, Folder, FolderCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -68,7 +69,7 @@ export function FolderPicker({ open, onOpenChange, start, mode, onPick }: Folder
           <Button type="button" size="icon" variant="outline" className="size-8 shrink-0" aria-label={t('Up one folder')} onClick={() => setDir(parentOf(dir))}>
             <ChevronUp className="size-4" />
           </Button>
-          <Input key={dir} name="picker-path" aria-label={t('Folder path')} defaultValue={dir} className="h-8 text-sm" />
+          <Input {...NO_AUTOFILL} key={dir} name="picker-path" aria-label={t('Folder path')} defaultValue={dir} className="h-8 text-sm" />
           <Button type="submit" size="sm" variant="outline"><ArrowRight />{t('Go')}</Button>
         </form>
         <div className="min-h-0 flex-1 overflow-y-auto">

@@ -1,4 +1,4 @@
-// What scrolls the page: in the frame (wide screens, or scrollbars that take room) the area below
+// What scrolls the page: in the frame (the wide layout) the area below
 // the header, elsewhere the window.
 export const PAGE_SCROLL_ID = 'page-scroll'
 
@@ -7,11 +7,6 @@ export function pageScroller(): HTMLElement {
   return area && getComputedStyle(area).overflowY === 'auto' ? area : (document.scrollingElement as HTMLElement ?? document.documentElement)
 }
 
-// Whether the page is in the frame (see the `frame` variant in index.css): wide screens, or
-// scrollbars that take room.
-export function inFrame(wide: boolean): boolean {
-  return wide || document.documentElement.dataset.scrollbars === 'room'
-}
 
 // A page as tall as the screen below the header, so its lists stop at the bottom and scroll on
 // their own instead of the page: the frame's height on wide screens, the window's below the

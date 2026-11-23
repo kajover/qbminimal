@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, type QueryClient, type QueryKey } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
 import { hasStatus, qbitClient, type LogLevels } from '@/lib/api'
 import { disguiseTorrents, incognitoName, incognitoOn, useIncognito } from '@/lib/incognito'
@@ -55,9 +55,24 @@ export const usePreferences = () => useQuery({
 export const useSavePreferences = () =>
   useServerChange((changes: Record<string, unknown>) => qbitClient.setPreferences(changes), [['preferences'], ['bannedPeers']], t('Failed to save settings'))
 
-export const useAppVersion = () => useQuery({ queryKey: ['app', 'version'], queryFn: () => qbitClient.getAppVersion() })
+const APP_VERSION = { queryKey: ['app', 'version'], queryFn: () => qbitClient.getAppVersion() }
+const WEB_API_VERSION = { queryKey: ['app', 'webApiVersion'], queryFn: () => qbitClient.getWebApiVersion(), staleTime: Infinity }
+const BUILD_INFO = { queryKey: ['app', 'buildInfo'], queryFn: () => qbitClient.getBuildInfo() }
+const PROCESS_INFO = { queryKey: ['app', 'processInfo'], queryFn: () => qbitClient.getProcessInfo() }
+export const useAppVersion = () => useQuery(APP_VERSION)
+export const useWebApiVersion = () => useQuery(WEB_API_VERSION)
+export const useBuildInfo = () => useQuery(BUILD_INFO)
+export const useProcessInfo = () => useQuery(PROCESS_INFO)
 
-export const useWebApiVersion = () => useQuery({ queryKey: ['app', 'webApiVersion'], queryFn: () => qbitClient.getWebApiVersion(), staleTime: Infinity })
+// What Settings shows in About and beside the update, asked for once signed in while the browser
+// is idle, so Settings opens whole instead of its rows appearing one by one.
+export function prefetchSettings(client: QueryClient) {
+  void client.prefetchQuery(APP_VERSION)
+  void client.prefetchQuery(WEB_API_VERSION)
+  void client.prefetchQuery(BUILD_INFO)
+  void client.prefetchQuery(PROCESS_INFO)
+  void client.prefetchQuery({ queryKey: ['preferences'], queryFn: () => qbitClient.getPreferences() })
+}
 
 // Whether the running qBittorrent has a newer Web API feature. False until its version is known.
 export function useApiFeature(feature: ApiFeature): boolean {

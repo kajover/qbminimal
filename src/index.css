@@ -21,25 +21,17 @@
     @slot;
   }
 }
-/* The page's frame: the header on top, and only the area below it scrolling. On wide screens, and
-   at any width where scrollbars take room (main.tsx marks the page), so the header always spans
-   the window and its scrollbar starts below it. Phones keep scrolling the window (see Layout). */
+/* The page's frame, in the wide layout: the header on top, and only the area below it
+   scrolling. Below that the window scrolls the page (window-scroll; see Layout). Named for what
+   they do; they cover the same widths as wide and narrow. */
 @custom-variant frame {
   @media (min-width: 1200px), (min-width: 900px) and (min-height: 540px) and (orientation: landscape), (min-width: 660px) and (min-height: 840px) {
     @slot;
   }
-  &:where(:root[data-scrollbars='room'] *) {
-    @slot;
-  }
 }
-
-/* The opposite of the frame: phones and narrow windows whose scrollbars take no room, where the
-   window scrolls the page. */
 @custom-variant window-scroll {
   @media (max-width: 659.98px), (max-width: 899.98px) and (max-height: 839.98px), (max-width: 1199.98px) and (max-height: 539.98px), (max-width: 1199.98px) and (orientation: portrait) and (max-height: 839.98px) {
-    &:where(:root:not([data-scrollbars='room']) *) {
-      @slot;
-    }
+    @slot;
   }
 }
 
@@ -118,49 +110,14 @@
     @apply border-border outline-ring/50;
   }
 
-  /* Scrollbars as qui has them: thin, with no track, and only while the pointer is over the box
-     that scrolls (or it holds the focus); they fade out 0.2s after it leaves. The same both ways,
-     so a table's sideways scrollbar too. Standard properties for Chrome, Edge and Firefox; the
-     webkit ones for Safari, which draws the thumb 6px wide inside a 12px bar. */
+  /* The browser's own scrollbars never show: they took room even when hidden, a blank strip over
+     the table's last column. Scrolling works as ever (wheel, trackpad, keys, touch); with a mouse,
+     a thin scrollbar of our own appears over the content where it's wanted (src/lib/scrollbars.ts). */
   * {
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-    transition: scrollbar-color 0.2s;
-  }
-  :hover,
-  :focus-within {
-    scrollbar-color: var(--border) transparent;
+    scrollbar-width: none;
   }
   ::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-  }
-  ::-webkit-scrollbar-track,
-  ::-webkit-scrollbar-corner {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    border: 3px solid transparent;
-    border-radius: var(--radius);
-    background-color: transparent;
-    background-clip: content-box;
-  }
-  :hover::-webkit-scrollbar-thumb,
-  :focus-within::-webkit-scrollbar-thumb {
-    background-color: var(--border);
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--muted-foreground);
-  }
-  /* Touch phones show none, as qui: a swipe scrolls, and the phone's own indicator shows while it
-     does. Not narrow windows with a mouse, which need them. */
-  @media (max-width: 768px) and (hover: none) {
-    * {
-      scrollbar-width: none;
-    }
-    ::-webkit-scrollbar {
-      display: none;
-    }
+    display: none;
   }
 
   /* No grey box from iPhone Safari around what's tapped, and no browser focus outline after a
@@ -566,10 +523,6 @@ select:not([multiple]):not([size]) {
     overscroll-behavior-y: none;
   }
 }
-:root[data-scrollbars='room'],
-:root[data-scrollbars='room'] body {
-  overscroll-behavior-y: none;
-}
 
 /* Maximized torrent details on phones are the page; the list steps aside until they're smaller. */
 /* Pulling the maximized details down moves them, so Safari doesn't reload the page then. */
@@ -607,6 +560,31 @@ select:not([multiple]):not([size]) {
   inset: 0;
   overflow-y: auto;
   overscroll-behavior-y: contain;
+}
+
+/* The scrollbar drawn over the content (src/lib/scrollbars.ts): a thin thumb, no track, shown
+   only while the pointer is on the strip along a box's edge, fading in and out in qui's 0.2s. */
+.overlay-scrollbar {
+  position: fixed;
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.overlay-scrollbar[data-shown] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.overlay-scrollbar > div {
+  position: absolute;
+  border-radius: 9999px;
+  background: var(--muted-foreground);
+  opacity: 0.5;
+  cursor: default;
+}
+.overlay-scrollbar > div:hover,
+.overlay-scrollbar[data-dragging] > div {
+  opacity: 0.8;
 }
 
 /* Back behind the details while they're dragged down (data-details-peek). */

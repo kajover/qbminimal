@@ -9,6 +9,7 @@ import type { PageId } from '@/components/navigation'
 import { TorrentsView } from '@/components/torrents/TorrentsView'
 import { AddTorrentView } from '@/components/torrents/AddTorrentView'
 import { SessionProvider } from '@/components/SessionProvider'
+import { prefetchSettings } from '@/hooks/useApi'
 import { useSession } from '@/hooks/useSession'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { hasIncoming, onIncoming } from '@/lib/incoming'
@@ -34,7 +35,11 @@ const PAGE_VIEWS: Record<PageId, ComponentType> = {
   statistics: lazy(LOADERS.statistics),
   settings: lazy(LOADERS.settings),
 }
-const preloadPages = () => Object.values(LOADERS).forEach(load => void load())
+// With them, what Settings shows from qBittorrent, so it opens whole.
+const preloadPages = () => {
+  Object.values(LOADERS).forEach(load => void load())
+  prefetchSettings(queryClient)
+}
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 5000, retry: 1 } } })
 

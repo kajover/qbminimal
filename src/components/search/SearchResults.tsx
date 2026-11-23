@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useRemembered } from '@/hooks/useRemembered'
-import { inFrame, pageScroller, ROOM_FOR_TABLE, WIDE } from '@/lib/pageScroll'
+import { pageScroller, ROOM_FOR_TABLE, WIDE } from '@/lib/pageScroll'
 import { useGrowingList } from '@/hooks/useGrowingList'
 import { useRowWindow } from '@/hooks/useRowWindow'
 import { createPortal } from 'react-dom'
@@ -113,7 +113,8 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   // Like the torrent list: the table where it fits and cards on phones, unless one is picked.
   const wide = useMediaQuery(WIDE)
   const roomy = useMediaQuery(ROOM_FOR_TABLE)
-  const framed = inFrame(wide)
+  // In the frame (wide), only the list scrolls; elsewhere the window does.
+  const framed = wide
   const [view, setViewState] = useState(loadSearchView)
   const shown = view ?? (roomy ? 'table' : 'cards')
   const showTable = shown !== 'cards'
