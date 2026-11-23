@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Απόκρυψη αυτών, σε οθόνες αφής",
   "Select every torrent": "Επιλογή όλων των torrents",
   "Show or hide the filters": "Εμφάνιση ή απόκρυψη των φίλτρων",
-  "Switch between table and cards": "Εναλλαγή μεταξύ πίνακα και καρτών",
   "Go to a page, in the menu's order": "Μετάβαση σε σελίδα, με τη σειρά του μενού",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Κάνε κλικ για να δεις μόνο αυτά. Ctrl ή ⌘ και κλικ, ή παρατεταμένο πάτημα, για να τα κρύψεις.",
   "Hidden": "Κρυφό",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Φόρτωσε ξανά για να τη χρησιμοποιήσεις. Η παλιά έκδοση μένει στο {folder}.",
   "Selection bar reset": "Η γραμμή επιλογής επαναφέρθηκε",
   "Show shortcuts": "Εμφάνιση συντομεύσεων",
-  "Installs it from GitHub, replacing this one.": "Την εγκαθιστά από το GitHub στη θέση αυτής."
+  "Installs it from GitHub, replacing this one.": "Την εγκαθιστά από το GitHub στη θέση αυτής.",
+  "Compact view": "Συμπαγής προβολή",
+  "Switch between table, compact and cards": "Εναλλαγή μεταξύ πίνακα, συμπαγούς προβολής και καρτών"
 }

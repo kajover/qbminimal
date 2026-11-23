@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Ascunde acestea, pe ecrane tactile",
   "Select every torrent": "Selectează toate torentele",
   "Show or hide the filters": "Arată sau ascunde filtrele",
-  "Switch between table and cards": "Comută între tabel și carduri",
   "Go to a page, in the menu's order": "Mergi la o pagină, în ordinea meniului",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Fă clic ca să vezi doar acestea. Ctrl sau ⌘ și clic, ori ține apăsat, ca să le ascunzi.",
   "Hidden": "Ascuns",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Reîncarcă ca să o folosești. Versiunea veche rămâne în {folder}.",
   "Selection bar reset": "Bara de selecție a fost resetată",
   "Show shortcuts": "Arată scurtăturile",
-  "Installs it from GitHub, replacing this one.": "O instalează de pe GitHub în locul acesteia."
+  "Installs it from GitHub, replacing this one.": "O instalează de pe GitHub în locul acesteia.",
+  "Compact view": "Vizualizare compactă",
+  "Switch between table, compact and cards": "Comută între tabel, vizualizare compactă și carduri"
 }

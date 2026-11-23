@@ -15,7 +15,7 @@ import type { RowProps } from '@/hooks/useRowPress'
 import type { Torrent } from '@/types'
 import { useTransferInfo } from '@/hooks/useApi'
 import { ColumnMenuItems } from '@/components/ColumnMenuItems'
-import { fittedWidth, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
+import { COMPACT_ROWS, fittedWidth, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
 import { ColumnFilterButton, SidebarFilterButton, type FilterTarget } from '@/components/ColumnFilters'
 import type { ColumnFilter, ColumnFilters } from '@/lib/columnFilters'
 import { modKey, withKeys } from '@/lib/shortcutKeys'
@@ -126,12 +126,14 @@ interface TorrentTableProps {
   onColumnFilter: (id: ColumnId, filter: ColumnFilter | null) => void
   /** Shown below the rows (the pages, outside the frame). */
   footer?: ReactNode
+  // The compact view: the same table with low rows.
+  compact?: boolean
 }
 
 // A table whose columns can be dragged to a new place, resized from their right edge, sorted by
 // clicking, and shown or hidden from the Columns menu. Alt + arrow keys on a header move it too.
 // Clicking a row selects it and opens its details; Ctrl or Cmd adds to the selection, Shift a range.
-export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, selected, selectAllState, onToggle, onSelectAll, openHash, sortField, sortDirection, sortShown, onSort, rowProps, wrapBody, columnFilters, filterTargets, onColumnFilter, sidebarFilter, footer }: TorrentTableProps) {
+export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, selected, selectAllState, onToggle, onSelectAll, openHash, sortField, sortDirection, sortShown, onSort, rowProps, wrapBody, columnFilters, filterTargets, onColumnFilter, sidebarFilter, footer, compact }: TorrentTableProps) {
   const { data: serverState } = useTransferInfo()
   // qBittorrent hides its # column while queueing is off, when every torrent would show *.
   const defaultSort = !sortShown
@@ -280,7 +282,9 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
       </div>
       {/* Its own scrollbar is hidden: the one at the bottom of the screen stands in for it. */}
       <div ref={scroller} data-row-scroller onScroll={() => syncScroll(scroller.current, head.current)} style={LINKED_SCROLL ? { scrollTimeline: '--table-x inline' } as CSSProperties : undefined} className="min-h-0 overflow-auto overscroll-x-none rounded-b-xl">
-      <table className="table-fixed caption-bottom text-sm tabular-nums" style={tableWidth}>
+      {/* Compact: the rows lose most of their padding (about 25px instead of 37px, as qui's dense
+          rows), so more fit in the same height. */}
+      <table className={cn('table-fixed caption-bottom text-sm tabular-nums', compact && COMPACT_ROWS)} style={tableWidth}>
         {colgroup}
         {wrapBody(
           <tbody>

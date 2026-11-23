@@ -291,7 +291,7 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
   )
 
   return (
-    // Below the wide layout (1200px, or 1024px held sideways) the window scrolls the page, under a glass header and a floating
+    // Below the wide layout (WIDE in pageScroll.ts) the window scrolls the page, under a glass header and a floating
     // glass tab bar, with room at the end so it can always come clear of the tab bar. Only a scrolling
     // window lets iPhone Safari show the page on behind its address bar; a fixed frame stops at it
     // and leaves a blank strip. Nothing may make the page wider than the screen: iPhone Safari would
@@ -386,7 +386,7 @@ export function Layout({ page, shownPage = page, onNavigate, children }: LayoutP
       >
         <div className="flex justify-around px-1 py-1.5">
           {MAIN_PAGES.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)} className={cn('flex min-w-0 flex-auto flex-col items-center rounded-full px-1 py-1 transition-colors [:root[data-tab-labels=off]_&]:py-2', page === id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground')}>
+            <button key={id} type="button" aria-current={page === id ? 'page' : undefined} onClick={() => onNavigate(id)} className={cn('flex min-w-0 flex-auto flex-col items-center rounded-full px-1 py-1 [:root[data-tab-labels=off]_&]:py-2', page === id ? 'bg-foreground/10 text-foreground' : 'text-muted-foreground')}>
               {/* 18px icons over 12px names; with the names hidden in Settings, 20px icons on their own. */}
               <span className="relative">
                 <Icon className="size-4.5 [:root[data-tab-labels=off]_&]:size-5" />

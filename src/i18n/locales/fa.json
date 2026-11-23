@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "این‌ها را پنهان کن، در صفحه‌های لمسی",
   "Select every torrent": "انتخاب همه تورنت‌ها",
   "Show or hide the filters": "نمایش یا پنهان کردن فیلترها",
-  "Switch between table and cards": "جابه‌جایی بین جدول و کارت",
   "Go to a page, in the menu's order": "رفتن به یک صفحه، به ترتیب منو",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "برای نمایش فقط این‌ها کلیک کن. برای پنهان کردنشان Ctrl یا ⌘ و کلیک کن، یا نگه دار.",
   "Hidden": "پنهان",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "برای استفاده، دوباره بارگذاری کن. نسخه قدیمی در {folder} می‌ماند.",
   "Selection bar reset": "نوار انتخاب بازنشانی شد",
   "Show shortcuts": "نمایش میان‌برها",
-  "Installs it from GitHub, replacing this one.": "آن را از GitHub به‌جای این نسخه نصب می‌کند."
+  "Installs it from GitHub, replacing this one.": "آن را از GitHub به‌جای این نسخه نصب می‌کند.",
+  "Compact view": "نمای فشرده",
+  "Switch between table, compact and cards": "جابه‌جایی بین جدول، نمای فشرده و کارت"
 }

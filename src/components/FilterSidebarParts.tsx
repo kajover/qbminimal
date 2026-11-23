@@ -7,6 +7,7 @@ import { SearchInput } from '@/components/SearchInput'
 import { useLongPress } from '@/hooks/useLongPress'
 import { cn } from '@/lib/utils'
 import { keepOpenForNotices } from '@/lib/notices'
+import { WIDE } from '@/lib/pageScroll'
 import { t } from '@/i18n'
 
 // The parts both filter sidebars are built from, on the torrent list and the Search page: folding
@@ -165,8 +166,9 @@ function useListBox(list: HTMLElement | null | undefined, open: boolean): CSSPro
       const rtl = getComputedStyle(list).direction === 'rtl'
       setBox({
         top: `max(${column.top}px, var(--header-height, calc(3rem + 1px + env(safe-area-inset-top))))`,
-        // Where the table ends at its largest: above the tab bar and selection bar.
-        bottom: 'calc(var(--bottom-nav-height, 0px) + var(--selection-bar-gap, 0.25rem))',
+        // Where the table ends at its largest: above the tab bar and selection bar, or in the wide
+        // layout (an upright tablet) 16px above the window's bottom, as the lists end there.
+        bottom: window.matchMedia(WIDE).matches ? '1rem' : 'calc(var(--bottom-nav-height, 0px) + var(--selection-bar-gap, 0.25rem))',
         insetInlineEnd: rtl ? left : window.innerWidth - right,
       })
     }

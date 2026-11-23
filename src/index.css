@@ -8,15 +8,16 @@
    (data-pointer, main.tsx) they stay hidden until a key is pressed. */
 @custom-variant focus-visible (&:focus-visible:where(:root:not([data-pointer]) *));
 /* The desktop layout (menu sidebar, docked details, the selection bar in the header): from 1200px,
-   and on a tablet held sideways from 1024px, like an iPad. `narrow` is everything else, with the
-   tab bar. Keep both in step with WIDE in src/lib/pageScroll.ts. */
+   held sideways from 900px wide and 540px tall (a tablet like an iPad, an open iPhone Duo), and
+   upright from 660px wide and 840px tall (an upright tablet or open iPhone Duo). `narrow` is
+   everything else, with the tab bar. Keep both in step with WIDE in src/lib/pageScroll.ts. */
 @custom-variant wide {
-  @media (min-width: 1200px), (min-width: 1024px) and (orientation: landscape) {
+  @media (min-width: 1200px), (min-width: 900px) and (min-height: 540px) and (orientation: landscape), (min-width: 660px) and (min-height: 840px) {
     @slot;
   }
 }
 @custom-variant narrow {
-  @media (max-width: 1023.98px), (max-width: 1199.98px) and (orientation: portrait) {
+  @media (max-width: 659.98px), (max-width: 899.98px) and (max-height: 839.98px), (max-width: 1199.98px) and (max-height: 539.98px), (max-width: 1199.98px) and (orientation: portrait) and (max-height: 839.98px) {
     @slot;
   }
 }
@@ -24,7 +25,7 @@
    at any width where scrollbars take room (main.tsx marks the page), so the header always spans
    the window and its scrollbar starts below it. Phones keep scrolling the window (see Layout). */
 @custom-variant frame {
-  @media (min-width: 1200px), (min-width: 1024px) and (orientation: landscape) {
+  @media (min-width: 1200px), (min-width: 900px) and (min-height: 540px) and (orientation: landscape), (min-width: 660px) and (min-height: 840px) {
     @slot;
   }
   &:where(:root[data-scrollbars='room'] *) {
@@ -35,7 +36,7 @@
 /* The opposite of the frame: phones and narrow windows whose scrollbars take no room, where the
    window scrolls the page. */
 @custom-variant window-scroll {
-  @media (max-width: 1023.98px), (max-width: 1199.98px) and (orientation: portrait) {
+  @media (max-width: 659.98px), (max-width: 899.98px) and (max-height: 839.98px), (max-width: 1199.98px) and (max-height: 539.98px), (max-width: 1199.98px) and (orientation: portrait) and (max-height: 839.98px) {
     &:where(:root:not([data-scrollbars='room']) *) {
       @slot;
     }
@@ -410,6 +411,8 @@
   /* How far the tab bar, or the selection bar in its place, sits from the bottom of the page. */
   --bottom-edge: max(var(--nav-gap), env(safe-area-inset-bottom));
   --bottom-nav-height: calc(var(--nav-bar-height, 3.75rem) + var(--bottom-edge));
+  /* The phone details sheet's bottom: the window's bottom edge, or above the tab bar. */
+  --sheet-bottom: calc(var(--bottom-nav-height, 0px) + var(--selection-bar-gap, 0.25rem) - var(--nav-gap, 4px));
 }
 /* iPhone Safari in its own window, upright: the page ends at Safari's address bar, which floats
    with room of its own above it, so the tab bar can sit lower, closer to that bar. Not lower than
@@ -427,14 +430,14 @@
     }
   }
 }
-@media (min-width: 1200px), (min-width: 1024px) and (orientation: landscape) { /* wide */
+@media (min-width: 1200px), (min-width: 900px) and (min-height: 540px) and (orientation: landscape), (min-width: 660px) and (min-height: 840px) { /* wide */
   :root {
     --bottom-nav-height: 0px;
   }
 }
 /* Phones without the tab bar (Settings > Menu bar off): the selection bar and the table's
    scrollbar take its place, as far from the screen's edge as the tab bar would be. */
-@media (max-width: 1023.98px), (max-width: 1199.98px) and (orientation: portrait) {
+@media (max-width: 659.98px), (max-width: 899.98px) and (max-height: 839.98px), (max-width: 1199.98px) and (max-height: 539.98px), (max-width: 1199.98px) and (orientation: portrait) and (max-height: 839.98px) {
   :root:not([data-menu-bar='on']) {
     --bottom-nav-height: var(--bottom-edge);
     --selection-bar-gap: 0px;
@@ -510,11 +513,55 @@ select:not([multiple]):not([size]) {
   user-select: none;
 }
 
+/* In the frame only lists scroll, so the window never bounces at a list's end: it would move the
+   header, list and sidebars but not the docked details, which are fixed. */
+@media (min-width: 1200px), (min-width: 900px) and (min-height: 540px) and (orientation: landscape), (min-width: 660px) and (min-height: 840px) { /* wide */
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+}
+:root[data-scrollbars='room'],
+:root[data-scrollbars='room'] body {
+  overscroll-behavior-y: none;
+}
+
 /* Maximized torrent details on phones are the page; the list steps aside until they're smaller. */
 /* Pulling the maximized details down moves them, so Safari doesn't reload the page then. */
 :root[data-details-full],
 :root[data-details-full] body {
   overscroll-behavior-y: none;
+}
+
+/* Wide screens: the list under maximized details (data-details-cover) is hidden, keeping its
+   place, so nothing of it shows at their sides. */
+:root[data-details-cover] [data-list-edge] {
+  visibility: hidden;
+}
+
+/* The medium phone sheet carries its card colour on 6rem past its bottom edge (a box-shadow, as
+   its overflow is hidden; not a shadow to see). Safari in an iPad window grows the window
+   downward when its toolbar hides, while the fixed sheet keeps its place: without this, the
+   cards showed through the strip below it. */
+[data-details-sheet='medium'] {
+  box-shadow: 0 6rem 0 0 var(--card);
+}
+
+/* While the medium phone sheet is open, the list scrolls in <main> instead of the window, so
+   Safari keeps its toolbar as it is (useListScrollsInPage in TorrentDetails). */
+:root[data-sheet-scroll],
+:root[data-sheet-scroll] body {
+  height: 100%;
+  overflow: hidden;
+}
+/* Held to the window like the sheet, so the list ends where the sheet does: on an iPhone Safari
+   draws the page on behind its floating address bar, below the sheet, and a taller box showed
+   the cards there. */
+:root[data-sheet-scroll] main {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
 }
 
 /* Back behind the details while they're dragged down (data-details-peek). */

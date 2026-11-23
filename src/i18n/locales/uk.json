@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Сховати ці, на сенсорних екранах",
   "Select every torrent": "Вибрати всі торенти",
   "Show or hide the filters": "Показати або сховати фільтри",
-  "Switch between table and cards": "Перемкнути між таблицею й картками",
   "Go to a page, in the menu's order": "Перейти на сторінку, у порядку меню",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Натисніть, щоб показати лише ці. Ctrl або ⌘ і клік, або утримання, ховає їх.",
   "Hidden": "Приховано",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Перезавантажте, щоб користуватися. Стара версія лишається в {folder}.",
   "Selection bar reset": "Панель вибору скинуто",
   "Show shortcuts": "Показати сполучення",
-  "Installs it from GitHub, replacing this one.": "Встановлює її з GitHub замість цієї."
+  "Installs it from GitHub, replacing this one.": "Встановлює її з GitHub замість цієї.",
+  "Compact view": "Компактний вигляд",
+  "Switch between table, compact and cards": "Перемкнути між таблицею, компактним виглядом і картками"
 }

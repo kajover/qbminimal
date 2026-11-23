@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Ẩn những mục này, trên màn hình cảm ứng",
   "Select every torrent": "Chọn mọi torrent",
   "Show or hide the filters": "Hiện hoặc ẩn bộ lọc",
-  "Switch between table and cards": "Chuyển giữa bảng và thẻ",
   "Go to a page, in the menu's order": "Chuyển đến một trang, theo thứ tự menu",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Nhấp để chỉ hiện những mục này. Ctrl hoặc ⌘ rồi nhấp, hoặc nhấn giữ, để ẩn chúng.",
   "Hidden": "Ẩn",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Hãy tải lại để dùng. Phiên bản cũ vẫn nằm trong {folder}.",
   "Selection bar reset": "Đã đặt lại thanh chọn",
   "Show shortcuts": "Hiện phím tắt",
-  "Installs it from GitHub, replacing this one.": "Cài đặt từ GitHub, thay thế phiên bản này."
+  "Installs it from GitHub, replacing this one.": "Cài đặt từ GitHub, thay thế phiên bản này.",
+  "Compact view": "Dạng gọn",
+  "Switch between table, compact and cards": "Chuyển giữa bảng, dạng gọn và thẻ"
 }

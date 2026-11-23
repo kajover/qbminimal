@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Sembunyikan ini, di layar sentuh",
   "Select every torrent": "Pilih semua torrent",
   "Show or hide the filters": "Tampilkan atau sembunyikan filter",
-  "Switch between table and cards": "Beralih antara tabel dan kartu",
   "Go to a page, in the menu's order": "Buka halaman, sesuai urutan menu",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Klik untuk menampilkan hanya ini. Ctrl atau ⌘ dan klik, atau tahan, untuk menyembunyikannya.",
   "Hidden": "Disembunyikan",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Muat ulang untuk menggunakannya. Versi lama tetap ada di {folder}.",
   "Selection bar reset": "Bilah pilihan diatur ulang",
   "Show shortcuts": "Tampilkan pintasan",
-  "Installs it from GitHub, replacing this one.": "Menginstalnya dari GitHub, menggantikan versi ini."
+  "Installs it from GitHub, replacing this one.": "Menginstalnya dari GitHub, menggantikan versi ini.",
+  "Compact view": "Tampilan ringkas",
+  "Switch between table, compact and cards": "Beralih antara tabel, tampilan ringkas, dan kartu"
 }

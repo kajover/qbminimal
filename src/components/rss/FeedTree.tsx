@@ -44,7 +44,7 @@ export function FeedTree({ feeds, folders, selected, search = '', onSelect, onRe
         aria-pressed={selected === feed.uid}
         onClick={() => onSelect(feed.uid)}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(feed.uid) } }}
-        className={cn('flex cursor-pointer items-start gap-1 px-2 py-2 transition-colors outline-hidden hover:bg-muted/60 focus-visible:bg-muted/60', selected === feed.uid && 'bg-muted')}
+        className={cn('flex cursor-pointer items-start gap-1 px-2 py-2 outline-hidden hover:bg-muted/60 focus-visible:bg-muted/60', selected === feed.uid && 'bg-muted')}
         style={{ marginLeft: depth * STEP }}
       >
         <span className="min-w-0 flex-1">

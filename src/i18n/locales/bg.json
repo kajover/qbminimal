@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Скриване на тези, на сензорни екрани",
   "Select every torrent": "Избиране на всички торенти",
   "Show or hide the filters": "Показване или скриване на филтрите",
-  "Switch between table and cards": "Превключване между таблица и карти",
   "Go to a page, in the menu's order": "Отиване на страница, в реда на менюто",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Щракнете, за да покажете само тези. Ctrl или ⌘ и щракване, или задържане, за да ги скриете.",
   "Hidden": "Скрито",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Презаредете, за да го използвате. Старата версия остава в {folder}.",
   "Selection bar reset": "Лентата за избор е нулирана",
   "Show shortcuts": "Покажи комбинациите",
-  "Installs it from GitHub, replacing this one.": "Инсталира я от GitHub на мястото на тази."
+  "Installs it from GitHub, replacing this one.": "Инсталира я от GitHub на мястото на тази.",
+  "Compact view": "Компактен изглед",
+  "Switch between table, compact and cards": "Превключване между таблица, компактен изглед и карти"
 }

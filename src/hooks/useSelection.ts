@@ -1,9 +1,11 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
+import { useRemembered } from './useRemembered'
 import { rangeBetween } from '@/lib/selection'
 
-// A set of selected keys, with the last clicked one kept as the anchor for Shift ranges.
-export function useSelection(order: readonly string[]) {
-  const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set())
+// A set of selected keys, with the last clicked one kept as the anchor for Shift ranges. With a
+// memory key it's kept while another page shows.
+export function useSelection(order: readonly string[], memoryKey?: string) {
+  const [selected, setSelected] = useRemembered<ReadonlySet<string>>(memoryKey, () => new Set())
   const anchor = useRef<string | null>(null)
 
   return {

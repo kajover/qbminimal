@@ -28,10 +28,10 @@ function breakable(text: string) {
   return text.split(/(?<=[._])/).map((part, i) => <Fragment key={i}>{i > 0 && <wbr />}{part}</Fragment>)
 }
 
-function Identity({ label, value, wide, full, empty, extra }: { label: string; value: string | undefined; wide?: boolean; full?: boolean; empty?: string; extra?: ReactNode }) {
+function Identity({ label, value, wide, full, empty, extra, mark }: { label: string; value: string | undefined; wide?: boolean; full?: boolean; empty?: string; extra?: ReactNode; mark?: Record<`data-${string}`, string> }) {
   if (!value && !empty) return null
   return (
-    <div className={cn('min-w-0', (wide || full) && 'sm:col-span-2')}>
+    <div {...mark} className={cn('min-w-0', (wide || full) && 'sm:col-span-2')}>
       <dt className="text-xs text-muted-foreground">{label}</dt>
       {/* The name wraps, so it's always whole, with the copy button beside its first line. */}
       <dd className={cn('flex min-h-6 min-w-0 gap-1', wide ? 'items-start' : 'items-center')}>
@@ -49,10 +49,10 @@ function Identity({ label, value, wide, full, empty, extra }: { label: string; v
 }
 
 // One figure in a column: the name on the left, the value on the right.
-function Stat({ label, value, className }: { label: string; value: Value; className?: string }) {
+function Stat({ label, value, className, mark }: { label: string; value: Value; className?: string; mark?: Record<`data-${string}`, string> }) {
   if (!shown(value)) return null
   return (
-    <div className="flex items-baseline justify-between gap-3 py-0.5 text-xs">
+    <div {...mark} className="flex items-baseline justify-between gap-3 py-0.5 text-xs">
       <dt className="shrink-0 text-muted-foreground">{label}</dt>
       <dd className={cn('truncate text-end font-medium tabular-nums', className)} title={typeof value === 'string' ? value : undefined}>{value}</dd>
     </div>
@@ -77,11 +77,11 @@ export function TorrentInfoTab({ torrent: x }: { torrent: Torrent }) {
   const has = (n: number | undefined) => n !== undefined && n >= 0
   const pair = (a: number, b: number) => `${Math.max(a, 0)} / ${Math.max(b, 0)}`
   const exportButton = x.has_metadata === false ? (
-    <span className="inline-flex cursor-not-allowed" title={t('Available once qBittorrent has this torrent\'s metadata')}>
+    <span data-details-reach className="inline-flex cursor-not-allowed" title={t('Available once qBittorrent has this torrent\'s metadata')}>
       <Button size="sm" variant="ghost" className="h-6 shrink-0 px-2 text-xs" disabled><Download className="size-3" />{t('Export .torrent')}</Button>
     </span>
   ) : (
-    <Button size="sm" variant="ghost" className="h-6 shrink-0 px-2 text-xs" asChild>
+    <Button data-details-reach size="sm" variant="ghost" className="h-6 shrink-0 px-2 text-xs" asChild>
       <a href={getTorrentExportUrl(x.hash)} download={`${x.name}.torrent`}><Download className="size-3" />{t('Export .torrent')}</a>
     </Button>
   )
@@ -96,7 +96,8 @@ export function TorrentInfoTab({ torrent: x }: { torrent: Torrent }) {
         <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
           <Identity label={t('Name')} value={x.name} wide />
           <Identity label={t('Size')} value={formatBytes(x.size)} />
-          <Identity label={t('Hash')} value={x.hash} />
+          {/* The phone sheet, dragged down, closes once its top passes this row (TorrentDetails). */}
+          <Identity label={t('Hash')} value={x.hash} mark={{ 'data-details-close': '' }} />
           <Identity label={t('Hash (v2)')} value={x.infohash_v2} />
           <Identity label={t('Save path')} value={x.save_path} />
           {/* qBittorrent's temporary path; without one, incomplete files are in the save path, shown again. */}
@@ -111,7 +112,8 @@ export function TorrentInfoTab({ torrent: x }: { torrent: Torrent }) {
           <Stat label={t('Progress')} value={t('{part} of {whole}', { part: `${Math.floor(x.progress * 100)}%`, whole: formatBytes(x.size) })} />
           <Stat label={t('Downloaded')} value={formatBytes(x.downloaded ?? x.total_downloaded ?? 0)} />
           <Stat label={t('Uploaded')} value={formatBytes(x.uploaded)} />
-          <Stat label={t('Ratio')} value={x.ratio.toFixed(2)} />
+          {/* The phone sheet, dragged up, grows until this row shows; further, it maximizes. */}
+          <Stat label={t('Ratio')} value={x.ratio.toFixed(2)} mark={{ 'data-details-grow': '' }} />
           <Stat label={t('Wasted')} value={has(x.total_wasted) && formatBytes(x.total_wasted!)} />
           <Stat label={t('Queue position')} value={x.priority > 0 ? x.priority : t('Not queued')} />
         </Column>

@@ -1,4 +1,5 @@
-import { ArrowUpDown, Columns3, LayoutList, PanelRight, Plus, RotateCcw, Search, Table2 } from 'lucide-react'
+import { ArrowUpDown, Columns3, PanelRight, Plus, RotateCcw, Search } from 'lucide-react'
+import { ViewSwitch } from '@/components/ViewSwitch'
 import { SearchInput } from '@/components/SearchInput'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { Button } from '@/components/ui/button'
@@ -119,10 +120,7 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen,
         </DropdownMenu>
       )}
 
-      {/* One button that switches to the other view, showing that view's icon. */}
-      <Button variant="outline" size="icon" className="size-8" aria-label={list.showTable ? t('Card view') : t('Table view')} title={withKeys(list.showTable ? t('Card view') : t('Table view'), 'V')} onClick={() => list.showAsTable(!list.showTable)}>
-        {list.showTable ? <LayoutList className="size-4" /> : <Table2 className="size-4" />}
-      </Button>
+      <ViewSwitch shown={list.shown} onChoose={list.chooseView} />
       {/* Last, at the edge where the filter sidebar opens. */}
       <Button variant={filtersOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={list.narrowed ? t('Search and filter (filters on)') : t('Search and filter')} title={withKeys(list.narrowed ? t('Search and filter (filters on)') : t('Search and filter'), 'F')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
         {/* Opens the filter sidebar. */}

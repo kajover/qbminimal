@@ -145,7 +145,7 @@ export function RSSRules() {
       ) : (
         <ul className="divide-y">
         {shownRules.map(([name, rule]) => (
-          <li key={name} className="flex items-center gap-2 px-2 py-2 transition-colors hover:bg-muted/60">
+          <li key={name} className="flex items-center gap-2 px-2 py-2 hover:bg-muted/60">
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{name}</p>
                 <p className="truncate text-xs text-muted-foreground">

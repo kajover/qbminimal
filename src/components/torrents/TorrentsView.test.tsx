@@ -174,7 +174,23 @@ describe('the torrent list', () => {
     expect(within(screen.getAllByRole('table').at(-1)!).queryByText('alpha')).toBeNull()
   })
 
-  it('starts selecting on a long press and toggles with taps after that', async () => {
+  it('on a wide screen a tap selects the row and opens its details, as a click does', async () => {
+    await renderView()
+    const touch = { pointerType: 'touch', clientX: 10, clientY: 10 }
+    fireEvent.pointerDown(row('bravo'), touch)
+    fireEvent.pointerUp(row('bravo'), touch)
+    fireEvent.click(row('bravo'))
+    expect(selectedNames()).toEqual(['bravo'])
+    fireEvent.pointerDown(row('delta'), touch)
+    fireEvent.pointerUp(row('delta'), touch)
+    fireEvent.click(row('delta'))
+    expect(selectedNames()).toEqual(['delta'])
+  })
+
+  it('on a phone starts selecting on a long press and toggles with taps after that', async () => {
+    // Below the wide layout.
+    const wide = window.matchMedia
+    const narrow = vi.spyOn(window, 'matchMedia').mockImplementation(query => ({ ...wide(query), matches: wide(query).matches && !query.includes('min-height: 840px') }))
     await renderView()
     const touch = { pointerType: 'touch', clientX: 10, clientY: 10 }
     fireEvent.pointerDown(row('bravo'), touch)
@@ -188,6 +204,7 @@ describe('the torrent list', () => {
     fireEvent.click(row('delta'))
     expect(selectedNames()).toEqual(['bravo', 'delta'])
     expect(screen.queryByRole('region', { name: 'Torrent details' })).toBeNull()
+    narrow.mockRestore()
   })
 
   it('deletes with files when ticked, and the lock remembers it for next time', async () => {

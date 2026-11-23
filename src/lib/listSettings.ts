@@ -1,11 +1,18 @@
 import { COLUMN_IDS, type ColumnId } from './torrentColumns'
+import { t } from '@/i18n'
 
 // The torrent list's sort and view, kept per device so the list opens the way it was left.
 // Its filters aren't kept: each visit starts with every torrent showing, so none can hide unnoticed.
 export type SortField = ColumnId
 export type SortDirection = 'asc' | 'desc'
 // 'auto' shows the table on wide screens and cards on phones.
-export type ListView = 'auto' | 'table' | 'cards'
+export type ListView = 'auto' | 'table' | 'compact' | 'cards'
+// The view on screen. Compact is the table with low rows, so more fit in the same height.
+export type ShownView = Exclude<ListView, 'auto'>
+// The view button goes through them in turn.
+export const NEXT_VIEW: Record<ShownView, ShownView> = { table: 'compact', compact: 'cards', cards: 'table' }
+export const viewLabel = (view: ShownView) => (view === 'table' ? t('Table view') : view === 'compact' ? t('Compact view') : t('Card view'))
+export const isShownView = (value: unknown): value is ShownView => value === 'table' || value === 'compact' || value === 'cards'
 
 export interface ListSettings {
   sortField: SortField
@@ -33,7 +40,7 @@ export function parseListSettings(raw: string | null): ListSettings {
   return {
     sortField: current && COLUMN_IDS.includes(saved.sortField as SortField) ? saved.sortField as SortField : DEFAULT_LIST_SETTINGS.sortField,
     sortDirection: current && saved.sortDirection === 'desc' ? 'desc' : 'asc',
-    view: saved.view === 'table' || saved.view === 'cards' ? saved.view : 'auto',
+    view: isShownView(saved.view) ? saved.view : 'auto',
   }
 }
 

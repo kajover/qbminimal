@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Deze verbergen, op touchscreens",
   "Select every torrent": "Alle torrents selecteren",
   "Show or hide the filters": "Filters tonen of verbergen",
-  "Switch between table and cards": "Wisselen tussen tabel en kaarten",
   "Go to a page, in the menu's order": "Naar een pagina gaan, in de volgorde van het menu",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Klik om alleen deze te tonen. Ctrl of ⌘ en klik, of vasthouden, om ze te verbergen.",
   "Hidden": "Verborgen",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Laad opnieuw om het te gebruiken. De oude versie blijft in {folder}.",
   "Selection bar reset": "Selectiebalk hersteld",
   "Show shortcuts": "Sneltoetsen weergeven",
-  "Installs it from GitHub, replacing this one.": "Installeert hem van GitHub in plaats van deze."
+  "Installs it from GitHub, replacing this one.": "Installeert hem van GitHub in plaats van deze.",
+  "Compact view": "Compacte weergave",
+  "Switch between table, compact and cards": "Wisselen tussen tabel, compacte weergave en kaarten"
 }

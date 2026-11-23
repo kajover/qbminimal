@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "これらを非表示、タッチ画面の場合",
   "Select every torrent": "すべてのトレントを選択",
   "Show or hide the filters": "フィルターの表示と非表示",
-  "Switch between table and cards": "テーブルとカードを切り替え",
   "Go to a page, in the menu's order": "ページへ移動、メニューの順",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "クリックでこれらだけを表示します。Ctrl または ⌘ を押しながらクリック、または長押しで非表示にします。",
   "Hidden": "非表示",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "使うには再読み込みしてください。古いバージョンは {folder} に残っています。",
   "Selection bar reset": "選択バーをリセットしました",
   "Show shortcuts": "ショートカットを表示",
-  "Installs it from GitHub, replacing this one.": "GitHub からインストールし、このバージョンと置き換えます。"
+  "Installs it from GitHub, replacing this one.": "GitHub からインストールし、このバージョンと置き換えます。",
+  "Compact view": "コンパクト表示",
+  "Switch between table, compact and cards": "テーブル、コンパクト、カードを切り替え"
 }

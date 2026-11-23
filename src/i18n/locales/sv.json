@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Dölj dessa, på pekskärmar",
   "Select every torrent": "Markera alla torrenter",
   "Show or hide the filters": "Visa eller dölj filtren",
-  "Switch between table and cards": "Växla mellan tabell och kort",
   "Go to a page, in the menu's order": "Gå till en sida, i menyns ordning",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Klicka för att bara visa dessa. Ctrl eller ⌘ och klicka, eller håll nere, för att dölja dem.",
   "Hidden": "Dold",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Läs in igen för att använda den. Den gamla versionen ligger kvar i {folder}.",
   "Selection bar reset": "Markeringsfältet återställt",
   "Show shortcuts": "Visa kortkommandon",
-  "Installs it from GitHub, replacing this one.": "Installerar den från GitHub i stället för denna."
+  "Installs it from GitHub, replacing this one.": "Installerar den från GitHub i stället för denna.",
+  "Compact view": "Kompakt vy",
+  "Switch between table, compact and cards": "Växla mellan tabell, kompakt vy och kort"
 }

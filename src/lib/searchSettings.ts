@@ -1,4 +1,5 @@
 import { readStored, writeStored } from './storage'
+import { isShownView, type ShownView } from './listSettings'
 
 // How the search results are shown, sorted, which columns show and how wide they are, kept on this
 // device like the torrent list's. Anything unreadable falls back to the defaults.
@@ -77,10 +78,11 @@ export const loadSearchHidden = () => parseSearchHidden(readStored(HIDDEN_KEY))
 export const saveSearchHidden = (hidden: ResizableSearchColumn[]) =>
   writeStored(HIDDEN_KEY, hidden.length === DEFAULT_SEARCH_HIDDEN.length && hidden.every(key => DEFAULT_SEARCH_HIDDEN.includes(key)) ? null : JSON.stringify(hidden))
 
-// Cards or the table; without a choice, the table on wide screens and cards on phones.
-export type SearchView = 'table' | 'cards'
+// The table, the compact table or cards; without a choice, the table on wide screens and cards
+// on phones.
+export type SearchView = ShownView
 export const loadSearchView = (): SearchView | null => {
   const saved = readStored(VIEW_KEY)
-  return saved === 'table' || saved === 'cards' ? saved : null
+  return isShownView(saved) ? saved : null
 }
 export const saveSearchView = (view: SearchView | null) => writeStored(VIEW_KEY, view)

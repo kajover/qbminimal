@@ -182,7 +182,7 @@ function LogWindow({ rows, note, latest, autoScroll, onOpen }: { rows: LogRow[];
             <ul className="divide-y">
               {rows.map(row => (
                 <li key={row.key} data-log-key={row.key}>
-                  <button type="button" onClick={() => onOpen(row)} className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 px-2 py-2 @lg:gap-x-3 text-start transition-colors hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:outline-hidden @lg:flex-nowrap @lg:items-start">
+                  <button type="button" onClick={() => onOpen(row)} className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 px-2 py-2 @lg:gap-x-3 text-start hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:outline-hidden @lg:flex-nowrap @lg:items-start">
                     {/* Columns under the titles where they fit; elsewhere the level follows the time closely. */}
                     <span className="shrink-0 text-xs tabular-nums text-muted-foreground @lg:w-40 @lg:pt-0.5">{formatLogTime(row.timestamp)}</span>
                     <span className="shrink-0 @lg:w-(--level-width)" style={{ '--level-width': `${levelColumn}px` } as CSSProperties}><LogBadge row={row} /></span>

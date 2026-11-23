@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Ocultar estos, en pantallas táctiles",
   "Select every torrent": "Seleccionar todos los torrents",
   "Show or hide the filters": "Mostrar u ocultar los filtros",
-  "Switch between table and cards": "Cambiar entre tabla y tarjetas",
   "Go to a page, in the menu's order": "Ir a una página, en el orden del menú",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Haz clic para mostrar solo estos. Ctrl o ⌘ y clic, o mantén pulsado, para ocultarlos.",
   "Hidden": "Oculto",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Recarga para usarla. La versión antigua queda en {folder}.",
   "Selection bar reset": "Barra de selección restablecida",
   "Show shortcuts": "Mostrar atajos",
-  "Installs it from GitHub, replacing this one.": "La instala desde GitHub en lugar de esta."
+  "Installs it from GitHub, replacing this one.": "La instala desde GitHub en lugar de esta.",
+  "Compact view": "Vista compacta",
+  "Switch between table, compact and cards": "Cambiar entre tabla, vista compacta y tarjetas"
 }

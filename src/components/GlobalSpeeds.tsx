@@ -1,12 +1,14 @@
 import { useTotalSpeeds, useTransferInfo } from '@/hooks/useApi'
 import { formatBytes } from '@/lib/format'
+import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
 
 // Current speeds in the header, download above upload, when turned on in Settings. Each arrow
-// keeps its place at the start of a slot with room for "999.9 KB/s", and the number ends at the
-// slot's end. A limit that's set shows faintly after its speed, on the same line, so the header
-// stays low; while qBittorrent's alternative
+// keeps its place at the start of a slot as wide as the widest speed ("999.9 MB/s", measured by an
+// invisible copy), and the number ends at the slot's end, so a changing speed never moves the
+// header's buttons. A limit that's set shows faintly after its speed, on the same line, in a slot
+// of its own, so the header stays low; while qBittorrent's alternative
 // ("slow") limits are on, the speeds are amber. Clicking opens the statistics, which hold the switch
 // for the alternative limits; the limits themselves are set in Settings.
 export function GlobalSpeeds({ onOpen }: { onOpen: () => void }) {
@@ -15,13 +17,20 @@ export function GlobalSpeeds({ onOpen }: { onOpen: () => void }) {
   if (!speeds) return null
   const alternative = state?.use_alt_speed_limits === true
 
+  // Both rows get a limit's slot when either has a limit, so they stay the same width.
+  const limited = (state?.dl_rate_limit ?? 0) > 0 || (state?.up_rate_limit ?? 0) > 0
+  // The widest copy sets the slot's width; what shows only fills it (w-0 min-w-full), so it never
+  // widens it.
+  const slot = (widest: ReactNode, content: ReactNode, className?: string) => (
+    <span className={cn('grid', className)}>
+      <span aria-hidden className="invisible col-start-1 row-start-1 flex gap-1">{widest}</span>
+      <span className="col-start-1 row-start-1 flex w-0 min-w-full items-center justify-between gap-1">{content}</span>
+    </span>
+  )
   const row = (arrow: string, speed: number, limit: number | undefined) => (
     <span className="flex items-center gap-1.5">
-      <span className="flex min-w-[6.4em] items-center justify-between gap-1">
-        <span aria-hidden>{arrow}</span>
-        <span>{formatBytes(speed)}/s</span>
-      </span>
-      {!!limit && limit > 0 && <span className="opacity-60">≤ {formatBytes(limit)}/s</span>}
+      {slot(<><span>{arrow}</span><span>999.9 MB/s</span></>, <><span aria-hidden>{arrow}</span><span>{formatBytes(speed)}/s</span></>)}
+      {limited && slot('≤ 999.9 MB/s', !!limit && limit > 0 && <span>≤ {formatBytes(limit)}/s</span>, 'opacity-60')}
     </span>
   )
   return (

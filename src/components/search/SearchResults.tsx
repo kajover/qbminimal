@@ -1,17 +1,19 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useRemembered } from '@/hooks/useRemembered'
 import { inFrame, pageScroller, ROOM_FOR_TABLE, WIDE } from '@/lib/pageScroll'
 import { useGrowingList } from '@/hooks/useGrowingList'
 import { useRowWindow } from '@/hooks/useRowWindow'
 import { createPortal } from 'react-dom'
-import { ArrowDown, ArrowUp, ArrowUpDown, CircleCheck, Columns3, RotateCcw, Download, ExternalLink, LayoutList, Table2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, CircleCheck, Columns3, RotateCcw, Download, ExternalLink } from 'lucide-react'
+import { ViewSwitch } from '@/components/ViewSwitch'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ColumnFilterButton, type FilterTarget } from '@/components/ColumnFilters'
 import { ColumnMenuItems } from '@/components/ColumnMenuItems'
-import { canMeasureText, fittedWidth, moveInOrder, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
+import { canMeasureText, COMPACT_ROWS, fittedWidth, moveInOrder, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
 import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { searchFilterTargets } from '@/lib/searchFilters'
-import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loadSearchHidden, loadSearchOrder, loadSearchView, saveSearchOrder, SEARCH_SORT_KEYS, saveSearchView, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey, type SearchWidths } from '@/lib/searchSettings'
+import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loadSearchHidden, loadSearchOrder, loadSearchView, saveSearchOrder, SEARCH_SORT_KEYS, saveSearchView, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey, type SearchView, type SearchWidths } from '@/lib/searchSettings'
 import { applyColumnFilters, type ColumnFilter, type ColumnFilters } from '@/lib/columnFilters'
 import { published, SEARCH_FILTER_COLUMNS } from '@/lib/searchFilters'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
@@ -20,7 +22,6 @@ import { Tooltip } from '@/components/ui/tooltip'
 import { formatBytes, formatDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { SearchResult } from '@/types'
-import { withKeys } from '@/lib/shortcutKeys'
 import { t } from '@/i18n'
 
 
@@ -82,16 +83,17 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   // Where the filter, columns or sort, and view buttons go: the page header's button row.
   toolbarSlot?: HTMLElement | null
 }) {
-  // Each search starts with the most seeds first; a sort picked here lasts for this search.
-  const [sort, setSort] = useState<SearchSort>(DEFAULT_SEARCH_SORT)
+  // Each search starts with the most seeds first; a sort picked here lasts for this search, also
+  // while another page shows.
+  const [sort, setSort] = useRemembered<SearchSort>('search.sort', DEFAULT_SEARCH_SORT)
   // The sort shows in the titles once one is picked, but not in the default order (most seeds
   // first) before that, nor after a reset.
-  const [sortShown, setSortShown] = useState(false)
+  const [sortShown, setSortShown] = useRemembered('search.sortShown', false)
   // Counts each new search, sort or filter, so the cards start again from their top.
   const [restarts, setRestarts] = useState(0)
   const restart = () => setRestarts(n => n + 1)
   // Reset here rather than by drawing the table anew, which made it flash between searches.
-  const [shownSearch, setShownSearch] = useState(searchId)
+  const [shownSearch, setShownSearch] = useRemembered('search.shown', searchId)
   if (searchId !== shownSearch) {
     setShownSearch(searchId)
     setSort(DEFAULT_SEARCH_SORT)
@@ -113,14 +115,15 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   const roomy = useMediaQuery(ROOM_FOR_TABLE)
   const framed = inFrame(wide)
   const [view, setViewState] = useState(loadSearchView)
-  const showTable = view ? view === 'table' : roomy
+  const shown = view ?? (roomy ? 'table' : 'cards')
+  const showTable = shown !== 'cards'
+  const compact = shown === 'compact'
   // Outside the frame the table scrolls on its own, so the page starts at its top: the cards'
   // scroll would otherwise leave the column titles above the screen.
   useEffect(() => { if (!framed && showTable) pageScroller().scrollTo(0, 0) }, [framed, showTable])
-  const switchView = () => {
-    const next = showTable ? 'cards' : 'table'
+  const chooseView = (next: SearchView) => {
     // Back to following the screen when the pick matches it.
-    const saved = (next === 'table') === roomy ? null : next
+    const saved = next === (roomy ? 'table' : 'cards') ? null : next
     setViewState(saved)
     saveSearchView(saved)
   }
@@ -290,9 +293,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
           </DropdownMenuContent>
         </DropdownMenu>
         </div>
-        <Button variant="outline" size="icon" className="size-8" aria-label={showTable ? t('Card view') : t('Table view')} title={withKeys(showTable ? t('Card view') : t('Table view'), 'V')} data-key="v" onClick={switchView}>
-          {showTable ? <LayoutList className="size-4" /> : <Table2 className="size-4" />}
-        </Button>
+        <ViewSwitch shown={shown} onChoose={chooseView} pageKey />
     </>
   )
 
@@ -360,7 +361,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
           </table>
         </div>
         <div ref={scroller} onScroll={syncScroll} className="min-h-0 overflow-auto overscroll-x-none rounded-b-xl">
-          <table className="table-fixed text-sm tabular-nums" style={{ width: `max(100%, ${total}px)` }}>
+          <table className={cn('table-fixed text-sm tabular-nums', compact && COMPACT_ROWS)} style={{ width: `max(100%, ${total}px)` }}>
             {colgroup}
             <tbody>
               {/* Space for the rows above and below those drawn, so the scrollbar is as for all of them. */}

@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "הסתר אלה, במסכי מגע",
   "Select every torrent": "בחירת כל הטורנטים",
   "Show or hide the filters": "הצגה או הסתרה של המסננים",
-  "Switch between table and cards": "מעבר בין טבלה לכרטיסים",
   "Go to a page, in the menu's order": "מעבר לעמוד, לפי סדר התפריט",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "לחץ כדי להציג רק אלה. Ctrl או ⌘ ולחיצה, או לחיצה ארוכה, כדי להסתיר אותם.",
   "Hidden": "מוסתר",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "טען מחדש כדי להשתמש בו. הגרסה הישנה נשארת ב-{folder}.",
   "Selection bar reset": "סרגל הבחירה אופס",
   "Show shortcuts": "הצג קיצורים",
-  "Installs it from GitHub, replacing this one.": "מתקין אותה מ-GitHub במקום הגרסה הזו."
+  "Installs it from GitHub, replacing this one.": "מתקין אותה מ-GitHub במקום הגרסה הזו.",
+  "Compact view": "תצוגה דחוסה",
+  "Switch between table, compact and cards": "מעבר בין טבלה, תצוגה דחוסה וכרטיסים"
 }

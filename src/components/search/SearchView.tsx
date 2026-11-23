@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
+import { useRemembered } from '@/hooks/useRemembered'
 import { Eraser, Loader2, PanelRight, Plus, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -35,14 +36,15 @@ export function SearchView() {
   const [pattern, setPatternState] = useState(search.pattern)
   const [category, setCategory] = useState(search.category)
   // Column filters belong to the search shown, so a new search starts without them.
-  const [filtersFor, setFiltersFor] = useState<{ job: number | null; filters: ColumnFilters }>({ job: null, filters: {} })
+  // Kept while another page shows, as is the open filter sheet (useRemembered).
+  const [filtersFor, setFiltersFor] = useRemembered<{ job: number | null; filters: ColumnFilters }>('search.filters', { job: null, filters: {} })
   const filters = filtersFor.job === search.jobId ? filtersFor.filters : {}
   const setFilter = (id: string, filter: ColumnFilter | null) => setFiltersFor({ job: search.jobId, filters: withFilter(filters, id, filter) })
   // The sidebar starts closed. Where it fits beside the results it stays open once opened there; on
   // phones it opens over the page each time.
   const sideBySide = useMediaQuery(ROOM_FOR_SIDEBAR)
   const [sidebarPref, setSidebarPref] = useState(() => readStored(SIDEBAR_KEY))
-  const [sheetOpen, setSheetOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useRemembered('search.sheetOpen', false)
   // The results' column, which the phone filter sheet lines up with.
   const [resultsColumn, setResultsColumn] = useState<HTMLDivElement | null>(null)
   const sidebarOpen = sideBySide ? sidebarPref === 'open' : sheetOpen

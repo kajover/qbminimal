@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useRemembered } from '@/hooks/useRemembered'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { ROOM_FOR_TABLE } from '@/lib/pageScroll'
-import { DEFAULT_LIST_SETTINGS, loadListSettings, saveListSettings, type ListView, type SortDirection, type SortField } from '@/lib/listSettings'
+import { DEFAULT_LIST_SETTINGS, loadListSettings, NEXT_VIEW, saveListSettings, type ListView, type ShownView, type SortDirection, type SortField } from '@/lib/listSettings'
 import { compareTorrents, TORRENT_FILTER_COLUMNS } from '@/lib/torrentColumns'
 import { activeCount, applyColumnFilters, loadColumnFilters, saveColumnFilters, withFilter, type ColumnFilter } from '@/lib/columnFilters'
 import { countFilterOptions, cycleChoice, excludeChoice, filterTorrents, searchTorrents, withoutSidebarColumns, groupTrackersByHost, hasSidebarFilters, NO_FILTERS, type FilterList, type TorrentFilters } from '@/lib/torrentFilters'
@@ -16,9 +17,10 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
   const [saved] = useState(loadListSettings)
   // The quick search narrows the list for a moment, apart from the filters: views don't keep it.
   // What's typed (the draft) applies after a 500ms pause, or at once on Enter.
-  const [draft, setDraft] = useState('')
-  const [query, setQuery] = useState('')
-  const [filters, setFilters] = useState<TorrentFilters>(() => ({ ...NO_FILTERS, columns: withoutSidebarColumns(loadColumnFilters(COLUMN_FILTERS_TABLE)) }))
+  // Kept while another page shows; a reload starts with every torrent showing.
+  const [draft, setDraft] = useRemembered('torrents.draft', '')
+  const [query, setQuery] = useRemembered('torrents.query', '')
+  const [filters, setFilters] = useRemembered<TorrentFilters>('torrents.filters', () => ({ ...NO_FILTERS, columns: withoutSidebarColumns(loadColumnFilters(COLUMN_FILTERS_TABLE)) }))
   const [sort, setSort] = useState<{ field: SortField; direction: SortDirection }>({ field: saved.sortField, direction: saved.sortDirection })
   // Whether the sort shows in the column titles: once one is picked, even the default queue order,
   // but not on first load in the default order or after a reset.
@@ -46,6 +48,9 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
 
   const hosts = useMemo(() => groupTrackersByHost(trackerMap ?? {}), [trackerMap])
   const counts = useMemo(() => countFilterOptions(torrents, hosts), [torrents, hosts])
+
+  const shown = view === 'auto' ? (roomy ? 'table' : 'cards') : view
+  const chooseView = (next: ShownView) => setView(next === (roomy ? 'table' : 'cards') ? 'auto' : next)
 
   const matching = useMemo(() => {
     const sign = sort.direction === 'asc' ? 1 : -1
@@ -132,8 +137,12 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
       restart()
     },
     // 'auto' follows the screen: the table where it fits, cards on phones.
-    showTable: view === 'table' || (view === 'auto' && roomy),
-    showAsTable: (table: boolean) => setView(table === roomy ? 'auto' : table ? 'table' : 'cards'),
+    shown,
+    showTable: shown !== 'cards',
+    compact: shown === 'compact',
+    // Back to following the screen when that's the view it would pick.
+    chooseView,
+    switchView: () => chooseView(NEXT_VIEW[shown]),
     matching,
     restarts,
   }

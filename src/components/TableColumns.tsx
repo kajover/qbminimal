@@ -167,3 +167,8 @@ export function useColumnDrag<K extends string>({ keys, onMove, busy }: {
   }
   return { titleProps, onTitleKey }
 }
+
+// The compact view's rows, for the torrent and search tables: cells keep 2px above and below, and
+// badges and buttons no more height than the text, so a row is about 25px instead of 37px (as
+// qui's dense rows) and more fit in the same height.
+export const COMPACT_ROWS = '[&_td]:py-0.5 [&_td_.rounded]:py-0 [&_td_[data-slot=button]]:h-5'

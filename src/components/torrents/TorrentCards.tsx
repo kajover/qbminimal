@@ -42,10 +42,10 @@ function Fact({ icon: Icon, label, placeholder, className, children }: { icon?: 
 }
 
 // A speed in the list's colors, in a slot that fits "999.9 KB/s", so a changing speed never moves
-// the facts after it; only the rare longer one widens it. Idle speeds read "0 B/s" like the
-// header's, faded instead of colored.
+// the facts after it; only the rare longer one widens it. An idle speed keeps its arrow and reads
+// a faded dash, like the table's.
 function Speed({ icon, bytes, color, label }: { icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>; bytes: number; color: string; label: string }) {
-  return <Fact icon={icon} label={label} placeholder="999.9 KB/s" className={bytes > 0 ? color : 'text-muted-foreground/60'}>{formatBytes(bytes)}/s</Fact>
+  return <Fact icon={icon} label={label} placeholder="999.9 KB/s" className={bytes > 0 ? color : 'text-muted-foreground/60'}>{bytes > 0 ? `${formatBytes(bytes)}/s` : '-'}</Fact>
 }
 
 // The events a card hands on to the list's row handlers.
@@ -73,8 +73,9 @@ const TorrentCard = memo(function TorrentCard({ torrent, isSelected, isOpen, sho
       aria-current={isOpen ? 'true' : undefined}
       className={cn(
         'flex cursor-default touch-manipulation items-start gap-2 rounded-xl border bg-card px-2.5 py-2.5 outline-hidden select-none focus-visible:ring-2 focus-visible:ring-ring [-webkit-touch-callout:none]',
-        // Selected or open, a card only gets a stronger border all round, the same everywhere.
-        (isSelected || isOpen) && 'border-primary ring-1 ring-primary',
+        // Selected or open, a card only gets a stronger border all round, the same everywhere. It's
+        // drawn inside the card (inset), so it never reaches past it, as beside the docked details.
+        (isSelected || isOpen) && 'border-primary ring-1 ring-inset ring-primary',
       )}
     >
       {showCheckboxes && (

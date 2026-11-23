@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "隱藏這些，觸控裝置上",
   "Select every torrent": "選取所有種子",
   "Show or hide the filters": "顯示或隱藏篩選",
-  "Switch between table and cards": "在表格和卡片之間切換",
   "Go to a page, in the menu's order": "前往某個頁面，依選單順序",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "點擊只顯示這些。按住 Ctrl 或 ⌘ 點擊，或長按，可隱藏它們。",
   "Hidden": "隱藏",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "重新載入即可使用。舊版本保留在 {folder} 中。",
   "Selection bar reset": "選取列已重設",
   "Show shortcuts": "顯示快速鍵",
-  "Installs it from GitHub, replacing this one.": "從 GitHub 安裝，取代目前版本。"
+  "Installs it from GitHub, replacing this one.": "從 GitHub 安裝，取代目前版本。",
+  "Compact view": "緊湊檢視",
+  "Switch between table, compact and cards": "在表格、緊湊檢視和卡片之間切換"
 }

@@ -9,6 +9,7 @@ import { useRowPress, type RowProps } from '@/hooks/useRowPress'
 import { revealRow } from '@/hooks/useRowWindow'
 import { useSelection } from '@/hooks/useSelection'
 import { useTorrentList } from '@/hooks/useTorrentList'
+import { forget, useRemembered } from '@/hooks/useRemembered'
 import { useGrowingList } from '@/hooks/useGrowingList'
 import { chosenCount, SIDEBAR_COLUMNS } from '@/lib/torrentFilters'
 import { loadFilterViews, type FilterView } from '@/lib/filterViews'
@@ -25,6 +26,7 @@ import { BulkPromptDialog } from './BulkPromptDialog'
 import { ActionBarDialog } from './ActionBarDialog'
 import { DeleteTorrentsDialog } from './DeleteTorrentsDialog'
 import { TorrentCards } from './TorrentCards'
+import { viewLabel } from '@/lib/listSettings'
 import { FilterChoices, FilterSidebar } from './TorrentFilterPanel'
 import { FilterSheet } from '@/components/FilterSidebarParts'
 import { useMarkedTorrents } from '@/hooks/useTrackerIssues'
@@ -35,7 +37,7 @@ import { ShortcutsDialog } from './ShortcutsDialog'
 import { TorrentTable } from './TorrentTable'
 // Loaded with the list rather than on first use, so the details and dialogs open at once.
 import { AddTorrentDialog } from './AddTorrentView'
-import { TorrentDetailsDialog, TorrentDetailsPanel } from './TorrentDetails'
+import { DETAILS_MEMORY, TorrentDetailsDialog, TorrentDetailsPanel } from './TorrentDetails'
 import { AddTorrentButton, QuickSearchField, TorrentToolbar } from './TorrentToolbar'
 import { t } from '@/i18n'
 
@@ -64,14 +66,17 @@ export function TorrentsView() {
   useEffect(() => { if (!framed && list.showTable) pageScroller().scrollTo(0, 0) }, [framed, list.showTable])
   const mouse = useMediaQuery('(pointer: fine)')
 
-  const selection = useSelection(list.matching.map(t => t.hash))
+  // Kept while another page shows, with the open details and filters (useRemembered).
+  const selection = useSelection(list.matching.map(t => t.hash), 'torrents.selected')
   // The table draws only the rows in view; the cards draw in batches as the list scrolls.
   const growing = useGrowingList(list.matching, list.restarts)
   const rows = list.showTable ? list.matching : growing.shown
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useRemembered('torrents.filtersOpen', false)
   // The search bar over the list on phones.
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [detailsHash, setDetailsHash] = useState<string | null>(null)
+  const [searchOpen, setSearchOpen] = useRemembered('torrents.searchOpen', false)
+  const [detailsHash, setDetailsHash] = useRemembered<string | null>('torrents.details', null)
+  // Closed details open next time at medium height, not maximized.
+  useEffect(() => { if (!detailsHash) forget(...DETAILS_MEMORY) }, [detailsHash])
   const [columns, setColumns] = useState<ColumnLayout>(loadColumnLayout)
   // A new id for each request starts the delete dialog fresh.
   const [deleteRequest, setDeleteRequest] = useState<{ id: number; torrents: Torrent[] }>({ id: 0, torrents: [] })
@@ -108,7 +113,7 @@ export function TorrentsView() {
   const [addOpen, setAddOpen] = useState(false)
   const [views, setViews] = useState<FilterView[]>(loadFilterViews)
   // The row that Tab reaches and the arrow keys move from.
-  const [focusHash, setFocusHash] = useState<string | null>(null)
+  const [focusHash, setFocusHash] = useRemembered<string | null>('torrents.focus', null)
 
   // Looked up on every refresh, so open details stay current. Torrents deleted elsewhere drop out.
   // A search or filter that hides the open torrent closes its details, so they never show a
@@ -177,8 +182,8 @@ export function TorrentsView() {
   const viewMounted = useRef(false)
   useEffect(() => {
     if (!viewMounted.current) { viewMounted.current = true; return }
-    announce(list.showTable ? t('Table view') : t('Card view'))
-  }, [list.showTable])
+    announce(viewLabel(list.shown))
+  }, [list.shown])
   // An Effect Event reads the count as it is when the timer fires, without restarting the timer.
   const matchingLength = list.matching.length
   const announceMatches = useEffectEvent(() => {
@@ -226,7 +231,8 @@ export function TorrentsView() {
   const press = useRowPress<Torrent>({
     onPress: (event: MouseEvent, torrent, touch) => {
       const { hash } = torrent
-      if (touch) {
+      // Wide screens act on a finger's tap as on a click, so a tap on a tablet selects the row too.
+      if (touch && !wide) {
         // After a long press has started selecting, taps add and remove instead of opening. A
         // tap on the torrent whose details are open closes them, as a click does on desktop.
         if (count > 0) selection.toggle(hash)
@@ -316,7 +322,7 @@ export function TorrentsView() {
     },
     showShortcuts: () => setShortcutsOpen(true),
     toggleFilters: () => setFiltersOpen(open => !open),
-    toggleView: () => list.showAsTable(!list.showTable),
+    toggleView: list.switchView,
     runAction: (code) => {
       const name = actionKeyName(code)
       const entry = name ? entries.find(entry => ACTION_KEYS[entry.id] === name && !entry.disabled) : undefined
@@ -411,7 +417,10 @@ export function TorrentsView() {
       {/* The filters open on the list's end side: beside it where it fits, over it on phones. */}
       <div className={cn('frame:flex frame:min-h-0 frame:flex-1', filtersOpen && sideBySide && 'flex items-start gap-4 frame:items-stretch')}>
         {!sideBySide && <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen} list={listColumn}>{sidebar}</FilterSheet>}
-        <div ref={setListColumn} className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0 frame:pb-(--details-room)">
+        {/* Above the docked details: the table ends 16px above them, with its own frame; cards run
+            on under their top edge as far as its rounded corners, so a card cut off there still
+            shows its border in the corners, without a gap. */}
+        <div ref={setListColumn} className={cn('flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0', list.showTable ? 'frame:pb-(--details-room)' : 'frame:pb-[max(calc(var(--details-room,0px)-1rem-var(--radius-xl)),0px)]')}>
           {searchOpen && !headerSearch && <QuickSearchField list={list} wide={false} onClose={() => setSearchOpen(false)} />}
 
         {list.matching.length === 0 ? (
@@ -438,6 +447,7 @@ export function TorrentsView() {
             wrapBody={withMenu}
             columnFilters={list.filters.columns ?? {}}
             filterTargets={filterTargets}
+            compact={list.compact}
             sidebarFilter={{
               has: (id) => id in SIDEBAR_COLUMNS,
               active: (id) => chosenCount(list.filters, SIDEBAR_COLUMNS[id]) > 0,
@@ -451,7 +461,8 @@ export function TorrentsView() {
           // Below the last card, room for Safari's toolbar, which grows at the end of the page. In the
           // frame the box reaches 4px past the column for the cards' focus rings, but is cut off
           // level with the filters sidebar, with room inside so the last card's border shows.
-          <div className="relative mb-[var(--toolbar-room,0px)] frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1 frame:pb-2 frame:[clip-path:inset(0_0_4px_0)]">
+          // With the details docked, the last card scrolls up clear of their corners.
+          <div className={cn('relative mb-[var(--toolbar-room,0px)] frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1 frame:pb-2 frame:[clip-path:inset(0_0_4px_0)]', wide && detailsTorrent && 'frame:pb-[calc(0.5rem+var(--radius-xl))]')}>
             <TorrentCards
               torrents={rows}
               selected={selection.selected}

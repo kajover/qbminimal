@@ -23,9 +23,10 @@ export const FILL_PAGE = `flex flex-col gap-4 frame:h-full window-scroll:h-[calc
 // Desktop layouts wherever they fit, not only on wide screens: these parts span the page, so the
 // window's width tells their room. A table from a tablet up; the filters beside the list while it
 // keeps about 550px; the quick search field in the header where it fits beside the buttons.
-// The desktop layout: from 1200px, and on a tablet held sideways from 1024px. The same as the
-// `wide` variant in index.css.
-export const WIDE = '(min-width: 1200px), (min-width: 1024px) and (orientation: landscape)'
+// The desktop layout: from 1200px, held sideways from 900px wide and 540px tall (a tablet, an open
+// iPhone Duo), and upright from 660px wide and 840px tall (an upright tablet or open iPhone Duo).
+// The same as the `wide` variant in index.css.
+export const WIDE = '(min-width: 1200px), (min-width: 900px) and (min-height: 540px) and (orientation: landscape), (min-width: 660px) and (min-height: 840px)'
 export const ROOM_FOR_TABLE = '(min-width: 768px)'
 export const ROOM_FOR_SIDEBAR = '(min-width: 900px)'
 export const ROOM_FOR_HEADER_SEARCH = '(min-width: 768px)'

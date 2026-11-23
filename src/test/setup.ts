@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { afterEach } from 'vitest'
+import { forgetPages } from '@/hooks/useRemembered'
 
 // What jsdom leaves out and the app expects from a browser. Screens count as wide, with a mouse.
 if (typeof window !== 'undefined') {
@@ -42,5 +43,7 @@ if (typeof window !== 'undefined') {
   afterEach(() => {
     cleanup()
     localStorage.clear()
+    // What pages keep while the app runs (useRemembered) doesn't carry into the next test.
+    forgetPages()
   })
 }

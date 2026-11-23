@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Skrýt tyto, na dotykových displejích",
   "Select every torrent": "Vybrat všechny torrenty",
   "Show or hide the filters": "Zobrazit nebo skrýt filtry",
-  "Switch between table and cards": "Přepnout mezi tabulkou a kartami",
   "Go to a page, in the menu's order": "Přejít na stránku, v pořadí nabídky",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Kliknutím zobrazíš jen tyto. Ctrl nebo ⌘ a klik, nebo podržení je skryje.",
   "Hidden": "Skryté",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Načti znovu, ať ji můžeš používat. Stará verze zůstává ve složce {folder}.",
   "Selection bar reset": "Lišta výběru obnovena",
   "Show shortcuts": "Ukázat zkratky",
-  "Installs it from GitHub, replacing this one.": "Nainstaluje ji z GitHubu místo této."
+  "Installs it from GitHub, replacing this one.": "Nainstaluje ji z GitHubu místo této.",
+  "Compact view": "Kompaktní zobrazení",
+  "Switch between table, compact and cards": "Přepnout mezi tabulkou, kompaktním zobrazením a kartami"
 }

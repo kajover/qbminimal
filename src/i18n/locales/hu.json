@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Ezek elrejtése, érintőképernyőn",
   "Select every torrent": "Összes torrent kijelölése",
   "Show or hide the filters": "Szűrők megjelenítése vagy elrejtése",
-  "Switch between table and cards": "Váltás táblázat és kártyák között",
   "Go to a page, in the menu's order": "Ugrás egy oldalra, a menü sorrendjében",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Kattints, hogy csak ezek látszanak. Ctrl vagy ⌘ és kattintás, vagy nyomva tartás az elrejtésükhöz.",
   "Hidden": "Rejtve",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Töltsd újra a használatához. A régi verzió a(z) {folder} mappában marad.",
   "Selection bar reset": "Kijelölési sáv visszaállítva",
   "Show shortcuts": "Billentyűparancsok",
-  "Installs it from GitHub, replacing this one.": "Telepíti a GitHubról, a jelenlegi helyére."
+  "Installs it from GitHub, replacing this one.": "Telepíti a GitHubról, a jelenlegi helyére.",
+  "Compact view": "Tömör nézet",
+  "Switch between table, compact and cards": "Váltás táblázat, tömör nézet és kártyák között"
 }

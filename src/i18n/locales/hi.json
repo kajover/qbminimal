@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "ये छिपाएँ, टच स्क्रीन पर",
   "Select every torrent": "सभी टोरेंट चुनें",
   "Show or hide the filters": "फ़िल्टर दिखाएँ या छिपाएँ",
-  "Switch between table and cards": "टेबल और कार्ड के बीच बदलें",
   "Go to a page, in the menu's order": "किसी पेज पर जाएँ, मेनू के क्रम में",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "सिर्फ़ ये दिखाने के लिए क्लिक करें। इन्हें छिपाने के लिए Ctrl या ⌘ के साथ क्लिक करें, या देर तक दबाएँ।",
   "Hidden": "छिपा हुआ",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "इस्तेमाल करने के लिए फिर से लोड करें। पुराना संस्करण {folder} में रहेगा।",
   "Selection bar reset": "चयन बार रीसेट हो गया",
   "Show shortcuts": "शॉर्टकट दिखाएँ",
-  "Installs it from GitHub, replacing this one.": "इसे GitHub से इंस्टॉल करता है, इस संस्करण की जगह।"
+  "Installs it from GitHub, replacing this one.": "इसे GitHub से इंस्टॉल करता है, इस संस्करण की जगह।",
+  "Compact view": "कॉम्पैक्ट व्यू",
+  "Switch between table, compact and cards": "टेबल, कॉम्पैक्ट और कार्ड के बीच बदलें"
 }

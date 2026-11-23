@@ -230,12 +230,13 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
         {prompt === 'location' && <Input aria-label={t('Folder')} autoFocus value={value} onChange={(e) => setValue(e.target.value)} />}
         {prompt === 'queuePosition' && <Input aria-label={t('Queue position')} type="number" inputMode="numeric" min={1} max={length} step={1} autoFocus value={value} onChange={(e) => setValue(e.target.value)} />}
         {prompt === 'limits' && (
+          // A label that wraps to more lines than its neighbour's keeps both fields on one level.
           <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1">
+            <div className="flex flex-col justify-between gap-1">
               <Label htmlFor="bulk-dl" className="text-xs text-muted-foreground">{t('Download (KiB/s, 0 = none)')}</Label>
               <Input id="bulk-dl" type="number" min={0} placeholder="0" value={value} onChange={(e) => setValue(e.target.value)} />
             </div>
-            <div className="space-y-1">
+            <div className="flex flex-col justify-between gap-1">
               <Label htmlFor="bulk-up" className="text-xs text-muted-foreground">{t('Upload (KiB/s, 0 = none)')}</Label>
               <Input id="bulk-up" type="number" min={0} placeholder="0" value={second} onChange={(e) => setSecond(e.target.value)} />
             </div>

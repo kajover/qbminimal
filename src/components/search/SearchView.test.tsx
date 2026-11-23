@@ -106,20 +106,24 @@ describe('search', () => {
     expect(JSON.parse(localStorage.getItem('qbminimal.searchWidths')!)).toHaveProperty('fileName')
   })
 
-  it('switches between the table and cards, with the buttons for each', async () => {
+  it('goes through the table, the compact table and cards, the button showing the one on screen', async () => {
     renderView()
     await search()
     await screen.findAllByText('ubuntu-desktop.iso')
-    expect(toolbar()).toEqual(['Columns', 'Card view', 'Filters'])
-
-    await userEvent.click(screen.getByRole('button', { name: 'Card view' }))
-    expect(toolbar()).toEqual(['Sort: Seeds', 'Table view', 'Filters'])
-    expect(screen.getAllByRole('table')[0].closest('.hidden')).not.toBeNull()
-    // Wide screens show the table by default, so cards are the choice kept.
-    expect(localStorage.getItem('qbminimal.searchView')).toBe('cards')
+    expect(toolbar()).toEqual(['Columns', 'Table view', 'Filters'])
 
     await userEvent.click(screen.getByRole('button', { name: 'Table view' }))
-    expect(toolbar()).toEqual(['Columns', 'Card view', 'Filters'])
+    expect(toolbar()).toEqual(['Columns', 'Compact view', 'Filters'])
+    expect(localStorage.getItem('qbminimal.searchView')).toBe('compact')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Compact view' }))
+    expect(toolbar()).toEqual(['Sort: Seeds', 'Card view', 'Filters'])
+    expect(screen.getAllByRole('table')[0].closest('.hidden')).not.toBeNull()
+    expect(localStorage.getItem('qbminimal.searchView')).toBe('cards')
+
+    // Wide screens show the table by default, so going back to it keeps no choice.
+    await userEvent.click(screen.getByRole('button', { name: 'Card view' }))
+    expect(toolbar()).toEqual(['Columns', 'Table view', 'Filters'])
     expect(localStorage.getItem('qbminimal.searchView')).toBeNull()
   })
 

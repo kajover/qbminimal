@@ -39,14 +39,16 @@ const REREAD_TIMEOUT_MS = 20000
 const isForgottenFileList = (error: unknown) => error instanceof Error && error.message.includes('filePriorities')
 
 // `aside` sits at the end of the label's line, so a note that loads later doesn't move the form.
+// Beside another field, a label that wraps to more lines keeps the fields on one level: the
+// label stays on top and the field at the bottom of the row.
 function Field({ label, htmlFor, aside, children }: { label: string; htmlFor: string; aside?: ReactNode; children: ReactNode }) {
   return (
-    <div className="space-y-1">
+    <div className="flex flex-col justify-between gap-1">
       <div className="flex items-baseline justify-between gap-2">
         <Label htmlFor={htmlFor} className="text-xs text-muted-foreground">{label}</Label>
         {aside}
       </div>
-      {children}
+      <div className="space-y-1">{children}</div>
     </div>
   )
 }

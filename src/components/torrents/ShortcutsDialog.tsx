@@ -37,7 +37,7 @@ const GROUPS = perLanguage((): { title: string; keys: [string[], string][] }[] =
       [['S'], t('Search')],
       [['F'], t('Show or hide the filters')],
       [['N'], t('Add torrents, a feed or a rule')],
-      [['V'], t('Switch between table and cards')],
+      [['V'], t('Switch between table, compact and cards')],
       [['G', '1–7'], t('Go to a page, in the menu\'s order')],
       [[t('Esc')], t('Close the details, then clear the selection')],
       [['?'], t('Show this list')],

@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "ซ่อนรายการนี้ บนหน้าจอสัมผัส",
   "Select every torrent": "เลือกทอร์เรนต์ทั้งหมด",
   "Show or hide the filters": "แสดงหรือซ่อนตัวกรอง",
-  "Switch between table and cards": "สลับระหว่างตารางและการ์ด",
   "Go to a page, in the menu's order": "ไปยังหน้าหนึ่ง ตามลำดับของเมนู",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "คลิกเพื่อแสดงเฉพาะรายการนี้ กด Ctrl หรือ ⌘ แล้วคลิก หรือกดค้าง เพื่อซ่อน",
   "Hidden": "ซ่อนอยู่",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "โหลดใหม่เพื่อใช้งาน เวอร์ชันเก่ายังอยู่ใน {folder}",
   "Selection bar reset": "รีเซ็ตแถบการเลือกแล้ว",
   "Show shortcuts": "แสดงทางลัด",
-  "Installs it from GitHub, replacing this one.": "ติดตั้งจาก GitHub แทนเวอร์ชันนี้"
+  "Installs it from GitHub, replacing this one.": "ติดตั้งจาก GitHub แทนเวอร์ชันนี้",
+  "Compact view": "มุมมองแบบกะทัดรัด",
+  "Switch between table, compact and cards": "สลับระหว่างตาราง แบบกะทัดรัด และการ์ด"
 }

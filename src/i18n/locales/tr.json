@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Bunları gizle, dokunmatik ekranlarda",
   "Select every torrent": "Tüm torrentleri seç",
   "Show or hide the filters": "Filtreleri göster veya gizle",
-  "Switch between table and cards": "Tablo ile kartlar arasında geç",
   "Go to a page, in the menu's order": "Bir sayfaya git, menü sırasıyla",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Yalnızca bunları göstermek için tıkla. Gizlemek için Ctrl veya ⌘ ile tıkla ya da basılı tut.",
   "Hidden": "Gizli",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Kullanmak için yeniden yükle. Eski sürüm {folder} içinde duruyor.",
   "Selection bar reset": "Seçim çubuğu sıfırlandı",
   "Show shortcuts": "Kısayolları göster",
-  "Installs it from GitHub, replacing this one.": "GitHub'dan kurar ve bu sürümün yerini alır."
+  "Installs it from GitHub, replacing this one.": "GitHub'dan kurar ve bu sürümün yerini alır.",
+  "Compact view": "Kompakt görünüm",
+  "Switch between table, compact and cards": "Tablo, kompakt görünüm ve kartlar arasında geç"
 }

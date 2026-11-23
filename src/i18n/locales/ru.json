@@ -1275,7 +1275,6 @@
   "Hide these, on touch screens": "Скрыть эти, на сенсорных экранах",
   "Select every torrent": "Выбрать все торренты",
   "Show or hide the filters": "Показать или скрыть фильтры",
-  "Switch between table and cards": "Переключить между таблицей и карточками",
   "Go to a page, in the menu's order": "Перейти на страницу, в порядке меню",
   "Click to show only these. Ctrl or ⌘ and click, or hold, to hide them.": "Нажмите, чтобы показать только эти. Ctrl или ⌘ и щелчок, либо удержание, скрывает их.",
   "Hidden": "Спрятано",
@@ -1408,5 +1407,7 @@
   "Reload to use it. The old version stays in {folder}.": "Перезагрузите, чтобы использовать. Старая версия осталась в {folder}.",
   "Selection bar reset": "Панель выбора сброшена",
   "Show shortcuts": "Показать сочетания",
-  "Installs it from GitHub, replacing this one.": "Устанавливает её с GitHub вместо этой."
+  "Installs it from GitHub, replacing this one.": "Устанавливает её с GitHub вместо этой.",
+  "Compact view": "Компактно",
+  "Switch between table, compact and cards": "Переключить между таблицей, компактным видом и карточками"
 }
