@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Показати сполучення",
   "Installs it from GitHub, replacing this one.": "Встановлює її з GitHub замість цієї.",
   "Compact view": "Компактний вигляд",
-  "Switch between table, compact and cards": "Перемкнути між таблицею, компактним виглядом і картками"
+  "Switch between table, compact and cards": "Перемкнути між таблицею, компактним виглядом і картками",
+  "{count} torrents added to qBittorrent": "Додано до qBittorrent торентів: {count}",
+  "Couldn't add {count} torrents": "Не вдалося додати торентів: {count}",
+  "Selected results": "Вибрані результати",
+  "Add {count} torrents?": "Додати торенти ({count})?",
+  "Couldn't change qBittorrent's language": "Не вдалося змінити мову qBittorrent"
 }

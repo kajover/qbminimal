@@ -1409,5 +1409,10 @@
   "Show shortcuts": "显示快捷键",
   "Installs it from GitHub, replacing this one.": "从 GitHub 安装，替换当前版本。",
   "Compact view": "紧凑视图",
-  "Switch between table, compact and cards": "在表格、紧凑视图和卡片之间切换"
+  "Switch between table, compact and cards": "在表格、紧凑视图和卡片之间切换",
+  "{count} torrents added to qBittorrent": "已将 {count} 个种子添加到 qBittorrent",
+  "Couldn't add {count} torrents": "无法添加 {count} 个种子",
+  "Selected results": "所选结果",
+  "Add {count} torrents?": "添加 {count} 个种子？",
+  "Couldn't change qBittorrent's language": "无法更改 qBittorrent 的语言"
 }

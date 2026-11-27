@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useRemembered } from './useRemembered'
 import { rangeBetween } from '@/lib/selection'
 
@@ -7,9 +7,12 @@ import { rangeBetween } from '@/lib/selection'
 export function useSelection(order: readonly string[], memoryKey?: string) {
   const [selected, setSelected] = useRemembered<ReadonlySet<string>>(memoryKey, () => new Set())
   const anchor = useRef<string | null>(null)
+  // The newest order, for ranges, so the actions below can stay the same function for good.
+  const latestOrder = useRef(order)
+  useLayoutEffect(() => { latestOrder.current = order })
 
-  return {
-    selected,
+  // Made once: lists and cards that are drawn again only when their props change keep them.
+  const actions = useMemo(() => ({
     toggle(key: string) {
       anchor.current = key
       setSelected(current => {
@@ -26,7 +29,7 @@ export function useSelection(order: readonly string[], memoryKey?: string) {
     extendTo(key: string) {
       const from = anchor.current ?? key
       if (!anchor.current) anchor.current = key
-      setSelected(current => new Set([...current, ...rangeBetween(order, from, key)]))
+      setSelected(current => new Set([...current, ...rangeBetween(latestOrder.current, from, key)]))
     },
     replace(keys: Iterable<string>) {
       setSelected(new Set(keys))
@@ -38,5 +41,7 @@ export function useSelection(order: readonly string[], memoryKey?: string) {
       anchor.current = null
       setSelected(new Set())
     },
-  }
+  }), [setSelected])
+
+  return useMemo(() => ({ selected, ...actions }), [selected, actions])
 }

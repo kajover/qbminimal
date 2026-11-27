@@ -1409,5 +1409,10 @@
   "Show shortcuts": "הצג קיצורים",
   "Installs it from GitHub, replacing this one.": "מתקין אותה מ-GitHub במקום הגרסה הזו.",
   "Compact view": "תצוגה דחוסה",
-  "Switch between table, compact and cards": "מעבר בין טבלה, תצוגה דחוסה וכרטיסים"
+  "Switch between table, compact and cards": "מעבר בין טבלה, תצוגה דחוסה וכרטיסים",
+  "{count} torrents added to qBittorrent": "טורנטים שנוספו ל-qBittorrent: {count}",
+  "Couldn't add {count} torrents": "טורנטים שלא ניתן היה להוסיף: {count}",
+  "Selected results": "תוצאות שנבחרו",
+  "Add {count} torrents?": "להוסיף טורנטים ({count})?",
+  "Couldn't change qBittorrent's language": "לא ניתן לשנות את השפה של qBittorrent"
 }

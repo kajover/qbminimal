@@ -15,7 +15,6 @@ const SERVER_FRAME: Shape = [
 // Like Lucide's crashed server, with an exclamation mark where the lightning bolt is: a tracker
 // that answered with a warning.
 const SERVER_ALERT: Shape = [...SERVER_FRAME, ['path', { d: 'M12 5v8' }], ['path', { d: 'M12 18h.01' }]]
-export const ServerAlert: LucideIcon = createLucideIcon('server-alert', SERVER_ALERT.map(([tag, attrs], i) => [tag, { ...attrs, key: `s${i}` }]) as IconNode)
 
 const SHAPES = {
   hourglass: [

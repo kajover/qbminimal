@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Εμφάνιση συντομεύσεων",
   "Installs it from GitHub, replacing this one.": "Την εγκαθιστά από το GitHub στη θέση αυτής.",
   "Compact view": "Συμπαγής προβολή",
-  "Switch between table, compact and cards": "Εναλλαγή μεταξύ πίνακα, συμπαγούς προβολής και καρτών"
+  "Switch between table, compact and cards": "Εναλλαγή μεταξύ πίνακα, συμπαγούς προβολής και καρτών",
+  "{count} torrents added to qBittorrent": "Προστέθηκαν στο qBittorrent {count} torrents",
+  "Couldn't add {count} torrents": "Αδυναμία προσθήκης {count} torrents",
+  "Selected results": "Επιλεγμένα αποτελέσματα",
+  "Add {count} torrents?": "Προσθήκη {count} torrents;",
+  "Couldn't change qBittorrent's language": "Αδυναμία αλλαγής της γλώσσας του qBittorrent"
 }

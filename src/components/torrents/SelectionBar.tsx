@@ -1,13 +1,12 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { Pause, Play, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/ui/tooltip'
 import type { MenuEntry } from './bulkActions'
-import { altKey, withKeys } from '@/lib/shortcutKeys'
+import { withKeys } from '@/lib/shortcutKeys'
 import { t } from '@/i18n'
 
-// The bar of actions for the selected torrents. Phones: where a thumb reaches, just above the tab
+// The bar of actions for what's selected: torrents, or search results. Phones: where a thumb reaches, just above the tab
 // bar, or where the tab bar would be when it's off; on tablets as wide as the tab bar. The buttons
 // sit at the end, Delete last. No margin from the page's spacing, which would lift it off the tab
 // bar. In the header where it fits, as always on wide screens, in the middle of the window, so the
@@ -15,12 +14,14 @@ import { t } from '@/i18n'
 // A pinned action's button; the bar's gap comes on top.
 const PINNED_BUTTON = 32
 
-export function SelectionBar({ count, total, pinned, inHeader, centered = true, onWidth, onPlace, onStart, onStop, onDelete, more }: {
+export function SelectionBar({ label, count, total, pinned = [], inHeader, centered = true, onWidth, onPlace, leading, trailing }: {
+  // What the bar acts on, for screen readers.
+  label: string
   count: number
-  // How many torrents match, of which `count` are selected.
+  // How many match, of which `count` are selected.
   total: number
-  // Actions pinned from the More menu, shown as icons.
-  pinned: MenuEntry[]
+  // Actions pinned from a More menu, shown as icons where they fit.
+  pinned?: MenuEntry[]
   // In the header bar, or else above the bottom edge.
   inHeader: boolean
   // In the header, centred on it; else, where that would cover the title or the buttons, centred
@@ -30,10 +31,9 @@ export function SelectionBar({ count, total, pinned, inHeader, centered = true, 
   onWidth: (width: number) => void
   // Told where it went, for the room the page keeps below it.
   onPlace: (inHeader: boolean) => void
-  onStart: () => void
-  onStop: () => void
-  onDelete: () => void
-  more: ReactNode
+  // Buttons that always show, before and after the pinned ones.
+  leading?: ReactNode
+  trailing?: ReactNode
 }) {
   useLayoutEffect(() => { onPlace(inHeader) }, [inHeader, onPlace])
   // Its buttons' own widths, which are the same wherever it sits, so the header's choice is stable.
@@ -73,7 +73,7 @@ export function SelectionBar({ count, total, pinned, inHeader, centered = true, 
     <div
       ref={bar}
       role="toolbar"
-      aria-label={t('Selected torrents')}
+      aria-label={label}
       className={cn(
         'glass z-30 flex items-center',
         inHeader
@@ -85,17 +85,12 @@ export function SelectionBar({ count, total, pinned, inHeader, centered = true, 
       {/* Just the number, the same in every language and styled like the progress percentage; the
           words are its hover text and for screen readers. Its end padding matches the room inside
           an icon button, so it sits as far from Start as the buttons from each other. */}
-      <span className="ps-2 pe-2 text-xs whitespace-nowrap text-muted-foreground tabular-nums" title={t('{selected}/{total} selected', { selected: count, total })}>
+      <span className={cn('ps-2 pe-2 text-xs whitespace-nowrap text-muted-foreground tabular-nums', !inHeader && 'me-auto')} title={t('{selected}/{total} selected', { selected: count, total })}>
         <span aria-hidden>{count}</span>
         <span className="sr-only">{t('{selected}/{total} selected', { selected: count, total })}</span>
       </span>
       {/* Icons only, like the other buttons, so the bar is as wide in every language. */}
-      <Tooltip label={withKeys(t('Start'), altKey('S'))}>
-        <Button variant="ghost" size="icon" className={cn('size-8 shrink-0', !inHeader && 'ms-auto')} aria-label={t('Start')} onClick={onStart}><Play className="size-4" /></Button>
-      </Tooltip>
-      <Tooltip label={withKeys(t('Stop'), altKey('P'))}>
-        <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Stop')} onClick={onStop}><Pause className="size-4" /></Button>
-      </Tooltip>
+      {leading}
       {visible.map(entry => {
         const Icon = entry.icon
         return Icon && (
@@ -106,10 +101,7 @@ export function SelectionBar({ count, total, pinned, inHeader, centered = true, 
           </Tooltip>
         )
       })}
-      {more}
-      <Tooltip label={withKeys(t('Delete'), `${altKey('D')}, Del`)}>
-        <Button variant="ghost" size="icon" className="size-8 shrink-0 text-destructive hover:text-destructive" aria-label={t('Delete')} onClick={onDelete}><Trash2 className="size-4" /></Button>
-      </Tooltip>
+      {trailing}
     </div>
   )
 }

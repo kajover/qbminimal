@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useEffectEvent, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type ReactElement } from 'react'
 import { Button } from '@/components/ui/button'
+import { Pause, Play, Trash2 } from 'lucide-react'
+import { Tooltip } from '@/components/ui/tooltip'
+import { altKey, withKeys } from '@/lib/shortcutKeys'
 import { cn } from '@/lib/utils'
 import { PageBoundary } from '@/components/PageBoundary'
 import { PageHeader } from '@/components/PageHeader'
@@ -37,7 +40,8 @@ import { ShortcutsDialog } from './ShortcutsDialog'
 import { TorrentTable } from './TorrentTable'
 // Loaded with the list rather than on first use, so the details and dialogs open at once.
 import { AddTorrentDialog } from './AddTorrentView'
-import { DETAILS_MEMORY, TorrentDetailsDialog, TorrentDetailsPanel } from './TorrentDetails'
+import { DETAILS_MEMORY, TorrentDetailsPanel } from './TorrentDetails'
+import { TorrentDetailsDialog } from './TorrentDetailsSheet'
 import { AddTorrentButton, QuickSearchField, TorrentToolbar } from './TorrentToolbar'
 import { t } from '@/i18n'
 
@@ -335,6 +339,7 @@ export function TorrentsView() {
   const matchingSelected = list.matching.filter(t => selection.selected.has(t.hash)).length
   const selectionBar = (inHeader: boolean, centered: boolean) => count > 0 && (
     <SelectionBar
+      label={t('Selected torrents')}
       inHeader={inHeader}
       centered={centered}
       onWidth={setBarWidth}
@@ -342,10 +347,24 @@ export function TorrentsView() {
       count={count}
       total={list.matching.length}
       pinned={pinnedEntries}
-      onStart={start}
-      onStop={stop}
-      onDelete={() => askToDelete(selectedTorrents)}
-      more={<MoreMenu torrents={selectedTorrents} groups={groups} onDetails={toggleDetails} detailsHash={detailsHash} onStart={start} onStop={stop} onDelete={() => askToDelete(selectedTorrents)} onCustomize={() => setBarDialogOpen(true)} cards={list.showTable ? undefined : { onSelectAll: matchingSelected < list.matching.length ? () => selection.replace(list.matching.map(t => t.hash)) : undefined, onClear: selection.clear }} />}
+      leading={(
+        <>
+          <Tooltip label={withKeys(t('Start'), altKey('S'))}>
+            <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Start')} onClick={start}><Play className="size-4" /></Button>
+          </Tooltip>
+          <Tooltip label={withKeys(t('Stop'), altKey('P'))}>
+            <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Stop')} onClick={stop}><Pause className="size-4" /></Button>
+          </Tooltip>
+        </>
+      )}
+      trailing={(
+        <>
+          <MoreMenu torrents={selectedTorrents} groups={groups} onDetails={toggleDetails} detailsHash={detailsHash} onStart={start} onStop={stop} onDelete={() => askToDelete(selectedTorrents)} onCustomize={() => setBarDialogOpen(true)} cards={list.showTable ? undefined : { onSelectAll: matchingSelected < list.matching.length ? () => selection.replace(list.matching.map(t => t.hash)) : undefined, onClear: selection.clear }} />
+          <Tooltip label={withKeys(t('Delete'), `${altKey('D')}, Del`)}>
+            <Button variant="ghost" size="icon" className="size-8 shrink-0 text-destructive hover:text-destructive" aria-label={t('Delete')} onClick={() => askToDelete(selectedTorrents)}><Trash2 className="size-4" /></Button>
+          </Tooltip>
+        </>
+      )}
     />
   )
 

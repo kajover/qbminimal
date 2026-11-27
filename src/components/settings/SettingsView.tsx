@@ -20,7 +20,9 @@ import { BrowserSettings } from './BrowserSettings'
 import { Switch } from '@/components/ui/switch'
 import { setDisplayOption, useDisplayOption, type DisplayOption } from '@/lib/displayOptions'
 import { chosenTextSize, setTextSize, TEXT_SIZES, type TextSize } from '@/lib/textSize'
-import { changedLanguage, chosenLanguage, LANGUAGES, setLanguage, t, type LanguageChoice } from '@/i18n'
+import { changedLanguage, chosenLanguage, currentLanguage, LANGUAGES, qbittorrentLocale, setLanguage, t, type LanguageChoice } from '@/i18n'
+import { useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { qbitClient } from '@/lib/api'
 
 // System is the default, so it comes first.
 const themeOptions: { value: Theme; label: string; icon: typeof Monitor }[] = [
@@ -134,14 +136,32 @@ function useStackedChoices() {
   return { themeRow: setThemeRow, colorsRow: setColorsRow, stacked }
 }
 
+// As qBittorrent's own Web UI does, a new language is qBittorrent's too: it loads it at once, so the
+// messages it logs from then on are in it. Those already in the log stay as they were written.
+async function changeLanguage(choice: LanguageChoice, queryClient: QueryClient) {
+  await setLanguage(choice)
+  const locale = qbittorrentLocale(currentLanguage())
+  try {
+    const prefs = await queryClient.fetchQuery({ queryKey: ['preferences'], queryFn: () => qbitClient.getPreferences() })
+    if (prefs.locale === locale) return
+    await qbitClient.setPreferences({ locale })
+    await queryClient.invalidateQueries({ queryKey: ['preferences'] })
+  } catch {
+    toast.error(t('Couldn\'t change qBittorrent\'s language'))
+  }
+}
+
 function AppSection() {
-  // Drawn again for a new language: the field in view and focused, as it was left.
+  // Drawn again for a new language: the field in view, as it was left. Focused again only after
+  // the keyboard picked it: phones open a focused drop-down's picker, which would show again.
   useLayoutEffect(() => {
     if (!changedLanguage()) return
     const field = document.getElementById('language')
     field?.scrollIntoView({ block: 'center' })
-    field?.focus({ preventScroll: true })
+    const byPointer = 'pointer' in document.documentElement.dataset || matchMedia('(pointer: coarse)').matches
+    if (!byPointer) field?.focus({ preventScroll: true })
   }, [])
+  const queryClient = useQueryClient()
   const { theme, setTheme } = useTheme()
   const { themeRow, colorsRow, stacked } = useStackedChoices()
   const menuBar = useDisplayOption('menuBar')
@@ -200,7 +220,7 @@ function AppSection() {
           <div className={cn('mt-3', ROW)}>
             <IconLabel htmlFor="language" icon={Languages}>{t('Language')}</IconLabel>
             {/* Applies at once: the pages are drawn again in the new language, still on Settings. */}
-            <NativeSelect id="language" value={chosenLanguage()} onChange={(e) => void setLanguage(e.target.value as LanguageChoice)}>
+            <NativeSelect id="language" value={chosenLanguage()} onChange={(e) => void changeLanguage(e.target.value as LanguageChoice, queryClient)}>
               <option value="auto">{t('Same as the browser')}</option>
               {LANGUAGES.map(language => <option key={language.code} value={language.code}>{language.name}</option>)}
             </NativeSelect>

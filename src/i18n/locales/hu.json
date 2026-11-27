@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Billentyűparancsok",
   "Installs it from GitHub, replacing this one.": "Telepíti a GitHubról, a jelenlegi helyére.",
   "Compact view": "Tömör nézet",
-  "Switch between table, compact and cards": "Váltás táblázat, tömör nézet és kártyák között"
+  "Switch between table, compact and cards": "Váltás táblázat, tömör nézet és kártyák között",
+  "{count} torrents added to qBittorrent": "{count} torrent hozzáadva a qBittorrenthez",
+  "Couldn't add {count} torrents": "{count} torrent nem adható hozzá",
+  "Selected results": "Kijelölt találatok",
+  "Add {count} torrents?": "Hozzáadsz {count} torrentet?",
+  "Couldn't change qBittorrent's language": "A qBittorrent nyelve nem módosítható"
 }

@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Arată scurtăturile",
   "Installs it from GitHub, replacing this one.": "O instalează de pe GitHub în locul acesteia.",
   "Compact view": "Vizualizare compactă",
-  "Switch between table, compact and cards": "Comută între tabel, vizualizare compactă și carduri"
+  "Switch between table, compact and cards": "Comută între tabel, vizualizare compactă și carduri",
+  "{count} torrents added to qBittorrent": "Torente adăugate în qBittorrent: {count}",
+  "Couldn't add {count} torrents": "Torente care nu au putut fi adăugate: {count}",
+  "Selected results": "Rezultate selectate",
+  "Add {count} torrents?": "Adaugi torentele ({count})?",
+  "Couldn't change qBittorrent's language": "Limba qBittorrent nu a putut fi schimbată"
 }

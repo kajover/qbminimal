@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { COLUMN_IDS, DEFAULT_COLUMN_LAYOUT, compareTorrents, moveColumn, parseColumnLayout, resizeColumn, shiftColumn, toggleColumn, trackerHost, visibleColumns } from './torrentColumns'
+import { COLUMN_IDS, DEFAULT_COLUMN_LAYOUT, compareTorrents, moveColumn, parseColumnLayout, resizeColumn, toggleColumn, trackerHost, visibleColumns } from './torrentColumns'
 import type { Torrent } from '@/types'
 
 describe('column layout', () => {
@@ -39,10 +39,9 @@ describe('column layout', () => {
     expect(toggleColumn(DEFAULT_COLUMN_LAYOUT, 'name')).toBe(DEFAULT_COLUMN_LAYOUT)
   })
 
-  it('moves columns by drag target or one step', () => {
+  it('moves a column to where it is dragged', () => {
     expect(moveColumn(DEFAULT_COLUMN_LAYOUT, 'ratio', 'name').order.slice(0, 3)).toEqual(['priority', 'ratio', 'name'])
-    expect(shiftColumn(DEFAULT_COLUMN_LAYOUT, 'size', -1).order.slice(0, 3)).toEqual(['priority', 'size', 'name'])
-    expect(shiftColumn(DEFAULT_COLUMN_LAYOUT, 'priority', -1)).toBe(DEFAULT_COLUMN_LAYOUT)
+    expect(moveColumn(DEFAULT_COLUMN_LAYOUT, 'ratio', 'ratio')).toBe(DEFAULT_COLUMN_LAYOUT)
   })
 
   it('keeps dates whole, even with a narrower saved width', () => {

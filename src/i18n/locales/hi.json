@@ -1409,5 +1409,10 @@
   "Show shortcuts": "शॉर्टकट दिखाएँ",
   "Installs it from GitHub, replacing this one.": "इसे GitHub से इंस्टॉल करता है, इस संस्करण की जगह।",
   "Compact view": "कॉम्पैक्ट व्यू",
-  "Switch between table, compact and cards": "टेबल, कॉम्पैक्ट और कार्ड के बीच बदलें"
+  "Switch between table, compact and cards": "टेबल, कॉम्पैक्ट और कार्ड के बीच बदलें",
+  "{count} torrents added to qBittorrent": "qBittorrent में {count} टोरेंट जोड़े गए",
+  "Couldn't add {count} torrents": "{count} टोरेंट जोड़े नहीं जा सके",
+  "Selected results": "चुने गए परिणाम",
+  "Add {count} torrents?": "{count} टोरेंट जोड़ें?",
+  "Couldn't change qBittorrent's language": "qBittorrent की भाषा बदली नहीं जा सकी"
 }

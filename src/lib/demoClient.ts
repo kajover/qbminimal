@@ -16,7 +16,8 @@ import type {
 } from '@/types'
 import type { ApiClient, LogLevels, QueueMove, SearchJob, SearchPlugin } from './api'
 import { isApiAtLeast } from './apiVersion'
-import type { MainDataUpdate } from './mainData'
+import { currentLanguage, qbittorrentLocale } from '@/i18n'
+import type { MainDataUpdate, ServerState } from './mainData'
 import { STAND_INS } from './incognito'
 import type { PrefDef } from './preferences'
 import type { ShareLimits } from './shareLimits'
@@ -31,12 +32,29 @@ const DEMO_SESSION_KEY = 'qbminimal.demoSession'
 const NOW = Math.floor(Date.now() / 1000)
 
 // Everyday log lines, enough that the Logs page scrolls.
-const DEMO_LOG_LINES = [
-  'UPnP / NAT-PMP support: ON', 'Peer ID: "-qB5230-"', 'Anonymous mode: OFF', 'Encryption support: ON',
-  'Detected external IP. IP: "203.0.113.7"', 'Peer exchange (PeX) support: ON', 'Local Peer Discovery support: ON',
-  'Distributed Hash Table (DHT) support: ON', 'Tracker is not reachable, retrying later', 'Added new torrent.',
-  'Torrent download finished.', 'Successfully moved torrent.', 'Restored torrent.', 'Removed torrent.',
-].flatMap((line, i, list) => [line, list[(i + 5) % list.length], list[(i + 9) % list.length]])
+// qBittorrent's own log messages, with %1, %2 for the parts it fills in. Like qBittorrent, the demo
+// writes each one in the language set when it's logged (see logText), so a change of language
+// shows in the entries that follow while the earlier ones stay as they were.
+type LogLine = [template: string, ...values: string[]]
+const DEMO_LOG_LINES: LogLine[] = ([
+  ['UPnP/NAT-PMP support: ON'], ['Peer ID: "%1"', '-qB5230-'], ['Anonymous mode: %1', 'OFF'], ['Encryption support: %1', 'ON'],
+  ['Detected external IP. IP: "%1"', '203.0.113.7'], ['Peer Exchange (PeX) support: %1', 'ON'], ['Local Peer Discovery support: %1', 'ON'],
+  ['Distributed Hash Table (DHT) support: %1', 'ON'], ['Removed tracker from torrent. Torrent: "%1". Tracker: "%2"', 'Sintel.2010.1080p.mkv', 'udp://tracker.example.org:6969/announce'],
+  ['Added new torrent. Torrent: "%1"', 'Fedora-Workstation-Live-43.iso'], ['Torrent download finished. Torrent: "%1"', 'debian-13.1.0-amd64-netinst.iso'],
+  ['Moved torrent successfully. Torrent: "%1". Destination: "%2"', 'Sintel.2010.1080p.mkv', '/downloads/movies'],
+  ['Restored torrent. Torrent: "%1"', 'debian-13.1.0-amd64-netinst.iso'], ['Detected external IP. IP: "%1"', '203.0.113.7'],
+] as LogLine[]).flatMap((line, i, list) => [line, list[(i + 5) % list.length], list[(i + 9) % list.length]])
+
+// A message in qBittorrent's language for that moment: its translations of these few messages,
+// loaded once a language other than English is set. Words it fills in (ON, OFF) are translated too.
+type LogTexts = Record<string, Record<string, string>>
+function logText(texts: LogTexts | null, locale: string, [template, ...values]: LogLine): string {
+  const own = texts?.[locale] ?? {}
+  return (own[template] ?? template).replace(/%(\d)/g, (whole, n: string) => {
+    const value = values[Number(n) - 1]
+    return value === undefined ? whole : own[value] ?? value
+  })
+}
 const GiB = 1024 ** 3
 const MiB = 1024 ** 2
 
@@ -93,7 +111,9 @@ function demoTorrents(): DemoTorrent[] {
       const movie = /\.mkv$|Blender/.test(name)
       return { ...seed, name, size: mb * MiB, category: movie ? 'Movies' : 'Linux', tags: movie ? 'open-movie' : 'iso' }
     }
-    return { ...seed, name: `${seed.name} (${Math.floor(i / SEED.length) + 1})` }
+    // Copies that are finished seed without uploading, as most torrents in a long list do, so each
+    // refresh changes only the active ones.
+    return { ...seed, name: `${seed.name} (${Math.floor(i / SEED.length) + 1})`, up: seed.progress >= 1 ? 0 : seed.up }
   })
 }
 
@@ -113,6 +133,20 @@ function computeHash(name: string): string {
     out += (h >>> 0).toString(16).padStart(8, '0')
   }
   return out.slice(0, 40)
+}
+
+// The fields of `next` that differ from `before`, or null when none do; all of them without `before`.
+function changedFields<T extends object>(before: T | undefined, next: T): Partial<T> | null {
+  if (!before) return next
+  const changed: Partial<T> = {}
+  let any = false
+  for (const key of Object.keys(next) as (keyof T)[]) {
+    if (before[key] !== next[key]) {
+      changed[key] = next[key]
+      any = true
+    }
+  }
+  return any ? changed : null
 }
 
 function toTorrent(t: DemoTorrent, jitter: number, queuePosition: number): Torrent {
@@ -199,6 +233,10 @@ class DemoClient implements ApiClient {
     { name: 'archive', fullName: 'Internet Archive', version: '2.3', enabled: false },
   ]
   private rid = 0
+  // Each change of qBittorrent's language and when it was made.
+  private locales: { at: number; locale: string }[] = []
+  // The language it ran in before the first change.
+  private startedIn: string | undefined
 
   private find = (hash: string) => this.torrents.find(t => fakeHash(t.name) === hash)
   // One pass over the torrents, so changing thousands at once stays quick.
@@ -228,13 +266,23 @@ class DemoClient implements ApiClient {
   async getProcessInfo() { return { launch_time: NOW - 26 * 3600 } }
   async shutdown() {}
 
+  // The demo's qBittorrent runs in the language the app shows, as if it always had, until the
+  // language is changed.
+  private startLocale = () => qbittorrentLocale(currentLanguage())
+
   async getPreferences() {
-    this.prefs ??= await samplePreferences()
+    this.prefs ??= { ...await samplePreferences(), locale: this.startLocale() }
     return { ...this.prefs, banned_IPs: this.banned.join('\n') }
   }
 
   async setPreferences(changes: Record<string, unknown>) {
-    this.prefs = { ...(this.prefs ?? await samplePreferences()), ...changes }
+    // A new language: qBittorrent loads it at once and says so in its log.
+    const before = (this.prefs ?? { locale: this.startLocale() }).locale
+    if (typeof changes.locale === 'string' && changes.locale !== before) {
+      this.startedIn ??= String(before)
+      this.locales.push({ at: Date.now() / 1000, locale: changes.locale })
+    }
+    this.prefs = { ...(this.prefs ?? { ...await samplePreferences(), locale: this.startLocale() }), ...changes }
     if (typeof changes.banned_IPs === 'string') this.banned = changes.banned_IPs.split('\n').filter(Boolean)
   }
 
@@ -252,30 +300,45 @@ class DemoClient implements ApiClient {
   async getInterfaceAddresses() { return ['192.0.2.10'] }
   async sendTestEmail() {}
 
-  async getMainData(): Promise<MainDataUpdate> {
+  // What the last update sent, so the next one sends only what changed, as qBittorrent does. A
+  // full list every time made every card and row draw again every two seconds.
+  private sent: { rid: number; torrents: Record<string, Torrent>; trackers: string; state: ServerState } | null = null
+
+  async getMainData(rid = 0): Promise<MainDataUpdate> {
     this.rid++
     // Speeds wobble by up to 15% either way.
     const jitter = 0.85 + Math.random() * 0.3
     const unfinished = this.torrents.filter(t => t.progress < 1)
-    const list = this.torrents.map(t => toTorrent(t, this.sessionPaused ? 0 : jitter, unfinished.indexOf(t) + 1))
+    const queue = new Map(unfinished.map((t, i) => [t, i + 1]))
+    const list = this.torrents.map(t => toTorrent(t, this.sessionPaused ? 0 : jitter, queue.get(t) ?? 0))
     const trackers: Record<string, string[]> = {}
     for (const t of list) (trackers[t.tracker] ??= []).push(t.hash)
     const dl = list.reduce((sum, t) => sum + t.dlspeed, 0)
     const ul = list.reduce((sum, t) => sum + t.upspeed, 0)
+    const state: ServerState = {
+      connection_status: 'connected', dht_nodes: 312, dl_info_speed: dl, up_info_speed: ul,
+      dl_info_data: 146 * GiB, up_info_data: 83 * GiB, dl_rate_limit: this.limits.down, up_rate_limit: this.limits.up,
+      free_space_on_disk: 512 * GiB, alltime_dl: 4.1 * 1024 * GiB, alltime_ul: 8.6 * 1024 * GiB, global_ratio: '2.10',
+      total_peer_connections: 46, use_alt_speed_limits: this.altSpeed, session_state: this.sessionPaused,
+      last_external_address_v4: '203.0.113.7', total_wasted_session: 212 * 1024 * 1024,
+      read_cache_hits: '0', read_cache_overload: '0', write_cache_overload: '0', total_buffers_size: 0,
+      queued_io_jobs: 0, average_time_queue: 0, total_queued_size: 0,
+    }
+    const torrents = Object.fromEntries(list.map(t => [t.hash, t]))
+    const trackersJson = JSON.stringify(trackers)
+    const previous = this.sent?.rid === rid && rid > 0 ? this.sent : null
+    this.sent = { rid: this.rid, torrents, trackers: trackersJson, state }
+    if (!previous) return { rid: this.rid, full_update: true, torrents, trackers, server_state: state }
     return {
       rid: this.rid,
-      full_update: true,
-      torrents: Object.fromEntries(list.map(t => [t.hash, t])),
-      trackers,
-      server_state: {
-        connection_status: 'connected', dht_nodes: 312, dl_info_speed: dl, up_info_speed: ul,
-        dl_info_data: 146 * GiB, up_info_data: 83 * GiB, dl_rate_limit: this.limits.down, up_rate_limit: this.limits.up,
-        free_space_on_disk: 512 * GiB, alltime_dl: 4.1 * 1024 * GiB, alltime_ul: 8.6 * 1024 * GiB, global_ratio: '2.10',
-        total_peer_connections: 46, use_alt_speed_limits: this.altSpeed, session_state: this.sessionPaused,
-        last_external_address_v4: '203.0.113.7', total_wasted_session: 212 * 1024 * 1024,
-        read_cache_hits: '0', read_cache_overload: '0', write_cache_overload: '0', total_buffers_size: 0,
-        queued_io_jobs: 0, average_time_queue: 0, total_queued_size: 0,
-      },
+      torrents: Object.fromEntries(list.flatMap(t => {
+        const before = previous.torrents[t.hash]
+        const changed = changedFields(before, t)
+        return changed ? [[t.hash, changed]] : []
+      })),
+      torrents_removed: Object.keys(previous.torrents).filter(hash => !torrents[hash]),
+      ...(trackersJson === previous.trackers ? {} : { trackers }),
+      server_state: changedFields(previous.state, state) ?? {},
     }
   }
 
@@ -523,15 +586,25 @@ class DemoClient implements ApiClient {
   async updateSearchPlugins() {}
 
   async getLogs(levels: LogLevels): Promise<LogEntry[]> {
+    // The language set at a moment: the one it started in until the first change.
+    const startedIn = this.startedIn ?? (this.prefs?.locale as string | undefined) ?? this.startLocale()
+    const localeAt = (time: number) => this.locales.findLast(change => change.at <= time)?.locale ?? startedIn
+    const texts = [startedIn, ...this.locales.map(change => change.locale)].some(locale => locale !== 'en') ? (await import('./demoLogTexts.json')).default as LogTexts : null
+    const line = (time: number, logLine: LogLine) => logText(texts, localeAt(time), logLine)
     const all: LogEntry[] = [
-      { id: 0, timestamp: NOW - 26 * 3600, type: 1, message: 'qBittorrent v5.2.3 started' },
-      { id: 1, timestamp: NOW - 26 * 3600 + 2, type: 2, message: 'Successfully listening on IP. IP: "0.0.0.0". Port: "TCP/51413"' },
-      { id: 2, timestamp: NOW - 600, type: 4, message: 'Tracker is not reachable, retrying later' },
-      ...DEMO_LOG_LINES.map((message, i) => ({ id: 3 + i, timestamp: NOW - 500 + i * 8, type: i % 9 === 4 ? 4 : 2, message })),
+      { id: 0, timestamp: NOW - 26 * 3600, type: 1, message: line(NOW - 26 * 3600, ['qBittorrent %1 started. Process ID: %2', 'v5.2.3', '4711']) },
+      { id: 1, timestamp: NOW - 26 * 3600 + 2, type: 2, message: line(NOW - 26 * 3600 + 2, ['Successfully listening on IP. IP: "%1". Port: "%2/%3"', '0.0.0.0', 'TCP', '51413']) },
+      ...DEMO_LOG_LINES.map((logLine, i) => ({ id: 2 + i, timestamp: NOW - 500 + i * 8, type: i % 9 === 4 ? 4 : 2, message: line(NOW - 500 + i * 8, logLine) })),
     ]
     // A new entry every 20 seconds, so the log moves as a real one does.
     const since = Math.floor((Date.now() / 1000 - NOW) / 20)
-    for (let i = 1; i <= since; i++) all.push({ id: 2 + DEMO_LOG_LINES.length + i, timestamp: NOW + i * 20, type: 2, message: DEMO_LOG_LINES[i % DEMO_LOG_LINES.length] })
+    for (let i = 1; i <= since; i++) {
+      const time = NOW + i * 20
+      all.push({ id: 1 + DEMO_LOG_LINES.length + i, timestamp: time, type: 2, message: line(time, DEMO_LOG_LINES[i % DEMO_LOG_LINES.length]) })
+    }
+    // Each change of language is logged when it's made, in the new language, as qBittorrent does.
+    this.locales.forEach(({ at, locale }, i) => all.push({ id: 1_000_000 + i, timestamp: Math.floor(at), type: 1, message: line(at, ['Load qBittorrent translation successful. Locale: %1.', locale]) }))
+    all.sort((a, b) => a.timestamp - b.timestamp || a.id - b.id)
     const wanted = { 1: levels.normal, 2: levels.info, 4: levels.warning, 8: levels.critical } as Record<number, boolean>
     return all.filter(entry => wanted[entry.type])
   }

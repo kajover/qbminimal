@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Tampilkan pintasan",
   "Installs it from GitHub, replacing this one.": "Menginstalnya dari GitHub, menggantikan versi ini.",
   "Compact view": "Tampilan ringkas",
-  "Switch between table, compact and cards": "Beralih antara tabel, tampilan ringkas, dan kartu"
+  "Switch between table, compact and cards": "Beralih antara tabel, tampilan ringkas, dan kartu",
+  "{count} torrents added to qBittorrent": "{count} torrent ditambahkan ke qBittorrent",
+  "Couldn't add {count} torrents": "Tidak dapat menambahkan {count} torrent",
+  "Selected results": "Hasil yang dipilih",
+  "Add {count} torrents?": "Tambahkan {count} torrent?",
+  "Couldn't change qBittorrent's language": "Tidak dapat mengubah bahasa qBittorrent"
 }

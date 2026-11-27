@@ -161,11 +161,16 @@ export function moveColumn(layout: ColumnLayout, id: ColumnId, target: ColumnId)
   return from === -1 || to === -1 ? layout : { ...layout, order }
 }
 
-// Moves a column one place left (-1) or right (1) among the visible ones.
-export function shiftColumn(layout: ColumnLayout, id: ColumnId, step: -1 | 1): ColumnLayout {
-  const visible = visibleColumns(layout).map(def => def.id)
-  const neighbour = visible[visible.indexOf(id) + step]
-  return neighbour ? moveColumn(layout, id, neighbour) : layout
+// The torrent table's columns as its Columns menu shows them; the name always shows.
+export function torrentColumnChoices(layout: ColumnLayout, onChange: (layout: ColumnLayout) => void) {
+  return {
+    order: layout.order,
+    shown: (id: ColumnId) => !layout.hidden.includes(id),
+    locked: 'name' as ColumnId,
+    label: (id: ColumnId) => getColumn(id).label,
+    onToggle: (id: ColumnId) => onChange(toggleColumn(layout, id)),
+    onMove: (id: ColumnId, target: ColumnId) => onChange(moveColumn(layout, id, target)),
+  }
 }
 
 export function resizeColumn(layout: ColumnLayout, id: ColumnId, width: number): ColumnLayout {

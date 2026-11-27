@@ -1,5 +1,8 @@
 import { useState, type ComponentType, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
-import { GripVertical } from 'lucide-react'
+import { Columns3, GripVertical, RotateCcw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator } from '@/components/ui/context-menu'
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n'
 
@@ -81,4 +84,58 @@ export function ColumnMenuItems<K extends string>({ order, shown, locked, label,
       </div>
     )
   })
+}
+
+// What a Columns menu shows and changes: every column in order, which ones show, and how they move.
+export interface ColumnChoices<K extends string> {
+  order: readonly K[]
+  shown: (key: K) => boolean
+  // The column that always shows.
+  locked?: K
+  label: (key: K) => string
+  onToggle: (key: K) => void
+  onMove: (key: K, target: K) => void
+}
+
+interface ColumnsMenuProps<K extends string> {
+  columns: ColumnChoices<K>
+  // Puts the columns, and the sort, back as they first were; greyed out when they are.
+  onReset: () => void
+  isDefault: boolean
+}
+
+const hint = () => t('Drag headers to reorder, or drag their edges to resize')
+
+// The Columns button above a table (Torrents and Search), with the same menu the column titles
+// open on a right-click (ColumnsContextMenu).
+export function ColumnsMenu<K extends string>({ columns, onReset, isDefault }: ColumnsMenuProps<K>) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon" className="size-8" aria-label={t('Columns')} title={t('Choose columns')}>
+          <Columns3 className="size-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="max-h-[70vh] w-60 overflow-y-auto">
+        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">{hint()}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <ColumnMenuItems {...columns} Item={DropdownMenuCheckboxItem} />
+        <DropdownMenuSeparator />
+        <DropdownMenuItem disabled={isDefault} onClick={onReset}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+// The menu a right-click on the column titles opens: the same as the Columns button's.
+export function ColumnsContextMenu<K extends string>({ columns, onReset, isDefault }: ColumnsMenuProps<K>) {
+  return (
+    <ContextMenuContent className="max-h-[70vh] w-60">
+      <ContextMenuLabel className="whitespace-normal text-xs font-normal text-muted-foreground">{hint()}</ContextMenuLabel>
+      <ContextMenuSeparator />
+      <ColumnMenuItems {...columns} Item={ContextMenuCheckboxItem} />
+      <ContextMenuSeparator />
+      <ContextMenuItem disabled={isDefault} onClick={onReset}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
+    </ContextMenuContent>
+  )
 }

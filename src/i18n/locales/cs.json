@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Ukázat zkratky",
   "Installs it from GitHub, replacing this one.": "Nainstaluje ji z GitHubu místo této.",
   "Compact view": "Kompaktní zobrazení",
-  "Switch between table, compact and cards": "Přepnout mezi tabulkou, kompaktním zobrazením a kartami"
+  "Switch between table, compact and cards": "Přepnout mezi tabulkou, kompaktním zobrazením a kartami",
+  "{count} torrents added to qBittorrent": "Přidáno do qBittorrentu – torrenty: {count}",
+  "Couldn't add {count} torrents": "Nepodařilo se přidat torrenty: {count}",
+  "Selected results": "Vybrané výsledky",
+  "Add {count} torrents?": "Přidat torrenty ({count})?",
+  "Couldn't change qBittorrent's language": "Jazyk qBittorrentu se nepodařilo změnit"
 }

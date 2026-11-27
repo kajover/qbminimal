@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { changeTags } from '@/lib/tagChanges'
 import { Check, FileCheck, Folder, Plus, Power, Tag as TagIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -12,6 +13,7 @@ import { moveToQueuePosition, planQueueMoves, queueLength } from '@/lib/queuePos
 import { toast } from '@/hooks/use-toast'
 import { qbitClient } from '@/lib/api'
 import { parseShareLimits, type ShareLimitMode } from '@/lib/shareLimits'
+import { ShareModeOptions } from './ShareLimitsForm'
 import { parseTags } from '@/lib/torrentFilters'
 import type { Torrent } from '@/types'
 import type { BulkPrompt } from './bulkActions'
@@ -155,10 +157,7 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
         const added = wanted.filter(tag => tagCounts.get(tag) !== torrents.length)
         const removed = [...tagCounts.keys()].filter(tag => !wanted.includes(tag) && !mixed.includes(tag))
         if (!added.length && !removed.length) return onClose()
-        return apply(async () => {
-          if (added.length) await qbitClient.addTags(hashes, added)
-          if (removed.length) await qbitClient.removeTags(hashes, removed)
-        }, t('Tags saved'), t('Failed to save tags'))
+        return apply(() => changeTags(hashes, added, removed), t('Tags saved'), t('Failed to save tags'))
       }
       case 'comment':
         return apply(() => qbitClient.setComment(hashes, value.trim()), t('Comment saved'), t('Failed to save comment'))
@@ -245,9 +244,7 @@ function PromptForm({ prompt, torrents, onClose }: { prompt: BulkPrompt; torrent
         {prompt === 'shareLimits' && (
           <div className="space-y-2">
             <NativeSelect aria-label={t('Seeding limits')} className="w-full" value={share.mode} onChange={(e) => setShare({ ...share, mode: e.target.value as ShareLimitMode })}>
-              <option value="global">{t('Use qBittorrent\'s global limits')}</option>
-              <option value="none">{t('No limit')}</option>
-              <option value="custom">{t('Custom limits')}</option>
+              <ShareModeOptions />
             </NativeSelect>
             {share.mode === 'custom' && (
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">

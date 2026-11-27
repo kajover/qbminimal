@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Sneltoetsen weergeven",
   "Installs it from GitHub, replacing this one.": "Installeert hem van GitHub in plaats van deze.",
   "Compact view": "Compacte weergave",
-  "Switch between table, compact and cards": "Wisselen tussen tabel, compacte weergave en kaarten"
+  "Switch between table, compact and cards": "Wisselen tussen tabel, compacte weergave en kaarten",
+  "{count} torrents added to qBittorrent": "{count} torrents toegevoegd aan qBittorrent",
+  "Couldn't add {count} torrents": "Kan {count} torrents niet toevoegen",
+  "Selected results": "Geselecteerde resultaten",
+  "Add {count} torrents?": "{count} torrents toevoegen?",
+  "Couldn't change qBittorrent's language": "Kan de taal van qBittorrent niet wijzigen"
 }

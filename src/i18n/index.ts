@@ -54,6 +54,13 @@ let current: LanguageCode = 'en'
 
 const isLanguage = (code: string | null): code is LanguageCode => LANGUAGES.some(language => language.code === code)
 
+// The language shown now.
+export const currentLanguage = (): LanguageCode => current
+
+// A language as qBittorrent's locale setting names it.
+const QBITTORRENT_LOCALES: Partial<Record<LanguageCode, string>> = { 'pt-BR': 'pt_BR', pt: 'pt_PT', 'zh-Hans': 'zh_CN', 'zh-Hant': 'zh_TW', hi: 'hi_IN' }
+export const qbittorrentLocale = (code: LanguageCode): string => QBITTORRENT_LOCALES[code] ?? code
+
 export function chosenLanguage(): LanguageChoice {
   const stored = readStored(STORAGE_KEY)
   return isLanguage(stored) ? stored : 'auto'

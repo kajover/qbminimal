@@ -1409,5 +1409,10 @@
   "Show shortcuts": "ショートカットを表示",
   "Installs it from GitHub, replacing this one.": "GitHub からインストールし、このバージョンと置き換えます。",
   "Compact view": "コンパクト表示",
-  "Switch between table, compact and cards": "テーブル、コンパクト、カードを切り替え"
+  "Switch between table, compact and cards": "テーブル、コンパクト、カードを切り替え",
+  "{count} torrents added to qBittorrent": "{count} 個のトレントを qBittorrent に追加しました",
+  "Couldn't add {count} torrents": "{count} 個のトレントを追加できませんでした",
+  "Selected results": "選択した結果",
+  "Add {count} torrents?": "{count} 個のトレントを追加しますか？",
+  "Couldn't change qBittorrent's language": "qBittorrent の言語を変更できませんでした"
 }

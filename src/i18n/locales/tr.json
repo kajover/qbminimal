@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Kısayolları göster",
   "Installs it from GitHub, replacing this one.": "GitHub'dan kurar ve bu sürümün yerini alır.",
   "Compact view": "Kompakt görünüm",
-  "Switch between table, compact and cards": "Tablo, kompakt görünüm ve kartlar arasında geç"
+  "Switch between table, compact and cards": "Tablo, kompakt görünüm ve kartlar arasında geç",
+  "{count} torrents added to qBittorrent": "{count} torrent qBittorrent'e eklendi",
+  "Couldn't add {count} torrents": "{count} torrent eklenemedi",
+  "Selected results": "Seçili sonuçlar",
+  "Add {count} torrents?": "{count} torrent eklensin mi?",
+  "Couldn't change qBittorrent's language": "qBittorrent'in dili değiştirilemedi"
 }

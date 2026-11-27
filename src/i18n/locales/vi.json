@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Hiện phím tắt",
   "Installs it from GitHub, replacing this one.": "Cài đặt từ GitHub, thay thế phiên bản này.",
   "Compact view": "Dạng gọn",
-  "Switch between table, compact and cards": "Chuyển giữa bảng, dạng gọn và thẻ"
+  "Switch between table, compact and cards": "Chuyển giữa bảng, dạng gọn và thẻ",
+  "{count} torrents added to qBittorrent": "Đã thêm {count} torrent vào qBittorrent",
+  "Couldn't add {count} torrents": "Không thể thêm {count} torrent",
+  "Selected results": "Kết quả đã chọn",
+  "Add {count} torrents?": "Thêm {count} torrent?",
+  "Couldn't change qBittorrent's language": "Không thể đổi ngôn ngữ của qBittorrent"
 }

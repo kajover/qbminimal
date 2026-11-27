@@ -51,9 +51,7 @@ export function ShareLimitsForm({ torrent, className }: { torrent: Torrent; clas
             onChange={(e) => setForm({ ...form, mode: e.target.value as ShareLimitMode })}
             className={cn(selectClass, 'w-full min-w-0 flex-1 @md:w-auto @md:max-w-full @md:flex-none')}
           >
-            <option value="global">{t('Use qBittorrent\'s global limits')}</option>
-            <option value="none">{t('No limit')}</option>
-            <option value="custom">{t('Custom limits')}</option>
+            <ShareModeOptions />
           </select>
           <Button type="submit" size="sm" variant="outline" className="h-7 shrink-0 gap-1 px-2 text-xs [&_svg:not([class*=size-])]:size-3.5" disabled={action.isPending}><Check />{t('Save')}</Button>
         </div>
@@ -115,5 +113,16 @@ export function ShareLimitsForm({ torrent, className }: { torrent: Torrent; clas
       )}
 
     </form>
+  )
+}
+
+// The choices for a torrent's seeding limits, for a drop-down.
+export function ShareModeOptions() {
+  return (
+    <>
+      <option value="global">{t('Use qBittorrent\'s global limits')}</option>
+      <option value="none">{t('No limit')}</option>
+      <option value="custom">{t('Custom limits')}</option>
+    </>
   )
 }

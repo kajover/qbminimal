@@ -19,7 +19,7 @@ qbminimal is licensed under the GNU General Public License v3.0. It includes or 
 | [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss), Copyright (c) Tailwind Labs, Inc. | Styles | MIT |
 | [country-flag-emoji-polyfill](https://github.com/talkjs/country-flag-emoji-polyfill), Copyright (c) 2022 TalkJS | Flag emoji on Windows | MIT |
 | Twemoji Country Flags font, from [Twemoji](https://github.com/twitter/twemoji), Copyright Twitter, Inc. and other contributors | Flag images, shipped with the polyfill above | CC-BY-4.0 |
-| Translations from [qBittorrent](https://github.com/qbittorrent/qBittorrent), Copyright the qBittorrent project and its translators | Some of the text and the torrent terms in `src/i18n`, taken from qBittorrent's Web UI and desktop translations | GPL-2.0-or-later |
+| Translations from [qBittorrent](https://github.com/qbittorrent/qBittorrent), Copyright the qBittorrent project and its translators | Some of the text and the torrent terms in `src/i18n`, and the demo's log messages in `src/lib/demoLogTexts.json`, taken from qBittorrent's Web UI and desktop translations | GPL-2.0-or-later |
 | [Silkscreen](https://github.com/googlefonts/silkscreen), Copyright 2001 The Silkscreen Project Authors | The "qBittorrent" title font | SIL Open Font License 1.1, see `src/assets/fonts/Silkscreen-OFL.txt` |
 
 ## Used only to build and test

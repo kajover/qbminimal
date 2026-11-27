@@ -1,20 +1,20 @@
 import { createElement, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react'
 import { textScale } from '@/lib/textSize'
 import { useRowWindow } from '@/hooks/useRowWindow'
-import { ArrowDown, ArrowUp, RotateCcw } from 'lucide-react'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Tooltip } from '@/components/ui/tooltip'
-import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
+import { ContextMenu, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { columnWidth, DEFAULT_COLUMN_LAYOUT, getColumn, isDefaultLayout, toggleColumn, moveColumn, resizeColumn, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
+import { columnWidth, DEFAULT_COLUMN_LAYOUT, getColumn, isDefaultLayout, moveColumn, resizeColumn, torrentColumnChoices, trackerHost, visibleColumns, type ColumnId, type ColumnLayout } from '@/lib/torrentColumns'
 import { getStateIcon } from '@/lib/stateIcons'
 import { DOWN_SPEED_COLOR, formatEta, getStateBadge, getStateColor, getStateLabel, stateLabels, UP_SPEED_COLOR, peerPair as pair } from '@/lib/torrentState'
 import type { SortDirection } from '@/lib/listSettings'
 import type { RowProps } from '@/hooks/useRowPress'
 import type { Torrent } from '@/types'
 import { useTransferInfo } from '@/hooks/useApi'
-import { ColumnMenuItems } from '@/components/ColumnMenuItems'
+import { ColumnsContextMenu } from '@/components/ColumnMenuItems'
 import { COMPACT_ROWS, fittedWidth, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
 import { ColumnFilterButton, SidebarFilterButton, type FilterTarget } from '@/components/ColumnFilters'
 import type { ColumnFilter, ColumnFilters } from '@/lib/columnFilters'
@@ -270,13 +270,7 @@ export function TorrentTable({ torrents, layout, onLayoutChange, onResetSort, se
           </tr>
         </thead>
         </ContextMenuTrigger>
-        <ContextMenuContent className="max-h-[70vh] w-60">
-          <ContextMenuLabel className="whitespace-normal text-xs font-normal text-muted-foreground">{t('Drag headers to reorder, or drag their edges to resize')}</ContextMenuLabel>
-          <ContextMenuSeparator />
-          <ColumnMenuItems order={layout.order} shown={id => !layout.hidden.includes(id)} locked="name" label={id => getColumn(id).label} onToggle={id => onLayoutChange(toggleColumn(layout, id))} onMove={(id, target) => onLayoutChange(moveColumn(layout, id, target))} Item={ContextMenuCheckboxItem} />
-          <ContextMenuSeparator />
-          <ContextMenuItem disabled={isDefaultLayout(layout) && defaultSort} onClick={() => { onLayoutChange(DEFAULT_COLUMN_LAYOUT); onResetSort() }}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
-        </ContextMenuContent>
+        <ColumnsContextMenu columns={torrentColumnChoices(layout, onLayoutChange)} isDefault={isDefaultLayout(layout) && defaultSort} onReset={() => { onLayoutChange(DEFAULT_COLUMN_LAYOUT); onResetSort() }} />
         </ContextMenu>
       </table>
       </div>

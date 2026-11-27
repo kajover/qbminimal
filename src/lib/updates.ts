@@ -101,10 +101,6 @@ export async function latestQbminimalRelease(): Promise<{ version: Version | nul
   return { version: parseVersion(release.tag_name), torrentUrl: torrentUrl?.startsWith('https://') ? torrentUrl : undefined }
 }
 
-export async function latestQbminimal(): Promise<Version | null> {
-  return (await latestQbminimalRelease()).version
-}
-
 export async function latestQbittorrent(): Promise<Version | null> {
   const tags = await getJson('https://api.github.com/repos/qbittorrent/qBittorrent/tags?per_page=100') as { name?: string }[]
   return newestRelease(tags.map(tag => tag.name ?? ''))

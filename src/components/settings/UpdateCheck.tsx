@@ -12,6 +12,9 @@ import { cancelInstall, getInstallState, setInstallState, startInstallControl, s
 import { countReleaseDownload, QBITTORRENT_DOWNLOADS, QBMINIMAL_RELEASES } from '@/lib/updates'
 import { t } from '@/i18n'
 
+// How long the full bar shows before the update counts as installed: its fill takes 300ms.
+const FINISH_MS = 600
+
 // Asks GitHub for the newest qbminimal and qBittorrent releases: by itself, in the background after
 // signing in at most every 12 hours (see Layout), or when the button is pressed. The last answer
 // stays on this device until the next check.
@@ -37,6 +40,10 @@ export function UpdateCheck() {
         onProgress: percent => setInstallState({ percent }), signal: control.signal, currentVersion: __APP_VERSION__,
         onAdded: () => countReleaseDownload(latestVersion),
       })
+      // The bar fills to the end and stays there a moment, so the notice never comes while it
+      // still shows part of the download (the last steps often take less than one poll).
+      setInstallState({ percent: 100 })
+      await new Promise(resolve => setTimeout(resolve, FINISH_MS))
       setInstallState({ percent: null, installed: true })
       // Stays until it's answered, so nothing typed elsewhere is lost to a reload.
       // Short: only where the old version stays is worth saying.
@@ -104,6 +111,11 @@ export function UpdateCheck() {
           </Button>
         </div>
       </div>
+      {installing !== null && (
+        <div aria-hidden className="h-1 overflow-hidden rounded-full bg-muted">
+          <div className="h-full rounded-full bg-primary transition-[width] duration-300" style={{ width: `${installing}%` }} />
+        </div>
+      )}
       {notice.latest && (
         <dl className="space-y-1 text-sm" aria-live="polite">
           {rows.map(([name, latest, newer, link]) => (

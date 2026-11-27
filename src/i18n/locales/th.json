@@ -1409,5 +1409,10 @@
   "Show shortcuts": "แสดงทางลัด",
   "Installs it from GitHub, replacing this one.": "ติดตั้งจาก GitHub แทนเวอร์ชันนี้",
   "Compact view": "มุมมองแบบกะทัดรัด",
-  "Switch between table, compact and cards": "สลับระหว่างตาราง แบบกะทัดรัด และการ์ด"
+  "Switch between table, compact and cards": "สลับระหว่างตาราง แบบกะทัดรัด และการ์ด",
+  "{count} torrents added to qBittorrent": "เพิ่ม {count} ทอร์เรนต์ใน qBittorrent แล้ว",
+  "Couldn't add {count} torrents": "เพิ่ม {count} ทอร์เรนต์ไม่ได้",
+  "Selected results": "ผลลัพธ์ที่เลือก",
+  "Add {count} torrents?": "เพิ่ม {count} ทอร์เรนต์หรือไม่?",
+  "Couldn't change qBittorrent's language": "เปลี่ยนภาษาของ qBittorrent ไม่ได้"
 }

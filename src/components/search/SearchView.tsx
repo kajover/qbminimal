@@ -1,6 +1,9 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useRemembered } from '@/hooks/useRemembered'
-import { Eraser, Loader2, PanelRight, Plus, Search, X } from 'lucide-react'
+import { Download, Eraser, Loader2, PanelRight, Plus, Search, X } from 'lucide-react'
+import { Tooltip } from '@/components/ui/tooltip'
+import { SelectionBar } from '@/components/torrents/SelectionBar'
+import { useSelection } from '@/hooks/useSelection'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { SearchInput } from '@/components/SearchInput'
@@ -21,6 +24,7 @@ import { cn } from '@/lib/utils'
 import type { SearchResult } from '@/types'
 import { SearchPluginsDialog } from './SearchPluginsDialog'
 import { SearchResults } from './SearchResults'
+import { resultKey } from '@/lib/searchFilters'
 import { SearchSidebar } from './SearchSidebar'
 import { t } from '@/i18n'
 import { withKeys } from '@/lib/shortcutKeys'
@@ -55,8 +59,41 @@ export function SearchView() {
   }
   const [pluginsOpen, setPluginsOpen] = useState(false)
   const [toolbarSlot, setToolbarSlot] = useState<HTMLDivElement | null>(null)
-  const [adding, setAdding] = useState<SearchResult | null>(null)
+  // The results asked to be added: one from its own button or card, or the ticked ones.
+  const [adding, setAdding] = useState<SearchResult[] | null>(null)
   const [addBusy, setAddBusy] = useState(false)
+  // Ticked results, kept while another page shows, and only for the search they were ticked in.
+  const [shownKeys, setShownKeys] = useState<string[]>([])
+  // The same list again keeps the old one, so drawing the results again doesn't start another round.
+  const onShown = useCallback((keys: string[]) => setShownKeys(current => (current.length === keys.length && current.every((key, i) => key === keys[i]) ? current : keys)), [])
+  const selection = useSelection(shownKeys, 'search.selected')
+  const [selectedFor, setSelectedFor] = useRemembered<number | null>('search.selectedFor', search.jobId ?? null)
+  if ((search.jobId ?? null) !== selectedFor) {
+    setSelectedFor(search.jobId ?? null)
+    if (selection.selected.size) selection.clear()
+  }
+  const selectedResults = useMemo(() => search.results.filter(result => selection.selected.has(resultKey(result))), [search.results, selection.selected])
+  const resultSelection = useMemo(() => ({
+    selected: selection.selected,
+    toggle: (key: string, range: boolean) => (range ? selection.extendTo(key) : selection.toggle(key)),
+    replace: selection.replace,
+    clear: selection.clear,
+  }), [selection])
+  const [barWidth, setBarWidth] = useState<number>()
+  const [barInHeader, setBarInHeader] = useState(false)
+  // Esc clears the ticks, as on the torrent list, unless a field or a dialog takes it.
+  const hasSelection = selectedResults.length > 0
+  const clearSelection = selection.clear
+  useEffect(() => {
+    if (!hasSelection) return
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null
+      if (event.key !== 'Escape' || event.defaultPrevented || target?.closest('input, textarea, select, [role="dialog"], [role="menu"]')) return
+      clearSelection()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [hasSelection, clearSelection])
 
 
   const enabled = (plugins ?? []).filter(plugin => plugin.enabled)
@@ -92,19 +129,51 @@ export function SearchView() {
   const sidebarLabel = narrowed ? t('Filters (on)') : t('Filters')
 
 
-  const add = async (result: SearchResult) => {
+  // Each one as qBittorrent's own search does: the plugin fetches the .torrent itself when it
+  // can, for sites that need its login. Added one after another; those that fail are told.
+  const add = async (results: SearchResult[]) => {
     setAddBusy(true)
-    try {
-      // The plugin fetches the .torrent itself when it can, for sites that need its login.
-      await (result.engineName ? qbitClient.downloadSearchTorrent(result.fileUrl, result.engineName) : qbitClient.addTorrentUrl(result.fileUrl))
-      toast.success(t('Added to qBittorrent'))
+    let failed = 0
+    let reason: string | undefined
+    for (const result of results) {
+      try {
+        await (result.engineName ? qbitClient.downloadSearchTorrent(result.fileUrl, result.engineName) : qbitClient.addTorrentUrl(result.fileUrl))
+      } catch (error) {
+        failed++
+        reason = error instanceof Error ? error.message : undefined
+      }
+    }
+    setAddBusy(false)
+    const added = results.length - failed
+    if (added) toast.success(results.length === 1 ? t('Added to qBittorrent') : t('{count} torrents added to qBittorrent', { count: added }))
+    if (failed) toast.error(results.length === 1 ? t('Couldn\'t add the torrent') : t('Couldn\'t add {count} torrents', { count: failed }), { description: reason })
+    if (!failed) {
       setAdding(null)
-    } catch (error) {
-      toast.error(t('Couldn\'t add the torrent'), { description: error instanceof Error ? error.message : undefined })
-    } finally {
-      setAddBusy(false)
+      if (results.length > 1) selection.clear()
     }
   }
+
+  const selectionBar = (inHeader: boolean, centered: boolean) => selectedResults.length > 0 && (
+    <SelectionBar
+      label={t('Selected results')}
+      inHeader={inHeader}
+      centered={centered}
+      onWidth={setBarWidth}
+      onPlace={setBarInHeader}
+      count={selectedResults.length}
+      total={shownKeys.length}
+      trailing={(
+        <>
+          <Tooltip label={t('Add')}>
+            <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Add')} onClick={() => setAdding(selectedResults)}><Download className="size-4" /></Button>
+          </Tooltip>
+          <Tooltip label={`${t('Clear selection')} (Esc)`}>
+            <Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label={t('Clear selection')} onClick={selection.clear}><X className="size-4" /></Button>
+          </Tooltip>
+        </>
+      )}
+    />
+  )
 
   const sidebar = (
     <SearchSidebar
@@ -135,6 +204,8 @@ export function SearchView() {
           a search too so the view can be picked first. The sidebar button comes last. */}
       <PageHeader
         title={t('Search')}
+        middle={selectionBar}
+        middleWidth={barWidth}
         actions={(
           <>
             <div ref={setToolbarSlot} className="flex items-center gap-1" />
@@ -171,8 +242,10 @@ export function SearchView() {
       <div className={cn('frame:flex frame:min-h-0 frame:flex-1', sidebarOpen && sideBySide && 'flex items-start gap-4 frame:items-stretch')}>
         {!sideBySide && <FilterSheet open={sheetOpen} onOpenChange={setSheetOpen} list={resultsColumn}>{sidebar}</FilterSheet>}
         <div ref={setResultsColumn} className="flex min-w-0 flex-1 flex-col gap-4 frame:min-h-0">
-          <SearchResults searchId={search.jobId ?? null} results={search.results} onAdd={setAdding} toolbarSlot={toolbarSlot} filters={filters} onFilterChange={setFilter} />
+          <SearchResults searchId={search.jobId ?? null} results={search.results} onAdd={(result) => setAdding([result])} toolbarSlot={toolbarSlot} filters={filters} onFilterChange={setFilter} selection={resultSelection} onShown={onShown} />
           {search.results.length === 0 && search.searched && !search.running && <p className="py-8 text-center text-sm text-muted-foreground">{t('Nothing found')}</p>}
+          {/* Room for the selection bar above the tab bar, so it never covers the last card. */}
+          {hasSelection && !barInHeader && <div aria-hidden className="h-10 shrink-0 wide:hidden" />}
         </div>
         {sidebarOpen && sideBySide && (
           <aside aria-label={t('Filters')} className="sticky top-0 max-h-[calc(100dvh-var(--header-height,3rem)-2rem)] w-72 shrink-0 overflow-y-auto rounded-xl border bg-card p-3 window-scroll:top-[calc(var(--header-height,3rem)+1rem)] window-scroll:max-h-[calc(100dvh-var(--header-height,3rem)-var(--bottom-nav-height,0px)-2rem)]">
@@ -189,13 +262,23 @@ export function SearchView() {
       <Dialog open={!!adding} onOpenChange={(open) => !open && setAdding(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('Add this torrent?')}</DialogTitle>
+            <DialogTitle>{adding && adding.length > 1 ? t('Add {count} torrents?', { count: adding.length }) : t('Add this torrent?')}</DialogTitle>
             <DialogDescription>{t('qBittorrent downloads it with your default settings.')}</DialogDescription>
           </DialogHeader>
-          {adding && (
-            <div className="space-y-1 text-sm">
-              <p className="font-medium wrap-anywhere">{adding.fileName}</p>
-              <p className="text-muted-foreground">{formatBytes(adding.fileSize)} · {t('{seeds} seeds · {leeches} leeches', { seeds: adding.nbSeeders, leeches: adding.nbLeechers })}</p>
+          {adding?.length === 1 && (
+            // One line each, clipped where the window is too narrow; hovering gives the whole name.
+            // min-w-0, so the dialog's grid lets the line shrink below the name's width.
+            <div className="min-w-0 space-y-1 text-sm">
+              <p className="truncate font-medium" title={adding[0].fileName}>{adding[0].fileName}</p>
+              <p className="text-muted-foreground">{formatBytes(adding[0].fileSize)} · {t('{seeds} seeds · {leeches} leeches', { seeds: adding[0].nbSeeders, leeches: adding[0].nbLeechers })}</p>
+            </div>
+          )}
+          {adding && adding.length > 1 && (
+            <div className="min-w-0 space-y-1 text-sm">
+              <ul className="max-h-48 space-y-1 overflow-y-auto">
+                {adding.map(result => <li key={resultKey(result)} className="truncate" title={result.fileName}>{result.fileName}</li>)}
+              </ul>
+              <p className="text-muted-foreground">{formatBytes(adding.reduce((sum, result) => sum + Math.max(result.fileSize, 0), 0))}</p>
             </div>
           )}
           <DialogFooter>

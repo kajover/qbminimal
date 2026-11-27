@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRemembered } from '@/hooks/useRemembered'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { ROOM_FOR_TABLE } from '@/lib/pageScroll'
-import { DEFAULT_LIST_SETTINGS, loadListSettings, NEXT_VIEW, saveListSettings, type ListView, type ShownView, type SortDirection, type SortField } from '@/lib/listSettings'
+import { DEFAULT_LIST_SETTINGS, loadListSettings, NEXT_VIEW, saveListSettings, type ListView, type SortDirection, type SortField } from '@/lib/listSettings'
 import { compareTorrents, TORRENT_FILTER_COLUMNS } from '@/lib/torrentColumns'
 import { activeCount, applyColumnFilters, loadColumnFilters, saveColumnFilters, withFilter, type ColumnFilter } from '@/lib/columnFilters'
 import { countFilterOptions, cycleChoice, excludeChoice, filterTorrents, searchTorrents, withoutSidebarColumns, groupTrackersByHost, hasSidebarFilters, NO_FILTERS, type FilterList, type TorrentFilters } from '@/lib/torrentFilters'
@@ -50,7 +50,18 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
   const counts = useMemo(() => countFilterOptions(torrents, hosts), [torrents, hosts])
 
   const shown = view === 'auto' ? (roomy ? 'table' : 'cards') : view
-  const chooseView = (next: ShownView) => setView(next === (roomy ? 'table' : 'cards') ? 'auto' : next)
+  // The next view after the one in effect, so two quick clicks go two steps. Back to following the
+  // screen ('auto') when the next one is what the screen would show anyway.
+  // The cards then start again from the first few, which draw at once, so they show before the
+  // next click even in a long list (drawing them all made quick clicks seem to skip them).
+  const switchView = () => {
+    setView(current => {
+      const fallback = roomy ? 'table' : 'cards'
+      const next = NEXT_VIEW[current === 'auto' ? fallback : current]
+      return next === fallback ? 'auto' : next
+    })
+    restart()
+  }
 
   const matching = useMemo(() => {
     const sign = sort.direction === 'asc' ? 1 : -1
@@ -141,8 +152,7 @@ export function useTorrentList(torrents: Torrent[], trackerMap: Record<string, s
     showTable: shown !== 'cards',
     compact: shown === 'compact',
     // Back to following the screen when that's the view it would pick.
-    chooseView,
-    switchView: () => chooseView(NEXT_VIEW[shown]),
+    switchView,
     matching,
     restarts,
   }

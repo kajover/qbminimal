@@ -1409,5 +1409,10 @@
   "Show shortcuts": "단축키 표시",
   "Installs it from GitHub, replacing this one.": "GitHub에서 설치하여 이 버전을 대체합니다.",
   "Compact view": "간단히 보기",
-  "Switch between table, compact and cards": "표, 간단히 보기, 카드 전환"
+  "Switch between table, compact and cards": "표, 간단히 보기, 카드 전환",
+  "{count} torrents added to qBittorrent": "토렌트 {count}개를 qBittorrent에 추가함",
+  "Couldn't add {count} torrents": "토렌트 {count}개를 추가하지 못했습니다",
+  "Selected results": "선택한 결과",
+  "Add {count} torrents?": "토렌트 {count}개를 추가할까요?",
+  "Couldn't change qBittorrent's language": "qBittorrent 언어를 변경하지 못했습니다"
 }

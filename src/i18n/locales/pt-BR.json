@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Mostrar atalhos",
   "Installs it from GitHub, replacing this one.": "Instala a partir do GitHub, substituindo esta.",
   "Compact view": "Visualização compacta",
-  "Switch between table, compact and cards": "Alternar entre tabela, visualização compacta e cartões"
+  "Switch between table, compact and cards": "Alternar entre tabela, visualização compacta e cartões",
+  "{count} torrents added to qBittorrent": "Torrents adicionados ao qBittorrent: {count}",
+  "Couldn't add {count} torrents": "Não foi possível adicionar torrents: {count}",
+  "Selected results": "Resultados selecionados",
+  "Add {count} torrents?": "Adicionar torrents ({count})?",
+  "Couldn't change qBittorrent's language": "Não foi possível alterar o idioma do qBittorrent"
 }

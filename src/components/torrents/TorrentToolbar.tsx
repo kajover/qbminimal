@@ -1,13 +1,13 @@
-import { ArrowUpDown, Columns3, PanelRight, Plus, RotateCcw, Search } from 'lucide-react'
+import { ArrowUpDown, PanelRight, Plus, RotateCcw, Search } from 'lucide-react'
 import { ViewSwitch } from '@/components/ViewSwitch'
 import { SearchInput } from '@/components/SearchInput'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import type { TorrentList } from '@/hooks/useTorrentList'
 import type { SortField } from '@/lib/listSettings'
-import { DEFAULT_COLUMN_LAYOUT, getColumn, isDefaultLayout, moveColumn, toggleColumn, type ColumnLayout } from '@/lib/torrentColumns'
-import { ColumnMenuItems } from '@/components/ColumnMenuItems'
+import { DEFAULT_COLUMN_LAYOUT, getColumn, isDefaultLayout, torrentColumnChoices, type ColumnLayout } from '@/lib/torrentColumns'
+import { ColumnsMenu } from '@/components/ColumnMenuItems'
 import { t } from '@/i18n'
 import { withKeys } from '@/lib/shortcutKeys'
 import { ROOM_FOR_HEADER_SEARCH } from '@/lib/pageScroll'
@@ -81,20 +81,7 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen,
       <AddTorrentButton onAdd={onAdd} />
 
       {list.showTable ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="size-8" aria-label={t('Columns')} title={t('Choose columns')}>
-              <Columns3 className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="max-h-[70vh] w-60 overflow-y-auto">
-            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">{t('Drag headers to reorder, or drag their edges to resize')}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <ColumnMenuItems order={columns.order} shown={id => !columns.hidden.includes(id)} locked="name" label={id => getColumn(id).label} onToggle={id => onColumnsChange(toggleColumn(columns, id))} onMove={(id, target) => onColumnsChange(moveColumn(columns, id, target))} Item={DropdownMenuCheckboxItem} />
-            <DropdownMenuSeparator />
-            <DropdownMenuItem disabled={isDefaultLayout(columns) && defaultSort} onClick={() => { onColumnsChange(DEFAULT_COLUMN_LAYOUT); list.resetSort() }}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ColumnsMenu columns={torrentColumnChoices(columns, onColumnsChange)} isDefault={isDefaultLayout(columns) && defaultSort} onReset={() => { onColumnsChange(DEFAULT_COLUMN_LAYOUT); list.resetSort() }} />
       ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -120,7 +107,7 @@ export function TorrentToolbar({ list, filtersOpen, onToggleFilters, searchOpen,
         </DropdownMenu>
       )}
 
-      <ViewSwitch shown={list.shown} onChoose={list.chooseView} />
+      <ViewSwitch shown={list.shown} onNext={list.switchView} />
       {/* Last, at the edge where the filter sidebar opens. */}
       <Button variant={filtersOpen ? 'secondary' : 'outline'} size="icon" className="relative size-8" aria-label={list.narrowed ? t('Search and filter (filters on)') : t('Search and filter')} title={withKeys(list.narrowed ? t('Search and filter (filters on)') : t('Search and filter'), 'F')} aria-expanded={filtersOpen} aria-controls="torrent-filters" onClick={onToggleFilters}>
         {/* Opens the filter sidebar. */}

@@ -4,18 +4,20 @@ import { pageScroller, ROOM_FOR_TABLE, WIDE } from '@/lib/pageScroll'
 import { useGrowingList } from '@/hooks/useGrowingList'
 import { useRowWindow } from '@/hooks/useRowWindow'
 import { createPortal } from 'react-dom'
-import { ArrowDown, ArrowUp, ArrowUpDown, CircleCheck, Columns3, RotateCcw, Download, ExternalLink } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, CircleCheck, RotateCcw, Download, ExternalLink } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
 import { ViewSwitch } from '@/components/ViewSwitch'
+import { NEXT_VIEW } from '@/lib/listSettings'
 import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ColumnFilterButton, type FilterTarget } from '@/components/ColumnFilters'
-import { ColumnMenuItems } from '@/components/ColumnMenuItems'
+import { ColumnsContextMenu, ColumnsMenu, type ColumnChoices } from '@/components/ColumnMenuItems'
 import { canMeasureText, COMPACT_ROWS, fittedWidth, moveInOrder, textWidth, useColumnDrag, useColumnResize } from '@/components/TableColumns'
-import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
+import { ContextMenu, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { searchFilterTargets } from '@/lib/searchFilters'
-import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loadSearchHidden, loadSearchOrder, loadSearchView, saveSearchOrder, SEARCH_SORT_KEYS, saveSearchView, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey, type SearchView, type SearchWidths } from '@/lib/searchSettings'
+import { DEFAULT_SEARCH_HIDDEN, DEFAULT_SEARCH_SORT, FALLBACK_SEARCH_WIDTHS, loadSearchHidden, loadSearchOrder, loadSearchView, saveSearchOrder, SEARCH_SORT_KEYS, saveSearchView, loadSearchWidths, MIN_SEARCH_WIDTH, saveSearchHidden, saveSearchWidths, type ResizableSearchColumn as ResizableKey, type SearchSort, type SearchSortKey as SortKey, type SearchWidths } from '@/lib/searchSettings'
 import { applyColumnFilters, type ColumnFilter, type ColumnFilters } from '@/lib/columnFilters'
-import { published, SEARCH_FILTER_COLUMNS } from '@/lib/searchFilters'
+import { published, resultKey, SEARCH_FILTER_COLUMNS } from '@/lib/searchFilters'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useAddedMatcher } from '@/hooks/useApi'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -36,6 +38,8 @@ const COLUMNS: { key: SortKey; label: string; numeric?: boolean; className?: str
 ]
 
 const ACTIONS_WIDTH = 96
+// The tick box column at the start, as on the torrent table.
+const SELECT_WIDTH = 40
 // The name never fits into less than this, so narrow screens scroll the table instead.
 const MIN_NAME_WIDTH = 240
 // Cell padding, and in the titles also the sort arrow and filter button beside the label.
@@ -70,9 +74,50 @@ function AddedMark() {
   )
 }
 
+// Selected results, kept by the page, which adds them.
+export interface ResultSelection {
+  selected: ReadonlySet<string>
+  // With Shift, everything from the last one picked.
+  toggle: (key: string, range: boolean) => void
+  replace: (keys: string[]) => void
+  clear: () => void
+}
+
+// A card in the list. A tap anywhere on it ticks it, like its box; only its add icon asks to add it.
+function ResultCard({ result, details, isSelected, showCheckbox, added, links, onToggle }: {
+  result: SearchResult
+  // Size, plugin and date, as far as their columns are shown.
+  details: string
+  isSelected: boolean
+  // As on the torrent cards: always with a mouse, on touch screens once one is ticked.
+  showCheckbox: boolean
+  added: boolean
+  links: ReactNode
+  onToggle: (key: string, range: boolean) => void
+}) {
+  const key = resultKey(result)
+  // Results without a .torrent link can't be added, so they don't tick either.
+  const toggle = (range: boolean) => { if (result.fileUrl) onToggle(key, range) }
+  return (
+    <li className={cn('flex items-start gap-2 rounded-xl border bg-card px-3 py-2.5', isSelected && 'border-primary ring-1 ring-inset ring-primary')}>
+      {showCheckbox && result.fileUrl && (
+        <Checkbox className="mt-0.5" aria-label={t('Select {name}', { name: result.fileName })} checked={isSelected} onClick={(e) => { e.preventDefault(); toggle(e.shiftKey) }} />
+      )}
+      {/* For screen readers the box above does the ticking; this is the larger place to tap. */}
+      <button type="button" tabIndex={-1} aria-hidden className="min-w-0 flex-1 text-start" onClick={(e) => toggle(e.shiftKey)}>
+        <span className="block text-xs text-muted-foreground">{t('{seeds} seeds · {leeches} leeches', { seeds: result.nbSeeders, leeches: result.nbLeechers })}</span>
+        {/* One line, clipped; hovering, or the add prompt, gives the whole name. */}
+        <span className="block truncate text-sm" title={result.fileName}>{added && <AddedMark />}{result.fileName}</span>
+        <span className="block truncate text-xs text-muted-foreground">{details}</span>
+      </button>
+      {links}
+    </li>
+  )
+}
+
 // Found torrents, sortable, 50 a page unless chosen otherwise: a table on wide screens and a list on phones.
 
-export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, onFilterChange }: {
+export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, onFilterChange, selection, onShown }: {
   // The search shown: another one starts again at the top, sorted by seeds.
   searchId: number | null
   results: SearchResult[]
@@ -82,6 +127,9 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   onFilterChange: (id: string, filter: ColumnFilter | null) => void
   // Where the filter, columns or sort, and view buttons go: the page header's button row.
   toolbarSlot?: HTMLElement | null
+  selection: ResultSelection
+  // The results shown, in their order, which ranges and select all go by.
+  onShown: (keys: string[]) => void
 }) {
   // Each search starts with the most seeds first; a sort picked here lasts for this search, also
   // while another page shows.
@@ -122,12 +170,18 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   // Outside the frame the table scrolls on its own, so the page starts at its top: the cards'
   // scroll would otherwise leave the column titles above the screen.
   useEffect(() => { if (!framed && showTable) pageScroller().scrollTo(0, 0) }, [framed, showTable])
-  const chooseView = (next: SearchView) => {
-    // Back to following the screen when the pick matches it.
-    const saved = next === (roomy ? 'table' : 'cards') ? null : next
-    setViewState(saved)
-    saveSearchView(saved)
+  // The next view after the one in effect, so two quick clicks go two steps. Back to following the
+  // screen (null) when the next one is what the screen would show anyway.
+  // The cards then start again from the first few, which draw at once (see the torrent list).
+  const switchView = () => {
+    setViewState(current => {
+      const fallback = roomy ? 'table' : 'cards'
+      const next = NEXT_VIEW[current ?? fallback]
+      return next === fallback ? null : next
+    })
+    restart()
   }
+  useEffect(() => { saveSearchView(view) }, [view])
 
   // Like the torrent table: a column is resized from its right edge, and the table scrolls sideways
   // when the columns are wider than the screen. Until then each fits its content and the name takes
@@ -160,7 +214,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   })
   const resize = useColumnResize<SortKey>({
     widthOf: (key): number => (key === 'fileName' && widths.fileName === undefined && tableWidth > 0
-      ? Math.max(MIN_NAME_WIDTH, tableWidth - others() - ACTIONS_WIDTH)
+      ? Math.max(MIN_NAME_WIDTH, tableWidth - others() - ACTIONS_WIDTH - SELECT_WIDTH)
       : widths[key] ?? fitted[key] ?? FALLBACK_SEARCH_WIDTHS[key]),
     minWidthOf: () => MIN_SEARCH_WIDTH,
     onResize: saveWidth,
@@ -173,13 +227,14 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   const widthOf: (key: SortKey) => number = resize.width
   // The other columns' widths, which the name's share of the table leaves room for.
   const others = (): number => visible.reduce((sum, c) => sum + (c.key === 'fileName' ? 0 : widthOf(c.key)), 0)
-  const total = ACTIONS_WIDTH + visible.reduce((sum, c) => sum + widthOf(c.key), 0)
+  const total = SELECT_WIDTH + ACTIONS_WIDTH + visible.reduce((sum, c) => sum + widthOf(c.key), 0)
   const drag = useColumnDrag<SortKey>({ keys: visible.map(c => c.key), onMove: (key, target) => setOrder(moveInOrder(order, key, target)), busy: resize.busy })
   // The titles sit in a table of their own, so they stay in view below the header while the rows
   // scroll sideways along with them.
   const syncScroll = () => { if (head.current && scroller.current) head.current.scrollLeft = scroller.current.scrollLeft }
   const colgroup = (
     <colgroup>
+      <col style={{ width: SELECT_WIDTH }} />
       {visible.map(c => <col key={c.key} style={{ width: widthOf(c.key) }} />)}
       <col style={{ width: ACTIONS_WIDTH }} />
       {/* Takes any room left over, so the columns keep their widths. */}
@@ -201,6 +256,17 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
       return sort.desc ? -order : order
     })
   }, [results, sort, filters])
+
+  // Ranges and select all go by the results shown, in their order.
+  useEffect(() => { onShown(sorted.filter(result => result.fileUrl).map(resultKey)) }, [sorted, onShown])
+  const { selected, toggle } = selection
+  const shownSelected = useMemo(() => sorted.reduce((sum, result) => sum + (selected.has(resultKey(result)) ? 1 : 0), 0), [sorted, selected])
+  const addable = useMemo(() => sorted.filter(result => result.fileUrl).length, [sorted])
+  const allState: boolean | 'indeterminate' = shownSelected === 0 ? false : shownSelected >= addable ? true : 'indeterminate'
+  // Tick boxes on the cards: always with a mouse, on touch screens once one is ticked.
+  const mouse = useMediaQuery('(pointer: fine)')
+  // As on the torrent table: with some ticked a click clears, the next one ticks all.
+  const selectAll = () => (allState === false ? selection.replace(sorted.filter(result => result.fileUrl).map(resultKey)) : selection.clear())
 
   // The table draws only the rows in view; the cards draw in batches as the list scrolls.
   const rows = useRowWindow(scroller, showTable ? sorted.length : 0)
@@ -235,11 +301,10 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   )
 
   // The Columns menu, also opened by right-clicking a column title, as on the torrent list.
-  const columnsHint = t('Drag headers to reorder, or drag their edges to resize')
-  const columnItems = {
+  const columnItems: ColumnChoices<SortKey> = {
     order,
     shown: (key: SortKey) => key === 'fileName' || shows(key as ResizableKey),
-    locked: 'fileName' as SortKey,
+    locked: 'fileName',
     label: (key: SortKey) => COLUMNS.find(c => c.key === key)!.label,
     onToggle: (key: SortKey) => { if (key !== 'fileName') toggleColumn(key as ResizableKey) },
     onMove: (key: SortKey, target: SortKey) => setOrder(moveInOrder(order, key, target)),
@@ -254,22 +319,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
   const toolbar = (
     <>
         {/* As on the torrent list: columns or sort, then the view. The sidebar button follows. */}
-        {showTable && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="size-8" aria-label={t('Columns')} title={t('Choose columns')}>
-              <Columns3 className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-60">
-            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">{columnsHint}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <ColumnMenuItems {...columnItems} Item={DropdownMenuCheckboxItem} />
-            <DropdownMenuSeparator />
-            <DropdownMenuItem disabled={columnsDefault} onClick={resetColumns}><RotateCcw className="size-4" />{t('Reset columns')}</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        )}
+        {showTable && <ColumnsMenu columns={columnItems} onReset={resetColumns} isDefault={columnsDefault} />}
         {/* The table sorts from its titles; the cards from here. */}
         <div className={cn('contents', showTable && 'hidden')}>
         {/* Like the torrent cards' sort: pick a column, and pick it again to reverse the order. */}
@@ -294,7 +344,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
           </DropdownMenuContent>
         </DropdownMenu>
         </div>
-        <ViewSwitch shown={shown} onChoose={chooseView} pageKey />
+        <ViewSwitch shown={shown} onNext={switchView} pageKey />
     </>
   )
 
@@ -327,6 +377,13 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
             <ContextMenuTrigger asChild>
             <thead>
               <tr>
+                <th className="px-2 align-middle">
+                  <Tooltip label={allState === false ? t('Select all') : t('Clear selection')}>
+                    <span className="inline-flex">
+                      <Checkbox aria-label={allState === false ? t('Select all') : t('Clear selection')} checked={allState} onCheckedChange={selectAll} />
+                    </span>
+                  </Tooltip>
+                </th>
                 {visible.map(c => {
                   const { className: dragClass, ...dragProps } = drag.titleProps(c.key)
                   return (
@@ -351,13 +408,7 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
               </tr>
             </thead>
             </ContextMenuTrigger>
-            <ContextMenuContent className="max-h-[70vh] w-60">
-              <ContextMenuLabel className="whitespace-normal text-xs font-normal text-muted-foreground">{columnsHint}</ContextMenuLabel>
-              <ContextMenuSeparator />
-              <ColumnMenuItems {...columnItems} Item={ContextMenuCheckboxItem} />
-              <ContextMenuSeparator />
-              <ContextMenuItem disabled={columnsDefault} onClick={resetColumns}><RotateCcw />{t('Reset columns')}</ContextMenuItem>
-            </ContextMenuContent>
+            <ColumnsContextMenu columns={columnItems} onReset={resetColumns} isDefault={columnsDefault} />
             </ContextMenu>
           </table>
         </div>
@@ -368,8 +419,17 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
               {/* Space for the rows above and below those drawn, so the scrollbar is as for all of them. */}
               {rows.before > 0 && <tr aria-hidden style={{ height: rows.before }} />}
               {sorted.slice(rows.start, rows.end).map(result => (
-                // Only its add button asks to add it, so a click to read or select a name doesn't.
-                <tr key={`${result.fileUrl}|${result.descrLink}`} className="border-b last:border-0 hover:bg-muted/50">
+                // Only its add button asks to add it; a click elsewhere ticks it, as on the torrent table.
+                <tr
+                  key={resultKey(result)}
+                  onClick={(e) => { if (result.fileUrl && !window.getSelection()?.toString()) toggle(resultKey(result), e.shiftKey) }}
+                  className={cn('border-b last:border-0', result.fileUrl && 'cursor-pointer', selected.has(resultKey(result)) ? 'bg-primary/10 hover:bg-primary/15' : 'hover:bg-muted/50')}
+                >
+                  <td className="px-2 py-1.5">
+                    {result.fileUrl && (
+                      <Checkbox aria-label={t('Select {name}', { name: result.fileName })} checked={selected.has(resultKey(result))} onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(resultKey(result), e.shiftKey) }} />
+                    )}
+                  </td>
                   {visible.map(c => (
                     <td key={c.key} className={cn('truncate px-2 py-1.5 whitespace-nowrap', c.className)} title={c.key === 'fileName' ? result.fileName : undefined}>
                       {/* Numbers, sizes and dates read left to right, also in a right-to-left language. */}
@@ -393,17 +453,16 @@ export function SearchResults({ searchId, results, onAdd, toolbarSlot, filters, 
       <div className={cn('relative mb-[var(--toolbar-room,0px)] frame:-m-1 frame:min-h-0 frame:overflow-y-auto frame:p-1 frame:pb-2 frame:[clip-path:inset(0_0_4px_0)]', showTable && 'hidden')}>
       <ul data-list-edge className="grid grid-cols-1 items-start gap-2 max-sm:-mx-2 lg:grid-cols-2 2xl:grid-cols-3">
         {(showTable ? [] : growing.shown).map(result => (
-          <li key={`${result.fileUrl}|${result.descrLink}`} className="flex items-start gap-2 rounded-xl border bg-card px-3 py-2.5">
-            <button type="button" className="min-w-0 flex-1 text-start" onClick={() => result.fileUrl && onAdd(result)}>
-              <span className="block text-xs text-muted-foreground">{t('{seeds} seeds · {leeches} leeches', { seeds: result.nbSeeders, leeches: result.nbLeechers })}</span>
-              {/* One line, clipped; hovering, or the add prompt a tap opens, gives the whole name. */}
-              <span className="block truncate text-sm" title={result.fileName}>{isAdded(result) && <AddedMark />}{result.fileName}</span>
-              <span className="block truncate text-xs text-muted-foreground">
-                {[shows('fileSize') && formatBytes(result.fileSize), shows('engineName') && result.engineName, shows('pubDate') && published(result) > 0 && formatDateTime(published(result))].filter(Boolean).join(' · ')}
-              </span>
-            </button>
-            {links(result)}
-          </li>
+          <ResultCard
+            key={resultKey(result)}
+            result={result}
+            details={[shows('fileSize') && formatBytes(result.fileSize), shows('engineName') && result.engineName, shows('pubDate') && published(result) > 0 && formatDateTime(published(result))].filter(Boolean).join(' · ')}
+            isSelected={selected.has(resultKey(result))}
+            showCheckbox={mouse || selected.size > 0}
+            added={isAdded(result)}
+            links={links(result)}
+            onToggle={toggle}
+          />
         ))}
       </ul>
       {!showTable && growing.endMarker}

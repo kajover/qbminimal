@@ -22,6 +22,7 @@ const api = vi.hoisted(() => {
     deleteSearch: vi.fn(async (id: number) => { state.searches = state.searches.filter(search => search.id !== id) }),
     getSearchStatus: vi.fn(async () => api.state.searches),
     getSearchResults: vi.fn(async () => ({ results, status: state.status })),
+    downloadSearchTorrent: vi.fn(async () => undefined),
   }
 })
 
@@ -68,7 +69,7 @@ describe('search', () => {
     await search()
     await screen.findAllByText('ubuntu-desktop.iso')
     const titles = within(screen.getAllByRole('table')[0]).getAllByRole('columnheader').map(th => th.textContent?.trim())
-    expect(titles).toEqual(['Name', 'Size', 'Seeds', 'Leeches', 'Plugin', 'Actions'])
+    expect(titles).toEqual(['', 'Name', 'Size', 'Seeds', 'Leeches', 'Plugin', 'Actions'])
   })
 
   it('searches with every enabled plugin, filters results by plugin, and searches again in a category', async () => {
@@ -250,5 +251,59 @@ describe('search', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Fill in this field')
     expect(api.startSearch).not.toHaveBeenCalled()
+  })
+
+  it('adds the ticked results together', async () => {
+    renderView()
+    await search()
+    await screen.findAllByText('ubuntu-desktop.iso')
+    for (const name of ['ubuntu-desktop.iso', 'ubuntu-server.iso']) {
+      await userEvent.click(screen.getAllByRole('checkbox', { name: `Select ${name}` })[0])
+    }
+    const bar = screen.getByRole('toolbar', { name: 'Selected results' })
+    await userEvent.click(within(bar).getByRole('button', { name: 'Add' }))
+    expect(screen.getByRole('heading', { name: 'Add 2 torrents?' })).toBeInTheDocument()
+    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Add' }))
+    await waitFor(() => expect(api.downloadSearchTorrent).toHaveBeenCalledTimes(2))
+    expect(api.downloadSearchTorrent).toHaveBeenCalledWith('https://example.org/1.torrent', 'demo')
+    await waitFor(() => expect(screen.queryByRole('toolbar', { name: 'Selected results' })).not.toBeInTheDocument())
+  })
+
+  it('ticks a card when it is tapped, and asks to add only from its add icon', async () => {
+    localStorage.setItem('qbminimal.searchView', 'cards')
+    renderView()
+    await search()
+    await userEvent.click(await screen.findByText('ubuntu-server.iso'))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Select ubuntu-server.iso' })).toBeChecked()
+    expect(screen.getByRole('toolbar', { name: 'Selected results' })).toBeInTheDocument()
+    await userEvent.click(screen.getByText('ubuntu-server.iso'))
+    expect(screen.getByRole('checkbox', { name: 'Select ubuntu-server.iso' })).not.toBeChecked()
+    await userEvent.click(screen.getByRole('button', { name: 'Add ubuntu-desktop.iso' }))
+    expect(screen.getByRole('heading', { name: 'Add this torrent?' })).toBeInTheDocument()
+    localStorage.removeItem('qbminimal.searchView')
+  })
+
+  it('shows the cards\' tick boxes on touch screens only once one is ticked', async () => {
+    const real = window.matchMedia
+    // A touch screen: no fine pointer, everything else as in the other tests.
+    window.matchMedia = ((query: string) => ({ ...real(query), matches: /min-width:/.test(query) })) as typeof window.matchMedia
+    localStorage.setItem('qbminimal.searchView', 'cards')
+    try {
+      renderView()
+      await search()
+      // The cards only: the table's select-all box is there too, hidden by the styles.
+      const cards = () => within(screen.getByText('ubuntu-server.iso').closest('ul')!)
+      await screen.findByText('ubuntu-server.iso')
+      expect(cards().queryAllByRole('checkbox')).toHaveLength(0)
+      await userEvent.click(screen.getByText('ubuntu-server.iso'))
+      expect(screen.getByRole('checkbox', { name: 'Select ubuntu-server.iso' })).toBeChecked()
+      expect(screen.getByRole('checkbox', { name: 'Select ubuntu-desktop.iso' })).not.toBeChecked()
+      await userEvent.click(screen.getByText('ubuntu-server.iso'))
+      expect(cards().queryAllByRole('checkbox')).toHaveLength(0)
+    } finally {
+      window.matchMedia = real
+      localStorage.removeItem('qbminimal.searchView')
+    }
   })
 })

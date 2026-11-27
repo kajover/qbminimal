@@ -1409,5 +1409,10 @@
   "Show shortcuts": "نمایش میان‌برها",
   "Installs it from GitHub, replacing this one.": "آن را از GitHub به‌جای این نسخه نصب می‌کند.",
   "Compact view": "نمای فشرده",
-  "Switch between table, compact and cards": "جابه‌جایی بین جدول، نمای فشرده و کارت"
+  "Switch between table, compact and cards": "جابه‌جایی بین جدول، نمای فشرده و کارت",
+  "{count} torrents added to qBittorrent": "{count} تورنت به qBittorrent افزوده شد",
+  "Couldn't add {count} torrents": "افزودن {count} تورنت ممکن نبود",
+  "Selected results": "نتایج انتخاب‌شده",
+  "Add {count} torrents?": "{count} تورنت افزوده شود؟",
+  "Couldn't change qBittorrent's language": "تغییر زبان qBittorrent ممکن نبود"
 }

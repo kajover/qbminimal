@@ -110,6 +110,12 @@
     @apply border-border outline-ring/50;
   }
 
+  /* Two quick taps on a control are two taps, not Safari's double-tap zoom, which swallowed the
+     second one (the view button stepped only once). Pinch zoom still works. */
+  button, a, input, select, textarea, label, summary, [role="button"], [role="tab"], [role="checkbox"], [role="menuitem"] {
+    touch-action: manipulation;
+  }
+
   /* The browser's own scrollbars never show: they took room even when hidden, a blank strip over
      the table's last column. Scrolling works as ever (wheel, trackpad, keys, touch); with a mouse,
      a thin scrollbar of our own appears over the content where it's wanted (src/lib/scrollbars.ts). */

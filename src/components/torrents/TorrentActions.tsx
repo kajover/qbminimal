@@ -1,4 +1,5 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
+import { changeTags } from '@/lib/tagChanges'
 import { ArrowDown, ArrowDownToLine, ArrowLeftRight, ArrowUp, ArrowUpToLine, Check, FileCheck, List, FolderInput, Megaphone, Pause, Play, Trash2, Rocket, WandSparkles, Zap, type LucideIcon } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
@@ -160,10 +161,7 @@ export function TorrentActions({ torrent, onDelete }: { torrent: Torrent; onDele
     const next = parseTags(tags)
     const added = next.filter(tag => !current.includes(tag))
     const removed = current.filter(tag => !next.includes(tag))
-    return run(async () => {
-      if (added.length) await qbitClient.addTags(hashes, added)
-      if (removed.length) await qbitClient.removeTags(hashes, removed)
-    }, t('Tags saved'), t('Failed to save tags'))
+    return run(() => changeTags(hashes, added, removed), t('Tags saved'), t('Failed to save tags'))
   }
 
   return (

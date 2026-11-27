@@ -1409,5 +1409,10 @@
   "Show shortcuts": "أظهر الاختصارات",
   "Installs it from GitHub, replacing this one.": "يثبّتها من GitHub بدلًا من هذه النسخة.",
   "Compact view": "عرض مضغوط",
-  "Switch between table, compact and cards": "التبديل بين الجدول والعرض المضغوط والبطاقات"
+  "Switch between table, compact and cards": "التبديل بين الجدول والعرض المضغوط والبطاقات",
+  "{count} torrents added to qBittorrent": "تمت إضافة {count} تورنت إلى qBittorrent",
+  "Couldn't add {count} torrents": "تعذرت إضافة {count} تورنت",
+  "Selected results": "النتائج المحددة",
+  "Add {count} torrents?": "إضافة {count} تورنت؟",
+  "Couldn't change qBittorrent's language": "تعذر تغيير لغة qBittorrent"
 }

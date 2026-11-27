@@ -1409,5 +1409,10 @@
   "Show shortcuts": "Visa kortkommandon",
   "Installs it from GitHub, replacing this one.": "Installerar den från GitHub i stället för denna.",
   "Compact view": "Kompakt vy",
-  "Switch between table, compact and cards": "Växla mellan tabell, kompakt vy och kort"
+  "Switch between table, compact and cards": "Växla mellan tabell, kompakt vy och kort",
+  "{count} torrents added to qBittorrent": "Torrenter tillagda i qBittorrent: {count}",
+  "Couldn't add {count} torrents": "Kunde inte lägga till torrenter: {count}",
+  "Selected results": "Markerade resultat",
+  "Add {count} torrents?": "Lägga till torrenter ({count})?",
+  "Couldn't change qBittorrent's language": "Kunde inte ändra språk i qBittorrent"
 }

@@ -20,3 +20,6 @@ export const SEARCH_FILTER_COLUMNS: FilterColumn<SearchResult>[] = [
 export function searchFilterTargets(results: SearchResult[]): FilterTarget[] {
   return SEARCH_FILTER_COLUMNS.map(column => ({ ...column, options: column.kind === 'set' ? () => choiceOptions(results, column) : undefined }))
 }
+
+// Each result's key, for selecting it: the same torrent can be found by two plugins.
+export const resultKey = (result: SearchResult) => `${result.fileUrl}|${result.descrLink}`
